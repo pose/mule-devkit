@@ -47,7 +47,6 @@ import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Type;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
-import org.mule.devkit.model.code.WhileLoop;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
@@ -110,7 +109,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         FieldVariable messageProcessor = generateFieldForMessageProcessorListener(messageSourceClass);
 
         FieldVariable stopSourceCallback = null;
-        if( executableElement.getReturnType().toString().contains("StopSourceCallback") ) {
+        if (executableElement.getReturnType().toString().contains("StopSourceCallback")) {
             stopSourceCallback = messageSourceClass.field(Modifier.PRIVATE, ref(StopSourceCallback.class), "stopSourceCallback");
         }
 
@@ -193,14 +192,13 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
     private void generateRunMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> connectFields, FieldVariable object, FieldVariable muleContext, DefinedClass poolObjectClass, FieldVariable flowConstruct, FieldVariable stopSourceCallback) {
         String methodName = executableElement.getSimpleName().toString();
-        Source sourceAnnotation = executableElement.getAnnotation(Source.class);
         Method run = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "run");
         run.javadoc().add("Implementation {@link Runnable#run()} that will invoke the method on the pojo that this message source wraps.");
 
-        generateSourceExecution(run.body(), executableElement, fields, connectFields, object, muleContext, poolObjectClass, flowConstruct, methodName, sourceAnnotation, stopSourceCallback);
+        generateSourceExecution(run.body(), executableElement, fields, connectFields, object, muleContext, poolObjectClass, flowConstruct, methodName, stopSourceCallback);
     }
 
-    private void generateSourceExecution(Block body, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> connectFields, FieldVariable object, FieldVariable muleContext, DefinedClass poolObjectClass, FieldVariable flowConstruct, String methodName, Source sourceAnnotation, FieldVariable stopSourceCallback) {
+    private void generateSourceExecution(Block body, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> connectFields, FieldVariable object, FieldVariable muleContext, DefinedClass poolObjectClass, FieldVariable flowConstruct, String methodName, FieldVariable stopSourceCallback) {
         DefinedClass moduleObjectClass = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey((TypeElement) executableElement.getEnclosingElement()));
         Variable moduleObject = body.decl(moduleObjectClass, "castedModuleObject", ExpressionFactory._null());
 
@@ -229,11 +227,6 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         }
 
         TryStatement callSource = body._try();
-
-        if (sourceAnnotation.primaryNodeOnly()) {
-            WhileLoop ifNotPrimary = callSource.body()._while(Op.not(muleContext.invoke("isPrimaryPollingInstance")));
-            ifNotPrimary.body().add(ref(Thread.class).staticInvoke("sleep").arg(ExpressionFactory.lit(5000)));
-        }
 
         findConfig(callSource.body(), muleContext, object, methodName, null, moduleObjectClass, moduleObject);
 
@@ -329,15 +322,10 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
             methodCall.arg(parameters.get(i));
         }
 
-        if( executableElement.getReturnType().toString().contains("StopSourceCallback") ) {
+        if (executableElement.getReturnType().toString().contains("StopSourceCallback")) {
             callSource.body().assign(stopSourceCallback, methodCall);
         } else {
             callSource.body().add(methodCall);
-        }
-
-        if (sourceAnnotation.primaryNodeOnly()) {
-            // catch interrupted exception and do nothing
-            callSource._catch(ref(InterruptedException.class));
         }
 
         CatchBlock catchMessagingException = callSource._catch(ref(MessagingException.class));
@@ -404,12 +392,11 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
     private void generateNoThreadStartMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> connectFields, FieldVariable object, FieldVariable muleContext, DefinedClass poolObjectClass, FieldVariable flowConstruct, FieldVariable stopSourceCallback) {
         String methodName = executableElement.getSimpleName().toString();
-        Source sourceAnnotation = executableElement.getAnnotation(Source.class);
         Method start = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "start");
         start.javadoc().add("Method to be called when Mule instance gets started.");
         start._throws(ref(MuleException.class));
 
-        generateSourceExecution(start.body(), executableElement, fields, connectFields, object, muleContext, poolObjectClass, flowConstruct, methodName, sourceAnnotation, stopSourceCallback);
+        generateSourceExecution(start.body(), executableElement, fields, connectFields, object, muleContext, poolObjectClass, flowConstruct, methodName, stopSourceCallback);
     }
 
 
@@ -419,7 +406,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         stop.javadoc().add("Method to be called when Mule instance gets stopped.");
         stop._throws(ref(MuleException.class));
 
-        if( stopSourceCallback != null ) {
+        if (stopSourceCallback != null) {
             Conditional ifStopCallbackNotNull = stop.body()._if(Op.ne(stopSourceCallback, ExpressionFactory._null()));
             TryStatement tryToStop = ifStopCallbackNotNull._then()._try();
             tryToStop.body().add(stopSourceCallback.invoke("stop"));

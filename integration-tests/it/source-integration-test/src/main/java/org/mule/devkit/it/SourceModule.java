@@ -27,7 +27,7 @@ import org.mule.api.callback.SourceCallback;
 import java.util.HashMap;
 import java.util.Map;
 
-@Module(name = "source")
+@Module(name = "source", minMuleVersion="3.3")
 public class SourceModule {
 
     @Source(threadingModel = SourceThreadingModel.NONE)

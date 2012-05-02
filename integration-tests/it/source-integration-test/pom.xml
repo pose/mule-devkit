@@ -9,8 +9,8 @@
     <name>Mule DevKit Source Integration Tests</name>
 
     <properties>
-        <mule.version>@mule.version@</mule.version>
-        <devkit.version>@project.version@</devkit.version>
+        <mule.version>3.3.0-EA</mule.version>
+        <devkit.version>3.3-SNAPSHOT</devkit.version>
     </properties>
 
     <build>
@@ -155,6 +155,11 @@
             <id>codehaus-snaphosts</id>
             <name>Codehaus Snapshots</name>
             <url>http://snapshots.repository.codehaus.org/</url>
+        </repository>
+		<repository>
+            <id>codehaus-releases</id>
+            <name>Codehaus Releases</name>
+            <url>http://repository.codehaus.org/</url>
         </repository>
     </repositories>
 </project>
