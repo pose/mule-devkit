@@ -10,7 +10,7 @@
 
     <properties>
         <mule.version>3.3.0-RC4-SNAPSHOT</mule.version>
-        <devkit.version>3.3-SNAPSHOT</devkit.version>
+        <devkit.version>3.4-SNAPSHOT</devkit.version>
     </properties>
 
     <build>
