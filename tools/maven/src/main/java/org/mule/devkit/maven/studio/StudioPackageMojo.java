@@ -58,6 +58,13 @@ public class StudioPackageMojo extends AbstractMuleMojo {
     @MojoParameter(expression = "${licensePath}")
     private String licensePath;
 
+
+    @MojoParameter(expression = "${storepass}")
+    private String storepass;
+
+    @MojoParameter(expression = "${keypass}")
+    private String keypass;
+
     @MojoComponent
     private P2ApplicationLauncher launcher;
 
@@ -129,9 +136,24 @@ public class StudioPackageMojo extends AbstractMuleMojo {
         ArrayList<String> options = new ArrayList<String>();
         options.add("-keystore");
         options.add(keystorePath);
+
+        if ( storepass != null )
+        {
+            options.add("-storepass");
+            options.add(storepass);
+        }
+
+        if ( keypass != null )
+        {
+            options.add("-keypass");
+            options.add(keypass);
+        }
+
         options.add("-verbose");
         options.add(path);
         options.add(alias);
+
+
 
          return options;
     }
