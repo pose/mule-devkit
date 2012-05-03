@@ -19,11 +19,11 @@
 
     <groupId>org.mule.tools.devkit</groupId>
     <artifactId>mule-devkit</artifactId>
-    <version>3.3-SNAPSHOT</version>
+    <version>3.4-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
-        <mule.version>3.3.0-RC3</mule.version>
+        <mule.version>3.3.0-EA</mule.version>
         <jdk.version>1.6</jdk.version>
     </properties>
 
@@ -208,6 +208,11 @@
             <id>codehaus-snaphosts</id>
             <name>Codehaus Snapshots</name>
             <url>http://snapshots.repository.codehaus.org/</url>
+        </repository>
+        <repository>
+            <id>codehaus-releases</id>
+            <name>Codehaus Releases</name>
+            <url>http://repository.codehaus.org/</url>
         </repository>
     </repositories>
 

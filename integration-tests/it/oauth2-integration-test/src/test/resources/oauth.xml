@@ -73,7 +73,7 @@
     </flow>
 
     <flow name="accessToken">
-        <http:inbound-endpoint host="localhost" port="9098" path="accessToken" exchange-pattern="request-response"/>
+        <http:inbound-endpoint host="localhost" port="${http.port}" path="accessToken" exchange-pattern="request-response"/>
         <component class="org.mule.devkit.it.AccessTokenComponent"/>
     </flow>
 

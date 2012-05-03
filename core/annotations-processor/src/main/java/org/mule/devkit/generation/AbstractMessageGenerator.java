@@ -28,6 +28,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
+import org.mule.api.annotations.Source;
 import org.mule.api.callback.HttpCallback;
 import org.mule.api.callback.SourceCallback;
 import org.mule.api.construct.FlowConstruct;
@@ -42,6 +43,7 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.RegistrationException;
+import org.mule.api.source.ClusterizableMessageSource;
 import org.mule.api.source.MessageSource;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
@@ -472,31 +474,25 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     protected DefinedClass getMessageSourceClass(ExecutableElement executableElement, boolean runnable) {
         String beanDefinitionParserName = context.getNameUtils().generateClassName(executableElement, NamingContants.MESSAGE_SOURCE_CLASS_NAME_SUFFIX);
         Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(beanDefinitionParserName) + NamingContants.MESSAGE_SOURCE_NAMESPACE);
+        ArrayList<Class> inherits = new ArrayList<Class>();
+        inherits.add(MuleContextAware.class);
+        inherits.add(Startable.class);
+        inherits.add(Stoppable.class);
+        inherits.add(Initialisable.class);
+        inherits.add(SourceCallback.class);
+        inherits.add(FlowConstructAware.class);
 
-        Class[] inherits;
         if (runnable) {
-            inherits = new Class[]{
-                    MuleContextAware.class,
-                    Startable.class,
-                    Stoppable.class,
-                    Runnable.class,
-                    Initialisable.class,
-                    MessageSource.class,
-                    SourceCallback.class,
-                    FlowConstructAware.class};
-        } else {
-            inherits = new Class[]{
-                    MuleContextAware.class,
-                    Startable.class,
-                    Stoppable.class,
-                    Initialisable.class,
-                    MessageSource.class,
-                    SourceCallback.class,
-                    FlowConstructAware.class};
-
+            inherits.add(Runnable.class);
         }
 
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(beanDefinitionParserName), inherits);
+        if( executableElement.getAnnotation(Source.class).primaryNodeOnly() ) {
+            inherits.add(ClusterizableMessageSource.class);
+        } else {
+            inherits.add(MessageSource.class);
+        }
+
+        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(beanDefinitionParserName), inherits.toArray( new Class<?>[] {} ));
 
         return clazz;
     }

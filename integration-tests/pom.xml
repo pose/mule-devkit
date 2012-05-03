@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.mule.tools.devkit</groupId>
         <artifactId>mule-devkit</artifactId>
-        <version>3.3-SNAPSHOT</version>
+        <version>3.4-SNAPSHOT</version>
     </parent>
 
     <name>Mule DevKit Integration Tests</name>
@@ -57,7 +57,8 @@
                         <include>target/test-classes/**/transformer-archetype.properties</include>
                         <include>target/test-classes/**/generic-archetype.properties</include>
                         <include>target/test-classes/**/mule-app-archetype.properties</include>
-                        <include>target/classes/**/*OAuth*</include>
+                        <include>target/integration-tests/**/Constants.java</include>
+                        <include>target/integration-tests/**/maven.properties</include>
                     </includes>
                     <replacements>
                         <replacement>

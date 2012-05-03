@@ -75,12 +75,12 @@
     </flow>
 
     <flow name="requestToken">
-        <http:inbound-endpoint host="localhost" port="9098" path="requestToken" exchange-pattern="request-response"/>
+        <http:inbound-endpoint host="localhost" port="${http.port}" path="requestToken" exchange-pattern="request-response"/>
         <component class="org.mule.devkit.it.RequestTokenComponent"/>
     </flow>
 
     <flow name="accessToken">
-        <http:inbound-endpoint host="localhost" port="9098" path="accessToken" exchange-pattern="request-response"/>
+        <http:inbound-endpoint host="localhost" port="${http.port}" path="accessToken" exchange-pattern="request-response"/>
         <component class="org.mule.devkit.it.AccessTokenComponent"/>
     </flow>
 

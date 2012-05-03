@@ -39,6 +39,24 @@ public class SourceValidator implements Validator {
 
         for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Source.class)) {
 
+            if (method.getAnnotation(Source.class).primaryNodeOnly()) {
+                String[] expectedMinVersion = new String[]{"3", "3"};
+                String minMuleVersion = typeElement.minMuleVersion();
+                if (minMuleVersion.contains("-")) {
+                    minMuleVersion = minMuleVersion.split("-")[0];
+                }
+                String[] minMuleVersions = minMuleVersion.split("\\.");
+                for (int i = 0; (i < expectedMinVersion.length); i++) {
+                    try {
+                        if (Integer.parseInt(minMuleVersions[i]) < Integer.parseInt(expectedMinVersion[i])) {
+                            throw new ValidationException(method, "The attribute primaryNodeOnly works with Mule 3.3 only therefore you must set the minMuleVersion of your @Connector or @Module to \"3.3\". Example: @Module(minMuleVersion=\"3.3\")");
+                        }
+                    } catch (NumberFormatException nfe) {
+                        throw new ValidationException(method, "Error parsing Mule version, verify that the minMuleVersion is in the correct format: X.X.X");
+                    }
+                }
+            }
+
             if (method.getModifiers().contains(Modifier.STATIC)) {
                 throw new ValidationException(method, "@Source cannot be applied to a static method");
             }

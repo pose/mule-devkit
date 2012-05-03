@@ -23,5 +23,5 @@ public class Constants {
     public static final String OAUTH_VERIFIER = "3333";
     public static final String ACCESS_TOKEN = "444";
     public static final String ACCESS_TOKEN_SECRET = "555";
-    public static final int OAUTH_ENDPOINTS_PORT = 9098;
+    public static final int OAUTH_ENDPOINTS_PORT = @http.port@;
 }
