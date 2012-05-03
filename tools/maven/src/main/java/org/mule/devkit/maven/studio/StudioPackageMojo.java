@@ -29,9 +29,10 @@ import sun.security.tools.JarSigner;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -211,11 +212,11 @@ public class StudioPackageMojo extends AbstractMuleMojo {
         
     }
 
-
     private String buildQualifier() {
-        Calendar calendar = Calendar.getInstance();
-        return String.valueOf(calendar.get(Calendar.YEAR)) + calendar.get(Calendar.MONTH) + calendar.get(Calendar.DATE) +
-                calendar.get(Calendar.HOUR) + calendar.get(Calendar.MINUTE);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
+
+        return sdf.format(new Date());
     }
 
 
