@@ -83,17 +83,9 @@ public abstract class BaseStudioXmlBuilder {
     }
 
     protected Group createGroupWithModeSwitch(List<ExecutableElement> methods) {
-        List<ModeElementType> modes = new ArrayList<ModeElementType>();
-        for (ExecutableElement method : methods) {
-            ModeElementType mode = new ModeElementType();
-            String methodName = method.getSimpleName().toString();
-            mode.setModeId(MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + nameUtils.uncamel(methodName));
-            mode.setModeLabel(StringUtils.capitalize(helper.getFriendlyName(method)));
-            modes.add(mode);
-        }
-
+       
         ModeType modeSwitch = new ModeType();
-        modeSwitch.getMode().addAll(modes);
+        modeSwitch.getMode().addAll(this.getModes(methods));
         modeSwitch.setCaption(helper.formatCaption("Operation"));
         modeSwitch.setName(StringUtils.capitalize(moduleName) + " operations to execute");
         modeSwitch.setDescription(helper.formatDescription("Operation"));
@@ -103,6 +95,19 @@ public abstract class BaseStudioXmlBuilder {
         group.getRegexpOrEncodingOrModeSwitch().add(objectFactory.createGroupModeSwitch(modeSwitch));
         group.setCaption(helper.formatCaption(MuleStudioEditorXmlGenerator.GROUP_DEFAULT_CAPTION));
         return group;
+    }
+    
+    protected List<ModeElementType> getModes(List<ExecutableElement> methods) {
+		 List<ModeElementType> modes = new ArrayList<ModeElementType>();
+	     for (ExecutableElement method : methods) {
+	         ModeElementType mode = new ModeElementType();
+	         String methodName = method.getSimpleName().toString();
+	         mode.setModeId(MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + nameUtils.uncamel(methodName));
+	         mode.setModeLabel(StringUtils.capitalize(helper.getFriendlyName(method)));
+	         modes.add(mode);
+	     }
+	     
+	     return modes;
     }
 
     protected BaseStudioXmlBuilder(GeneratorContext context, ExecutableElement executableElement, DevKitTypeElement typeElement) {

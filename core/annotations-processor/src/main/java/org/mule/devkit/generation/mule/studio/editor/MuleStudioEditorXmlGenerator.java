@@ -17,9 +17,15 @@
 
 package org.mule.devkit.generation.mule.studio.editor;
 
+import java.util.List;
+
+import javax.lang.model.element.ExecutableElement;
+
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
+import org.mule.api.annotations.oauth.OAuth;
+import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.studio.EndpointType;
@@ -27,9 +33,6 @@ import org.mule.devkit.model.studio.GlobalType;
 import org.mule.devkit.model.studio.NamespaceType;
 import org.mule.devkit.model.studio.ObjectFactory;
 import org.mule.devkit.model.studio.PatternType;
-
-import javax.lang.model.element.ExecutableElement;
-import java.util.List;
 
 public class MuleStudioEditorXmlGenerator extends AbstractMessageGenerator {
 
@@ -50,18 +53,23 @@ public class MuleStudioEditorXmlGenerator extends AbstractMessageGenerator {
     @Override
     protected void doGenerate(DevKitTypeElement typeElement) {
         String moduleName = typeElement.name();
+        boolean isOAuth = typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class);
 
         NamespaceType namespace = new NamespaceType();
         namespace.setPrefix(moduleName);
         namespace.setUrl(URI_PREFIX + moduleName);
 
+        PatternTypeOperationsBuilder operationsBuilder = isOAuth
+        				? new OAuthPatternTypeOperationsBuilder(context, typeElement, PatternTypes.CLOUD_CONNECTOR)
+        				: new PatternTypeOperationsBuilder(context, typeElement, PatternTypes.CLOUD_CONNECTOR);
+        
         GlobalType globalCloudConnector = new GlobalCloudConnectorTypeBuilder(context, typeElement).build();
         namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeGlobalCloudConnector(globalCloudConnector));
-        namespace.getConnectorOrEndpointOrGlobal().add(new PatternTypeOperationsBuilder(context, typeElement, PatternTypes.CLOUD_CONNECTOR).build());
+        namespace.getConnectorOrEndpointOrGlobal().add(operationsBuilder.build());
         namespace.getConnectorOrEndpointOrGlobal().add(new ConfigRefBuilder(context, typeElement).build());
         namespace.getConnectorOrEndpointOrGlobal().addAll(new NestedsBuilder(context, typeElement).build());
 
-        processProcessorMethods(typeElement, namespace);
+        processProcessorMethods(typeElement, namespace, isOAuth);
         processTransformerMethods(typeElement, namespace);
         processSourceMethods(typeElement, namespace);
 
@@ -69,11 +77,16 @@ public class MuleStudioEditorXmlGenerator extends AbstractMessageGenerator {
         context.getStudioModel().setOutputFileName(EDITOR_XML_FILE_NAME);
     }
 
-    private void processProcessorMethods(DevKitTypeElement typeElement, NamespaceType namespace) {
+    private void processProcessorMethods(DevKitTypeElement typeElement, NamespaceType namespace, boolean isOAuth) {
         for (ExecutableElement processorMethod : typeElement.getMethodsAnnotatedWith(Processor.class)) {
             PatternType cloudConnector = new PatternTypeBuilder(context, processorMethod, typeElement).build();
             namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeCloudConnector(cloudConnector));
             namespace.getConnectorOrEndpointOrGlobal().addAll(new NestedsBuilder(context, processorMethod, typeElement).build());
+        }
+        
+        if (isOAuth) {
+        	PatternType authorize = new OAuthPatternTypeBuilder(context, typeElement).build();
+        	namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeCloudConnector(authorize));
         }
     }
 

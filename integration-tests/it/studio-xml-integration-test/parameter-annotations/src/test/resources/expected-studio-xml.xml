@@ -12,6 +12,7 @@
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="parameter-annotationsConnectorGeneric">
         <modeSwitch description="Operation." caption="Operation" name="Parameter-annotations operations to execute">
+          <mode modeLabel="Authorize" modeId="http://www.mulesoft.org/schema/mule/parameter-annotations/authorize"></mode>
           <mode modeLabel="Inbound headers" modeId="http://www.mulesoft.org/schema/mule/parameter-annotations/inbound-headers"></mode>
           <mode modeLabel="Invocation headers" modeId="http://www.mulesoft.org/schema/mule/parameter-annotations/invocation-headers"></mode>
           <mode modeLabel="Optional params" modeId="http://www.mulesoft.org/schema/mule/parameter-annotations/optional-params"></mode>
@@ -71,4 +72,5 @@
   <cloud-connector returnType="void" extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="pauth" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Pauth">
     <attribute-category description="General." caption="General"></attribute-category>
   </cloud-connector>
+  <cloud-connector abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="authorize" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Authorize"></cloud-connector>
 </namespace>

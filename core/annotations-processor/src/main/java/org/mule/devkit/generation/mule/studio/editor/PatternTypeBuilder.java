@@ -47,7 +47,7 @@ public class PatternTypeBuilder extends BaseStudioXmlBuilder {
         return patternType;
     }
 
-    private PatternType createPatternType() {
+    protected PatternType createPatternType() {
         PatternType patternType = new PatternType();
         patternType.setLocalId(nameUtils.uncamel(executableElement.getSimpleName().toString()));
         patternType.setCaption(helper.getFormattedCaption(executableElement));
@@ -66,7 +66,7 @@ public class PatternTypeBuilder extends BaseStudioXmlBuilder {
         return patternType;
     }
 
-    private String getImage() {
+    protected String getImage() {
         if(executableElement.getAnnotation(Transformer.class) != null) {
             return helper.getTransformerImage(typeElement);
         } else {
@@ -74,7 +74,7 @@ public class PatternTypeBuilder extends BaseStudioXmlBuilder {
         }
     }
 
-    private String getIcon() {
+    protected String getIcon() {
         if(executableElement.getAnnotation(Transformer.class) != null) {
             return helper.getTransformerIcon(typeElement);
         } else {
