@@ -47,7 +47,7 @@ public class OAuthPatternTypeOperationsBuilder extends PatternTypeOperationsBuil
         mode.setModeId(MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + nameUtils.uncamel(methodName));
         mode.setModeLabel(StringUtils.capitalize(methodName));
         modes.add(0, mode);
-        
+
         return modes;
     }
 	

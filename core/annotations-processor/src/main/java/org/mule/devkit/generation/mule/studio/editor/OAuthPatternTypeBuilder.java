@@ -28,6 +28,8 @@ import org.mule.devkit.model.studio.PatternType;
  */
 public class OAuthPatternTypeBuilder extends PatternTypeBuilder {
 
+	private static final String EXTENDS = "http://www.mulesoft.org/schema/mule/gss/abstractGssConnectorGeneric";
+	
 	public OAuthPatternTypeBuilder(GeneratorContext context, DevKitTypeElement typeElement) {
         super(context, null, typeElement);
 	}
@@ -46,6 +48,7 @@ public class OAuthPatternTypeBuilder extends PatternTypeBuilder {
 
         patternType.setIcon(getIcon());
         patternType.setImage(getImage());
+        patternType.setExtends(EXTENDS);
         return patternType;
 	}
 	
