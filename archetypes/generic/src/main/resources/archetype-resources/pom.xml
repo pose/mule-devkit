@@ -42,6 +42,7 @@
                                             <goal>attach-test-resources</goal>
                                             <goal>filter-resources</goal>
                                             <goal>generate-sources</goal>
+                                            <goal>generate-mashape-client</goal>
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
