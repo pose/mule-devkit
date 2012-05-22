@@ -19,6 +19,9 @@ package org.mule.devkit.it;
 
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.Source;
+import org.mule.api.annotations.Transformer;
+import org.mule.api.callback.SourceCallback;
 
 /**
  * My module
@@ -33,5 +36,25 @@ public class MyModule {
      */
     @Processor
     public void processor() {
+    }
+
+    /**
+     * Some transformer
+     *
+     * @param myString the transformer input
+     * @return the transformed string
+     */
+    @Transformer(sourceTypes = {String.class})
+    public static String transformer(String myString) {
+        return "";
+    }
+
+    /**
+     * Some source
+     *
+     * @param sourceCallback the callback
+     */
+    @Source
+    public void source(SourceCallback sourceCallback) {
     }
 }

@@ -18,6 +18,8 @@
 package org.mule.devkit.generation.mule.studio;
 
 import org.apache.commons.lang.StringUtils;
+import org.mule.api.annotations.Source;
+import org.mule.api.annotations.Transformer;
 import org.mule.api.annotations.display.Icons;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
@@ -43,18 +45,26 @@ public class MuleStudioIconsGenerator extends AbstractMessageGenerator {
         Icons icons = typeElement.getAnnotation(Icons.class);
         if (icons != null) {
             copyFile(icons.connectorSmall(), "icons/small", typeElement);
-            copyFile(icons.endpointSmall(), "icons/small", typeElement);
-            copyFile(icons.transformerSmall(), "icons/small", typeElement);
             copyFile(icons.connectorLarge(), "icons/large", typeElement);
-            copyFile(icons.endpointLarge(), "icons/large", typeElement);
-            copyFile(icons.transformerLarge(), "icons/large", typeElement);
+            if(typeElement.hasMethodsAnnotatedWith(Transformer.class)) {
+                copyFile(icons.transformerSmall(), "icons/small", typeElement);
+                copyFile(icons.transformerLarge(), "icons/large", typeElement);
+            }
+            if(typeElement.hasMethodsAnnotatedWith(Source.class)) {
+                copyFile(icons.endpointSmall(), "icons/small", typeElement);
+                copyFile(icons.endpointLarge(), "icons/large", typeElement);
+            }
         } else {
             copyFile(String.format(Icons.GENERIC_CLOUD_CONNECTOR_SMALL, typeElement.name()), "icons/small", typeElement);
-            copyFile(String.format(Icons.GENERIC_ENDPOINT_SMALL, typeElement.name()), "icons/small", typeElement);
-            copyFile(String.format(Icons.GENERIC_TRANSFORMER_SMALL, typeElement.name()), "icons/small", typeElement);
             copyFile(String.format(Icons.GENERIC_CLOUD_CONNECTOR_LARGE, typeElement.name()), "icons/large", typeElement);
-            copyFile(String.format(Icons.GENERIC_ENDPOINT_LARGE, typeElement.name()), "icons/large", typeElement);
-            copyFile(String.format(Icons.GENERIC_TRANSFORMER_LARGE, typeElement.name()), "icons/large", typeElement);
+            if(typeElement.hasMethodsAnnotatedWith(Transformer.class)) {
+                copyFile(String.format(Icons.GENERIC_TRANSFORMER_SMALL, typeElement.name()), "icons/small", typeElement);
+                copyFile(String.format(Icons.GENERIC_TRANSFORMER_LARGE, typeElement.name()), "icons/large", typeElement);
+            }
+            if(typeElement.hasMethodsAnnotatedWith(Source.class)) {
+                copyFile(String.format(Icons.GENERIC_ENDPOINT_SMALL, typeElement.name()), "icons/small", typeElement);
+                copyFile(String.format(Icons.GENERIC_ENDPOINT_LARGE, typeElement.name()), "icons/large", typeElement);
+            }
         }
     }
 
