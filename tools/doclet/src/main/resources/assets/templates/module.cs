@@ -297,7 +297,7 @@ to be the OAuth access token and OAuth access token secret.</p>
 <pre>
     &lt;<?cs var:class.moduleName ?>:config&gt;
         &lt;<?cs var:class.moduleName ?>:oauth-save-access-token&gt;
-            &lt;logger level="INFO" message="Received access token #[header:INBOUND:OAuthAccessToken] and #[header:INBOUND:OAuthAccessTokenSecret]"/&gt;
+            &lt;logger level="INFO" message="Received access token #[variable:OAuthAccessToken] and #[variable:OAuthAccessTokenSecret]"/&gt;
         &lt;/<?cs var:class.moduleName ?>:oauth-save-access-token&gt;
     &lt;/<?cs var:class.moduleName ?>:config&gt;
 </pre>
@@ -333,8 +333,8 @@ we will extract the OAuth access token property and OAuth access token secret pr
 
     &lt;<?cs var:class.moduleName ?>:config&gt;
         &lt;<?cs var:class.moduleName ?>:oauth-save-access-token&gt;
-            &lt;objectstore:store key="OAuthAccessToken" value-ref="#[header:INBOUND:OAuthAccessToken]"/&gt;
-            &lt;objectstore:store key="OAuthAccessTokenSecret" value-ref="#[header:INBOUND:OAuthAccessTokenSecret]"/&gt;
+            &lt;objectstore:store key="OAuthAccessToken" value-ref="#[variable:OAuthAccessToken]"/&gt;
+            &lt;objectstore:store key="OAuthAccessTokenSecret" value-ref="#[variable:OAuthAccessTokenSecret]"/&gt;
         &lt;/<?cs var:class.moduleName ?>:oauth-save-access-token&gt;
         &lt;<?cs var:class.moduleName ?>:oauth-restore-access-token&gt;
             &lt;enricher target="#[header:OAuthAccessToken]"&gt;
