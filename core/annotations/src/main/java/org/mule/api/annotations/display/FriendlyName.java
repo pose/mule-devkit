@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
 /**
  * Adds displaying information to a field or parameter.
  */
-@Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
+@Target({ElementType.PARAMETER, ElementType.FIELD})
 @Documented
 public @interface FriendlyName {
 
