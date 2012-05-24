@@ -64,7 +64,7 @@ public class StudioFeatureBuilder extends UpdateSiteElementsBuilder {
 
     @Override
     public File build() throws MojoExecutionException {
-        File studioPlugin = new File(path, pluginName + FEATURE_SUFIX + "_" + pluginVersion +".jar");
+        File studioPlugin = new File(path, pluginName + "_" + pluginVersion +".jar");
 
         try {
             File file = new File(classesDirectory, MuleStudioFeatureGenerator.FEATURE_XML_FILENAME);

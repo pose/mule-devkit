@@ -46,6 +46,7 @@ public class MuleStudioManifestGenerator extends AbstractMessageGenerator {
         } catch (IOException e) {
             throw new GenerationException("Could not create MANIFEST for Studio plugin: " + e.getMessage(), e);
         } finally {
+
             IOUtils.closeQuietly(printStream);
         }
     }
@@ -54,8 +55,8 @@ public class MuleStudioManifestGenerator extends AbstractMessageGenerator {
         StringBuilder manfiestContentBuilder = new StringBuilder(100);
         manfiestContentBuilder.append("Manifest-Version: 1.0\n");
         manfiestContentBuilder.append("Bundle-ManifestVersion: 2\n");
-        manfiestContentBuilder.append("Bundle-Name: %BUNDLE_NAME%\n");
-        manfiestContentBuilder.append("Bundle-SymbolicName: %BUNDLE_NAME%").append(";singleton:=true\n");
+        manfiestContentBuilder.append("Bundle-Name: ").append(context.getNameUtils().friendlyNameFromCamelCase(typeElement.name())).append("\n");
+        manfiestContentBuilder.append("Bundle-SymbolicName: " + MuleStudioFeatureGenerator.STUDIO_PREFIX).append(typeElement.name()).append(";singleton:=true\n");
         manfiestContentBuilder.append("Bundle-Version: %VERSION%\n");
         manfiestContentBuilder.append("Bundle-Activator: org.mule.tooling.ui.contribution.Activator\n");
         manfiestContentBuilder.append("Bundle-Vendor: ").append(context.getJavaDocUtils().getTagContent("author", typeElement.getInnerTypeElement())).append("\n");
