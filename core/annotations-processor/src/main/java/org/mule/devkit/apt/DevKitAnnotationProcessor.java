@@ -44,10 +44,7 @@ import org.mule.devkit.generation.mule.oauth.DefaultSaveAccessTokenCallbackGener
 import org.mule.devkit.generation.mule.studio.MuleStudioFeatureGenerator;
 import org.mule.devkit.generation.mule.studio.MuleStudioPluginGenerator;
 import org.mule.devkit.generation.mule.studio.MuleStudioSiteXmlGenerator;
-import org.mule.devkit.generation.mule.transfomer.EnumTransformerGenerator;
-import org.mule.devkit.generation.mule.transfomer.JaxbTransformerGenerator;
-import org.mule.devkit.generation.mule.transfomer.StringToDateTransformerGenerator;
-import org.mule.devkit.generation.mule.transfomer.TransformerGenerator;
+import org.mule.devkit.generation.mule.transfomer.*;
 import org.mule.devkit.generation.spring.BeanDefinitionParserGenerator;
 import org.mule.devkit.generation.spring.NamespaceHandlerGenerator;
 import org.mule.devkit.generation.spring.SchemaGenerator;
@@ -81,6 +78,8 @@ public class DevKitAnnotationProcessor extends AbstractAnnotationProcessor {
     public DevKitAnnotationProcessor() {
         generators = new ArrayList<Generator>();
         generators.add(new StringToDateTransformerGenerator());
+        generators.add(new StringToBigDecimalTransformerGenerator());
+        generators.add(new StringToBigIntegerTransformerGenerator());
         generators.add(new DefaultHttpCallbackGenerator());
         generators.add(new CapabilitiesAdapterGenerator());
         generators.add(new LifecycleAdapterGenerator());

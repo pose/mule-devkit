@@ -64,6 +64,10 @@ public final class SchemaTypeConversion {
             return new QName(targetNamespace, "booleanType");
         } else if (typeName.equals("java.lang.Character")) {
             return new QName(targetNamespace, "charType");
+        } else if (typeName.equals("java.math.BigDecimal")) {
+            return new QName(targetNamespace, "doubleType");
+        } else if (typeName.equals("java.math.BigInteger")) {
+            return new QName(targetNamespace, "integerType");
         } else if (typeName.equals("java.util.Date")) {
             return new QName(targetNamespace, "dateTimeType");
         } else if (typeName.equals("java.net.URL")) {

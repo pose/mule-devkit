@@ -24,59 +24,37 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.NamingContants;
-import org.mule.devkit.model.code.CatchBlock;
-import org.mule.devkit.model.code.DefinedClass;
-import org.mule.devkit.model.code.ExpressionFactory;
-import org.mule.devkit.model.code.FieldVariable;
-import org.mule.devkit.model.code.Invocation;
-import org.mule.devkit.model.code.Method;
-import org.mule.devkit.model.code.Modifier;
+import org.mule.devkit.model.code.*;
 import org.mule.devkit.model.code.Package;
-import org.mule.devkit.model.code.TryStatement;
-import org.mule.devkit.model.code.TypeReference;
-import org.mule.devkit.model.code.Variable;
-import org.mule.devkit.model.code.builders.FieldBuilder;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
 import javax.lang.model.element.TypeElement;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.math.BigDecimal;
 
-public class StringToDateTransformerGenerator extends AbstractMessageGenerator {
-
-    private static final String PATTERN = "yyyy-MM-dd'T'hh:mm:ss";
-    private static final String SIMPLE_DATE_FORMAT_FIELD_NAME = "SIMPLE_DATE_FORMAT";
+public class StringToBigDecimalTransformerGenerator extends AbstractMessageGenerator {
 
     @Override
     protected boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return typeElement.hasProcessorMethodWithParameter(Date.class);
+        return typeElement.hasProcessorMethodWithParameter(BigDecimal.class) ||
+                typeElement.hasConfigurableWithType(BigDecimal.class);
     }
 
     @Override
     protected void doGenerate(DevKitTypeElement typeElement) {
         DefinedClass transformerClass = getTransformerClass(typeElement);
 
-        context.note("Generating String to Date transformer as " + transformerClass.fullName());
+        context.note("Generating String to BigDecimal transformer as " + transformerClass.fullName());
 
         FieldVariable muleContext = generateFieldForMuleContext(transformerClass);
-        FieldVariable simpleDateFormat = generateSimpleDateFormatField(transformerClass);
         FieldVariable weighting = transformerClass.field(Modifier.PRIVATE, context.getCodeModel().INT, "weighting", ref(DiscoverableTransformer.class).staticRef("DEFAULT_PRIORITY_WEIGHTING"));
         generateConstructor(transformerClass);
         generateSetMuleContextMethod(transformerClass, muleContext);
-        generateDoTransform(transformerClass, simpleDateFormat);
+        generateDoTransform(transformerClass);
         generateGetPriorityWeighting(transformerClass, weighting);
         generateSetPriorityWeighting(transformerClass, weighting);
 
         context.registerAtBoot(transformerClass);
-    }
-
-    private FieldVariable generateSimpleDateFormatField(DefinedClass transformerClass) {
-        return FieldBuilder.newConstantFieldBuilder(transformerClass).
-                type(SimpleDateFormat.class).name(SIMPLE_DATE_FORMAT_FIELD_NAME).
-                initialValue(ExpressionFactory._new(ref(SimpleDateFormat.class)).arg(PATTERN)).
-                build();
     }
 
     private void generateSetPriorityWeighting(DefinedClass transformerClass, FieldVariable weighting) {
@@ -90,18 +68,20 @@ public class StringToDateTransformerGenerator extends AbstractMessageGenerator {
         getPriorityWeighting.body()._return(weighting);
     }
 
-    private void generateDoTransform(DefinedClass definedClass, FieldVariable simpleDateFormat) {
+    private void generateDoTransform(DefinedClass definedClass) {
         Method doTransform = definedClass.method(Modifier.PROTECTED, ref(Object.class), "doTransform");
         doTransform._throws(TransformerException.class);
         Variable src = doTransform.param(ref(Object.class), "src");
         doTransform.param(ref(String.class), "encoding");
 
         TryStatement tryStatement = doTransform.body()._try();
-        tryStatement.body()._return(simpleDateFormat.invoke("parse").arg(src.invoke("toString")));
-        CatchBlock catchBlock = tryStatement._catch(ref(ParseException.class));
+        tryStatement.body()._return(
+                ExpressionFactory._new(ref(BigDecimal.class)).arg(ExpressionFactory.cast(ref(String.class), src))
+        );
+        CatchBlock catchBlock = tryStatement._catch(ref(NumberFormatException.class));
         Variable exceptionCaught = catchBlock.param("e");
         Invocation errorMessage = ref(MessageFactory.class).staticInvoke("createStaticMessage").
-                arg(ref(String.class).staticInvoke("format").arg("Could not parse %s using the format %s").arg(src).arg(simpleDateFormat.invoke("toPattern")));
+                arg(ref(String.class).staticInvoke("format").arg("Could not parse %s to a big integer").arg(src));
         catchBlock.body()._throw(ExpressionFactory._new(
                 ref(TransformerException.class)).
                 arg(errorMessage).
@@ -112,7 +92,7 @@ public class StringToDateTransformerGenerator extends AbstractMessageGenerator {
     private void generateConstructor(DefinedClass transformerClass) {
         Method constructor = transformerClass.constructor(Modifier.PUBLIC);
         registerSourceTypes(constructor);
-        registerDestinationType(constructor, ref(Date.class));
+        registerDestinationType(constructor, ref(BigDecimal.class));
         constructor.body().invoke("setName").arg(transformerClass.name());
     }
 
@@ -127,7 +107,7 @@ public class StringToDateTransformerGenerator extends AbstractMessageGenerator {
     }
 
     private DefinedClass getTransformerClass(TypeElement typeElement) {
-        String transformerClassName = context.getNameUtils().generateClassNameInPackage(typeElement, NamingContants.STRING_TO_DATE_TRANSFORMER_CLASS_NAME);
+        String transformerClassName = context.getNameUtils().generateClassNameInPackage(typeElement, NamingContants.STRING_TO_BIGDECIMAL_TRANSFORMER_CLASS_NAME);
         Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(transformerClassName) + NamingContants.TRANSFORMERS_NAMESPACE);
         return pkg._class(context.getNameUtils().getClassName(transformerClassName), AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class, MuleContextAware.class});
     }

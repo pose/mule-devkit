@@ -36,7 +36,9 @@ public class NamingContants {
     public static final String ENUM_TRANSFORMER_CLASS_NAME_SUFFIX = "EnumTransformer";
     public static final String TRANSFORMER_CLASS_NAME_SUFFIX = "Transformer";
     public static final String AUTHORIZE_MESSAGE_PROCESSOR_CLASS_NAME = "AuthorizeMessageProcessor";
-    public static final String TRANSFORMER_CLASS_NAME = "StringToDateTransformer";
+    public static final String STRING_TO_DATE_TRANSFORMER_CLASS_NAME = "StringToDateTransformer";
+    public static final String STRING_TO_BIGINTEGER_TRANSFORMER_CLASS_NAME = "StringToBigIntegerTransformer";
+    public static final String STRING_TO_BIGDECIMAL_TRANSFORMER_CLASS_NAME = "StringToBigDecimalTransformer";
     public static final String CONFIG_NAMESPACE = ".config";
     public static final String RESTORE_ACCESS_TOKEN_CALLBACK_FACTORY_BEAN_CLASS_NAME = "RestoreAccessTokenCallbackFactoryBean";
     public static final String DEFAULT_RESTORE_ACCESS_TOKEN_CALLBACK_CLASS_NAME = "DefaultRestoreAccessTokenCallback";

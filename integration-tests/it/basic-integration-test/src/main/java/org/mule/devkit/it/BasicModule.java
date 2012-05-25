@@ -20,6 +20,10 @@ package org.mule.devkit.it;
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.param.Optional;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 /**
  * Basic module
@@ -33,6 +37,13 @@ public class BasicModule {
     private int myInt;
     @Configurable
     private long myLong;
+    @Configurable
+    @Optional
+    private BigDecimal myBigDecimal;
+    @Configurable
+    @Optional
+    private BigInteger myBigInteger;
+
     /**
      * Passthru char
      *
@@ -143,6 +154,28 @@ public class BasicModule {
         return value;
     }
 
+    /**
+     * Passthru big decimal
+     *
+     * @param value Value to passthru
+     * @return The same big decimal
+     */
+    @Processor
+    public BigDecimal passthruBigDecimal(BigDecimal value) {
+        return value;
+    }
+
+    /**
+     * Passthru big integer
+     *
+     * @param value Value to passthru
+     * @return The same big integer
+     */
+    @Processor
+    public BigInteger passthruBigInteger(BigInteger value) {
+        return value;
+    }
+
     public enum Mode {
         In,
         Out
@@ -176,5 +209,13 @@ public class BasicModule {
 
     public void setMyLong(long myLong) {
         this.myLong = myLong;
+    }
+
+    public void setMyBigInteger(BigInteger myBigInteger) {
+        this.myBigInteger = myBigInteger;
+    }
+
+    public void setMyBigDecimal(BigDecimal myBigDecimal) {
+        this.myBigDecimal = myBigDecimal;
     }
 }
