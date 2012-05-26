@@ -55,6 +55,7 @@
                         <include>target/integration-tests/**/pom.xml</include>
                         <include>target/test-classes/**/cloud-connector-archetype.properties</include>
                         <include>target/test-classes/**/transformer-archetype.properties</include>
+                        <include>target/test-classes/**/expression-language-archetype.properties</include>
                         <include>target/test-classes/**/generic-archetype.properties</include>
                         <include>target/test-classes/**/mule-app-archetype.properties</include>
                         <include>target/integration-tests/**/Constants.java</include>
