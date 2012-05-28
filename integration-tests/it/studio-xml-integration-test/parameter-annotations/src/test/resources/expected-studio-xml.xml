@@ -72,5 +72,5 @@
   <cloud-connector returnType="void" extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="pauth" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Pauth">
     <attribute-category description="General." caption="General"></attribute-category>
   </cloud-connector>
-  <cloud-connector abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="authorize" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Authorize"></cloud-connector>
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="authorize" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Authorize"></cloud-connector>
 </namespace>
