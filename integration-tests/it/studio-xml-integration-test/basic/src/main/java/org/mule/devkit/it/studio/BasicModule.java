@@ -33,7 +33,7 @@ public class BasicModule {
      * @param value Value to passthru
      * @return The same char
      */
-    @Processor
+    @Processor(name = "otherPassthruChar")
     public char passthruChar(char value) {
         return value;
     }

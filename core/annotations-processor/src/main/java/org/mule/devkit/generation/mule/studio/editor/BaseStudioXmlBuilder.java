@@ -101,8 +101,7 @@ public abstract class BaseStudioXmlBuilder {
 		 List<ModeElementType> modes = new ArrayList<ModeElementType>();
 	     for (ExecutableElement method : methods) {
 	         ModeElementType mode = new ModeElementType();
-	         String methodName = method.getSimpleName().toString();
-	         mode.setModeId(MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + nameUtils.uncamel(methodName));
+	         mode.setModeId(MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + helper.getLocalId(method));
 	         mode.setModeLabel(StringUtils.capitalize(helper.getFriendlyName(method)));
 	         modes.add(mode);
 	     }

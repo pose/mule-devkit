@@ -49,7 +49,7 @@ public class PatternTypeBuilder extends BaseStudioXmlBuilder {
 
     protected PatternType createPatternType() {
         PatternType patternType = new PatternType();
-        patternType.setLocalId(nameUtils.uncamel(executableElement.getSimpleName().toString()));
+        patternType.setLocalId(helper.getLocalId(executableElement));
         patternType.setCaption(helper.getFormattedCaption(executableElement));
         patternType.setAbstract(true);
 
@@ -67,7 +67,7 @@ public class PatternTypeBuilder extends BaseStudioXmlBuilder {
     }
 
     protected String getImage() {
-        if(executableElement.getAnnotation(Transformer.class) != null) {
+        if (executableElement.getAnnotation(Transformer.class) != null) {
             return helper.getTransformerImage(typeElement);
         } else {
             return helper.getConnectorImage(typeElement);
@@ -75,7 +75,7 @@ public class PatternTypeBuilder extends BaseStudioXmlBuilder {
     }
 
     protected String getIcon() {
-        if(executableElement.getAnnotation(Transformer.class) != null) {
+        if (executableElement.getAnnotation(Transformer.class) != null) {
             return helper.getTransformerIcon(typeElement);
         } else {
             return helper.getConnectorIcon(typeElement);

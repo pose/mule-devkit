@@ -297,6 +297,17 @@ public class MuleStudioUtils {
         }
     }
 
+    public String getLocalId(ExecutableElement executableElement) {
+        String localId;
+        Processor processor = executableElement.getAnnotation(Processor.class);
+        if (processor != null && StringUtils.isNotBlank(processor.name())) {
+            localId = processor.name();
+        } else {
+            localId = executableElement.getSimpleName().toString();
+        }
+        return nameUtils.uncamel(localId);
+    }
+
     public String getFormattedDescription(VariableElement element) {
         Summary description = element.getAnnotation(Summary.class);
         if (description != null && StringUtils.isNotBlank(description.value())) {
