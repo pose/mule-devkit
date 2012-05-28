@@ -43,7 +43,7 @@ public class OAuthPatternTypeBuilder extends PatternTypeBuilder {
         patternType.setLocalId("authorize");
         patternType.setCaption("Authorize");
         patternType.setAbstract(true);
-
+        patternType.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name()));
         patternType.setIcon(getIcon());
         patternType.setImage(getImage());
         return patternType;

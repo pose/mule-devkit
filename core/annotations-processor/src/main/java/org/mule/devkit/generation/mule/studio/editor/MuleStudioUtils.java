@@ -246,7 +246,7 @@ public class MuleStudioUtils {
             Booleantype booleantype = new Booleantype();
             booleantype.setSupportsExpressions(true);
             return booleantype;
-        } else if (typeMirrorUtils.isInteger(element) || typeMirrorUtils.isLong(element)) {
+        } else if (typeMirrorUtils.isInteger(element) || typeMirrorUtils.isLong(element) || typeMirrorUtils.isBigDecimal(element) || typeMirrorUtils.isBigInteger(element)) {
             IntegerType integerType = new IntegerType();
             integerType.setMin(0);
             integerType.setStep(1);
@@ -374,6 +374,8 @@ public class MuleStudioUtils {
                 typeMirrorUtils.isLong(variable) ||
                 typeMirrorUtils.isHttpCallback(variable) ||
                 typeMirrorUtils.isInteger(variable) ||
+                typeMirrorUtils.isBigDecimal(variable) ||
+                typeMirrorUtils.isBigInteger(variable) ||
                 typeMirrorUtils.isBoolean(variable) ||
                 typeMirrorUtils.isEnum(variable) ||
                 typeMirrorUtils.isCollection(variable) ||

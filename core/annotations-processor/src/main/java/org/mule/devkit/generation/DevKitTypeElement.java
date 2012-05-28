@@ -27,6 +27,8 @@ public interface DevKitTypeElement extends TypeElement {
 
     boolean hasProcessorMethodWithParameter(Class<?> parameterType);
 
+    boolean hasConfigurableWithType(Class<?> parameterType);
+
     boolean hasProcessorMethodWithParameterListOf(Class<?> listGenericType);
 
     boolean hasAnnotation(Class<? extends Annotation> annotation);

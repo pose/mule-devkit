@@ -16,6 +16,9 @@
  */
 package org.mule.devkit.it.studio;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -37,6 +40,7 @@ public class ParameterAnnotationsModuleStudioXmlTest {
         XMLUnit.setIgnoreAttributeOrder(true);
         String expectedXml = IOUtils.toString(ParameterAnnotationsModuleStudioXmlTest.class.getClassLoader().getResourceAsStream(EXPECTED_STUDIO_XML));
         String actualXml = IOUtils.toString(ParameterAnnotationsModuleStudioXmlTest.class.getClassLoader().getResourceAsStream(ACTUAL_STUDIO_XML));
+        
         Diff diff = new Diff(expectedXml, actualXml);
         diff.overrideElementQualifier(new RecursiveElementNameAndTextQualifier());
         DetailedDiff detailedDiff = new DetailedDiff(diff);
