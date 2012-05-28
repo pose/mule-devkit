@@ -16,10 +16,11 @@
  */
 package org.mule.devkit.maven.studio;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProjectHelper;
+import org.codehaus.plexus.archiver.zip.ZipArchiver;
 import org.eclipse.sisu.equinox.launching.internal.P2ApplicationLauncher;
 import org.jfrog.maven.annomojo.annotations.*;
 import org.mule.devkit.maven.AbstractMuleMojo;
@@ -29,9 +30,9 @@ import sun.security.tools.JarSigner;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -50,13 +51,13 @@ public class StudioPackageMojo extends AbstractMuleMojo {
     @MojoParameter(expression = "${project.build.outputDirectory}", required = true)
     private File classesDirectory;
 
-    @MojoParameter(expression = "${keystore.path}")
+    @MojoParameter(expression = "${keystore.path}", defaultValue = "${project.basedir}/keystore.ks")
     private String keystorePath;
 
     @MojoParameter(expression = "${alias}")
     private String alias;
 
-    @MojoParameter(expression = "${licensePath}")
+    @MojoParameter(expression = "${licensePath}" , defaultValue = "${project.basedir}/studio_license.txt")
     private String licensePath;
 
 
@@ -65,6 +66,9 @@ public class StudioPackageMojo extends AbstractMuleMojo {
 
     @MojoParameter(expression = "${keypass}")
     private String keypass;
+
+    @MojoParameter(expression = "${category}")
+    private String category;
 
     @MojoComponent
     private P2ApplicationLauncher launcher;
@@ -82,46 +86,72 @@ public class StudioPackageMojo extends AbstractMuleMojo {
         File studioPlugin = pluginBuilderFor(pluginVersion, pluginName).build();
          new StudioSiteXmlBuilder(pluginName,pluginVersion,finalName,
                  outputDirectory.getPath(),
-                 classesDirectory).build();
+                 classesDirectory, category).build();
 
         sign(studioFeature, studioPlugin);
 
-        createContentAndArtifacts();
+        createContentAndArtifacts(pluginName, pluginVersion);
 
 
-        projectHelper.attachArtifact(project, "jar", "studio", studioPlugin);
-        projectHelper.attachArtifact(project, "jar", "studio-feature", studioFeature);
+
+        projectHelper.attachArtifact(project, "zip", "us", buildZip());
     }
 
-    private String buildVersion() {
+    private File buildZip()
+    {
+        ZipArchiver archiver = new ZipArchiver();
 
-        String projectVersion = project.getVersion();
-        String cleanProjectVersion = projectVersion.replaceAll("[^0-9\\.]", "");
+        File updateSiteDir = new File(outputDirectory + File.separator + "update-site" + File.separator);
 
-        String pluginVersion = getPluginVersionFrom(cleanProjectVersion);
+        for ( File file : updateSiteDir.listFiles() )
+        {
+            if (file.isDirectory())
+            {
+                archiver.addDirectory(file, file.getName() +  File.separator);
+            }
+            else
+            {
+                archiver.addFile(file, file.getName());
+            }
+        }
+
+        File destFile = new File(outputDirectory +  File.separator + "UpdateSite.zip");
+        archiver.setDestFile(destFile);
+
+        try {
+            destFile.delete();
+            archiver.createArchive();
+        } catch (IOException e) {
+
+        }
+
+
+        return destFile;
+    }
+
+    private String buildVersion() throws MojoExecutionException {
+
+        String pluginVersion = getPluginVersionFrom();
 
         return pluginVersion + "."+buildQualifier();
     }
 
-    private String getPluginVersionFrom(String cleanProjectVersion) {
-        List<String> versionNumbers = new ArrayList<String>(Arrays.asList(cleanProjectVersion.split("\\.")));
+    private String getPluginVersionFrom() throws MojoExecutionException {
+        DefaultArtifactVersion av = new DefaultArtifactVersion(project.getVersion());
 
-        if ( versionNumbers.size() > 3 )
+        int majorVersion = av.getMajorVersion();
+        int minorVersion = av.getMinorVersion();
+        int incrementalVersion = av.getIncrementalVersion();
+        if ( majorVersion == 0 && minorVersion == 0 && incrementalVersion ==0 )
         {
-            versionNumbers = versionNumbers.subList(0,3);
+            throw new MojoExecutionException("Invalid maven project version, can't create studio plugin version, format must be " +
+                    "[major-version].[minor-version].[incremental-version]-[qualifier], at least a major version must be specified.");
         }
-        else
-        {
-            while (versionNumbers.size() < 3 )
-            {
-                versionNumbers.add("0");
-            }
-        }
-        return StringUtils.join(versionNumbers.toArray(), ".");
+        return majorVersion + "." + minorVersion + "." + incrementalVersion;
     }
 
     private void sign(File studioFeature, File studioPlugin) {
-        if ( keystorePath != null )
+        if ( keystorePath != null && checkExistenceOf(keystorePath))
         {
             JarSigner jarsigner = new JarSigner();
 
@@ -132,6 +162,8 @@ public class StudioPackageMojo extends AbstractMuleMojo {
             jarsigner.run(featureOptions.toArray(new String[0]));
         }
     }
+
+
 
     private List<String> buildOptions(String path) {
         ArrayList<String> options = new ArrayList<String>();
@@ -160,22 +192,27 @@ public class StudioPackageMojo extends AbstractMuleMojo {
     }
 
 
-    private void createContentAndArtifacts() throws MojoExecutionException{
+    private void createContentAndArtifacts(String pluginName, String pluginVersion) throws MojoExecutionException{
         try{
            String updateSitePath = outputDirectory + File.separator + "update-site" + File.separator;
 
            launcher.addArguments("-metadataRepository", "file:" + updateSitePath);
            launcher.addArguments("-source", updateSitePath);
            launcher.addArguments("-artifactRepository", "file:" + updateSitePath);
-           launcher.addArguments("-publishArtifacts", "-append", "-compress");
+           launcher.addArguments("-publishArtifacts", "-append");
            launcher.addArguments("-site",  "file:" + updateSitePath + "site.xml");
            launcher.setApplicationName("org.eclipse.equinox.p2.publisher.EclipseGenerator");
 
            launcher.execute(20);
+
+            String jarName = pluginName + "_" + pluginVersion + ".jar";
+            new File(updateSitePath + File.separator + "features" + File.separator + jarName).delete();
+            new File(updateSitePath + File.separator + "plugins" + File.separator + jarName).delete();
+
         }
         catch (Exception e)
         {
-            throw new MojoExecutionException("error");
+            throw new MojoExecutionException("Could not create update site", e);
         }
       
     }
@@ -193,9 +230,14 @@ public class StudioPackageMojo extends AbstractMuleMojo {
 
         try {
             String license = "";
-            if ( licensePath != null )
+
+            if ( licensePath != null)
             {
-                license = IOUtils.toString(new FileInputStream(new File(licensePath)));
+                File licenseFile = new File(licensePath);
+                if ( licenseFile.exists() )
+                {
+                    license = IOUtils.toString(new FileInputStream(licenseFile));
+                }
             }
 
             return new StudioFeatureBuilder(pluginName,
@@ -219,5 +261,8 @@ public class StudioPackageMojo extends AbstractMuleMojo {
         return sdf.format(new Date());
     }
 
+    private boolean checkExistenceOf(String path) {
+        return new File(path).exists();
+    }
 
 }

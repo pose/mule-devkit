@@ -17,68 +17,56 @@
 
 package org.mule.devkit.maven.studio;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.mule.devkit.generation.mule.studio.MuleStudioSiteXmlGenerator;
+import org.mule.util.FileUtils;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-/**
- * Created by IntelliJ IDEA.
- * User: fernandofederico
- * Date: 4/17/12
- * Time: 5:25 PM
- * To change this template use File | Settings | File Templates.
- */
+
 public class StudioSiteXmlBuilder extends UpdateSiteElementsBuilder
 {
-    StudioSiteXmlBuilder(String pluginName, String pluginVersion, String muleAppName, String outputDirectory, File classesDirectory) {
+    private String category;
+
+    private TokensReplacer tokensReplacer;
+
+    StudioSiteXmlBuilder(String pluginName, String pluginVersion, String muleAppName, String outputDirectory, File classesDirectory, String category) {
         super(pluginName, pluginVersion, muleAppName, outputDirectory, classesDirectory);
+        this.category = StringUtils.isEmpty(category) ? "Connectors" : category;
+        this.tokensReplacer = new TokensReplacer(buildTokens());
+
     }
 
+
+    private Map<String, String> buildTokens() {
+        Map<String, String> tokens = new HashMap<String, String>();
+        tokens.put("%CATEGORY%", category);
+        tokens.put("%VERSION%", pluginVersion);
+
+        return tokens;
+    }
     @Override
     public File build() throws MojoExecutionException {
-        try
-        {
-            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-            Document document = documentBuilder.newDocument();
+        File siteXmlFile = new File(updateSitePath, MuleStudioSiteXmlGenerator.SITE_XML);
+        File file = new File(classesDirectory, MuleStudioSiteXmlGenerator.SITE_XML);
 
-            Element site = document.createElement("site");
-            document.appendChild(site);
 
-            Element feature = document.createElement("feature");
-            feature.setAttribute("url", "features" + SEPARATOR + pluginName + StudioFeatureBuilder.FEATURE_SUFIX + "_" + pluginVersion +".jar");
-            feature.setAttribute("id", pluginName + StudioFeatureBuilder.FEATURE_SUFIX );
-            feature.setAttribute("version", pluginVersion );
-
-            Element category = document.createElement("category");
-            category.setAttribute("name", "connector");
-
-            feature.appendChild(category);
-
-            Element categoryDef = document.createElement("category-def");
-            categoryDef.setAttribute("name", "connector");
-            categoryDef.setAttribute("label", "connector");
-            site.appendChild(feature);
-            site.appendChild(categoryDef);
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-
-            DOMSource source = new DOMSource(document);
-            File siteXml = new File(updateSitePath, "site.xml");
-            StreamResult result = new StreamResult(siteXml);
-            transformer.transform(source, result);
-
-            return siteXml;
-        } catch (Exception e) {
-            throw new MojoExecutionException("Could not create site.xml file",e);
+        if (!file.exists()) {
+            throw new MojoExecutionException("Error while packaging Mule Studio Site: " + file.getName() + " does not exist");
         }
+        tokensReplacer.replaceTokensOn(file);
+
+        try {
+            FileUtils.copyFile(file, siteXmlFile);
+        } catch (IOException e) {
+            throw new MojoExecutionException("Error while packaging Mule Studio Site: " + file.getName() + " does not exist");
+        }
+
+        return siteXmlFile;
+
     }
 }

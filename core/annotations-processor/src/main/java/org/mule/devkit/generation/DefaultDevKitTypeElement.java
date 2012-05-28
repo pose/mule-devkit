@@ -76,6 +76,16 @@ public class DefaultDevKitTypeElement extends TypeElementImpl implements DevKitT
     }
 
     @Override
+    public boolean hasConfigurableWithType(Class<?> parameterType) {
+        for (VariableElement field : getFieldsAnnotatedWith(Configurable.class)) {
+            if (field.asType().toString().startsWith(parameterType.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public boolean hasProcessorMethodWithParameterListOf(Class<?> listGenericType) {
         for (ExecutableElement method : getMethodsAnnotatedWith(Processor.class)) {
             for (VariableElement parameter : method.getParameters()) {

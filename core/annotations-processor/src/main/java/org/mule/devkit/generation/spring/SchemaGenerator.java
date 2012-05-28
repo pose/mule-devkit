@@ -239,7 +239,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         Union union = new Union();
         union.getSimpleType().add(createEnumSimpleType(enumElement));
-        union.getSimpleType().add(createExpressionSimpleType());
+        union.getSimpleType().add(createExpressionAndPropertyPlaceHolderSimpleType());
         enumSimpleType.setUnion(union);
 
         schema.getSimpleTypeOrComplexTypeOrGroup().add(enumSimpleType);
@@ -1166,18 +1166,6 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         restriction.setBase(SchemaConstants.STRING);
         Pattern pattern = new Pattern();
         pattern.setValue("(\\#\\[[^\\]]+\\]|\\$\\{[^\\}]+\\})");
-        restriction.getFacets().add(pattern);
-
-        return expression;
-    }
-
-    private LocalSimpleType createExpressionSimpleType() {
-        LocalSimpleType expression = new LocalSimpleType();
-        Restriction restriction = new Restriction();
-        expression.setRestriction(restriction);
-        restriction.setBase(SchemaConstants.STRING);
-        Pattern pattern = new Pattern();
-        pattern.setValue("\\#\\[[^\\]]+\\]");
         restriction.getFacets().add(pattern);
 
         return expression;

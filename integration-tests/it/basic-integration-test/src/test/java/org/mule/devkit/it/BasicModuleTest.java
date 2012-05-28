@@ -17,6 +17,9 @@
 
 package org.mule.devkit.it;
 
+import java.math.BigInteger;
+import java.math.BigDecimal;
+
 public class BasicModuleTest extends AbstractModuleTest {
 
     public BasicModuleTest() {
@@ -59,4 +62,13 @@ public class BasicModuleTest extends AbstractModuleTest {
     public void testComplexRef() throws Exception {
         runFlow("passthruComplexRef", "MuleSoft$");
     }
+
+    public void testBigDecimal() throws Exception {
+        runFlow("passthruBigDecimal", new BigDecimal("10.2"));
+    }
+
+    public void testBigInteger() throws Exception {
+        runFlow("passthruBigInteger", BigInteger.valueOf(18));
+    }
+
 }

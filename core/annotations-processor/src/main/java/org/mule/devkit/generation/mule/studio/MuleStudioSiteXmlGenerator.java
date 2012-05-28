@@ -29,14 +29,13 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.File;
 
-/**
- * <p>Generates the the feature.xml file for an update site</p>
- */
-public class MuleStudioFeatureGenerator extends AbstractMessageGenerator {
-    public static final String FEATURE_XML_FILENAME = "feature.xml";
-    public static final String STUDIO_PREFIX = "org.mule.tooling.ui.extension.";
-    public static final String LABEL_SUFFIX = " Mule Studio Extension";
+
+public class MuleStudioSiteXmlGenerator extends AbstractMessageGenerator {
+
+    protected static final String SEPARATOR = File.separator;
+    public static final String SITE_XML = "site.xml";
 
     @Override
     protected boolean shouldGenerate(DevKitTypeElement typeElement) {
@@ -51,32 +50,34 @@ public class MuleStudioFeatureGenerator extends AbstractMessageGenerator {
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
             Document document = documentBuilder.newDocument();
 
+            Element site = document.createElement("site");
+            document.appendChild(site);
+
             Element feature = document.createElement("feature");
-            feature.setAttribute("id", STUDIO_PREFIX + typeElement.name());
-            feature.setAttribute("label", context.getNameUtils().friendlyNameFromCamelCase(typeElement.name()) + LABEL_SUFFIX);
+            feature.setAttribute("url", "features" + SEPARATOR + MuleStudioFeatureGenerator.STUDIO_PREFIX + typeElement.name() + "_%VERSION%" +".jar");
+            feature.setAttribute("id", MuleStudioFeatureGenerator.STUDIO_PREFIX + typeElement.name() );
             feature.setAttribute("version", "%VERSION%");
-            feature.setAttribute("provider-name", "Mulesoft, Inc.");
-            document.appendChild(feature);
 
-            Element license = document.createElement("license");
-            license.setTextContent("%LICENSE%");
-            license.setNodeValue("%LICENSE%");
-            feature.appendChild(license);
+            Element category = document.createElement("category");
+            category.setAttribute("name", "%CATEGORY%");
 
-            Element plugin = document.createElement("plugin");
-            plugin.setAttribute("id", STUDIO_PREFIX + typeElement.name());
-            plugin.setAttribute("download-size", "0");
-            plugin.setAttribute("install-size", "0");
-            plugin.setAttribute("version", "%VERSION%");
-            plugin.setAttribute("unpack", "true");
-            feature.appendChild(plugin);
+            feature.appendChild(category);
+
+            Element categoryDef = document.createElement("category-def");
+            categoryDef.setAttribute("name", "%CATEGORY%");
+            categoryDef.setAttribute("label", "%CATEGORY%");
+            site.appendChild(feature);
+            site.appendChild(categoryDef);
+
 
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
 
             DOMSource source = new DOMSource(document);
-            StreamResult result = new StreamResult(context.getCodeModel().getCodeWriter().openBinary(null, FEATURE_XML_FILENAME));
+            StreamResult result = new StreamResult(context.getCodeModel().getCodeWriter().openBinary(null, SITE_XML));
             transformer.transform(source, result);
+
+
 
         } catch (Exception e) {
             throw new GenerationException("Error generating Mule Studio plugin.xml", e);

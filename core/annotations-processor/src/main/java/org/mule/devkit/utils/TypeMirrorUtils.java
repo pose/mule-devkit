@@ -43,6 +43,8 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 import javax.xml.bind.annotation.XmlType;
 import java.lang.annotation.Annotation;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Date;
@@ -223,6 +225,14 @@ public class TypeMirrorUtils {
 
     public boolean isDate(Element element) {
         return element.asType().toString().startsWith(Date.class.getName());
+    }
+
+    public boolean isBigDecimal(Element element) {
+        return element.asType().toString().startsWith(BigDecimal.class.getName());
+    }
+
+    public boolean isBigInteger(Element element) {
+        return element.asType().toString().startsWith(BigInteger.class.getName());
     }
 
     public String getJavaType(Element element) {

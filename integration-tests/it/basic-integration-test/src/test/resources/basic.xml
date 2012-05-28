@@ -27,7 +27,7 @@
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
         http://www.mulesoft.org/schema/mule/basic http://www.mulesoft.org/schema/mule/basic/current/mule-basic.xsd">
 
-    <basic:config myInt="${my.int}" myLong="${my.long}"/>
+    <basic:config myInt="${my.int}" myLong="${my.long}" myBigDecimal="10.2" myBigInteger="10" />
 
     <spring:bean id="refObject" class="org.mule.devkit.it.MyComplexObject">
         <spring:property name="value" value="MuleSoft$"/>
@@ -71,5 +71,15 @@
     <flow name="passthruComplexRef">
         <basic:passthru-complex-ref myComplexObject-ref="refObject"/>
     </flow>
+
+    <flow name="passthruBigDecimal">
+        <basic:passthru-big-decimal value="10.2"/>
+    </flow>
+
+
+    <flow name="passthruBigInteger">
+        <basic:passthru-big-integer value="18"/>
+    </flow>
+
 
 </mule>

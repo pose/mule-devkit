@@ -69,7 +69,7 @@ public class MuleStudioPluginXmlGenerator extends AbstractMessageGenerator {
             externalContributionElement.setAttribute("contributionType", "cloud-connector");
             externalContributionElement.setAttribute("path", MuleStudioEditorXmlGenerator.EDITOR_XML_FILE_NAME);
             externalContributionElement.setAttribute("version", "%PROJECT_VERSION%");
-            externalContributionElement.setAttribute("name", "%BUNDLE_NAME%");
+            externalContributionElement.setAttribute("name", context.getNameUtils().friendlyNameFromCamelCase(typeElement.name()));
 
             extensionElement.appendChild(externalContributionElement);
 
