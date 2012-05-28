@@ -41,13 +41,6 @@ public class ParameterAnnotationsModuleStudioXmlTest {
         String expectedXml = IOUtils.toString(ParameterAnnotationsModuleStudioXmlTest.class.getClassLoader().getResourceAsStream(EXPECTED_STUDIO_XML));
         String actualXml = IOUtils.toString(ParameterAnnotationsModuleStudioXmlTest.class.getClassLoader().getResourceAsStream(ACTUAL_STUDIO_XML));
         
-        
-        FileWriter fstream = new FileWriter("/Users/marianogonzalez/Desktop/devkit.xml");
-        BufferedWriter out = new BufferedWriter(fstream);
-        out.write(actualXml);
-        //Close the output stream
-        out.close();
-        
         Diff diff = new Diff(expectedXml, actualXml);
         diff.overrideElementQualifier(new RecursiveElementNameAndTextQualifier());
         DetailedDiff detailedDiff = new DetailedDiff(diff);
