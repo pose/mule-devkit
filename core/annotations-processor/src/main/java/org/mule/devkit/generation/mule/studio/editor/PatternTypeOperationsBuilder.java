@@ -25,7 +25,6 @@ import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.PatternType;
 
-import javax.lang.model.element.ExecutableElement;
 import javax.xml.bind.JAXBElement;
 import java.util.Collections;
 import java.util.List;

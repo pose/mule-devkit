@@ -22,9 +22,15 @@ import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.generation.spring.SchemaGenerator;
-import org.mule.devkit.model.studio.*;
+import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.studio.AttributeType;
+import org.mule.devkit.model.studio.Booleantype;
+import org.mule.devkit.model.studio.NestedElementReference;
+import org.mule.devkit.model.studio.NestedElementType;
+import org.mule.devkit.model.studio.PatternType;
+import org.mule.devkit.model.studio.StringAttributeType;
+import org.mule.devkit.model.studio.TextType;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;

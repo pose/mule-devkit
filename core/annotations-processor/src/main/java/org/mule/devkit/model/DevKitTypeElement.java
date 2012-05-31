@@ -17,9 +17,7 @@
 
 package org.mule.devkit.model;
 
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import java.lang.annotation.Annotation;
 import java.util.List;
 

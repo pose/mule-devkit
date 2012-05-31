@@ -18,8 +18,8 @@
 package org.mule.devkit.generation.mule.studio;
 
 import org.mule.devkit.generation.AbstractMessageGenerator;
-import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.model.DevKitTypeElement;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

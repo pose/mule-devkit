@@ -18,8 +18,8 @@
 package org.mule.devkit.generation.mule;
 
 import org.mule.devkit.generation.AbstractModuleGenerator;
-import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.DefinedClass;
 
 import java.io.IOException;

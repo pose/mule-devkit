@@ -16,15 +16,13 @@
  */
 package org.mule.devkit.generation.mule.studio.editor;
 
-import java.util.List;
-
-import javax.lang.model.element.ExecutableElement;
-
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.studio.ModeElementType;
 import org.mule.util.StringUtils;
+
+import java.util.List;
 
 /**
  * Extension of {@link org.mule.devkit.generation.mule.studio.editor.PatternTypeOperationsBuilder}

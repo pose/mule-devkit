@@ -18,8 +18,8 @@
 package org.mule.devkit.generation.mule.studio.editor;
 
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.generation.spring.SchemaGenerator;
+import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.Group;
 import org.mule.devkit.model.studio.NewType;

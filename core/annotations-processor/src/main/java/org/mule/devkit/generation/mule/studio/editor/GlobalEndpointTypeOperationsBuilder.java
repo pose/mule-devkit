@@ -24,7 +24,6 @@ import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.GlobalType;
 
-import javax.lang.model.element.ExecutableElement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

@@ -23,7 +23,6 @@ import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
 
-import javax.lang.model.element.ExecutableElement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

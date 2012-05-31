@@ -17,10 +17,6 @@
 
 package org.mule.devkit.generation.mule.studio.editor;
 
-import java.util.List;
-
-import javax.lang.model.element.ExecutableElement;
-
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
@@ -34,6 +30,9 @@ import org.mule.devkit.model.studio.GlobalType;
 import org.mule.devkit.model.studio.NamespaceType;
 import org.mule.devkit.model.studio.ObjectFactory;
 import org.mule.devkit.model.studio.PatternType;
+
+import javax.lang.model.element.ExecutableElement;
+import java.util.List;
 
 public class MuleStudioEditorXmlGenerator extends AbstractMessageGenerator {
 

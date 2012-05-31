@@ -18,10 +18,10 @@
 package org.mule.devkit.apt;
 
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.DefaultDevKitTypeElement;
-import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.Generator;
+import org.mule.devkit.model.DefaultDevKitTypeElement;
+import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.validation.ValidationException;
 import org.mule.devkit.validation.Validator;
 

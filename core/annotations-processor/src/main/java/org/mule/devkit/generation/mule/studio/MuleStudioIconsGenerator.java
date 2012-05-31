@@ -22,8 +22,8 @@ import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
 import org.mule.api.annotations.display.Icons;
 import org.mule.devkit.generation.AbstractMessageGenerator;
-import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.util.IOUtils;
 
 import java.io.File;
