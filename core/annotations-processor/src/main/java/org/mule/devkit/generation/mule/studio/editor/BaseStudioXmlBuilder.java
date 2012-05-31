@@ -22,6 +22,7 @@ import org.mule.api.annotations.Connect;
 import org.mule.api.annotations.display.Placement;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.model.DevKitExecutableElement;
+import org.mule.devkit.model.DevKitFieldElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.AttributeType;
@@ -303,8 +304,8 @@ public abstract class BaseStudioXmlBuilder {
         return enumType;
     }
 
-    private List<VariableElement> getConfigurableFieldsSorted() {
-        List<VariableElement> configurableFields = typeElement.getFieldsAnnotatedWith(Configurable.class);
+    private List<DevKitFieldElement> getConfigurableFieldsSorted() {
+        List<DevKitFieldElement> configurableFields = typeElement.getFieldsAnnotatedWith(Configurable.class);
         Collections.sort(configurableFields, new VariableComparator(context));
         return configurableFields;
     }

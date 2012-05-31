@@ -26,7 +26,6 @@ import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
-import org.mule.devkit.generation.TypeElementImpl;
 
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
@@ -131,9 +130,9 @@ public class DefaultDevKitTypeElement extends TypeElementImpl implements DevKitT
     }
 
     @Override
-    public List<VariableElement> getFieldsAnnotatedWith(Class<? extends Annotation> annotation) {
-        List<VariableElement> result = new ArrayList<VariableElement>();
-        for (VariableElement field : getFields()) {
+    public List<DevKitFieldElement> getFieldsAnnotatedWith(Class<? extends Annotation> annotation) {
+        List<DevKitFieldElement> result = new ArrayList<DevKitFieldElement>();
+        for (DevKitFieldElement field : getFields()) {
             if (field.getAnnotation(annotation) != null) {
                 result.add(field);
             }
@@ -162,8 +161,13 @@ public class DefaultDevKitTypeElement extends TypeElementImpl implements DevKitT
     }
 
     @Override
-    public List<VariableElement> getFields() {
-        return ElementFilter.fieldsIn(typeElement.getEnclosedElements());
+    public List<DevKitFieldElement> getFields() {
+        List<DevKitFieldElement> fields = new ArrayList<DevKitFieldElement>();
+        for(VariableElement variableElement : ElementFilter.fieldsIn(typeElement.getEnclosedElements()) ) {
+            fields.add(new DefaultDevKitFieldElement(variableElement));
+        }
+
+        return fields;
     }
 
     public TypeElement unWrap() {
@@ -172,7 +176,12 @@ public class DefaultDevKitTypeElement extends TypeElementImpl implements DevKitT
 
     @Override
     public List<DevKitExecutableElement> getMethods() {
-        return ElementFilter.methodsIn(typeElement.getEnclosedElements());
+        List<DevKitExecutableElement> methods = new ArrayList<DevKitExecutableElement>();
+        for(ExecutableElement executableElement : ElementFilter.methodsIn(typeElement.getEnclosedElements()) ) {
+            methods.add(new DefaultDevKitExecutableElement(executableElement));
+        }
+
+        return methods;
     }
 
     @Override

@@ -80,7 +80,7 @@ public class ExtensionType
             @XmlElement(name = "attributeGroup", type = AttributeGroupRef.class),
             @XmlElement(name = "attribute", type = Attribute.class)
     })
-    protected List<Annotated> attributeOrAttributeGroup;
+    protected List<Attribute> attributeOrAttributeGroup;
     protected Wildcard anyAttribute;
     @XmlAttribute(name = "base", required = true)
     protected QName base;
@@ -186,9 +186,9 @@ public class ExtensionType
      * {@link AttributeGroupRef }
      * {@link Attribute }
      */
-    public List<Annotated> getAttributeOrAttributeGroup() {
+    public List<Attribute> getAttributeOrAttributeGroup() {
         if (attributeOrAttributeGroup == null) {
-            attributeOrAttributeGroup = new ArrayList<Annotated>();
+            attributeOrAttributeGroup = new ArrayList<Attribute>();
         }
         return this.attributeOrAttributeGroup;
     }

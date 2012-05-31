@@ -37,11 +37,11 @@ public interface DevKitTypeElement extends TypeElement {
 
     List<DevKitExecutableElement> getMethodsWhoseParametersAreAnnotatedWith(Class<? extends Annotation> annotation);
 
-    List<VariableElement> getFieldsAnnotatedWith(Class<? extends Annotation> annotation);
+    List<DevKitFieldElement> getFieldsAnnotatedWith(Class<? extends Annotation> annotation);
 
     boolean hasMethodsAnnotatedWith(Class<? extends Annotation> annotation);
 
-    List<VariableElement> getFields();
+    List<DevKitFieldElement> getFields();
 
     List<DevKitExecutableElement> getMethods();
 

@@ -19,7 +19,7 @@ package org.mule.devkit.utils;
 
 import org.apache.commons.lang.StringUtils;
 import org.mule.devkit.model.DefaultDevKitTypeElement;
-import org.mule.devkit.generation.TypeElementImpl;
+import org.mule.devkit.model.TypeElementImpl;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
