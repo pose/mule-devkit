@@ -21,7 +21,7 @@ import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.devkit.generation.AbstractMessageGenerator;
-import org.mule.devkit.generation.DevKitTypeElement;
+import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.Conditional;

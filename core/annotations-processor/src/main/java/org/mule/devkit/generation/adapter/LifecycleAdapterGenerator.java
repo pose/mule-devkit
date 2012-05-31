@@ -31,7 +31,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.config.MuleManifest;
 import org.mule.devkit.generation.AbstractModuleGenerator;
-import org.mule.devkit.generation.DevKitTypeElement;
+import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;

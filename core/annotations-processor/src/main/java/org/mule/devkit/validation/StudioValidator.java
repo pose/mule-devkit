@@ -18,7 +18,7 @@
 package org.mule.devkit.validation;
 
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.generation.DevKitTypeElement;
+import org.mule.devkit.model.DevKitTypeElement;
 
 import javax.lang.model.element.ExecutableElement;
 

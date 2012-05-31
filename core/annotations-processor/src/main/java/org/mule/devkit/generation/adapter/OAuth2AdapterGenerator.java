@@ -25,7 +25,7 @@ import org.mule.api.annotations.oauth.OAuthScope;
 import org.mule.api.oauth.OAuth2Adapter;
 import org.mule.api.oauth.UnableToAcquireAccessTokenException;
 import org.mule.devkit.generation.AbstractOAuthAdapterGenerator;
-import org.mule.devkit.generation.DevKitTypeElement;
+import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;

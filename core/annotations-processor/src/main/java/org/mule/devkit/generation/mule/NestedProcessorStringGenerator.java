@@ -19,7 +19,7 @@ package org.mule.devkit.generation.mule;
 
 import org.mule.api.NestedProcessor;
 import org.mule.devkit.generation.AbstractModuleGenerator;
-import org.mule.devkit.generation.DevKitTypeElement;
+import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.DefinedClass;

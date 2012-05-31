@@ -21,7 +21,7 @@ import java.util.List;
 import javax.lang.model.element.ExecutableElement;
 
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.generation.DevKitTypeElement;
+import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.studio.ModeElementType;
 import org.mule.util.StringUtils;
 

@@ -29,7 +29,7 @@ import org.mule.api.callback.SourceCallback;
 import org.mule.api.callback.StopSourceCallback;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.devkit.generation.AbstractMessageGenerator;
-import org.mule.devkit.generation.DevKitTypeElement;
+import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.generation.spring.SchemaTypeConversion;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.Cast;

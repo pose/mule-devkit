@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.generation;
+package org.mule.devkit.model;
 
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Connect;
@@ -26,6 +26,7 @@ import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
+import org.mule.devkit.generation.TypeElementImpl;
 
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;

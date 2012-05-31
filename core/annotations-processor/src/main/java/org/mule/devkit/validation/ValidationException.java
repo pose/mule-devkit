@@ -17,7 +17,7 @@
 
 package org.mule.devkit.validation;
 
-import org.mule.devkit.generation.DefaultDevKitTypeElement;
+import org.mule.devkit.model.DefaultDevKitTypeElement;
 
 import javax.lang.model.element.Element;
 

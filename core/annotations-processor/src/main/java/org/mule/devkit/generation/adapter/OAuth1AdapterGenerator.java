@@ -39,7 +39,7 @@ import org.mule.api.oauth.OAuth1Adapter;
 import org.mule.api.oauth.UnableToAcquireAccessTokenException;
 import org.mule.api.oauth.UnableToAcquireRequestTokenException;
 import org.mule.devkit.generation.AbstractOAuthAdapterGenerator;
-import org.mule.devkit.generation.DevKitTypeElement;
+import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;

@@ -26,7 +26,7 @@ import org.mule.api.annotations.rest.RestHttpClient;
 import org.mule.api.annotations.rest.RestQueryParam;
 import org.mule.api.annotations.rest.RestUriParam;
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.generation.DevKitTypeElement;
+import org.mule.devkit.model.DevKitTypeElement;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;

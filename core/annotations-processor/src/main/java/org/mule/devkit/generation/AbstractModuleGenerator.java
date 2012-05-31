@@ -26,6 +26,8 @@ import org.mule.api.annotations.Disconnect;
 import org.mule.api.annotations.ValidateConnection;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
+import org.mule.devkit.model.DefaultDevKitTypeElement;
+import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.Expression;

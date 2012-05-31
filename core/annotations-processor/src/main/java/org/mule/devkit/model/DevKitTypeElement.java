@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.generation;
+package org.mule.devkit.model;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;

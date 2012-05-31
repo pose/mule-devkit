@@ -34,7 +34,7 @@ import org.mule.api.transport.Connector;
 import org.mule.config.spring.factories.AsyncMessageProcessorsFactoryBean;
 import org.mule.construct.Flow;
 import org.mule.devkit.generation.AbstractModuleGenerator;
-import org.mule.devkit.generation.DevKitTypeElement;
+import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;

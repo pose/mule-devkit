@@ -23,7 +23,7 @@ import org.mule.api.callback.HttpCallback;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.transport.Connector;
 import org.mule.devkit.generation.AbstractModuleGenerator;
-import org.mule.devkit.generation.DevKitTypeElement;
+import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.Conditional;

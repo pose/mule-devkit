@@ -18,6 +18,7 @@
 package org.mule.devkit.generation;
 
 import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.CodeModel;
 
 public abstract class AbstractGenerator implements Generator {

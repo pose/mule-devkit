@@ -17,7 +17,7 @@
 package org.mule.devkit.utils;
 
 import org.apache.commons.lang.StringUtils;
-import org.mule.devkit.generation.DevKitTypeElement;
+import org.mule.devkit.model.DevKitTypeElement;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.util.Elements;

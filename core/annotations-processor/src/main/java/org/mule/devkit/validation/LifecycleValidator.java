@@ -20,7 +20,7 @@ package org.mule.devkit.validation;
 import org.mule.api.annotations.lifecycle.Start;
 import org.mule.api.annotations.lifecycle.Stop;
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.generation.DevKitTypeElement;
+import org.mule.devkit.model.DevKitTypeElement;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;

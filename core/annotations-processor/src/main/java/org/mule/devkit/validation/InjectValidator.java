@@ -30,7 +30,7 @@ import org.mule.api.security.SecurityManager;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.generation.DevKitTypeElement;
+import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.util.queue.QueueManager;
 
 import javax.inject.Inject;
