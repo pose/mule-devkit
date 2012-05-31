@@ -24,13 +24,7 @@ import org.mule.api.annotations.Transformer;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.generation.spring.SchemaGenerator;
-import org.mule.devkit.model.studio.AbstractElementType;
-import org.mule.devkit.model.studio.AttributeType;
-import org.mule.devkit.model.studio.Booleantype;
-import org.mule.devkit.model.studio.NestedElementReference;
-import org.mule.devkit.model.studio.NestedElementType;
-import org.mule.devkit.model.studio.StringAttributeType;
-import org.mule.devkit.model.studio.TextType;
+import org.mule.devkit.model.studio.*;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
@@ -50,8 +44,8 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
         super(context, typeElement);
     }
 
-    public List<JAXBElement<? extends AbstractElementType>> build() {
-        List<JAXBElement<? extends AbstractElementType>> nesteds = new ArrayList<JAXBElement<? extends AbstractElementType>>();
+    public List<? extends JAXBElement<PatternType>> build() {
+        List<? extends JAXBElement<PatternType>> nesteds = new ArrayList<JAXBElement<PatternType>>();
         for (VariableElement variableElement : getVariableElements()) {
             if (needToCreateNestedElement(variableElement)) {
 

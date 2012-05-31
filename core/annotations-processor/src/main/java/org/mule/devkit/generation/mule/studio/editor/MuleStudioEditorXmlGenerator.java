@@ -27,6 +27,7 @@ import org.mule.api.annotations.Transformer;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.devkit.generation.AbstractMessageGenerator;
+import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.studio.EndpointType;
 import org.mule.devkit.model.studio.GlobalType;
@@ -91,7 +92,7 @@ public class MuleStudioEditorXmlGenerator extends AbstractMessageGenerator {
     }
 
     private void processTransformerMethods(DevKitTypeElement typeElement, NamespaceType namespace) {
-        List<ExecutableElement> transformerMethods = typeElement.getMethodsAnnotatedWith(Transformer.class);
+        List<DevKitExecutableElement> transformerMethods = typeElement.getMethodsAnnotatedWith(Transformer.class);
         if (!transformerMethods.isEmpty()) {
             namespace.getConnectorOrEndpointOrGlobal().add(new PatternTypeOperationsBuilder(context, typeElement, PatternTypes.TRANSFORMER).build());
             namespace.getConnectorOrEndpointOrGlobal().add(new AbstractTransformerBuilder(context, typeElement).build());
@@ -108,7 +109,7 @@ public class MuleStudioEditorXmlGenerator extends AbstractMessageGenerator {
     }
 
     private void processSourceMethods(DevKitTypeElement typeElement, NamespaceType namespace) {
-        List<ExecutableElement> sourceMethods = typeElement.getMethodsAnnotatedWith(Source.class);
+        List<DevKitExecutableElement> sourceMethods = typeElement.getMethodsAnnotatedWith(Source.class);
         if (!sourceMethods.isEmpty()) {
             GlobalType abstractGlobalEndpoint = new GlobalEndpointTypeWithNameBuilder(context, typeElement).build();
             namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeGlobalEndpoint(abstractGlobalEndpoint));

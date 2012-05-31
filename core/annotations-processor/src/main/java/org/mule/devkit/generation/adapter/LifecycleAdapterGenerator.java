@@ -31,6 +31,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.config.MuleManifest;
 import org.mule.devkit.generation.AbstractModuleGenerator;
+import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.Block;
@@ -180,22 +181,22 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
     }
 
     private ExecutableElement getStartElement(DevKitTypeElement typeElement) {
-        List<ExecutableElement> startMethods = typeElement.getMethodsAnnotatedWith(Start.class);
+        List<DevKitExecutableElement> startMethods = typeElement.getMethodsAnnotatedWith(Start.class);
         return !startMethods.isEmpty() ? startMethods.get(0) : null;
     }
 
     private ExecutableElement getStopElement(DevKitTypeElement typeElement) {
-        List<ExecutableElement> stopMethods = typeElement.getMethodsAnnotatedWith(Stop.class);
+        List<DevKitExecutableElement> stopMethods = typeElement.getMethodsAnnotatedWith(Stop.class);
         return !stopMethods.isEmpty() ? stopMethods.get(0) : null;
     }
 
     private ExecutableElement getPostConstructElement(DevKitTypeElement typeElement) {
-        List<ExecutableElement> postConstructMethods = typeElement.getMethodsAnnotatedWith(PostConstruct.class);
+        List<DevKitExecutableElement> postConstructMethods = typeElement.getMethodsAnnotatedWith(PostConstruct.class);
         return !postConstructMethods.isEmpty() ? postConstructMethods.get(0) : null;
     }
 
     private ExecutableElement getPreDestroyElement(DevKitTypeElement typeElement) {
-        List<ExecutableElement> preDestroyMethods = typeElement.getMethodsAnnotatedWith(PreDestroy.class);
+        List<DevKitExecutableElement> preDestroyMethods = typeElement.getMethodsAnnotatedWith(PreDestroy.class);
         return !preDestroyMethods.isEmpty() ? preDestroyMethods.get(0) : null;
     }
 }

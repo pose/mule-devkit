@@ -20,6 +20,7 @@ package org.mule.devkit.validation;
 import org.mule.api.annotations.lifecycle.Start;
 import org.mule.api.annotations.lifecycle.Stop;
 import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitTypeElement;
 
 import javax.annotation.PostConstruct;
@@ -46,7 +47,7 @@ public class LifecycleValidator implements Validator {
     }
 
     private void check(DevKitTypeElement typeElement, Class<? extends Annotation> annotation) throws ValidationException {
-        List<ExecutableElement> methods = typeElement.getMethodsAnnotatedWith(annotation);
+        List<DevKitExecutableElement> methods = typeElement.getMethodsAnnotatedWith(annotation);
         if (methods.isEmpty()) {
             return;
         }

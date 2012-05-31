@@ -23,6 +23,7 @@ import org.mule.api.annotations.Disconnect;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.ValidateConnection;
 import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitTypeElement;
 
 import javax.lang.model.element.ExecutableElement;
@@ -39,10 +40,10 @@ public class ConnectorValidator implements Validator {
     @Override
     public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
 
-        List<ExecutableElement> connectMethods = typeElement.getMethodsAnnotatedWith(Connect.class);
-        List<ExecutableElement> validateConnectionMethods = typeElement.getMethodsAnnotatedWith(ValidateConnection.class);
-        List<ExecutableElement> disconnectMethods = typeElement.getMethodsAnnotatedWith(Disconnect.class);
-        List<ExecutableElement> connectionIdentifierMethods = typeElement.getMethodsAnnotatedWith(ConnectionIdentifier.class);
+        List<DevKitExecutableElement> connectMethods = typeElement.getMethodsAnnotatedWith(Connect.class);
+        List<DevKitExecutableElement> validateConnectionMethods = typeElement.getMethodsAnnotatedWith(ValidateConnection.class);
+        List<DevKitExecutableElement> disconnectMethods = typeElement.getMethodsAnnotatedWith(Disconnect.class);
+        List<DevKitExecutableElement> connectionIdentifierMethods = typeElement.getMethodsAnnotatedWith(ConnectionIdentifier.class);
 
         if (typeElement.hasAnnotation(Module.class)) {
             if (!connectMethods.isEmpty()) {
@@ -66,7 +67,7 @@ public class ConnectorValidator implements Validator {
         checkValidateConnectionMethod(typeElement, validateConnectionMethods);
     }
 
-    private void checkConnectMethod(DevKitTypeElement typeElement, List<ExecutableElement> connectMethods) throws ValidationException {
+    private void checkConnectMethod(DevKitTypeElement typeElement, List<DevKitExecutableElement> connectMethods) throws ValidationException {
         if (connectMethods.size() != 1) {
             throw new ValidationException(typeElement, "You must have exactly one method annotated with @Connect");
         }
@@ -87,7 +88,7 @@ public class ConnectorValidator implements Validator {
         }
     }
 
-    private void checkDisconnetcMethod(DevKitTypeElement typeElement, List<ExecutableElement> disconnectMethods) throws ValidationException {
+    private void checkDisconnetcMethod(DevKitTypeElement typeElement, List<DevKitExecutableElement> disconnectMethods) throws ValidationException {
         if (disconnectMethods.size() != 1) {
             throw new ValidationException(typeElement, "You must have exactly one method annotated with @Disconnect");
         }
@@ -103,7 +104,7 @@ public class ConnectorValidator implements Validator {
         }
     }
 
-    private void checkValidateConnectionMethod(DevKitTypeElement typeElement, List<ExecutableElement> validateConnectionMethods) throws ValidationException {
+    private void checkValidateConnectionMethod(DevKitTypeElement typeElement, List<DevKitExecutableElement> validateConnectionMethods) throws ValidationException {
         if (validateConnectionMethods.size() != 1) {
             throw new ValidationException(typeElement, "You must have exactly one method annotated with @ValidateConnection");
         }
@@ -120,7 +121,7 @@ public class ConnectorValidator implements Validator {
         }
     }
 
-    private void checkConnectionIdentifierMethod(DevKitTypeElement typeElement, List<ExecutableElement> connectionIdentifierMethods) throws ValidationException {
+    private void checkConnectionIdentifierMethod(DevKitTypeElement typeElement, List<DevKitExecutableElement> connectionIdentifierMethods) throws ValidationException {
         if (connectionIdentifierMethods.size() != 1) {
             throw new ValidationException(typeElement, "You must have exactly one method annotated with @ConnectionIdentifier");
         }

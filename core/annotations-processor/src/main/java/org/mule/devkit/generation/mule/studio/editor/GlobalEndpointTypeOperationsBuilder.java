@@ -19,6 +19,7 @@ package org.mule.devkit.generation.mule.studio.editor;
 
 import org.mule.api.annotations.Source;
 import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.GlobalType;
@@ -53,8 +54,8 @@ public class GlobalEndpointTypeOperationsBuilder extends GlobalTypeBuilder {
         return attributeCategories;
     }
 
-    private List<ExecutableElement> getTransformerMethodsSorted() {
-        List<ExecutableElement> transformer = typeElement.getMethodsAnnotatedWith(Source.class);
+    private List<DevKitExecutableElement> getTransformerMethodsSorted() {
+        List<DevKitExecutableElement> transformer = typeElement.getMethodsAnnotatedWith(Source.class);
         Collections.sort(transformer, new MethodComparator());
         return transformer;
     }

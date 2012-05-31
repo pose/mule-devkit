@@ -99,7 +99,7 @@ public class NamespaceType {
             @XmlElementRef(name = "cloud-connector", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
             @XmlElementRef(name = "global-filter", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class)
     })
-    protected List<JAXBElement<? extends AbstractElementType>> connectorOrEndpointOrGlobal;
+    protected List<JAXBElement<PatternType>> connectorOrEndpointOrGlobal;
     @XmlAttribute(name = "url")
     protected String url;
     @XmlAttribute(name = "prefix", required = true)
@@ -142,9 +142,9 @@ public class NamespaceType {
      * {@link JAXBElement }{@code <}{@link PatternType }{@code >}
      * {@link JAXBElement }{@code <}{@link GlobalType }{@code >}
      */
-    public List<JAXBElement<? extends AbstractElementType>> getConnectorOrEndpointOrGlobal() {
+    public List<JAXBElement<PatternType>> getConnectorOrEndpointOrGlobal() {
         if (connectorOrEndpointOrGlobal == null) {
-            connectorOrEndpointOrGlobal = new ArrayList<JAXBElement<? extends AbstractElementType>>();
+            connectorOrEndpointOrGlobal = new ArrayList<JAXBElement<PatternType>>();
         }
         return this.connectorOrEndpointOrGlobal;
     }

@@ -21,6 +21,7 @@ import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Connect;
 import org.mule.api.annotations.display.Placement;
 import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.AttributeType;
@@ -82,7 +83,7 @@ public abstract class BaseStudioXmlBuilder {
         moduleName = typeElement.name();
     }
 
-    protected Group createGroupWithModeSwitch(List<ExecutableElement> methods) {
+    protected Group createGroupWithModeSwitch(List<DevKitExecutableElement> methods) {
        
         ModeType modeSwitch = new ModeType();
         modeSwitch.getMode().addAll(this.getModes(methods));
@@ -97,7 +98,7 @@ public abstract class BaseStudioXmlBuilder {
         return group;
     }
     
-    protected List<ModeElementType> getModes(List<ExecutableElement> methods) {
+    protected List<ModeElementType> getModes(List<DevKitExecutableElement> methods) {
 		 List<ModeElementType> modes = new ArrayList<ModeElementType>();
 	     for (ExecutableElement method : methods) {
 	         ModeElementType mode = new ModeElementType();

@@ -21,6 +21,7 @@ import java.util.List;
 import javax.lang.model.element.ExecutableElement;
 
 import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.studio.ModeElementType;
 import org.mule.util.StringUtils;
@@ -39,7 +40,7 @@ public class OAuthPatternTypeOperationsBuilder extends PatternTypeOperationsBuil
 	}
 	
 	@Override
-    protected List<ModeElementType> getModes(List<ExecutableElement> methods) {
+    protected List<ModeElementType> getModes(List<DevKitExecutableElement> methods) {
     	List<ModeElementType> modes = super.getModes(methods);
     	
     	ModeElementType mode = new ModeElementType();

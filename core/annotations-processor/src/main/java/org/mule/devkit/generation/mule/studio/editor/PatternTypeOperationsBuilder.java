@@ -20,6 +20,7 @@ package org.mule.devkit.generation.mule.studio.editor;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Transformer;
 import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.PatternType;
@@ -88,8 +89,8 @@ public class PatternTypeOperationsBuilder extends BaseStudioXmlBuilder {
         }
     }
 
-    private List<ExecutableElement> getMethods() {
-        List<ExecutableElement> methods;
+    private List<DevKitExecutableElement> getMethods() {
+        List<DevKitExecutableElement> methods;
         if (patternTypeToUse.equals(PatternTypes.CLOUD_CONNECTOR)) {
             methods = typeElement.getMethodsAnnotatedWith(Processor.class);
         } else {

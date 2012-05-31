@@ -88,7 +88,7 @@ public abstract class ComplexType
             @XmlElement(name = "attribute", type = Attribute.class),
             @XmlElement(name = "attributeGroup", type = AttributeGroupRef.class)
     })
-    protected List<Annotated> attributeOrAttributeGroup;
+    protected List<Attribute> attributeOrAttributeGroup;
     protected Wildcard anyAttribute;
     @XmlAttribute(name = "name")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
@@ -246,9 +246,9 @@ public abstract class ComplexType
      * {@link Attribute }
      * {@link AttributeGroupRef }
      */
-    public List<Annotated> getAttributeOrAttributeGroup() {
+    public List<Attribute> getAttributeOrAttributeGroup() {
         if (attributeOrAttributeGroup == null) {
-            attributeOrAttributeGroup = new ArrayList<Annotated>();
+            attributeOrAttributeGroup = new ArrayList<Attribute>();
         }
         return this.attributeOrAttributeGroup;
     }

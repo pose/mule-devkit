@@ -234,7 +234,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     private void registerEnum(Schema schema, TypeMirror enumType) {
         javax.lang.model.element.Element enumElement = context.getTypeUtils().asElement(enumType);
 
-        TopLevelSimpleType enumSimpleType = new TopLevelSimpleType();
+        Element enumSimpleType = new TopLevelSimpleType();
         enumSimpleType.setName(enumElement.getSimpleName() + ENUM_TYPE_SUFFIX);
 
         Union union = new Union();
@@ -356,7 +356,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     }
 
     private void registerExtendedType(Schema schema, QName base, String targetNamespace, String name, ExecutableElement element) {
-        TopLevelComplexType complexType = new TopLevelComplexType();
+        Element complexType = new TopLevelComplexType();
         complexType.setName(name);
 
         ComplexContent complexContent = new ComplexContent();
@@ -691,8 +691,8 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         return xmlElement;
     }
 
-    private ComplexType createAnyXmlType() {
-        ComplexType xmlComplexType = new TopLevelComplexType();
+    private Element createAnyXmlType() {
+        Element xmlComplexType = new TopLevelComplexType();
         xmlComplexType.setName(XML_TYPE_SUFFIX);
         Any any = new Any();
         any.setProcessContents(LAX);
@@ -1115,7 +1115,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     }
 
     private void registerAnyXmlType(Schema schema) {
-        ComplexType xmlComplexType = createAnyXmlType();
+        Element xmlComplexType = createAnyXmlType();
         schema.getSimpleTypeOrComplexTypeOrGroup().add(xmlComplexType);
     }
 
@@ -1124,7 +1124,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     }
 
     private void registerType(Schema schema, String name, QName base, int minlen, int maxlen) {
-        SimpleType simpleType = new TopLevelSimpleType();
+        Element simpleType = new TopLevelSimpleType();
         simpleType.setName(name);
         Union union = new Union();
         simpleType.setUnion(union);

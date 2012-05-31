@@ -27,6 +27,7 @@ import org.mule.api.annotations.ValidateConnection;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.devkit.model.DefaultDevKitTypeElement;
+import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
@@ -116,22 +117,22 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
     }
 
     protected ExecutableElement connectMethodForClass(DevKitTypeElement typeElement) {
-        List<ExecutableElement> connectMethods = typeElement.getMethodsAnnotatedWith(Connect.class);
+        List<DevKitExecutableElement> connectMethods = typeElement.getMethodsAnnotatedWith(Connect.class);
         return !connectMethods.isEmpty() ? connectMethods.get(0) : null;
     }
 
     protected ExecutableElement validateConnectionMethodForClass(DevKitTypeElement typeElement) {
-        List<ExecutableElement> connectMethods = typeElement.getMethodsAnnotatedWith(ValidateConnection.class);
+        List<DevKitExecutableElement> connectMethods = typeElement.getMethodsAnnotatedWith(ValidateConnection.class);
         return !connectMethods.isEmpty() ? connectMethods.get(0) : null;
     }
 
     protected ExecutableElement disconnectMethodForClass(DevKitTypeElement typeElement) {
-        List<ExecutableElement> disconnectMethods = typeElement.getMethodsAnnotatedWith(Disconnect.class);
+        List<DevKitExecutableElement> disconnectMethods = typeElement.getMethodsAnnotatedWith(Disconnect.class);
         return !disconnectMethods.isEmpty() ? disconnectMethods.get(0) : null;
     }
 
     protected ExecutableElement connectionIdentifierMethodForClass(DevKitTypeElement typeElement) {
-        List<ExecutableElement> connectionIdentifierMethods = typeElement.getMethodsAnnotatedWith(ConnectionIdentifier.class);
+        List<DevKitExecutableElement> connectionIdentifierMethods = typeElement.getMethodsAnnotatedWith(ConnectionIdentifier.class);
         return !connectionIdentifierMethods.isEmpty() ? connectionIdentifierMethods.get(0) : null;
     }
 

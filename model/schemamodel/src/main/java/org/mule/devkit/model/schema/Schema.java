@@ -101,7 +101,7 @@ public class Schema
             @XmlElement(name = "complexType", type = TopLevelComplexType.class),
             @XmlElement(name = "simpleType", type = TopLevelSimpleType.class)
     })
-    protected List<OpenAttrs> simpleTypeOrComplexTypeOrGroup;
+    protected List<Element> simpleTypeOrComplexTypeOrGroup;
     @XmlAttribute(name = "targetNamespace")
     @XmlSchemaType(name = "anyURI")
     protected String targetNamespace;
@@ -184,9 +184,9 @@ public class Schema
      * {@link TopLevelComplexType }
      * {@link TopLevelSimpleType }
      */
-    public List<OpenAttrs> getSimpleTypeOrComplexTypeOrGroup() {
+    public List<Element> getSimpleTypeOrComplexTypeOrGroup() {
         if (simpleTypeOrComplexTypeOrGroup == null) {
-            simpleTypeOrComplexTypeOrGroup = new ArrayList<OpenAttrs>();
+            simpleTypeOrComplexTypeOrGroup = new ArrayList<Element>();
         }
         return this.simpleTypeOrComplexTypeOrGroup;
     }

@@ -107,9 +107,9 @@ public class DefaultDevKitTypeElement extends TypeElementImpl implements DevKitT
     }
 
     @Override
-    public List<ExecutableElement> getMethodsAnnotatedWith(Class<? extends Annotation> annotation) {
-        List<ExecutableElement> result = new ArrayList<ExecutableElement>();
-        for (ExecutableElement method : getMethods()) {
+    public List<DevKitExecutableElement> getMethodsAnnotatedWith(Class<? extends Annotation> annotation) {
+        List<DevKitExecutableElement> result = new ArrayList<DevKitExecutableElement>();
+        for (DevKitExecutableElement method : getMethods()) {
             if (method.getAnnotation(annotation) != null) {
                 result.add(method);
             }
@@ -118,9 +118,9 @@ public class DefaultDevKitTypeElement extends TypeElementImpl implements DevKitT
     }
 
     @Override
-    public List<ExecutableElement> getMethodsWhoseParametersAreAnnotatedWith(Class<? extends Annotation> annotation) {
-        List<ExecutableElement> result = new ArrayList<ExecutableElement>();
-        for (ExecutableElement method : getMethods()) {
+    public List<DevKitExecutableElement> getMethodsWhoseParametersAreAnnotatedWith(Class<? extends Annotation> annotation) {
+        List<DevKitExecutableElement> result = new ArrayList<DevKitExecutableElement>();
+        for (DevKitExecutableElement method : getMethods()) {
             for (VariableElement parameter : method.getParameters()) {
                 if (parameter.getAnnotation(annotation) != null) {
                     result.add(method);
@@ -171,7 +171,7 @@ public class DefaultDevKitTypeElement extends TypeElementImpl implements DevKitT
     }
 
     @Override
-    public List<ExecutableElement> getMethods() {
+    public List<DevKitExecutableElement> getMethods() {
         return ElementFilter.methodsIn(typeElement.getEnclosedElements());
     }
 

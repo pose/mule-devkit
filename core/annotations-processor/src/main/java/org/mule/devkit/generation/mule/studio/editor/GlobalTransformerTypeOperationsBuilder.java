@@ -19,6 +19,7 @@ package org.mule.devkit.generation.mule.studio.editor;
 
 import org.mule.api.annotations.Transformer;
 import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
 
@@ -45,8 +46,8 @@ public class GlobalTransformerTypeOperationsBuilder extends GlobalTypeBuilder {
         return attributeCategories;
     }
 
-    private List<ExecutableElement> getTransformerMethodsSorted() {
-        List<ExecutableElement> transformer = typeElement.getMethodsAnnotatedWith(Transformer.class);
+    private List<DevKitExecutableElement> getTransformerMethodsSorted() {
+        List<DevKitExecutableElement> transformer = typeElement.getMethodsAnnotatedWith(Transformer.class);
         Collections.sort(transformer, new MethodComparator());
         return transformer;
     }
