@@ -29,16 +29,15 @@ import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.mule.api.callback.HttpCallback;
 import org.mule.devkit.generation.AbstractModuleGenerator;
-import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.generation.adapter.HttpCallbackAdapterGenerator;
+import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.schema.Annotation;
 import org.mule.devkit.model.schema.Any;
 import org.mule.devkit.model.schema.Attribute;
 import org.mule.devkit.model.schema.ComplexContent;
-import org.mule.devkit.model.schema.ComplexType;
 import org.mule.devkit.model.schema.Documentation;
 import org.mule.devkit.model.schema.Element;
 import org.mule.devkit.model.schema.ExplicitGroup;
@@ -58,7 +57,6 @@ import org.mule.devkit.model.schema.SchemaConstants;
 import org.mule.devkit.model.schema.SchemaLocation;
 import org.mule.devkit.model.schema.SimpleContent;
 import org.mule.devkit.model.schema.SimpleExtensionType;
-import org.mule.devkit.model.schema.SimpleType;
 import org.mule.devkit.model.schema.TopLevelComplexType;
 import org.mule.devkit.model.schema.TopLevelElement;
 import org.mule.devkit.model.schema.TopLevelSimpleType;
@@ -729,7 +727,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         }
 
         for (VariableElement variable : typeElement.getFieldsAnnotatedWith(Inject.class)) {
-            if( variable.asType().toString().equals("org.mule.api.store.ObjectStore") ) {
+            if (variable.asType().toString().equals("org.mule.api.store.ObjectStore")) {
                 config.getAttributeOrAttributeGroup().add(createObjectStoreRefAttribute(variable));
             }
         }
