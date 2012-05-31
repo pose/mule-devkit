@@ -29,15 +29,16 @@ import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.mule.api.callback.HttpCallback;
 import org.mule.devkit.generation.AbstractModuleGenerator;
+import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.generation.adapter.HttpCallbackAdapterGenerator;
-import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.schema.Annotation;
 import org.mule.devkit.model.schema.Any;
 import org.mule.devkit.model.schema.Attribute;
 import org.mule.devkit.model.schema.ComplexContent;
+import org.mule.devkit.model.schema.ComplexType;
 import org.mule.devkit.model.schema.Documentation;
 import org.mule.devkit.model.schema.Element;
 import org.mule.devkit.model.schema.ExplicitGroup;
@@ -57,6 +58,7 @@ import org.mule.devkit.model.schema.SchemaConstants;
 import org.mule.devkit.model.schema.SchemaLocation;
 import org.mule.devkit.model.schema.SimpleContent;
 import org.mule.devkit.model.schema.SimpleExtensionType;
+import org.mule.devkit.model.schema.SimpleType;
 import org.mule.devkit.model.schema.TopLevelComplexType;
 import org.mule.devkit.model.schema.TopLevelElement;
 import org.mule.devkit.model.schema.TopLevelSimpleType;
@@ -152,7 +154,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         String versionedLocation = getVersionedLocation(typeElement);
         String currentLocation = null;
         if (typeElement.schemaLocation() == null || typeElement.schemaLocation().length() == 0) {
-              currentLocation = schema.getTargetNamespace() + "/current/mule-" + typeElement.name() + XSD_EXTENSION;
+            currentLocation = schema.getTargetNamespace() + "/current/mule-" + typeElement.name() + XSD_EXTENSION;
         }
 
         // TODO: replace with a class role
@@ -232,7 +234,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     private void registerEnum(Schema schema, TypeMirror enumType) {
         javax.lang.model.element.Element enumElement = context.getTypeUtils().asElement(enumType);
 
-        Element enumSimpleType = new TopLevelSimpleType();
+        TopLevelSimpleType enumSimpleType = new TopLevelSimpleType();
         enumSimpleType.setName(enumElement.getSimpleName() + ENUM_TYPE_SUFFIX);
 
         Union union = new Union();
@@ -354,7 +356,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     }
 
     private void registerExtendedType(Schema schema, QName base, String targetNamespace, String name, ExecutableElement element) {
-        Element complexType = new TopLevelComplexType();
+        TopLevelComplexType complexType = new TopLevelComplexType();
         complexType.setName(name);
 
         ComplexContent complexContent = new ComplexContent();
@@ -689,8 +691,8 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         return xmlElement;
     }
 
-    private Element createAnyXmlType() {
-        Element xmlComplexType = new TopLevelComplexType();
+    private TopLevelComplexType createAnyXmlType() {
+        TopLevelComplexType xmlComplexType = new TopLevelComplexType();
         xmlComplexType.setName(XML_TYPE_SUFFIX);
         Any any = new Any();
         any.setProcessContents(LAX);
@@ -1113,7 +1115,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     }
 
     private void registerAnyXmlType(Schema schema) {
-        Element xmlComplexType = createAnyXmlType();
+        TopLevelComplexType xmlComplexType = createAnyXmlType();
         schema.getSimpleTypeOrComplexTypeOrGroup().add(xmlComplexType);
     }
 
@@ -1122,7 +1124,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     }
 
     private void registerType(Schema schema, String name, QName base, int minlen, int maxlen) {
-        Element simpleType = new TopLevelSimpleType();
+        TopLevelSimpleType simpleType = new TopLevelSimpleType();
         simpleType.setName(name);
         Union union = new Union();
         simpleType.setUnion(union);

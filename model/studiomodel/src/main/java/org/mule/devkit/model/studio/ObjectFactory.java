@@ -334,8 +334,8 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link EndpointType }{@code >}}
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "endpoint")
-    public JAXBElement<PatternType> createEndpoint(EndpointType value) {
-        return new JAXBElement<PatternType>(_Endpoint_QNAME, EndpointType.class, null, value);
+    public JAXBElement<EndpointType> createEndpoint(EndpointType value) {
+        return new JAXBElement<EndpointType>(_Endpoint_QNAME, EndpointType.class, null, value);
     }
 
     /**
@@ -606,8 +606,8 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link GlobalType }{@code >}}
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "global-cloud-connector", scope = NamespaceType.class)
-    public JAXBElement<PatternType> createNamespaceTypeGlobalCloudConnector(GlobalType value) {
-        return new JAXBElement<PatternType>(_NamespaceTypeGlobalCloudConnector_QNAME, GlobalType.class, NamespaceType.class, value);
+    public JAXBElement<GlobalType> createNamespaceTypeGlobalCloudConnector(GlobalType value) {
+        return new JAXBElement<GlobalType>(_NamespaceTypeGlobalCloudConnector_QNAME, GlobalType.class, NamespaceType.class, value);
     }
 
     /**
@@ -622,8 +622,8 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link GlobalType }{@code >}}
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "global-transformer", scope = NamespaceType.class)
-    public JAXBElement<PatternType> createNamespaceTypeGlobalTransformer(GlobalType value) {
-        return new JAXBElement<PatternType>(_NamespaceTypeGlobalTransformer_QNAME, GlobalType.class, NamespaceType.class, value);
+    public JAXBElement<GlobalType> createNamespaceTypeGlobalTransformer(GlobalType value) {
+        return new JAXBElement<GlobalType>(_NamespaceTypeGlobalTransformer_QNAME, GlobalType.class, NamespaceType.class, value);
     }
 
     /**
@@ -638,8 +638,8 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link GlobalType }{@code >}}
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "global-endpoint", scope = NamespaceType.class)
-    public JAXBElement<PatternType> createNamespaceTypeGlobalEndpoint(GlobalType value) {
-        return new JAXBElement<PatternType>(_NamespaceTypeGlobalEndpoint_QNAME, GlobalType.class, NamespaceType.class, value);
+    public JAXBElement<GlobalType> createNamespaceTypeGlobalEndpoint(GlobalType value) {
+        return new JAXBElement<GlobalType>(_NamespaceTypeGlobalEndpoint_QNAME, GlobalType.class, NamespaceType.class, value);
     }
 
     /**
