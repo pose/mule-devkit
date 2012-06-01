@@ -25,7 +25,7 @@ import javax.lang.model.type.TypeMirror;
 import java.util.List;
 import java.util.Set;
 
-public interface DevKitElement<T extends Element, P extends DevKitElement> extends TestInterface {
+public interface DevKitElement<T extends Element, P extends DevKitElement> extends DevKitAnnotatedElement {
     T unwrap();
 
     P parent();
@@ -33,8 +33,6 @@ public interface DevKitElement<T extends Element, P extends DevKitElement> exten
     TypeMirror asType();
 
     ElementKind getKind();
-
-    List<? extends AnnotationMirror> getAnnotationMirrors();
 
     Set<Modifier> getModifiers();
 
