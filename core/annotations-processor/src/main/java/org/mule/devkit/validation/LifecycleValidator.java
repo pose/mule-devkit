@@ -25,7 +25,6 @@ import org.mule.devkit.model.DevKitTypeElement;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeKind;
 import java.lang.annotation.Annotation;
 import java.util.List;

@@ -21,8 +21,6 @@ import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitTypeElement;
 
-import javax.lang.model.element.ExecutableElement;
-
 public class StudioValidator extends JavaDocValidator {
 
     @Override

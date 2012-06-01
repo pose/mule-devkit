@@ -25,7 +25,6 @@ import org.mule.devkit.model.DevKitTypeElement;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
 import java.util.List;
 import java.util.Map;
 

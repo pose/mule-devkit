@@ -50,8 +50,6 @@ import org.mule.devkit.utils.NameUtils;
 import org.mule.devkit.utils.TypeMirrorUtils;
 import org.mule.util.StringUtils;
 
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
 import javax.xml.bind.JAXBElement;
 import java.util.ArrayList;
 import java.util.List;

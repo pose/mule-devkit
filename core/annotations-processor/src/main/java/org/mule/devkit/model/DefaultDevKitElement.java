@@ -18,8 +18,6 @@ package org.mule.devkit.model;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ElementVisitor;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
 import javax.lang.model.type.DeclaredType;
@@ -29,7 +27,6 @@ import javax.lang.model.util.Types;
 import javax.xml.bind.annotation.XmlType;
 import java.lang.annotation.Annotation;
 import java.util.List;
-import java.util.Set;
 
 public class DefaultDevKitElement<T extends Element, P extends DevKitElement> implements DevKitElement<T, P> {
     protected T innerElement;

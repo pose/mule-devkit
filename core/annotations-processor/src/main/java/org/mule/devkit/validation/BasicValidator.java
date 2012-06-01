@@ -24,7 +24,6 @@ import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.model.DevKitFieldElement;
 import org.mule.devkit.model.DevKitTypeElement;
 
-import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeKind;
 
 public class BasicValidator implements Validator {

@@ -35,7 +35,6 @@ import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitParameterElement;
 import org.mule.devkit.model.DevKitTypeElement;
 
-import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeKind;
 import java.util.List;
 

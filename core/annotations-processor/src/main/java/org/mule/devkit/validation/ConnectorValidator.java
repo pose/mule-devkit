@@ -26,7 +26,6 @@ import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitTypeElement;
 
-import javax.lang.model.element.Modifier;
 import java.util.List;
 
 public class ConnectorValidator implements Validator {

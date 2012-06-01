@@ -32,7 +32,6 @@ import org.mule.devkit.model.DevKitParameterElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.util.IOUtils;
 
-import javax.lang.model.element.Element;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

@@ -31,8 +31,6 @@ import org.mule.devkit.model.DevKitFieldElement;
 import org.mule.devkit.model.DevKitParameterElement;
 import org.mule.devkit.model.DevKitTypeElement;
 
-import javax.lang.model.element.Modifier;
-
 public class RestValidator implements Validator {
 
     @Override

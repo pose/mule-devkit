@@ -17,12 +17,8 @@
 package org.mule.devkit.model;
 
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
 import javax.lang.model.type.TypeMirror;
-import java.util.List;
-import java.util.Set;
 
 public interface DevKitElement<T extends Element, P extends DevKitElement> extends DevKitAnnotatedElement {
     T unwrap();
