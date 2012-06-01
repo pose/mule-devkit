@@ -232,7 +232,7 @@ public class MuleStudioUtils {
     }
 
     private boolean skipAttributeTypeGeneration(DevKitElement element) {
-        return typeMirrorUtils.isCollection(element.asType()) || typeMirrorUtils.isEnum(element.asType()) || typeMirrorUtils.ignoreParameter(element);
+        return element.isCollection() || element.isEnum() || typeMirrorUtils.ignoreParameter(element);
     }
 
     private AttributeType createAttributeTypeOfSupportedType(DevKitElement element) {
@@ -376,8 +376,8 @@ public class MuleStudioUtils {
                 typeMirrorUtils.isBigDecimal(variable) ||
                 typeMirrorUtils.isBigInteger(variable) ||
                 typeMirrorUtils.isBoolean(variable) ||
-                typeMirrorUtils.isEnum(variable) ||
-                typeMirrorUtils.isCollection(variable) ||
+                variable.isEnum() ||
+                variable.isCollection() ||
                 typeMirrorUtils.isURL(variable);
     }
 

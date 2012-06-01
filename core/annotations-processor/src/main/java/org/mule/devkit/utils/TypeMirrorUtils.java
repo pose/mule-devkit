@@ -65,83 +65,6 @@ public class TypeMirrorUtils {
         this.types = types;
     }
 
-    public boolean isCollection(TypeMirror type) {
-        return isArrayOrList(type) || isMap(type);
-    }
-
-    public boolean isNestedProcessor(TypeMirror type) {
-        if (type.toString().startsWith(NestedProcessor.class.getName())) {
-            return true;
-        }
-
-        if (type.toString().startsWith(List.class.getName())) {
-            DeclaredType variableType = (DeclaredType) type;
-            List<? extends TypeMirror> variableTypeParameters = variableType.getTypeArguments();
-            if (variableTypeParameters.isEmpty()) {
-                return false;
-            }
-
-            if (variableTypeParameters.get(0).toString().startsWith(NestedProcessor.class.getName())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public boolean isArrayOrList(TypeMirror type) {
-        if (type.toString().equals("byte[]")) {
-            return false;
-        }
-
-        if (type.getKind() == TypeKind.ARRAY) {
-            return true;
-        }
-
-        if (type.toString().startsWith(List.class.getName())) {
-            return true;
-        }
-
-        List<? extends TypeMirror> inherits = types.directSupertypes(type);
-        for (TypeMirror inherit : inherits) {
-            if (isArrayOrList(inherit)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public boolean isMap(TypeMirror type) {
-        if (type.toString().startsWith(Map.class.getName())) {
-            return true;
-        }
-
-        List<? extends TypeMirror> inherits = types.directSupertypes(type);
-        for (TypeMirror inherit : inherits) {
-            if (isMap(inherit)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public boolean isEnum(TypeMirror type) {
-        if (type.toString().startsWith(Enum.class.getName())) {
-            return true;
-        }
-
-        List<? extends TypeMirror> inherits = types.directSupertypes(type);
-        for (TypeMirror inherit : inherits) {
-            if (isEnum(inherit)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     public boolean ignoreParameter(DevKitElement element) {
         String variableType = element.asType().toString();
         for (Class<?> typeToIgnore : PARAMETER_TYPES_TO_IGNORE) {
@@ -190,14 +113,6 @@ public class TypeMirrorUtils {
     public boolean isChar(DevKitElement element) {
         String className = element.asType().toString();
         return className.startsWith(Character.class.getName()) || className.startsWith("char");
-    }
-
-    public boolean isEnum(DevKitElement element) {
-        return isEnum(element.asType());
-    }
-
-    public boolean isCollection(DevKitElement element) {
-        return isCollection(element.asType());
     }
 
     public boolean isHttpCallback(DevKitElement element) {

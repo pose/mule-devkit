@@ -216,12 +216,12 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
             } else if (parameter.getAnnotation(InboundHeaders.class) != null) {
                 InboundHeaders inboundHeaders = parameter.getAnnotation(InboundHeaders.class);
                 inboundHeadersVar = tryStatement.body().decl(trackMap.narrow(ref(String.class)).narrow(Object.class), "inboundHeaders", ExpressionFactory._null());
-                if (context.getTypeMirrorUtils().isArrayOrList(parameter.asType())) {
+                if (parameter.isArrayOrList()) {
                     tryStatement.body().assign(inboundHeadersVar, ExpressionFactory._new(trackMap.narrow(ref(String.class)).narrow(Object.class)).arg(ExpressionFactory.cast(ref(parameter.asType()),
                             ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
                                     ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("INBOUND:" + inboundHeaders.value()).arg(message).arg(ref(List.class).dotclass())
                             ))));
-                } else if (context.getTypeMirrorUtils().isMap(parameter.asType())) {
+                } else if (parameter.isMap()) {
                     tryStatement.body().assign(inboundHeadersVar, ExpressionFactory._new(trackMap.narrow(ref(String.class)).narrow(Object.class)).arg(ExpressionFactory.cast(ref(parameter.asType()),
                             ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
                                     ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("INBOUND:" + inboundHeaders.value()).arg(message).arg(ref(Map.class).dotclass())
@@ -236,12 +236,12 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
             } else if (parameter.getAnnotation(SessionHeaders.class) != null) {
                 SessionHeaders sessionHeaders = parameter.getAnnotation(SessionHeaders.class);
                 sessionHeadersVar = tryStatement.body().decl(trackMap.narrow(ref(String.class)).narrow(Object.class), "sessionHeaders", ExpressionFactory._null());
-                if (context.getTypeMirrorUtils().isArrayOrList(parameter.asType())) {
+                if (parameter.isArrayOrList()) {
                     tryStatement.body().assign(sessionHeadersVar, ExpressionFactory._new(trackMap.narrow(ref(String.class)).narrow(Object.class)).arg(ExpressionFactory.cast(ref(parameter.asType()),
                             ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
                                     ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("SESSION:" + sessionHeaders.value()).arg(message).arg(ref(List.class).dotclass())
                             ))));
-                } else if (context.getTypeMirrorUtils().isMap(parameter.asType())) {
+                } else if (parameter.isMap()) {
                     tryStatement.body().assign(sessionHeadersVar, ExpressionFactory._new(trackMap.narrow(ref(String.class)).narrow(Object.class)).arg(ExpressionFactory.cast(ref(parameter.asType()),
                             ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
                                     ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("SESSION:" + sessionHeaders.value()).arg(message).arg(ref(Map.class).dotclass())
@@ -263,12 +263,12 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
             } else if (parameter.getAnnotation(InvocationHeaders.class) != null) {
                 InvocationHeaders invocationHeaders = parameter.getAnnotation(InvocationHeaders.class);
                 invocationHeadersVar = tryStatement.body().decl(trackMap.narrow(ref(String.class)).narrow(Object.class), "invocationHeaders", ExpressionFactory._null());
-                if (context.getTypeMirrorUtils().isArrayOrList(parameter.asType())) {
+                if (parameter.isArrayOrList()) {
                     tryStatement.body().assign(invocationHeadersVar, ExpressionFactory._new(trackMap.narrow(ref(String.class)).narrow(Object.class)).arg(ExpressionFactory.cast(ref(parameter.asType()),
                             ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
                                     ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("INVOCATION:" + invocationHeaders.value()).arg(message).arg(ref(List.class).dotclass())
                             ))));
-                } else if (context.getTypeMirrorUtils().isMap(parameter.asType())) {
+                } else if (parameter.isMap()) {
                     tryStatement.body().assign(invocationHeadersVar, ExpressionFactory._new(trackMap.narrow(ref(String.class)).narrow(Object.class)).arg(ExpressionFactory.cast(ref(parameter.asType()),
                             ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
                                     ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("INVOCATION:" + invocationHeaders.value()).arg(message).arg(ref(Map.class).dotclass())

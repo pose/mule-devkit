@@ -271,8 +271,8 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
                 String fieldName = variable.getSimpleName().toString();
                 if (SchemaTypeConversion.isSupported(fields.get(fieldName).getVariableElement().asType().toString()) ||
                         fields.get(fieldName).getVariableElement().isXmlType() ||
-                        context.getTypeMirrorUtils().isCollection(fields.get(fieldName).getVariableElement().asType()) ||
-                        context.getTypeMirrorUtils().isEnum(fields.get(fieldName).getVariableElement().asType())) {
+                        fields.get(fieldName).getVariableElement().isCollection() ||
+                        fields.get(fieldName).getVariableElement().isEnum()) {
                     Variable transformed = callSource.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(), "transformed" + StringUtils.capitalize(fieldName), ExpressionFactory._null());
                     Conditional notNull = callSource.body()._if(Op.ne(fields.get(fieldName).getField(), ExpressionFactory._null()));
                     generateTransform(notNull._then(), transformed, fields.get(fieldName).getField(), fields.get(fieldName).getVariableElement().asType(), muleContext);

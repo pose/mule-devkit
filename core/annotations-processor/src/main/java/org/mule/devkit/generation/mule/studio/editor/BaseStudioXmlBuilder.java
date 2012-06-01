@@ -224,10 +224,10 @@ public abstract class BaseStudioXmlBuilder {
 
     private JAXBElement<? extends AttributeType> createJaxbElement(DevKitVariableElement parameter) {
         JAXBElement<? extends AttributeType> jaxbElement;
-        if (typeMirrorUtils.isEnum(parameter)) {
+        if (parameter.isEnum()) {
             EnumType enumType = createEnumType(parameter);
             jaxbElement = helper.createJAXBElement(enumType);
-        } else if (typeMirrorUtils.isCollection(parameter)) {
+        } else if (parameter.isCollection()) {
             NestedElementReference childElement = createNestedElementReference(executableElement, parameter);
             jaxbElement = objectFactory.createGroupChildElement(childElement);
         } else {

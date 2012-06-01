@@ -61,8 +61,8 @@ public class VariableComparatorTest {
         when(context.getTypeMirrorUtils()).thenReturn(typeMirrorUtils);
         when(typeMirrorUtils.isString(stringVariable)).thenReturn(true);
         when(typeMirrorUtils.isInteger(intVariable)).thenReturn(true);
-        when(typeMirrorUtils.isEnum(enumVariable)).thenReturn(true);
-        when(typeMirrorUtils.isCollection(mapVariable)).thenReturn(true);
+        when(enumVariable.isEnum()).thenReturn(true);
+        when(mapVariable.isCollection()).thenReturn(true);
         when(typeMirrorUtils.isBoolean(booleanVariable)).thenReturn(true);
     }
 

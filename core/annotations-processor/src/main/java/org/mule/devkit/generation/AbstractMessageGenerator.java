@@ -517,7 +517,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
             FieldVariable field;
             FieldVariable fieldType;
-            if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
+            if (variable.isNestedProcessor()) {
                 field = new FieldBuilder(messageProcessorClass).
                         privateVisibility().
                         type(Object.class).
@@ -638,8 +638,8 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             for (String fieldName : fields.keySet()) {
                 FieldVariableElement variableElement = fields.get(fieldName);
 
-                if (context.getTypeMirrorUtils().isNestedProcessor(variableElement.getVariableElement().asType())) {
-                    boolean isList = context.getTypeMirrorUtils().isArrayOrList(variableElement.getVariableElement().asType());
+                if (variableElement.getVariableElement().isNestedProcessor()) {
+                    boolean isList = variableElement.getVariableElement().isArrayOrList();
 
                     if (!isList) {
                         Conditional ifInitialisable = initialise.body()._if(Op._instanceof(variableElement.getField(), ref(Initialisable.class)));
@@ -686,8 +686,8 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             for (String fieldName : fields.keySet()) {
                 FieldVariableElement variableElement = fields.get(fieldName);
 
-                if (context.getTypeMirrorUtils().isNestedProcessor(variableElement.getVariableElement().asType())) {
-                    boolean isList = context.getTypeMirrorUtils().isArrayOrList(variableElement.getVariableElement().asType());
+                if (variableElement.getVariableElement().isNestedProcessor()) {
+                    boolean isList = variableElement.getVariableElement().isArrayOrList();
 
                     if (!isList) {
                         Conditional ifMuleContextAware = setMuleContext.body()._if(Op._instanceof(variableElement.getField(), ref(MuleContextAware.class)));
@@ -724,8 +724,8 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             for (String fieldName : fields.keySet()) {
                 FieldVariableElement variableElement = fields.get(fieldName);
 
-                if (context.getTypeMirrorUtils().isNestedProcessor(variableElement.getVariableElement().asType())) {
-                    boolean isList = context.getTypeMirrorUtils().isArrayOrList(variableElement.getVariableElement().asType());
+                if (variableElement.getVariableElement().isNestedProcessor()) {
+                    boolean isList = variableElement.getVariableElement().isArrayOrList();
 
                     if (!isList) {
                         Conditional ifMuleContextAware = setFlowConstruct.body()._if(Op._instanceof(variableElement.getField(), ref(FlowConstructAware.class)));
@@ -1044,8 +1044,8 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             for (String fieldName : fields.keySet()) {
                 FieldVariableElement variableElement = fields.get(fieldName);
 
-                if (context.getTypeMirrorUtils().isNestedProcessor(variableElement.getVariableElement().asType())) {
-                    boolean isList = context.getTypeMirrorUtils().isArrayOrList(variableElement.getVariableElement().asType());
+                if (variableElement.getVariableElement().isNestedProcessor()) {
+                    boolean isList = variableElement.getVariableElement().isArrayOrList();
 
                     if (!isList) {
                         Conditional ifStartable = startMethod.body()._if(Op._instanceof(variableElement.getField(), ref(Startable.class)));
@@ -1075,8 +1075,8 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             for (String fieldName : fields.keySet()) {
                 FieldVariableElement variableElement = fields.get(fieldName);
 
-                if (context.getTypeMirrorUtils().isNestedProcessor(variableElement.getVariableElement().asType())) {
-                    boolean isList = context.getTypeMirrorUtils().isArrayOrList(variableElement.getVariableElement().asType());
+                if (variableElement.getVariableElement().isNestedProcessor()) {
+                    boolean isList = variableElement.getVariableElement().isArrayOrList();
 
                     if (!isList) {
                         Conditional ifStoppable = stopMethod.body()._if(Op._instanceof(variableElement.getField(), ref(Stoppable.class)));
@@ -1106,8 +1106,8 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             for (String fieldName : fields.keySet()) {
                 FieldVariableElement variableElement = fields.get(fieldName);
 
-                if (context.getTypeMirrorUtils().isNestedProcessor(variableElement.getVariableElement().asType())) {
-                    boolean isList = context.getTypeMirrorUtils().isArrayOrList(variableElement.getVariableElement().asType());
+                if (variableElement.getVariableElement().isNestedProcessor()) {
+                    boolean isList = variableElement.getVariableElement().isArrayOrList();
 
                     if (!isList) {
                         Conditional ifDisposable = diposeMethod.body()._if(Op._instanceof(variableElement.getField(), ref(Disposable.class)));

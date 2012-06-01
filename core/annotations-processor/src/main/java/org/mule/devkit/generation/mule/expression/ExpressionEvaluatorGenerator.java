@@ -176,12 +176,12 @@ public class ExpressionEvaluatorGenerator extends AbstractMessageGenerator {
                 evaluateInvoke.arg(message);
             } else if (parameter.getAnnotation(InboundHeaders.class) != null) {
                 InboundHeaders inboundHeaders = parameter.getAnnotation(InboundHeaders.class);
-                if (context.getTypeMirrorUtils().isArrayOrList(parameter.asType())) {
+                if (parameter.isArrayOrList()) {
                     evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()).boxify(),
                             ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
                                     ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("INBOUND:" + inboundHeaders.value()).arg(message).arg(ref(List.class).dotclass())
                             )));
-                } else if (context.getTypeMirrorUtils().isMap(parameter.asType())) {
+                } else if (parameter.isMap()) {
                     evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()).boxify(),
                             ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
                                     ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("INBOUND:" + inboundHeaders.value()).arg(message).arg(ref(Map.class).dotclass())
@@ -194,12 +194,12 @@ public class ExpressionEvaluatorGenerator extends AbstractMessageGenerator {
                 }
             } else if (parameter.getAnnotation(SessionHeaders.class) != null) {
                 SessionHeaders sessionHeaders = parameter.getAnnotation(SessionHeaders.class);
-                if (context.getTypeMirrorUtils().isArrayOrList(parameter.asType())) {
+                if (parameter.isArrayOrList()) {
                     evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()).boxify(),
                             ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
                                     ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("SESSION:" + sessionHeaders.value()).arg(message).arg(ref(List.class).dotclass())
                             )));
-                } else if (context.getTypeMirrorUtils().isMap(parameter.asType())) {
+                } else if (parameter.isMap()) {
                     evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()).boxify(),
                             ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
                                     ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("SESSION:" + sessionHeaders.value()).arg(message).arg(ref(Map.class).dotclass())
@@ -217,12 +217,12 @@ public class ExpressionEvaluatorGenerator extends AbstractMessageGenerator {
                         )));
             } else if (parameter.getAnnotation(InvocationHeaders.class) != null) {
                 InvocationHeaders invocationHeaders = parameter.getAnnotation(InvocationHeaders.class);
-                if (context.getTypeMirrorUtils().isArrayOrList(parameter.asType())) {
+                if (parameter.isArrayOrList()) {
                     evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()).boxify(),
                             ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
                                     ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("INVOCATION:" + invocationHeaders.value()).arg(message).arg(ref(List.class).dotclass())
                             )));
-                } else if (context.getTypeMirrorUtils().isMap(parameter.asType())) {
+                } else if (parameter.isMap()) {
                     evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()).boxify(),
                             ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
                                     ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("INVOCATION:" + invocationHeaders.value()).arg(message).arg(ref(Map.class).dotclass())

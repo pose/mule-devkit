@@ -236,18 +236,15 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
     }
 
     private boolean isListOfMaps(DevKitVariableElement parameter) {
-        List<? extends TypeMirror> typeArguments = ((DeclaredType) parameter.asType()).getTypeArguments();
-        return typeMirrorUtils.isArrayOrList(parameter.asType()) && !typeArguments.isEmpty() && typeMirrorUtils.isMap(typeArguments.get(0));
+        return parameter.isArrayOrList() && parameter.hasTypeArguments() && ((DevKitTypeElement)parameter.getTypeArguments().get(0)).isMap();
     }
 
     private boolean isSimpleMap(DevKitVariableElement parameter) {
-        List<? extends TypeMirror> typeArguments = ((DeclaredType) parameter.asType()).getTypeArguments();
-        return typeMirrorUtils.isMap(parameter.asType()) && (typeArguments.isEmpty() || !typeMirrorUtils.isCollection(typeArguments.get(1)));
+        return parameter.isMap() && (!parameter.hasTypeArguments() || !((DevKitTypeElement)parameter.getTypeArguments().get(1)).isCollection());
     }
 
     private boolean isSimpleList(DevKitVariableElement parameter) {
-        List<? extends TypeMirror> typeArguments = ((DeclaredType) parameter.asType()).getTypeArguments();
-        return typeMirrorUtils.isArrayOrList(parameter.asType()) && (typeArguments.isEmpty() || !typeMirrorUtils.isCollection(typeArguments.get(0)));
+        return parameter.isArrayOrList() && (!parameter.hasTypeArguments() || !((DevKitTypeElement)parameter.getTypeArguments().get(0)).isCollection());
     }
 
     private NestedElementReference createChildElement(DevKitVariableElement parameter, String localId) {
@@ -271,8 +268,8 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
     }
 
     private boolean needToCreateNestedElement(DevKitVariableElement parameter) {
-        return (typeMirrorUtils.isMap(parameter.asType()) ||
-                typeMirrorUtils.isArrayOrList(parameter.asType())) && !typeMirrorUtils.ignoreParameter(parameter);
+        return (parameter.isMap() ||
+                parameter.isArrayOrList()) && !typeMirrorUtils.ignoreParameter(parameter);
     }
 
 }

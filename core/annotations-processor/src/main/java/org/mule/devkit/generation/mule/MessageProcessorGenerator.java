@@ -437,7 +437,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                 continue;
             } else if (variable.getAnnotation(OAuthAccessTokenSecret.class) != null) {
                 continue;
-            } else if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
+            } else if (variable.isNestedProcessor()) {
                 declareNestedProcessorParameter(fields, muleContext, event, callProcessor, parameters, variable, fieldName);
             } else if (variable.asType().toString().startsWith(MuleMessage.class.getName())) {
                 parameters.add(muleMessage);
@@ -681,25 +681,25 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             }
 
             if (inboundHeaders != null) {
-                if (context.getTypeMirrorUtils().isArrayOrList(fields.get(fieldName).getVariableElement().asType())) {
+                if (fields.get(fieldName).getVariableElement().isArrayOrList()) {
                     evaluateAndTransform.arg("#[" + MessageHeadersListExpressionEvaluator.NAME + ":INBOUND:" + inboundHeaders.value() + "]");
-                } else if (context.getTypeMirrorUtils().isMap(fields.get(fieldName).getVariableElement().asType())) {
+                } else if (fields.get(fieldName).getVariableElement().isMap()) {
                     evaluateAndTransform.arg("#[" + MessageHeadersExpressionEvaluator.NAME + ":INBOUND:" + inboundHeaders.value() + "]");
                 } else {
                     evaluateAndTransform.arg("#[" + MessageHeaderExpressionEvaluator.NAME + ":INBOUND:" + inboundHeaders.value() + "]");
                 }
             } else if (invocationHeaders != null) {
-                if (context.getTypeMirrorUtils().isArrayOrList(fields.get(fieldName).getVariableElement().asType())) {
+                if (fields.get(fieldName).getVariableElement().isArrayOrList()) {
                     evaluateAndTransform.arg("#[" + MessageHeadersListExpressionEvaluator.NAME + ":INVOCATION:" + invocationHeaders.value() + "]");
-                } else if (context.getTypeMirrorUtils().isMap(fields.get(fieldName).getVariableElement().asType())) {
+                } else if (fields.get(fieldName).getVariableElement().isMap()) {
                     evaluateAndTransform.arg("#[" + MessageHeadersExpressionEvaluator.NAME + ":INVOCATION:" + invocationHeaders.value() + "]");
                 } else {
                     evaluateAndTransform.arg("#[" + MessageHeaderExpressionEvaluator.NAME + ":INVOCATION:" + invocationHeaders.value() + "]");
                 }
             } else if (sessionHeaders != null) {
-                if (context.getTypeMirrorUtils().isArrayOrList(fields.get(fieldName).getVariableElement().asType())) {
+                if (fields.get(fieldName).getVariableElement().isArrayOrList()) {
                     evaluateAndTransform.arg("#[" + MessageHeadersListExpressionEvaluator.NAME + ":SESSION:" + sessionHeaders.value() + "]");
-                } else if (context.getTypeMirrorUtils().isMap(fields.get(fieldName).getVariableElement().asType())) {
+                } else if (fields.get(fieldName).getVariableElement().isMap()) {
                     evaluateAndTransform.arg("#[" + MessageHeadersExpressionEvaluator.NAME + ":SESSION:" + sessionHeaders.value() + "]");
                 } else {
                     evaluateAndTransform.arg("#[" + MessageHeaderExpressionEvaluator.NAME + ":SESSION:" + sessionHeaders.value() + "]");
@@ -740,7 +740,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         DefinedClass callbackClass = context.getClassForRole(NestedProcessorChainGenerator.ROLE);
         DefinedClass stringCallbackClass = context.getClassForRole(NestedProcessorStringGenerator.ROLE);
 
-        boolean isList = context.getTypeMirrorUtils().isArrayOrList(variable.asType());
+        boolean isList = variable.isArrayOrList();
 
         if (!isList) {
             Variable transformed = callProcessor.body().decl(ref(NestedProcessor.class), "_transformed" + StringUtils.capitalize(fieldName),

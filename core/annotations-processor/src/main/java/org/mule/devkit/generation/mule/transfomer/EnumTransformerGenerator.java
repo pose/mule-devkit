@@ -58,7 +58,7 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
     protected void doGenerate(DevKitTypeElement typeElement) {
 
         for (DevKitFieldElement field : typeElement.getFields()) {
-            if (context.getTypeMirrorUtils().isEnum(field.asType())) {
+            if (field.isEnum()) {
                 if (!context.isEnumRegistered(field.asType())) {
                     registerEnumTransformer(field);
                     context.registerEnum(field.asType());
@@ -68,21 +68,14 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
 
         for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Processor.class)) {
             for (DevKitParameterElement variable : method.getParameters()) {
-                if (context.getTypeMirrorUtils().isEnum(variable.asType()) && !context.isEnumRegistered(variable.asType())) {
+                if (variable.isEnum() && !context.isEnumRegistered(variable.asType())) {
                     registerEnumTransformer(variable);
                     context.registerEnum(variable.asType());
-                } else if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
-                    DeclaredType variableType = (DeclaredType) variable.asType();
-                    for (TypeMirror variableTypeParameter : variableType.getTypeArguments()) {
-                        if (context.getTypeMirrorUtils().isEnum(variableTypeParameter) && !context.isEnumRegistered(variableTypeParameter)) {
-                            //Element enumElement = context.getTypeUtils().asElement(variableTypeParameter);
-                            DevKitElement<Element, DevKitParameterElement> enumElement = new DefaultDevKitElement<Element, DevKitParameterElement>(
-                                    context.getTypeUtils().asElement(variableTypeParameter),
-                                    variable,
-                                    null
-                            );
-                            registerEnumTransformer(enumElement);
-                            context.registerEnum(variableTypeParameter);
+                } else if (variable.isCollection()) {
+                    for (DevKitElement variableTypeParameter : variable.getTypeArguments()) {
+                        if (variableTypeParameter.isEnum() && !context.isEnumRegistered(variableTypeParameter.asType())) {
+                            registerEnumTransformer(variableTypeParameter);
+                            context.registerEnum(variableTypeParameter.asType());
                         }
                     }
                 }
@@ -91,7 +84,7 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
 
         for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Source.class)) {
             for (DevKitParameterElement variable : method.getParameters()) {
-                if (!context.getTypeMirrorUtils().isEnum(variable.asType())) {
+                if (!variable.isEnum()) {
                     continue;
                 }
 

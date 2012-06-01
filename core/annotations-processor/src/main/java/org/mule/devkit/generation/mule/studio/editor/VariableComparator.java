@@ -68,10 +68,10 @@ public class VariableComparator implements Comparator<DevKitVariableElement> {
             return compareByName(variable1, variable2);
         }
 
-        if (typeMirrorUtils.isCollection(variable1)) {
+        if (variable1.isCollection()) {
             return VARIABLE2_FIRST;
         }
-        if (typeMirrorUtils.isCollection(variable2)) {
+        if (variable2.isCollection()) {
             return VARIABLE1_FIRST;
         }
 
@@ -82,10 +82,10 @@ public class VariableComparator implements Comparator<DevKitVariableElement> {
             return VARIABLE1_FIRST;
         }
 
-        if (typeMirrorUtils.isEnum(variable1)) {
+        if (variable1.isEnum()) {
             return VARIABLE2_FIRST;
         }
-        if (typeMirrorUtils.isEnum(variable2)) {
+        if (variable2.isEnum()) {
             return VARIABLE1_FIRST;
         }
 
@@ -108,9 +108,9 @@ public class VariableComparator implements Comparator<DevKitVariableElement> {
     private boolean bothOfSameType(DevKitVariableElement variable1, DevKitVariableElement variable2) {
         return typeMirrorUtils.isString(variable1) && typeMirrorUtils.isString(variable2) ||
                 typeMirrorUtils.isInteger(variable1) && typeMirrorUtils.isInteger(variable2) ||
-                typeMirrorUtils.isEnum(variable1) && typeMirrorUtils.isEnum(variable2) ||
+                variable1.isEnum() && variable2.isEnum() ||
                 typeMirrorUtils.isBoolean(variable1) && typeMirrorUtils.isBoolean(variable2) ||
-                typeMirrorUtils.isCollection(variable1) && typeMirrorUtils.isCollection(variable2);
+                variable1.isCollection() && variable2.isCollection();
     }
 
     private int compareByName(DevKitVariableElement variable1, DevKitVariableElement variable2) {

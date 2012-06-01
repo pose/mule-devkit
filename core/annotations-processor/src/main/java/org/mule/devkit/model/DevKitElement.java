@@ -19,6 +19,7 @@ package org.mule.devkit.model;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Name;
 import javax.lang.model.type.TypeMirror;
+import java.util.List;
 
 public interface DevKitElement<T extends Element, P extends DevKitElement> extends DevKitAnnotatedElement {
     T unwrap();
@@ -42,4 +43,18 @@ public interface DevKitElement<T extends Element, P extends DevKitElement> exten
     boolean isFinal();
 
     boolean isStatic();
+
+    boolean isNestedProcessor();
+
+    boolean isArrayOrList();
+
+    boolean isMap();
+
+    boolean isEnum();
+
+    boolean isCollection();
+
+    List<DevKitElement> getTypeArguments();
+
+    boolean hasTypeArguments();
 }
