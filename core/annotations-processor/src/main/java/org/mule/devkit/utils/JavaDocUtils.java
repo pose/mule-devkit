@@ -30,11 +30,8 @@ public class JavaDocUtils {
         this.elements = elements;
     }
 
-    public String getSummary(Element element) {
-        if (element instanceof DevKitElement) {
-            element = ((DevKitElement) element).unwrap();
-        }
-        String comment = elements.getDocComment(element);
+    public String getSummary(DevKitElement element) {
+        String comment = elements.getDocComment(element.unwrap());
         if (comment == null || StringUtils.isBlank(comment)) {
             return null;
         }
@@ -99,8 +96,8 @@ public class JavaDocUtils {
         return false;
     }
 
-    public String getTagContent(String tagName, Element element) {
-        String comment = elements.getDocComment(element);
+    public String getTagContent(String tagName, DevKitElement element) {
+        String comment = elements.getDocComment(element.unwrap());
         if (StringUtils.isBlank(comment)) {
             return "";
         }
@@ -133,8 +130,8 @@ public class JavaDocUtils {
         return tagContent.toString();
     }
 
-    public String getParameterSummary(String paramName, Element element) {
-        String comment = elements.getDocComment(element);
+    public String getParameterSummary(String paramName, DevKitElement element) {
+        String comment = elements.getDocComment(element.unwrap());
         if (StringUtils.isBlank(comment)) {
             return null;
         }

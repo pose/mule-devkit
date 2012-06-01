@@ -139,7 +139,7 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
         getPriorityWeighting.body()._return(weighting);
     }
 
-    private void generateDoTransform(DefinedClass jaxbTransformerClass, Element variableElement) {
+    private void generateDoTransform(DefinedClass jaxbTransformerClass, DevKitElement variableElement) {
         Method doTransform = jaxbTransformerClass.method(Modifier.PROTECTED, ref(Object.class), "doTransform");
         doTransform._throws(TransformerException.class);
         Variable src = doTransform.param(ref(Object.class), "src");
@@ -156,7 +156,7 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
         doTransform.body()._return(result);
     }
 
-    private void generateConstructor(DefinedClass transformerClass, Element variableElement) {
+    private void generateConstructor(DefinedClass transformerClass, DevKitElement variableElement) {
         // generate constructor
         Method constructor = transformerClass.constructor(Modifier.PUBLIC);
 

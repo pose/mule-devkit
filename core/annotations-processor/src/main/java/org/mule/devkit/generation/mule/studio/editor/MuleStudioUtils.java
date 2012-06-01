@@ -28,6 +28,7 @@ import org.mule.api.annotations.param.Optional;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.spring.SchemaGenerator;
 import org.mule.devkit.generation.spring.SchemaTypeConversion;
+import org.mule.devkit.model.DevKitElement;
 import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.DevKitVariableElement;
@@ -216,7 +217,7 @@ public class MuleStudioUtils {
         return null;
     }
 
-    public AttributeType createAttributeTypeIgnoreEnumsAndCollections(Element element) {
+    public AttributeType createAttributeTypeIgnoreEnumsAndCollections(DevKitElement element) {
         if (skipAttributeTypeGeneration(element)) {
             return null;
         } else if (SchemaTypeConversion.isSupported(element.asType().toString())) {
@@ -231,11 +232,11 @@ public class MuleStudioUtils {
         }
     }
 
-    private boolean skipAttributeTypeGeneration(Element element) {
+    private boolean skipAttributeTypeGeneration(DevKitElement element) {
         return typeMirrorUtils.isCollection(element.asType()) || typeMirrorUtils.isEnum(element.asType()) || typeMirrorUtils.ignoreParameter(element);
     }
 
-    private AttributeType createAttributeTypeOfSupportedType(Element element) {
+    private AttributeType createAttributeTypeOfSupportedType(DevKitElement element) {
         if (element.getAnnotation(Password.class) != null) {
             return new PasswordType();
         }
@@ -314,8 +315,7 @@ public class MuleStudioUtils {
             return formatDescription(description.value());
         }
         if (element.getKind() == ElementKind.PARAMETER) {
-            Element executableElement = element.getEnclosingElement();
-            return formatDescription(javaDocUtils.getParameterSummary(element.getSimpleName().toString(), executableElement));
+            return formatDescription(javaDocUtils.getParameterSummary(element.getSimpleName().toString(), element.parent()));
         }
         return formatDescription(javaDocUtils.getSummary(element));
     }

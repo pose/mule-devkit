@@ -61,7 +61,7 @@ public class DefaultDevKitElement<T extends Element, P extends DevKitElement> im
 
     @Override
     public <A extends Annotation> A getAnnotation(Class<A> aClass) {
-        return innerElement.getAnnotation(aClass);
+        return (A)innerElement.getAnnotation(aClass);
     }
 
     @Override
@@ -82,10 +82,5 @@ public class DefaultDevKitElement<T extends Element, P extends DevKitElement> im
     @Override
     public List<? extends Element> getEnclosedElements() {
         return innerElement.getEnclosedElements();
-    }
-
-    @Override
-    public <R, P> R accept(ElementVisitor<R, P> rpElementVisitor, P p) {
-        return innerElement.accept(rpElementVisitor, p);
     }
 }

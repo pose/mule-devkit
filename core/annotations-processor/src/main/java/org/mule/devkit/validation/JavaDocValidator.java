@@ -25,6 +25,7 @@ import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
 import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.model.DevKitElement;
 import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitFieldElement;
 import org.mule.devkit.model.DevKitParameterElement;
@@ -46,7 +47,7 @@ public class JavaDocValidator implements Validator {
     @Override
     public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
 
-        if (!hasComment(typeElement.unwrap(), context)) {
+        if (!hasComment(typeElement, context)) {
             throw new ValidationException(typeElement, "Class " + typeElement.getQualifiedName().toString() + " is not properly documented. A summary is missing.");
         }
 
@@ -83,7 +84,7 @@ public class JavaDocValidator implements Validator {
 
     private void validateAllParameters(GeneratorContext context, DevKitExecutableElement method) throws ValidationException {
         for (DevKitParameterElement variable : method.getParameters()) {
-            if (!hasParameterComment(variable.getSimpleName().toString(), variable.getEnclosingElement(), context)) {
+            if (!hasParameterComment(variable.getSimpleName().toString(), variable.parent(), context)) {
                 throw new ValidationException(variable, "Parameter " + variable.getSimpleName().toString() + " of method " + method.getSimpleName().toString() + " is not properly documented. A matching @param in the method documentation was not found. ");
             }
         }
@@ -108,13 +109,13 @@ public class JavaDocValidator implements Validator {
         validateAllParameters(context, method);
     }
 
-    private boolean hasComment(Element element, GeneratorContext context) {
+    private boolean hasComment(DevKitElement element, GeneratorContext context) {
         String comment = context.getJavaDocUtils().getSummary(element);
         return StringUtils.isNotBlank(comment);
 
     }
 
-    private boolean hasParameterComment(String paramName, Element element, GeneratorContext context) {
+    private boolean hasParameterComment(String paramName, DevKitElement element, GeneratorContext context) {
         String comment = context.getJavaDocUtils().getParameterSummary(paramName, element);
         return StringUtils.isNotBlank(comment);
     }
@@ -126,7 +127,7 @@ public class JavaDocValidator implements Validator {
         }
 
         boolean found = false;
-        String sample = context.getJavaDocUtils().getTagContent("sample.xml", method.unwrap());
+        String sample = context.getJavaDocUtils().getTagContent("sample.xml", method);
         String[] split = sample.split(" ");
 
         if (split.length != 2) {

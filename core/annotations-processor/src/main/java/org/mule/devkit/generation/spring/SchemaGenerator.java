@@ -464,7 +464,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         // add doc
         Annotation annotation = new Annotation();
         Documentation doc = new Documentation();
-        doc.getContent().add(context.getJavaDocUtils().getParameterSummary(variable.getSimpleName().toString(), variable.getEnclosingElement()));
+        doc.getContent().add(context.getJavaDocUtils().getParameterSummary(variable.getSimpleName().toString(), variable.parent()));
         annotation.getAppinfoOrDocumentation().add(doc);
 
         collectionElement.setAnnotation(annotation);
@@ -510,7 +510,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         // add doc
         Annotation annotation = new Annotation();
         Documentation doc = new Documentation();
-        doc.getContent().add(context.getJavaDocUtils().getParameterSummary(variable.getSimpleName().toString(), variable.getEnclosingElement()));
+        doc.getContent().add(context.getJavaDocUtils().getParameterSummary(variable.getSimpleName().toString(), variable.parent()));
         annotation.getAppinfoOrDocumentation().add(doc);
 
         collectionElement.setAnnotation(annotation);
@@ -793,7 +793,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         Annotation annotation = new Annotation();
         Documentation doc = new Documentation();
-        doc.getContent().add(context.getJavaDocUtils().getSummary(typeElement.unwrap()));
+        doc.getContent().add(context.getJavaDocUtils().getSummary(typeElement));
         annotation.getAppinfoOrDocumentation().add(doc);
         config.setAnnotation(annotation);
 
@@ -1012,7 +1012,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         // add doc
         Annotation annotation = new Annotation();
         Documentation doc = new Documentation();
-        doc.getContent().add(context.getJavaDocUtils().getParameterSummary(variable.getSimpleName().toString(), variable.getEnclosingElement()));
+        doc.getContent().add(context.getJavaDocUtils().getParameterSummary(variable.getSimpleName().toString(), variable.parent()));
         annotation.getAppinfoOrDocumentation().add(doc);
 
         attribute.setAnnotation(annotation);

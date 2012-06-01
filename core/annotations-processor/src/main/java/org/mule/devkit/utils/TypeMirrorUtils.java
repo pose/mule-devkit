@@ -34,6 +34,7 @@ import org.mule.api.annotations.param.Payload;
 import org.mule.api.annotations.param.SessionHeaders;
 import org.mule.api.callback.HttpCallback;
 import org.mule.api.callback.SourceCallback;
+import org.mule.devkit.model.DevKitElement;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -157,7 +158,7 @@ public class TypeMirrorUtils {
         return false;
     }
 
-    public boolean ignoreParameter(Element element) {
+    public boolean ignoreParameter(DevKitElement element) {
         String variableType = element.asType().toString();
         for (Class<?> typeToIgnore : PARAMETER_TYPES_TO_IGNORE) {
             if (variableType.contains(typeToIgnore.getName())) {
@@ -172,70 +173,70 @@ public class TypeMirrorUtils {
         return false;
     }
 
-    public boolean isString(Element element) {
+    public boolean isString(DevKitElement element) {
         String className = element.asType().toString();
         return className.startsWith(String.class.getName());
     }
 
-    public boolean isBoolean(Element element) {
+    public boolean isBoolean(DevKitElement element) {
         String className = element.asType().toString();
         return className.startsWith(Boolean.class.getName()) || className.startsWith("boolean");
     }
 
-    public boolean isInteger(Element element) {
+    public boolean isInteger(DevKitElement element) {
         String className = element.asType().toString();
         return className.startsWith(Integer.class.getName()) || className.startsWith("int");
     }
 
-    public boolean isLong(Element element) {
+    public boolean isLong(DevKitElement element) {
         String className = element.asType().toString();
         return className.startsWith(Long.class.getName()) || className.startsWith("long");
     }
 
-    public boolean isFloat(Element element) {
+    public boolean isFloat(DevKitElement element) {
         String className = element.asType().toString();
         return className.startsWith(Float.class.getName()) || className.startsWith("float");
     }
 
-    public boolean isDouble(Element element) {
+    public boolean isDouble(DevKitElement element) {
         String className = element.asType().toString();
         return className.startsWith(Double.class.getName()) || className.startsWith("double");
     }
 
-    public boolean isChar(Element element) {
+    public boolean isChar(DevKitElement element) {
         String className = element.asType().toString();
         return className.startsWith(Character.class.getName()) || className.startsWith("char");
     }
 
-    public boolean isEnum(Element element) {
+    public boolean isEnum(DevKitElement element) {
         return isEnum(element.asType());
     }
 
-    public boolean isCollection(Element element) {
+    public boolean isCollection(DevKitElement element) {
         return isCollection(element.asType());
     }
 
-    public boolean isHttpCallback(Element element) {
+    public boolean isHttpCallback(DevKitElement element) {
         return element.asType().toString().startsWith(HttpCallback.class.getName());
     }
 
-    public boolean isURL(Element element) {
+    public boolean isURL(DevKitElement element) {
         return element.asType().toString().startsWith(URL.class.getName());
     }
 
-    public boolean isDate(Element element) {
+    public boolean isDate(DevKitElement element) {
         return element.asType().toString().startsWith(Date.class.getName());
     }
 
-    public boolean isBigDecimal(Element element) {
+    public boolean isBigDecimal(DevKitElement element) {
         return element.asType().toString().startsWith(BigDecimal.class.getName());
     }
 
-    public boolean isBigInteger(Element element) {
+    public boolean isBigInteger(DevKitElement element) {
         return element.asType().toString().startsWith(BigInteger.class.getName());
     }
 
-    public String getJavaType(Element element) {
+    public String getJavaType(DevKitElement element) {
         return element.asType().toString();
     }
 

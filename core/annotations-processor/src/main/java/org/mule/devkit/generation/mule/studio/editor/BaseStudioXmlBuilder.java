@@ -274,7 +274,7 @@ public abstract class BaseStudioXmlBuilder {
         String prefix;
         if (executableElement != null) {
             prefix = nameUtils.uncamel(executableElement.getSimpleName().toString());
-            childElement.setDescription(helper.formatDescription(javaDocUtils.getParameterSummary(parameter.getSimpleName().toString(), executableElement.unwrap())));
+            childElement.setDescription(helper.formatDescription(javaDocUtils.getParameterSummary(parameter.getSimpleName().toString(), executableElement)));
         } else {
             prefix = "configurable";
             childElement.setDescription(helper.formatDescription(javaDocUtils.getSummary(parameter)));

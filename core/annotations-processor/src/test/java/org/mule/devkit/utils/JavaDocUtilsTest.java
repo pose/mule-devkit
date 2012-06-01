@@ -43,7 +43,7 @@ public class JavaDocUtilsTest {
 
     @Test
     public void getTagContentMultiLineSampleTag() throws Exception {
-        when(elements.getDocComment(executableElement)).thenReturn("\n" +
+        when(elements.getDocComment(executableElement.unwrap())).thenReturn("\n" +
                 "     Updates the given map of customer address attributes, for the given customer address\n" +
                 "     <p/>\n" +
                 "     {@sample.xml " +
@@ -59,7 +59,7 @@ public class JavaDocUtilsTest {
 
     @Test
     public void getTagContentSingleLineSampleTag() throws Exception {
-        when(elements.getDocComment(executableElement)).thenReturn("\n" +
+        when(elements.getDocComment(executableElement.unwrap())).thenReturn("\n" +
                 "     Updates the given map of customer address attributes, for the given customer address\n" +
                 "     <p/>\n" +
                 "     {@sample.xml ../../../doc/magento-connector.xml.sample magento:updateCustomerAddress}\n" +
@@ -73,7 +73,7 @@ public class JavaDocUtilsTest {
 
     @Test
     public void getParameterSummary() throws Exception {
-        when(elements.getDocComment(executableElement)).thenReturn("\n" +
+        when(elements.getDocComment(executableElement.unwrap())).thenReturn("\n" +
                 "     Bla bla bla\n" +
                 "     \n" +
                 "     @param name the name\n" +
@@ -84,7 +84,7 @@ public class JavaDocUtilsTest {
 
     @Test
     public void getParameterSummaryMultiline() throws Exception {
-        when(elements.getDocComment(executableElement)).thenReturn("\n" +
+        when(elements.getDocComment(executableElement.unwrap())).thenReturn("\n" +
                 "     Bla bla bla\n" +
                 "     \n" +
                 "     @param name the name\n" +
@@ -96,7 +96,7 @@ public class JavaDocUtilsTest {
 
     @Test
     public void getParameterSummaryParameterNamesDontMatch() throws Exception {
-        when(elements.getDocComment(executableElement)).thenReturn("\n" +
+        when(elements.getDocComment(executableElement.unwrap())).thenReturn("\n" +
                 "     Bla bla bla\n" +
                 "     \n" +
                 "     @param name the name\n" +
@@ -107,7 +107,7 @@ public class JavaDocUtilsTest {
 
     @Test
     public void getParameterSummaryParameterNotDocumented() throws Exception {
-        when(elements.getDocComment(executableElement)).thenReturn("\n" +
+        when(elements.getDocComment(executableElement.unwrap())).thenReturn("\n" +
                 "     Bla bla bla\n" +
                 "     \n" +
                 "     @param name the name\n" +
@@ -118,7 +118,7 @@ public class JavaDocUtilsTest {
 
     @Test
     public void getParameterSummaryParameterWithEmptyComment() throws Exception {
-        when(elements.getDocComment(executableElement)).thenReturn("\n" +
+        when(elements.getDocComment(executableElement.unwrap())).thenReturn("\n" +
                 "     Bla bla bla\n" +
                 "     \n" +
                 "     @param name the name\n" +
@@ -129,7 +129,7 @@ public class JavaDocUtilsTest {
 
     @Test
     public void getParameterSummaryStartingAtNextLine() throws Exception {
-        when(elements.getDocComment(executableElement)).thenReturn("\n" +
+        when(elements.getDocComment(executableElement.unwrap())).thenReturn("\n" +
                 "     Authorize a payment\n" +
                 "     \n" +
                 "     {@sample.xml ../../../doc/mule-module-paypal.xml.sample paypal:authorize}\n" +

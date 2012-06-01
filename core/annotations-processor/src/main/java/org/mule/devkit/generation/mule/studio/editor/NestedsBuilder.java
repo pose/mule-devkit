@@ -23,6 +23,7 @@ import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.spring.SchemaGenerator;
+import org.mule.devkit.model.DefaultDevKitElement;
 import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.DevKitVariableElement;
@@ -139,7 +140,7 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
             attributeTypeForMapKey = new StringAttributeType();
         } else {
             TypeMirror typeMirror = ((DeclaredType) parameter.asType()).getTypeArguments().get(0);
-            attributeTypeForMapKey = helper.createAttributeTypeIgnoreEnumsAndCollections(typeUtils.asElement(typeMirror));
+            attributeTypeForMapKey = helper.createAttributeTypeIgnoreEnumsAndCollections(new DefaultDevKitElement(typeUtils.asElement(typeMirror), null));
             if (attributeTypeForMapKey == null) { // nested
                 attributeTypeForMapKey = new StringAttributeType();
             }
@@ -176,7 +177,7 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
         attributeTypeForListValues.setName(nameUtils.singularize(localId));
         attributeTypeForListValues.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
         if (executableElement != null) {
-            attributeTypeForListValues.setDescription(helper.formatDescription(javaDocUtils.getParameterSummary(parameter.getSimpleName().toString(), executableElement.unwrap())));
+            attributeTypeForListValues.setDescription(helper.formatDescription(javaDocUtils.getParameterSummary(parameter.getSimpleName().toString(), executableElement)));
         } else {
             attributeTypeForListValues.setDescription(helper.formatDescription(javaDocUtils.getSummary(parameter)));
         }
