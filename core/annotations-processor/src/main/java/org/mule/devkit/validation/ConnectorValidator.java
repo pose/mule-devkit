@@ -71,7 +71,7 @@ public class ConnectorValidator implements Validator {
             throw new ValidationException(typeElement, "You must have exactly one method annotated with @Connect");
         }
         DevKitExecutableElement connectMethod = connectMethods.get(0);
-        if (!connectMethod.getModifiers().contains(Modifier.PUBLIC)) {
+        if (!connectMethod.isPublic()) {
             throw new ValidationException(typeElement, "A @Connect method must be public.");
         }
         if (connectMethod.getThrownTypes().size() != 1) {
@@ -92,7 +92,7 @@ public class ConnectorValidator implements Validator {
             throw new ValidationException(typeElement, "You must have exactly one method annotated with @Disconnect");
         }
         DevKitExecutableElement disconnectMethod = disconnectMethods.get(0);
-        if (!disconnectMethod.getModifiers().contains(Modifier.PUBLIC)) {
+        if (!disconnectMethod.isPublic()) {
             throw new ValidationException(typeElement, "A @Disconnect method must be public.");
         }
         if (!disconnectMethod.getParameters().isEmpty()) {
@@ -108,7 +108,7 @@ public class ConnectorValidator implements Validator {
             throw new ValidationException(typeElement, "You must have exactly one method annotated with @ValidateConnection");
         }
         DevKitExecutableElement validateConnectionMethod = validateConnectionMethods.get(0);
-        if (!validateConnectionMethod.getModifiers().contains(Modifier.PUBLIC)) {
+        if (!validateConnectionMethod.isPublic()) {
             throw new ValidationException(typeElement, "A @ValidateConnection method must be public.");
         }
         if (!validateConnectionMethod.getReturnType().toString().equals("boolean") &&
@@ -128,10 +128,10 @@ public class ConnectorValidator implements Validator {
         if (!connectionIdentifierMethod.getReturnType().toString().equals("java.lang.String")) {
             throw new ValidationException(typeElement, "A @ConnectionIdentifier must return java.lang.String.");
         }
-        if (!connectionIdentifierMethod.getModifiers().contains(Modifier.PUBLIC)) {
+        if (!connectionIdentifierMethod.isPublic()) {
             throw new ValidationException(typeElement, "A @ConnectionIdentifier method must be public.");
         }
-        if (connectionIdentifierMethod.getModifiers().contains(Modifier.STATIC)) {
+        if (connectionIdentifierMethod.isStatic()) {
             throw new ValidationException(typeElement, "A @ConnectionIdentifier cannot be static.");
         }
         if (!connectionIdentifierMethod.getParameters().isEmpty()) {

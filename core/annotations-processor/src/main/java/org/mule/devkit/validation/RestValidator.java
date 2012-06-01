@@ -45,7 +45,7 @@ public class RestValidator implements Validator {
 
         for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(RestCall.class)) {
 
-            if (!method.getModifiers().contains(Modifier.ABSTRACT)) {
+            if (!method.isAbstract()) {
                 throw new ValidationException(method, "@RestCall can only be applied to abstract methods");
             }
 

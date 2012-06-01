@@ -40,11 +40,11 @@ public class TransformerValidator implements Validator {
     public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
         for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Transformer.class)) {
 
-            if (!method.getModifiers().contains(Modifier.STATIC)) {
+            if (!method.isStatic()) {
                 throw new ValidationException(method, "@Transformer must be a static method");
             }
 
-            if (!method.getModifiers().contains(Modifier.PUBLIC)) {
+            if (!method.isPublic()) {
                 throw new ValidationException(method, "@Transformer cannot be applied to a non-public method");
             }
 

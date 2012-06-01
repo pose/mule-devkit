@@ -31,11 +31,21 @@ public interface DevKitElement<T extends Element, P extends DevKitElement> exten
 
     TypeMirror asType();
 
-    Set<Modifier> getModifiers();
-
     Name getSimpleName();
 
     List<? extends Element> getEnclosedElements();
 
     boolean isXmlType();
+
+    boolean isPublic();
+
+    boolean isPrivate();
+
+    boolean isProtected();
+
+    boolean isAbstract();
+
+    boolean isFinal();
+
+    boolean isStatic();
 }

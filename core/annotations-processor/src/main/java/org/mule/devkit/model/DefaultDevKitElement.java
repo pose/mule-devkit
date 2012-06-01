@@ -66,11 +66,6 @@ public class DefaultDevKitElement<T extends Element, P extends DevKitElement> im
     }
 
     @Override
-    public Set<Modifier> getModifiers() {
-        return innerElement.getModifiers();
-    }
-
-    @Override
     public Name getSimpleName() {
         return innerElement.getSimpleName();
     }
@@ -94,5 +89,35 @@ public class DefaultDevKitElement<T extends Element, P extends DevKitElement> im
         }
 
         return false;
+    }
+
+    @Override
+    public boolean isPublic() {
+        return innerElement.getModifiers().contains(Modifier.PUBLIC);
+    }
+
+    @Override
+    public boolean isPrivate() {
+        return innerElement.getModifiers().contains(Modifier.PRIVATE);
+    }
+
+    @Override
+    public boolean isProtected() {
+        return innerElement.getModifiers().contains(Modifier.PROTECTED);
+    }
+
+    @Override
+    public boolean isAbstract() {
+        return innerElement.getModifiers().contains(Modifier.PROTECTED);
+    }
+
+    @Override
+    public boolean isFinal() {
+        return innerElement.getModifiers().contains(Modifier.FINAL);
+    }
+
+    @Override
+    public boolean isStatic() {
+        return innerElement.getModifiers().contains(Modifier.STATIC);
     }
 }

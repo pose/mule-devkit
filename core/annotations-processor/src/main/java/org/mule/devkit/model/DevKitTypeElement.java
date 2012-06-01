@@ -50,8 +50,6 @@ public interface DevKitTypeElement extends DevKitElement<TypeElement, DevKitType
 
     boolean isParametrized();
 
-    boolean isPublic();
-
     boolean isModuleOrConnector();
 
     boolean isPoolable();

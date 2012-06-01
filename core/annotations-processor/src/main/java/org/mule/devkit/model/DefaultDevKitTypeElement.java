@@ -191,11 +191,6 @@ public class DefaultDevKitTypeElement extends DefaultDevKitElement<TypeElement, 
     }
 
     @Override
-    public boolean isPublic() {
-        return innerElement.getModifiers().contains(Modifier.PUBLIC);
-    }
-
-    @Override
     public boolean isModuleOrConnector() {
         return hasAnnotation(Module.class) || hasAnnotation(Connector.class);
     }

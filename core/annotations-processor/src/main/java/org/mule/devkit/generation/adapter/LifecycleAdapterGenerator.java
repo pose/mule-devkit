@@ -98,7 +98,7 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
         }
 
         int modifiers = Modifier.PUBLIC;
-        if( typeElement.getModifiers().contains(javax.lang.model.element.Modifier.ABSTRACT) ) {
+        if( typeElement.isAbstract() ) {
             modifiers |= Modifier.ABSTRACT;
         }
 

@@ -57,7 +57,7 @@ public class SourceValidator implements Validator {
                 }
             }
 
-            if (method.getModifiers().contains(Modifier.STATIC)) {
+            if (method.isStatic()) {
                 throw new ValidationException(method, "@Source cannot be applied to a static method");
             }
 
@@ -65,7 +65,7 @@ public class SourceValidator implements Validator {
                 throw new ValidationException(method, "@Source cannot be applied to a generic method");
             }
 
-            if (!method.getModifiers().contains(Modifier.PUBLIC)) {
+            if (!method.isPublic()) {
                 throw new ValidationException(method, "@Source cannot be applied to a non-public method");
             }
 

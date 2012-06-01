@@ -51,11 +51,11 @@ public class BasicValidator implements Validator {
 
         for (DevKitFieldElement variable : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
 
-            if (variable.getModifiers().contains(Modifier.FINAL)) {
+            if (variable.isFinal()) {
                 throw new ValidationException(variable, "@Configurable cannot be applied to field with final modifier");
             }
 
-            if (variable.getModifiers().contains(Modifier.STATIC)) {
+            if (variable.isStatic()) {
                 throw new ValidationException(variable, "@Configurable cannot be applied to field with static modifier");
             }
 

@@ -60,10 +60,10 @@ public class LifecycleValidator implements Validator {
         if (method.getReturnType().getKind() != TypeKind.VOID) {
             throw new ValidationException(typeElement, "A method annotated with " + annotation.getSimpleName() + " can only return void");
         }
-        if (!method.getModifiers().contains(Modifier.STATIC)) {
+        if (!method.isStatic()) {
             throw new ValidationException(method, "A method annotated with " + annotation.getSimpleName() + " cannot be static");
         }
-        if (!method.getModifiers().contains(Modifier.PUBLIC)) {
+        if (!method.isPublic()) {
             throw new ValidationException(method, "A method annotated with " + annotation.getSimpleName() + " can only be public");
         }
     }

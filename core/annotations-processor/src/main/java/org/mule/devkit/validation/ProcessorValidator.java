@@ -51,7 +51,7 @@ public class ProcessorValidator implements Validator {
 
         for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Processor.class)) {
 
-            if (method.getModifiers().contains(Modifier.STATIC)) {
+            if (method.isStatic()) {
                 throw new ValidationException(method, "@Processor cannot be applied to a static method");
             }
 
@@ -59,7 +59,7 @@ public class ProcessorValidator implements Validator {
                 throw new ValidationException(method, "@Processor cannot be applied to a generic method");
             }
 
-            if (!method.getModifiers().contains(Modifier.PUBLIC)) {
+            if (!method.isPublic()) {
                 throw new ValidationException(method, "@Processor cannot be applied to a non-public method");
             }
 
