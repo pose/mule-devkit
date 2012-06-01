@@ -18,5 +18,5 @@ package org.mule.devkit.model;
 
 import javax.lang.model.element.VariableElement;
 
-public interface DevKitVariableElement extends VariableElement {
+public interface DevKitVariableElement<P extends DevKitElement> extends DevKitElement<VariableElement, P> {
 }

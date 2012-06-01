@@ -43,6 +43,8 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.NamingContants;
+import org.mule.devkit.model.DevKitExecutableElement;
+import org.mule.devkit.model.DevKitParameterElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.ClassAlreadyExistsException;
@@ -62,8 +64,6 @@ import org.mule.devkit.model.code.Variable;
 import org.mule.expression.ExpressionUtils;
 
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -84,7 +84,7 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
     protected void doGenerate(DevKitTypeElement typeElement) {
         String name = typeElement.getAnnotation(ExpressionLanguage.class).name();
 
-        ExecutableElement executableElement = typeElement.getMethodsAnnotatedWith(ExpressionEnricher.class).get(0);
+        DevKitExecutableElement executableElement = typeElement.getMethodsAnnotatedWith(ExpressionEnricher.class).get(0);
         TypeReference moduleObject = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
         DefinedClass enricherClass = getEnricherClass(name, typeElement);
 
@@ -167,7 +167,7 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
         TryStatement tryStatement = enrich.body()._try();
 
         Invocation newArray = ExpressionFactory._new(ref(Class.class).array());
-        for (VariableElement parameter : executableElement.getParameters()) {
+        for (DevKitParameterElement parameter : executableElement.getParameters()) {
             if( parameter.asType().getKind() == TypeKind.BOOLEAN ||
                     parameter.asType().getKind() == TypeKind.BYTE ||
                     parameter.asType().getKind() == TypeKind.SHORT ||
@@ -186,7 +186,7 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
         Invocation getMethod = module.invoke("getClass").invoke("getMethod").arg(executableElement.getSimpleName().toString()).arg(parameterClasses);
         Variable moduleEvaluate = tryStatement.body().decl(ref(java.lang.reflect.Method.class), "evaluateMethod", getMethod);
         List<Variable> types = new ArrayList<Variable>();
-        for (VariableElement parameter : executableElement.getParameters()) {
+        for (DevKitParameterElement parameter : executableElement.getParameters()) {
             Variable var = tryStatement.body().decl(ref(Type.class), parameter.getSimpleName().toString() + "Type", moduleEvaluate.invoke("getGenericParameterTypes").component(ExpressionFactory.lit(types.size())));
             types.add(var);
         }
@@ -197,7 +197,7 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
         Variable outboundHeadersVar = null;
         Variable sessionHeadersVar = null;
         Invocation evaluateInvoke = module.invoke(executableElement.getSimpleName().toString());
-        for (VariableElement parameter : executableElement.getParameters()) {
+        for (DevKitParameterElement parameter : executableElement.getParameters()) {
             if (parameter.getAnnotation(Payload.class) != null) {
                 evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()).boxify(), ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(message.invoke("getPayload"))));
             } else if (parameter.getAnnotation(ExceptionPayload.class) != null) {

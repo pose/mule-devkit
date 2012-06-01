@@ -27,10 +27,9 @@ import org.mule.api.annotations.param.OutboundHeaders;
 import org.mule.api.annotations.param.Payload;
 import org.mule.api.annotations.param.SessionHeaders;
 import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.model.DevKitExecutableElement;
+import org.mule.devkit.model.DevKitParameterElement;
 import org.mule.devkit.model.DevKitTypeElement;
-
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.VariableElement;
 
 public class ExpressionLanguageValidator implements Validator {
     @Override
@@ -50,7 +49,7 @@ public class ExpressionLanguageValidator implements Validator {
                 typeElement.getMethodsAnnotatedWith(ExpressionEnricher.class).size() == 0) {
             throw new ValidationException(typeElement, "An @ExpressionLanguage must contain one @ExpressionEnricher or one @ExpressionEvaluator or both.");
         }
-        for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(ExpressionEvaluator.class)) {
+        for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(ExpressionEvaluator.class)) {
             if (executableElement.getParameters().size() == 0) {
                 throw new ValidationException(executableElement, "An @ExpressionEvaluator must receive at least a String that represents the expression to evaluate.");
             }
@@ -60,7 +59,7 @@ public class ExpressionLanguageValidator implements Validator {
             }
 
             boolean expressionStringFound = false;
-            for (VariableElement parameter : executableElement.getParameters()) {
+            for (DevKitParameterElement parameter : executableElement.getParameters()) {
                 if (parameter.getAnnotation(Payload.class) == null &&
                         parameter.getAnnotation(OutboundHeaders.class) == null &&
                         parameter.getAnnotation(InboundHeaders.class) == null &&
@@ -81,7 +80,7 @@ public class ExpressionLanguageValidator implements Validator {
             }
         }
 
-        for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(ExpressionEnricher.class)) {
+        for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(ExpressionEnricher.class)) {
             if (executableElement.getParameters().size() == 0) {
                 throw new ValidationException(executableElement, "An @ExpressionEnricher must receive at least a String that represents the expression and Object that represents the object to be used for enrichment.");
             }
@@ -92,7 +91,7 @@ public class ExpressionLanguageValidator implements Validator {
 
             boolean expressionStringFound = false;
             boolean enrichObjectFound = false;
-            for (VariableElement parameter : executableElement.getParameters()) {
+            for (DevKitParameterElement parameter : executableElement.getParameters()) {
                 if (parameter.getAnnotation(Payload.class) == null &&
                         parameter.getAnnotation(OutboundHeaders.class) == null &&
                         parameter.getAnnotation(InboundHeaders.class) == null &&

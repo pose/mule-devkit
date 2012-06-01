@@ -21,10 +21,10 @@ import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.model.DevKitFieldElement;
 import org.mule.devkit.model.DevKitTypeElement;
 
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 
 public class BasicValidator implements Validator {
@@ -49,7 +49,7 @@ public class BasicValidator implements Validator {
             throw new ValidationException(typeElement, "@Module/@Connector must be public");
         }
 
-        for (VariableElement variable : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
+        for (DevKitFieldElement variable : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
 
             if (variable.getModifiers().contains(Modifier.FINAL)) {
                 throw new ValidationException(variable, "@Configurable cannot be applied to field with final modifier");

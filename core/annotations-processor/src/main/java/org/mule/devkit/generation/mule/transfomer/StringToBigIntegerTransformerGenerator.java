@@ -38,7 +38,6 @@ import org.mule.devkit.model.code.Variable;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
-import javax.lang.model.element.TypeElement;
 import java.math.BigInteger;
 
 public class StringToBigIntegerTransformerGenerator extends AbstractMessageGenerator {
@@ -115,7 +114,7 @@ public class StringToBigIntegerTransformerGenerator extends AbstractMessageGener
         registerSourceType.arg(ref(DataTypeFactory.class).staticInvoke("create").arg(ref(String.class).boxify().dotclass()));
     }
 
-    private DefinedClass getTransformerClass(TypeElement typeElement) {
+    private DefinedClass getTransformerClass(DevKitTypeElement typeElement) {
         String transformerClassName = context.getNameUtils().generateClassNameInPackage(typeElement, NamingContants.STRING_TO_BIGINTEGER_TRANSFORMER_CLASS_NAME);
         Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(transformerClassName) + NamingContants.TRANSFORMERS_NAMESPACE);
         return pkg._class(context.getNameUtils().getClassName(transformerClassName), AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class, MuleContextAware.class});

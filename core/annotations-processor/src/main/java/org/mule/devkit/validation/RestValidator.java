@@ -26,11 +26,12 @@ import org.mule.api.annotations.rest.RestHttpClient;
 import org.mule.api.annotations.rest.RestQueryParam;
 import org.mule.api.annotations.rest.RestUriParam;
 import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.model.DevKitExecutableElement;
+import org.mule.devkit.model.DevKitFieldElement;
+import org.mule.devkit.model.DevKitParameterElement;
 import org.mule.devkit.model.DevKitTypeElement;
 
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.VariableElement;
 
 public class RestValidator implements Validator {
 
@@ -42,7 +43,7 @@ public class RestValidator implements Validator {
     @Override
     public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
 
-        for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(RestCall.class)) {
+        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(RestCall.class)) {
 
             if (!method.getModifiers().contains(Modifier.ABSTRACT)) {
                 throw new ValidationException(method, "@RestCall can only be applied to abstract methods");
@@ -65,7 +66,7 @@ public class RestValidator implements Validator {
             }
 
             int nonAnnotatedParameterCount = 0;
-            for (VariableElement parameter : method.getParameters()) {
+            for (DevKitParameterElement parameter : method.getParameters()) {
                 if (parameter.getAnnotation(RestUriParam.class) == null &&
                         parameter.getAnnotation(RestHeaderParam.class) == null &&
                         parameter.getAnnotation(RestQueryParam.class) == null) {
@@ -78,9 +79,9 @@ public class RestValidator implements Validator {
             }
         }
 
-        for (VariableElement field : typeElement.getFieldsAnnotatedWith(RestUriParam.class)) {
+        for (DevKitFieldElement field : typeElement.getFieldsAnnotatedWith(RestUriParam.class)) {
             boolean getterFound = false;
-            for (ExecutableElement method : typeElement.getMethods()) {
+            for (DevKitExecutableElement method : typeElement.getMethods()) {
                 if (method.getSimpleName().toString().equals("get" + StringUtils.capitalize(field.getSimpleName().toString()))) {
                     getterFound = true;
                     break;
@@ -101,9 +102,9 @@ public class RestValidator implements Validator {
             }
         }
 
-        for (VariableElement field : typeElement.getFieldsAnnotatedWith(RestHttpClient.class)) {
+        for (DevKitFieldElement field : typeElement.getFieldsAnnotatedWith(RestHttpClient.class)) {
             boolean getterFound = false;
-            for (ExecutableElement method : typeElement.getMethods()) {
+            for (DevKitExecutableElement method : typeElement.getMethods()) {
                 if (method.getSimpleName().toString().equals("get" + StringUtils.capitalize(field.getSimpleName().toString()))) {
                     getterFound = true;
                     break;

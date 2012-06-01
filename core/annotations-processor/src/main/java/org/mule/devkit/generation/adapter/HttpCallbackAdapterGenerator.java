@@ -38,8 +38,6 @@ import org.mule.devkit.model.code.Variable;
 import org.mule.devkit.model.code.builders.FieldBuilder;
 import org.mule.util.NumberUtils;
 
-import javax.lang.model.element.TypeElement;
-
 public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
 
     public static final String LOCAL_PORT_FIELD_NAME = "localPort";
@@ -104,7 +102,7 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
         thenBlock.assign(domain, ExpressionFactory.lit("localhost"));
     }
 
-    private DefinedClass getHttpCallbackAdapterClass(TypeElement typeElement) {
+    private DefinedClass getHttpCallbackAdapterClass(DevKitTypeElement typeElement) {
         String httpCallbackAdapterClassName = context.getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.HTTP_CALLBACK_ADAPTER_CLASS_NAME_SUFFIX);
         Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(httpCallbackAdapterClassName));
 

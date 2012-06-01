@@ -20,11 +20,11 @@ package org.mule.devkit.validation;
 import org.mule.api.annotations.Source;
 import org.mule.api.callback.SourceCallback;
 import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.model.DevKitExecutableElement;
+import org.mule.devkit.model.DevKitParameterElement;
 import org.mule.devkit.model.DevKitTypeElement;
 
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.VariableElement;
 import java.util.List;
 
 public class SourceValidator implements Validator {
@@ -37,7 +37,7 @@ public class SourceValidator implements Validator {
     @Override
     public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
 
-        for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Source.class)) {
+        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Source.class)) {
 
             if (method.getAnnotation(Source.class).primaryNodeOnly()) {
                 String[] expectedMinVersion = new String[]{"3", "3"};
@@ -71,8 +71,8 @@ public class SourceValidator implements Validator {
 
             // verify that every @Source receives a SourceCallback
             boolean containsSourceCallback = false;
-            List<? extends VariableElement> parameters = method.getParameters();
-            for (VariableElement parameter : parameters) {
+            List<DevKitParameterElement> parameters = method.getParameters();
+            for (DevKitParameterElement parameter : parameters) {
                 if (parameter.asType().toString().startsWith(SourceCallback.class.getName())) {
                     containsSourceCallback = true;
                 }

@@ -26,6 +26,9 @@ import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.NamingContants;
+import org.mule.devkit.model.DevKitExecutableElement;
+import org.mule.devkit.model.DevKitFieldElement;
+import org.mule.devkit.model.DevKitParameterElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -39,8 +42,6 @@ import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 
@@ -54,7 +55,7 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
     @Override
     protected void doGenerate(DevKitTypeElement typeElement) {
 
-        for (VariableElement field : typeElement.getFields()) {
+        for (DevKitFieldElement field : typeElement.getFields()) {
             if (context.getTypeMirrorUtils().isEnum(field.asType())) {
                 if (!context.isEnumRegistered(field.asType())) {
                     registerEnumTransformer(field);
@@ -63,8 +64,8 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
             }
         }
 
-        for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Processor.class)) {
-            for (VariableElement variable : method.getParameters()) {
+        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Processor.class)) {
+            for (DevKitParameterElement variable : method.getParameters()) {
                 if (context.getTypeMirrorUtils().isEnum(variable.asType()) && !context.isEnumRegistered(variable.asType())) {
                     registerEnumTransformer(variable);
                     context.registerEnum(variable.asType());
@@ -81,8 +82,8 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
             }
         }
 
-        for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Source.class)) {
-            for (VariableElement variable : method.getParameters()) {
+        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Source.class)) {
+            for (DevKitParameterElement variable : method.getParameters()) {
                 if (!context.getTypeMirrorUtils().isEnum(variable.asType())) {
                     continue;
                 }

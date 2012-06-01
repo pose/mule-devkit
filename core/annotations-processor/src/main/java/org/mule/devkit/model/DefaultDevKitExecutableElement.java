@@ -17,9 +17,39 @@
 package org.mule.devkit.model;
 
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeParameterElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
+import java.util.ArrayList;
+import java.util.List;
 
-public class DefaultDevKitExecutableElement extends ExecutableElementImpl implements DevKitExecutableElement {
-    public DefaultDevKitExecutableElement(ExecutableElement executableElement) {
-        super(executableElement);
+public class DefaultDevKitExecutableElement extends DefaultDevKitElement<ExecutableElement, DevKitTypeElement> implements DevKitExecutableElement {
+    public DefaultDevKitExecutableElement(ExecutableElement element, DevKitTypeElement parent) {
+        super(element, parent);
+    }
+
+    @Override
+    public List<DevKitParameterElement> getParameters() {
+        List<DevKitParameterElement> parameters = new ArrayList<DevKitParameterElement>();
+        for(VariableElement variableElement : innerElement.getParameters() ) {
+            parameters.add(new DefaultDevKitParameterElement(variableElement, this));
+        }
+
+        return parameters;
+    }
+
+    @Override
+    public List<? extends TypeMirror> getThrownTypes() {
+        return innerElement.getThrownTypes();
+    }
+
+    @Override
+    public TypeMirror getReturnType() {
+        return innerElement.getReturnType();
+    }
+
+    @Override
+    public List<? extends TypeParameterElement> getTypeParameters() {
+        return innerElement.getTypeParameters();
     }
 }

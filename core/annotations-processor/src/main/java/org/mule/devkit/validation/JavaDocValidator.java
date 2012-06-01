@@ -25,13 +25,13 @@ import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
 import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.model.DevKitExecutableElement;
+import org.mule.devkit.model.DevKitFieldElement;
+import org.mule.devkit.model.DevKitParameterElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.util.IOUtils;
 
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -46,50 +46,50 @@ public class JavaDocValidator implements Validator {
     @Override
     public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
 
-        if (!hasComment(typeElement.getInnerTypeElement(), context)) {
+        if (!hasComment(typeElement.unwrap(), context)) {
             throw new ValidationException(typeElement, "Class " + typeElement.getQualifiedName().toString() + " is not properly documented. A summary is missing.");
         }
 
-        if (!context.getJavaDocUtils().hasTag("author", typeElement.getInnerTypeElement())) {
+        if (!context.getJavaDocUtils().hasTag("author", typeElement.unwrap())) {
             throw new ValidationException(typeElement, "Class " + typeElement.getQualifiedName().toString() + " needs to have an @author tag.");
         }
 
-        for (VariableElement variable : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
+        for (DevKitFieldElement variable : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
             if (!hasComment(variable, context)) {
                 throw new ValidationException(variable, "Field " + variable.getSimpleName().toString() + " is not properly documented. The description is missing.");
             }
         }
 
-        for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Processor.class)) {
+        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Processor.class)) {
             validateMethod(typeElement, context, method);
         }
 
-        for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Source.class)) {
+        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Source.class)) {
             validateMethod(typeElement, context, method);
         }
 
-        for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Transformer.class)) {
+        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Transformer.class)) {
             validateMethod(typeElement, context, method);
         }
 
-        for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Connect.class)) {
+        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Connect.class)) {
             validateAllParameters(context, method);
         }
 
-        for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Disconnect.class)) {
+        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Disconnect.class)) {
             validateAllParameters(context, method);
         }
     }
 
-    private void validateAllParameters(GeneratorContext context, ExecutableElement method) throws ValidationException {
-        for (VariableElement variable : method.getParameters()) {
+    private void validateAllParameters(GeneratorContext context, DevKitExecutableElement method) throws ValidationException {
+        for (DevKitParameterElement variable : method.getParameters()) {
             if (!hasParameterComment(variable.getSimpleName().toString(), variable.getEnclosingElement(), context)) {
                 throw new ValidationException(variable, "Parameter " + variable.getSimpleName().toString() + " of method " + method.getSimpleName().toString() + " is not properly documented. A matching @param in the method documentation was not found. ");
             }
         }
     }
 
-    private void validateMethod(DevKitTypeElement typeElement, GeneratorContext context, ExecutableElement method) throws ValidationException {
+    private void validateMethod(DevKitTypeElement typeElement, GeneratorContext context, DevKitExecutableElement method) throws ValidationException {
         if (!hasComment(method, context)) {
             throw new ValidationException(method, "Method " + method.getSimpleName().toString() + " is not properly documented. A description of what it can do is missing.");
         }
@@ -119,7 +119,7 @@ public class JavaDocValidator implements Validator {
         return StringUtils.isNotBlank(comment);
     }
 
-    protected boolean exampleDoesNotExist(GeneratorContext context, ExecutableElement method) throws ValidationException {
+    protected boolean exampleDoesNotExist(GeneratorContext context, DevKitExecutableElement method) throws ValidationException {
 
         if (!context.getJavaDocUtils().hasTag("sample.xml", method)) {
             throw new ValidationException(method, "Method " + method.getSimpleName().toString() + " does not contain an example using {@sample.xml} tag.");
@@ -136,9 +136,8 @@ public class JavaDocValidator implements Validator {
         String pathToExamplesFile = split[0];
         String exampleName = split[1];
 
-        TypeElement typeElement = (TypeElement) method.getEnclosingElement();
-        String sourcePath = context.getSourceUtils().getPath(typeElement);
-        int packageCount = StringUtils.countMatches(typeElement.getQualifiedName().toString(), ".") + 1;
+        String sourcePath = context.getSourceUtils().getPath(method.parent().unwrap());
+        int packageCount = StringUtils.countMatches(method.parent().getQualifiedName().toString(), ".") + 1;
         while (packageCount > 0) {
             sourcePath = sourcePath.substring(0, sourcePath.lastIndexOf("/"));
             packageCount--;

@@ -27,6 +27,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.object.ObjectFactory;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.NamingContants;
+import org.mule.devkit.model.DevKitFieldElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -34,9 +35,6 @@ import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Variable;
-
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 
 public class LifecycleAdapterFactoryGenerator extends AbstractModuleGenerator {
 
@@ -98,7 +96,7 @@ public class LifecycleAdapterFactoryGenerator extends AbstractModuleGenerator {
         getInstance.param(ref(MuleContext.class), "muleContext");
 
         Variable object = getInstance.body().decl(poolObjectClass, "object", ExpressionFactory._new(poolObjectClass));
-        for (VariableElement variable : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
+        for (DevKitFieldElement variable : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
             getInstance.body().add(object.invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(ExpressionFactory._this().ref(variable.getSimpleName().toString())));
         }
 
@@ -115,13 +113,13 @@ public class LifecycleAdapterFactoryGenerator extends AbstractModuleGenerator {
     }
 
     private void generateFields(DevKitTypeElement typeElement, DefinedClass lifecycleAdapterFactory) {
-        for (VariableElement variable : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
+        for (DevKitFieldElement variable : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
             FieldVariable configField = lifecycleAdapterFactory.field(Modifier.PRIVATE, ref(variable.asType()), variable.getSimpleName().toString());
             generateSetter(lifecycleAdapterFactory, configField);
         }
     }
 
-    private DefinedClass getLifecycleAdapterFactoryClass(TypeElement typeElement) {
+    private DefinedClass getLifecycleAdapterFactoryClass(DevKitTypeElement typeElement) {
         String lifecycleAdapterName = context.getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.LIFECYCLE_ADAPTER_FACTORY_CLASS_NAME_SUFFIX);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(lifecycleAdapterName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(lifecycleAdapterName));

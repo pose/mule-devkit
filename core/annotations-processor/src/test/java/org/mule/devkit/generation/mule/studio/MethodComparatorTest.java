@@ -22,8 +22,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mule.devkit.generation.mule.studio.editor.MethodComparator;
+import org.mule.devkit.model.DevKitExecutableElement;
 
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Name;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,21 +37,21 @@ import static org.mockito.Mockito.when;
 public class MethodComparatorTest {
 
     @Mock
-    private ExecutableElement method1;
+    private DevKitExecutableElement method1;
     @Mock
-    private ExecutableElement method2;
+    private DevKitExecutableElement method2;
     @Mock
     private Name name1;
     @Mock
     private Name name2;
-    private List<ExecutableElement> methods;
+    private List<DevKitExecutableElement> methods;
 
     @Before
     public void setUpTests() throws Exception {
         MockitoAnnotations.initMocks(this);
         when(method1.getSimpleName()).thenReturn(name1);
         when(method2.getSimpleName()).thenReturn(name2);
-        methods = new ArrayList<ExecutableElement>(2);
+        methods = new ArrayList<DevKitExecutableElement>(2);
         methods.add(method1);
         methods.add(method2);
     }

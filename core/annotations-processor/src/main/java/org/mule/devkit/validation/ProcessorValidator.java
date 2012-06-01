@@ -31,11 +31,11 @@ import org.mule.api.annotations.param.Payload;
 import org.mule.api.annotations.param.SessionHeaders;
 import org.mule.api.callback.SourceCallback;
 import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.model.DevKitExecutableElement;
+import org.mule.devkit.model.DevKitParameterElement;
 import org.mule.devkit.model.DevKitTypeElement;
 
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import java.util.List;
 
@@ -49,7 +49,7 @@ public class ProcessorValidator implements Validator {
     @Override
     public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
 
-        for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Processor.class)) {
+        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Processor.class)) {
 
             if (method.getModifiers().contains(Modifier.STATIC)) {
                 throw new ValidationException(method, "@Processor cannot be applied to a static method");
@@ -65,7 +65,7 @@ public class ProcessorValidator implements Validator {
 
             validateIntercepting(method);
 
-            for (VariableElement parameter : method.getParameters()) {
+            for (DevKitParameterElement parameter : method.getParameters()) {
                 int count = 0;
                 if (parameter.getAnnotation(InboundHeaders.class) != null) {
                     count++;
@@ -112,11 +112,11 @@ public class ProcessorValidator implements Validator {
         }
     }
 
-    private void validateIntercepting(ExecutableElement method) throws ValidationException {
+    private void validateIntercepting(DevKitExecutableElement method) throws ValidationException {
         if (method.getAnnotation(Processor.class).intercepting()) {
             boolean containsSourceCallback = false;
-            List<? extends VariableElement> parameters = method.getParameters();
-            for (VariableElement parameter : parameters) {
+            List<DevKitParameterElement> parameters = method.getParameters();
+            for (DevKitParameterElement parameter : parameters) {
                 if (parameter.asType().toString().startsWith(SourceCallback.class.getName())) {
                     containsSourceCallback = true;
                 }

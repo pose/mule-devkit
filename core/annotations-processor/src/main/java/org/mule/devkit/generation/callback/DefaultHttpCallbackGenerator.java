@@ -52,7 +52,6 @@ import org.mule.devkit.model.code.builders.FieldBuilder;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 
-import javax.lang.model.element.TypeElement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -399,7 +398,7 @@ public class DefaultHttpCallbackGenerator extends AbstractModuleGenerator {
         processMethod.body()._return(ExpressionFactory.invoke(callbackFlowField, "process").arg(processMethod.params().get(0)));
     }
 
-    private DefinedClass getDefaultHttpCallbackClass(TypeElement type) {
+    private DefinedClass getDefaultHttpCallbackClass(DevKitTypeElement type) {
         String httpCallbackClassName = context.getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, CLASS_NAME);
         Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(httpCallbackClassName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(httpCallbackClassName), new Class[]{HttpCallback.class});

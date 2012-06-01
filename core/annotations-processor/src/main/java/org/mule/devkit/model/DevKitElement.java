@@ -16,17 +16,9 @@
  */
 package org.mule.devkit.model;
 
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeParameterElement;
-import javax.lang.model.type.TypeMirror;
-import java.util.List;
+import javax.lang.model.element.Element;
 
-public interface DevKitExecutableElement extends DevKitElement<ExecutableElement, DevKitTypeElement> {
-    List<DevKitParameterElement> getParameters();
-
-    List<? extends TypeMirror> getThrownTypes();
-
-    TypeMirror getReturnType();
-
-    List<? extends TypeParameterElement> getTypeParameters();
+public interface DevKitElement<T extends Element, P extends DevKitElement> extends Element {
+    T unwrap();
+    P parent();
 }

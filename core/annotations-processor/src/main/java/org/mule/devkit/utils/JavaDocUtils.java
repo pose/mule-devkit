@@ -17,7 +17,7 @@
 package org.mule.devkit.utils;
 
 import org.apache.commons.lang.StringUtils;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.DevKitElement;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.util.Elements;
@@ -31,8 +31,8 @@ public class JavaDocUtils {
     }
 
     public String getSummary(Element element) {
-        if(element instanceof DevKitTypeElement) {
-            element = ((DevKitTypeElement) element).getInnerTypeElement();
+        if (element instanceof DevKitElement) {
+            element = ((DevKitElement) element).unwrap();
         }
         String comment = elements.getDocComment(element);
         if (comment == null || StringUtils.isBlank(comment)) {
@@ -146,7 +146,7 @@ public class JavaDocUtils {
         StringTokenizer st = new StringTokenizer(comment, "\n\r");
         while (st.hasMoreTokens()) {
             String nextToken = st.nextToken().trim();
-            if (nextToken.startsWith("@param " + paramName + " " ) || nextToken.equals("@param " + paramName)) {
+            if (nextToken.startsWith("@param " + paramName + " ") || nextToken.equals("@param " + paramName)) {
                 insideParameter = true;
             } else if (nextToken.startsWith("@")) {
                 insideParameter = false;

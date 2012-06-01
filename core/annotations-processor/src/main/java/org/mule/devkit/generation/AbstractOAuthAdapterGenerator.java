@@ -34,6 +34,8 @@ import org.mule.api.oauth.SaveAccessTokenCallback;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.devkit.generation.callback.DefaultHttpCallbackGenerator;
+import org.mule.devkit.model.DevKitExecutableElement;
+import org.mule.devkit.model.DevKitParameterElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
@@ -50,9 +52,6 @@ import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Variable;
 import org.mule.devkit.model.code.builders.FieldBuilder;
 
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 import java.net.URLDecoder;
 import java.util.HashMap;
@@ -82,7 +81,7 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
     public static final String OAUTH_SAVE_ACCESS_TOKEN_CALLBACK_FIELD_NAME = "oauthSaveAccessToken";
     public static final String OAUTH_RESTORE_ACCESS_TOKEN_CALLBACK_FIELD_NAME = "oauthRestoreAccessToken";
 
-    protected DefinedClass getOAuthAdapterClass(TypeElement typeElement, String classSuffix, Class<?> interf) {
+    protected DefinedClass getOAuthAdapterClass(DevKitTypeElement typeElement, String classSuffix, Class<?> interf) {
         String oauthAdapterName = context.getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, classSuffix);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(oauthAdapterName));
 
@@ -211,7 +210,7 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
 
     protected void generateOverrides(DevKitTypeElement typeElement, DefinedClass oauthAdapter, FieldVariable oauthAccessToken, FieldVariable oauthAccessTokenSecret) {
         Map<String, Variable> variables = new HashMap<String, Variable>();
-        for (ExecutableElement executableElement : typeElement.getMethodsWhoseParametersAreAnnotatedWith(OAuthAccessToken.class)) {
+        for (DevKitExecutableElement executableElement : typeElement.getMethodsWhoseParametersAreAnnotatedWith(OAuthAccessToken.class)) {
             Method override = oauthAdapter.method(Modifier.PUBLIC, ref(executableElement.getReturnType()), executableElement.getSimpleName().toString());
             //override.annotate(Override.class);
             override._throws(ref(NotAuthorizedException.class));
@@ -221,7 +220,7 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
 
             override.body().invoke("hasBeenAuthorized");
 
-            for (VariableElement parameter : executableElement.getParameters()) {
+            for (DevKitParameterElement parameter : executableElement.getParameters()) {
                 if (parameter.getAnnotation(OAuthAccessToken.class) != null ||
                         parameter.getAnnotation(OAuthAccessTokenSecret.class) != null) {
                     continue;
@@ -234,7 +233,7 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
             }
 
             Invocation callSuper = ExpressionFactory._super().invoke(executableElement.getSimpleName().toString());
-            for (VariableElement parameter : executableElement.getParameters()) {
+            for (DevKitParameterElement parameter : executableElement.getParameters()) {
                 if (parameter.getAnnotation(OAuthAccessToken.class) != null) {
                     callSuper.arg(oauthAccessToken);
                 } else if (parameter.getAnnotation(OAuthAccessTokenSecret.class) != null) {

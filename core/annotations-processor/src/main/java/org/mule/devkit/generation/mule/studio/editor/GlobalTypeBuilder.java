@@ -18,17 +18,17 @@
 package org.mule.devkit.generation.mule.studio.editor;
 
 import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.AttributeType;
 import org.mule.devkit.model.studio.GlobalType;
 
-import javax.lang.model.element.ExecutableElement;
 import java.util.List;
 
 public abstract class GlobalTypeBuilder extends BaseStudioXmlBuilder {
 
-    public GlobalTypeBuilder(GeneratorContext context, ExecutableElement executableElement, DevKitTypeElement typeElement) {
+    public GlobalTypeBuilder(GeneratorContext context, DevKitExecutableElement executableElement, DevKitTypeElement typeElement) {
         super(context, executableElement, typeElement);
     }
 

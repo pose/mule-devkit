@@ -25,10 +25,10 @@ import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
 import org.mule.api.annotations.oauth.OAuthConsumerKey;
 import org.mule.api.annotations.oauth.OAuthConsumerSecret;
 import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.model.DevKitExecutableElement;
+import org.mule.devkit.model.DevKitParameterElement;
 import org.mule.devkit.model.DevKitTypeElement;
 
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.VariableElement;
 import java.lang.annotation.Annotation;
 
 public class OAuthValidator implements Validator {
@@ -92,8 +92,8 @@ public class OAuthValidator implements Validator {
     }
 
     private boolean classHasMethodWithParameterAnnotated(DevKitTypeElement typeElement, Class<? extends Annotation> annotation) {
-        for (ExecutableElement method : typeElement.getMethods()) {
-            for (VariableElement parameter : method.getParameters()) {
+        for (DevKitExecutableElement method : typeElement.getMethods()) {
+            for (DevKitParameterElement parameter : method.getParameters()) {
                 if (parameter.getAnnotation(annotation) != null) {
                     return true;
                 }

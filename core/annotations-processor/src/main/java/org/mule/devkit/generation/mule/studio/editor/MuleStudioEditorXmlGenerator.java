@@ -31,7 +31,6 @@ import org.mule.devkit.model.studio.NamespaceType;
 import org.mule.devkit.model.studio.ObjectFactory;
 import org.mule.devkit.model.studio.PatternType;
 
-import javax.lang.model.element.ExecutableElement;
 import java.util.List;
 
 public class MuleStudioEditorXmlGenerator extends AbstractMessageGenerator {
@@ -78,7 +77,7 @@ public class MuleStudioEditorXmlGenerator extends AbstractMessageGenerator {
     }
 
     private void processProcessorMethods(DevKitTypeElement typeElement, NamespaceType namespace, boolean isOAuth) {
-        for (ExecutableElement processorMethod : typeElement.getMethodsAnnotatedWith(Processor.class)) {
+        for (DevKitExecutableElement processorMethod : typeElement.getMethodsAnnotatedWith(Processor.class)) {
             PatternType cloudConnector = new PatternTypeBuilder(context, processorMethod, typeElement).build();
             namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeCloudConnector(cloudConnector));
             namespace.getConnectorOrEndpointOrGlobal().addAll(new NestedsBuilder(context, processorMethod, typeElement).build());
@@ -98,7 +97,7 @@ public class MuleStudioEditorXmlGenerator extends AbstractMessageGenerator {
             GlobalType globalTransformer = new GlobalTransformerTypeOperationsBuilder(context, typeElement).build();
             namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeGlobalTransformer(globalTransformer));
         }
-        for (ExecutableElement transformerMethod : transformerMethods) {
+        for (DevKitExecutableElement transformerMethod : transformerMethods) {
             PatternType transformer = new PatternTypeBuilder(context, transformerMethod, typeElement).build();
             namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeTransformer(transformer));
             GlobalType globalTransformer = new GlobalTransformerTypeBuilder(context, transformerMethod, typeElement).build();
@@ -117,7 +116,7 @@ public class MuleStudioEditorXmlGenerator extends AbstractMessageGenerator {
             GlobalType globalEndpointListingOps = new GlobalEndpointTypeOperationsBuilder(context, typeElement).build();
             namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeGlobalEndpoint(globalEndpointListingOps));
         }
-        for (ExecutableElement sourceMethod : sourceMethods) {
+        for (DevKitExecutableElement sourceMethod : sourceMethods) {
             EndpointType endpoint = new EndpointTypeBuilder(context, sourceMethod, typeElement).build();
             namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createEndpoint(endpoint));
             GlobalType globalEndpoint = new GlobalEndpointTypeBuilder(context, sourceMethod, typeElement).build();

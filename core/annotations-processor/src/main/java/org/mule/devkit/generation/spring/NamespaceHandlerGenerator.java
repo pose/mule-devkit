@@ -28,6 +28,7 @@ import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.generation.mule.oauth.AuthorizeBeanDefinitionParserGenerator;
+import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -37,9 +38,6 @@ import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Package;
 import org.mule.devkit.model.schema.SchemaConstants;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
-
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
 
 public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
 
@@ -62,7 +60,7 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
     }
 
     private DefinedClass getNamespaceHandlerClass(DevKitTypeElement typeElement) {
-        String namespaceHandlerName = context.getNameUtils().generateClassName((TypeElement) typeElement, NamingContants.CONFIG_NAMESPACE, NamingContants.NAMESPACE_HANDLER_CLASS_NAME_SUFFIX);
+        String namespaceHandlerName = context.getNameUtils().generateClassName(typeElement, NamingContants.CONFIG_NAMESPACE, NamingContants.NAMESPACE_HANDLER_CLASS_NAME_SUFFIX);
         Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(namespaceHandlerName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(namespaceHandlerName), NamespaceHandlerSupport.class);
 
@@ -75,7 +73,7 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
         return clazz;
     }
 
-    private void registerConfig(Method init, TypeElement pojo) {
+    private void registerConfig(Method init, DevKitTypeElement pojo) {
         DefinedClass configBeanDefinitionParser = context.getClassForRole(context.getNameUtils().generateConfigDefParserRoleKey(pojo));
         init.body().invoke("registerBeanDefinitionParser").arg("config").arg(ExpressionFactory._new(configBeanDefinitionParser));
     }
@@ -85,19 +83,19 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
             DefinedClass authorizeMessageProcessorClass = context.getClassForRole(AuthorizeBeanDefinitionParserGenerator.AUTHORIZE_DEFINITION_PARSER_ROLE);
             init.body().invoke("registerBeanDefinitionParser").arg(ExpressionFactory.lit("authorize")).arg(ExpressionFactory._new(authorizeMessageProcessorClass));
         }
-        for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Processor.class)) {
+        for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Processor.class)) {
             registerBeanDefinitionParserForProcessor(init, executableElement);
         }
     }
 
     private void registerBeanDefinitionParserForEachSource(DevKitTypeElement typeElement, Method init) {
-        for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Source.class)) {
+        for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Source.class)) {
             registerBeanDefinitionParserForSource(init, executableElement);
         }
     }
 
     private void registerBeanDefinitionParserForEachTransformer(DevKitTypeElement typeElement, Method init) {
-        for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Transformer.class)) {
+        for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Transformer.class)) {
             Invocation registerMuleBeanDefinitionParser = init.body().invoke("registerBeanDefinitionParser");
             registerMuleBeanDefinitionParser.arg(ExpressionFactory.lit(context.getNameUtils().uncamel(executableElement.getSimpleName().toString())));
             String transformerClassName = context.getNameUtils().generateClassName(executableElement, NamingContants.TRANSFORMER_CLASS_NAME_SUFFIX);
@@ -106,7 +104,7 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
         }
     }
 
-    private void registerBeanDefinitionParserForProcessor(Method init, ExecutableElement executableElement) {
+    private void registerBeanDefinitionParserForProcessor(Method init, DevKitExecutableElement executableElement) {
         DefinedClass beanDefinitionParser = getBeanDefinitionParserClass(executableElement);
 
         Processor processor = executableElement.getAnnotation(Processor.class);
@@ -118,7 +116,7 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
         init.body().invoke("registerBeanDefinitionParser").arg(ExpressionFactory.lit(context.getNameUtils().uncamel(elementName))).arg(ExpressionFactory._new(beanDefinitionParser));
     }
 
-    private void registerBeanDefinitionParserForSource(Method init, ExecutableElement executableElement) {
+    private void registerBeanDefinitionParserForSource(Method init, DevKitExecutableElement executableElement) {
         DefinedClass beanDefinitionParser = getBeanDefinitionParserClass(executableElement);
 
         Source source = executableElement.getAnnotation(Source.class);

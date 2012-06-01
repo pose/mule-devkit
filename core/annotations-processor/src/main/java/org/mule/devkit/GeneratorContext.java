@@ -17,6 +17,7 @@
 
 package org.mule.devkit;
 
+import org.mule.devkit.model.DevKitElement;
 import org.mule.devkit.model.code.CodeModel;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.writer.FilerCodeWriter;
@@ -29,7 +30,6 @@ import org.mule.devkit.utils.TypeMirrorUtils;
 
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.Element;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
@@ -168,7 +168,7 @@ public class GeneratorContext {
         messager.printMessage(Diagnostic.Kind.ERROR, msg);
     }
 
-    public void error(String msg, Element element) {
-        messager.printMessage(Diagnostic.Kind.ERROR, msg, element);
+    public void error(String msg, DevKitElement element) {
+        messager.printMessage(Diagnostic.Kind.ERROR, msg, element.unwrap());
     }
 }

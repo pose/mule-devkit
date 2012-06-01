@@ -41,8 +41,6 @@ import org.mule.devkit.model.code.Package;
 import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Variable;
 
-import javax.lang.model.element.TypeElement;
-
 public class DefaultRestoreAccessTokenCallbackGenerator extends AbstractMessageGenerator {
 
     public static final String ROLE = "DefaultRestoreAccessTokenCallback";
@@ -152,7 +150,7 @@ public class DefaultRestoreAccessTokenCallbackGenerator extends AbstractMessageG
         getAccessTokenSecretMethod.body()._return(accessTokenSecret);
     }
 
-    private DefinedClass getDefaultRestoreAccessTokenCallbackClass(TypeElement type) {
+    private DefinedClass getDefaultRestoreAccessTokenCallbackClass(DevKitTypeElement type) {
         String callbackClassName = context.getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, NamingContants.DEFAULT_RESTORE_ACCESS_TOKEN_CALLBACK_CLASS_NAME);
         Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(callbackClassName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(callbackClassName), new Class[]{

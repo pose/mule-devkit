@@ -51,7 +51,10 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.devkit.generation.AbstractMessageGenerator;
+import org.mule.devkit.model.DevKitExecutableElement;
+import org.mule.devkit.model.DevKitParameterElement;
 import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.DevKitVariableElement;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.Cast;
 import org.mule.devkit.model.code.CatchBlock;
@@ -79,8 +82,6 @@ import org.mule.transport.NullPayload;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
@@ -100,12 +101,12 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
     @Override
     protected void doGenerate(DevKitTypeElement typeElement) {
-        for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Processor.class)) {
+        for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Processor.class)) {
             generateMessageProcessor(typeElement, executableElement);
         }
     }
 
-    private void generateMessageProcessor(DevKitTypeElement typeElement, ExecutableElement executableElement) {
+    private void generateMessageProcessor(DevKitTypeElement typeElement, DevKitExecutableElement executableElement) {
         // get class
         DefinedClass messageProcessorClass;
 
@@ -125,7 +126,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         Map<String, AbstractMessageGenerator.FieldVariableElement> fields = generateProcessorFieldForEachParameter(messageProcessorClass, executableElement);
 
         // add fields for connectivity if required
-        ExecutableElement connectMethod = connectMethodForClass(typeElement);
+        DevKitExecutableElement connectMethod = connectMethodForClass(typeElement);
         Map<String, AbstractMessageGenerator.FieldVariableElement> connectFields = null;
         if (connectMethod != null) {
             connectFields = generateProcessorFieldForEachParameter(messageProcessorClass, connectMethod);
@@ -326,12 +327,12 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         evaluate.body()._return(source);
     }
 
-    private void generateMessageProcessorClassDoc(ExecutableElement executableElement, DefinedClass messageProcessorClass) {
+    private void generateMessageProcessorClassDoc(DevKitExecutableElement executableElement, DefinedClass messageProcessorClass) {
         messageProcessorClass.javadoc().add(messageProcessorClass.name() + " invokes the ");
-        messageProcessorClass.javadoc().add("{@link " + ((TypeElement) executableElement.getEnclosingElement()).getQualifiedName().toString() + "#");
+        messageProcessorClass.javadoc().add("{@link " + (executableElement.parent()).getQualifiedName().toString() + "#");
         messageProcessorClass.javadoc().add(executableElement.getSimpleName().toString() + "(");
         boolean first = true;
-        for (VariableElement variable : executableElement.getParameters()) {
+        for (DevKitParameterElement variable : executableElement.getParameters()) {
             if (!first) {
                 messageProcessorClass.javadoc().add(", ");
             }
@@ -345,11 +346,11 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         messageProcessorClass.javadoc().add(" where possible to the expected argument type.");
     }
 
-    private void generateProcessMethod(ExecutableElement executableElement, DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> connectionFields, FieldVariable messageProcessorListener, FieldVariable muleContext, FieldVariable object, FieldVariable logger, FieldVariable retryCount, FieldVariable retryMax) {
+    private void generateProcessMethod(DevKitExecutableElement executableElement, DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> connectionFields, FieldVariable messageProcessorListener, FieldVariable muleContext, FieldVariable object, FieldVariable logger, FieldVariable retryCount, FieldVariable retryMax) {
         generateProcessMethod(executableElement, messageProcessorClass, fields, connectionFields, messageProcessorListener, muleContext, object, null, logger, retryCount, retryMax);
     }
 
-    private void generateProcessMethod(ExecutableElement executableElement, DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> connectionFields, FieldVariable messageProcessorListener, FieldVariable muleContext, FieldVariable object, DefinedClass poolObjectClass, FieldVariable logger, FieldVariable retryCount, FieldVariable retryMax) {
+    private void generateProcessMethod(DevKitExecutableElement executableElement, DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> connectionFields, FieldVariable messageProcessorListener, FieldVariable muleContext, FieldVariable object, DefinedClass poolObjectClass, FieldVariable logger, FieldVariable retryCount, FieldVariable retryMax) {
         String methodName = executableElement.getSimpleName().toString();
         Type muleEvent = ref(MuleEvent.class);
 
@@ -362,7 +363,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         Variable event = process.param(muleEvent, "event");
         Variable muleMessage = process.body().decl(ref(MuleMessage.class), "_muleMessage", event.invoke("getMessage"));
 
-        DefinedClass moduleObjectClass = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey((TypeElement) executableElement.getEnclosingElement()));
+        DefinedClass moduleObjectClass = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(executableElement.parent()));
         Variable moduleObject = process.body().decl(moduleObjectClass, "_castedModuleObject", ExpressionFactory._null());
         findConfig(process.body(), muleContext, object, methodName, event, moduleObjectClass, moduleObject);
 
@@ -371,12 +372,12 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         Map<String, Expression> connectionParameters = declareConnectionParametersVariables(executableElement, connectionFields, process);
         Variable connection = addConnectionVariableIfNeeded(executableElement, process);
 
-        ExecutableElement connectMethod = connectForMethod(executableElement);
-        ExecutableElement connectionIdentifierMethod = connectionIdentifierForMethod(executableElement);
+        DevKitExecutableElement connectMethod = connectForMethod(executableElement);
+        DevKitExecutableElement connectionIdentifierMethod = connectionIdentifierForMethod(executableElement);
         TryStatement callProcessor = process.body()._try();
 
         if (connectMethod != null) {
-            for (VariableElement variable : connectMethod.getParameters()) {
+            for (DevKitParameterElement variable : connectMethod.getParameters()) {
                 String fieldName = variable.getSimpleName().toString();
 
                 Conditional ifNotNull = callProcessor.body()._if(Op.ne(connectionFields.get(fieldName).getField(),
@@ -425,7 +426,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         List<Expression> parameters = new ArrayList<Expression>();
         Variable interceptCallback = null;
         Variable outboundHeadersMap = null;
-        for (VariableElement variable : executableElement.getParameters()) {
+        for (DevKitParameterElement variable : executableElement.getParameters()) {
             String fieldName = variable.getSimpleName().toString();
 
             if (variable.asType().toString().startsWith(HttpCallback.class.getName())) {
@@ -446,7 +447,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         }
 
         if (connectMethod != null) {
-            DefinedClass connectionKey = context.getClassForRole(context.getNameUtils().generateConnectionParametersRoleKey((TypeElement) executableElement.getEnclosingElement()));
+            DefinedClass connectionKey = context.getClassForRole(context.getNameUtils().generateConnectionParametersRoleKey(executableElement.parent()));
 
             Conditional ifDebugEnabled = callProcessor.body()._if(logger.invoke("isDebugEnabled"));
             Variable messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "_messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
@@ -460,7 +461,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
             Invocation newKey = ExpressionFactory._new(connectionKey);
             Invocation createConnection = moduleObject.invoke("acquireConnection");
-            for (VariableElement variable : connectMethod.getParameters()) {
+            for (DevKitParameterElement variable : connectMethod.getParameters()) {
                 String fieldName = variable.getSimpleName().toString();
                 newKey.arg(connectionParameters.get(fieldName));
             }
@@ -504,7 +505,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
         callProcessor.body().add(retryCount.invoke("set").arg(ExpressionFactory.lit(0)));
 
-        for (VariableElement variable : executableElement.getParameters()) {
+        for (DevKitParameterElement variable : executableElement.getParameters()) {
             OutboundHeaders outboundHeaders = variable.getAnnotation(OutboundHeaders.class);
             if (outboundHeaders != null) {
                 Conditional ifNotEmpty = callProcessor.body()._if(Op.cand(Op.ne(outboundHeadersMap, ExpressionFactory._null()),
@@ -560,9 +561,9 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
             TryStatement innerTry = catchBlock.body()._try();
 
-            DefinedClass connectionKey = context.getClassForRole(context.getNameUtils().generateConnectionParametersRoleKey((TypeElement) executableElement.getEnclosingElement()));
+            DefinedClass connectionKey = context.getClassForRole(context.getNameUtils().generateConnectionParametersRoleKey(executableElement.parent()));
             Invocation newKey = ExpressionFactory._new(connectionKey);
-            for (VariableElement variable : connectMethod.getParameters()) {
+            for (DevKitParameterElement variable : connectMethod.getParameters()) {
                 String fieldName = variable.getSimpleName().toString();
                 newKey.arg(connectionParameters.get(fieldName));
             }
@@ -632,9 +633,9 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             ifDebugEnabled._then().add(logger.invoke("debug").arg(messageStringBuilder.invoke("toString")));
 
 
-            DefinedClass connectionKey = context.getClassForRole(context.getNameUtils().generateConnectionParametersRoleKey((TypeElement) executableElement.getEnclosingElement()));
+            DefinedClass connectionKey = context.getClassForRole(context.getNameUtils().generateConnectionParametersRoleKey(executableElement.parent()));
             Invocation newKey = ExpressionFactory._new(connectionKey);
-            for (VariableElement variable : connectMethod.getParameters()) {
+            for (DevKitParameterElement variable : connectMethod.getParameters()) {
                 String fieldName = variable.getSimpleName().toString();
                 newKey.arg(connectionParameters.get(fieldName));
             }
@@ -651,7 +652,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
     }
 
-    private Variable declareStandardParameter(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, Variable muleMessage, TryStatement callProcessor, List<Expression> parameters, Variable outboundHeadersMap, VariableElement variable, String fieldName) {
+    private Variable declareStandardParameter(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, Variable muleMessage, TryStatement callProcessor, List<Expression> parameters, Variable outboundHeadersMap, DevKitVariableElement variable, String fieldName) {
         InboundHeaders inboundHeaders = variable.getAnnotation(InboundHeaders.class);
         OutboundHeaders outboundHeaders = variable.getAnnotation(OutboundHeaders.class);
         InvocationHeaders invocationHeaders = variable.getAnnotation(InvocationHeaders.class);
@@ -735,7 +736,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         return outboundHeadersMap;
     }
 
-    private void declareNestedProcessorParameter(Map<String, FieldVariableElement> fields, FieldVariable muleContext, Variable event, TryStatement callProcessor, List<Expression> parameters, VariableElement variable, String fieldName) {
+    private void declareNestedProcessorParameter(Map<String, FieldVariableElement> fields, FieldVariable muleContext, Variable event, TryStatement callProcessor, List<Expression> parameters, DevKitVariableElement variable, String fieldName) {
         DefinedClass callbackClass = context.getClassForRole(NestedProcessorChainGenerator.ROLE);
         DefinedClass stringCallbackClass = context.getClassForRole(NestedProcessorStringGenerator.ROLE);
 
@@ -796,11 +797,11 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         }
     }
 
-    private Map<String, Expression> declareConnectionParametersVariables(ExecutableElement executableElement, Map<String, FieldVariableElement> connectionFields, Method process) {
+    private Map<String, Expression> declareConnectionParametersVariables(DevKitExecutableElement executableElement, Map<String, FieldVariableElement> connectionFields, Method process) {
         Map<String, Expression> connectionParameters = new HashMap<String, Expression>();
-        ExecutableElement connectMethod = connectForMethod(executableElement);
+        DevKitExecutableElement connectMethod = connectForMethod(executableElement);
         if (connectMethod != null) {
-            for (VariableElement variable : connectMethod.getParameters()) {
+            for (DevKitParameterElement variable : connectMethod.getParameters()) {
                 String fieldName = variable.getSimpleName().toString();
 
                 Type type = ref(connectionFields.get(fieldName).getVariableElement().asType()).boxify();
@@ -813,10 +814,10 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         return connectionParameters;
     }
 
-    private Variable addConnectionVariableIfNeeded(ExecutableElement executableElement, Method process) {
-        ExecutableElement connectMethod = connectForMethod(executableElement);
+    private Variable addConnectionVariableIfNeeded(DevKitExecutableElement executableElement, Method process) {
+        DevKitExecutableElement connectMethod = connectForMethod(executableElement);
         if (connectForMethod(executableElement) != null) {
-            DefinedClass connectionClass = context.getClassForRole(context.getNameUtils().generateConnectorObjectRoleKey((TypeElement) connectMethod.getEnclosingElement()));
+            DefinedClass connectionClass = context.getClassForRole(context.getNameUtils().generateConnectorObjectRoleKey(connectMethod.parent()));
             return process.body().decl(connectionClass, "connection", ExpressionFactory._null());
         }
         return null;

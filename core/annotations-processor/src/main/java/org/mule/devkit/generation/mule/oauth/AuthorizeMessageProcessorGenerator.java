@@ -52,8 +52,6 @@ import org.mule.devkit.model.code.Type;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 
-import javax.lang.model.element.TypeElement;
-
 public class AuthorizeMessageProcessorGenerator extends AbstractMessageGenerator {
     public static final String AUTHORIZE_MESSAGE_PROCESSOR_ROLE = "AuthorizeMessageProcessor";
     private static final String HTTP_STATUS_PROPERTY = "http.status";
@@ -165,7 +163,7 @@ public class AuthorizeMessageProcessorGenerator extends AbstractMessageGenerator
 
     }
 
-    private DefinedClass getAuthorizeMessageProcessorClass(TypeElement type) {
+    private DefinedClass getAuthorizeMessageProcessorClass(DevKitTypeElement type) {
         String httpCallbackClassName = context.getNameUtils().generateClassNameInPackage(type, NamingContants.MESSAGE_PROCESSOR_NAMESPACE, NamingContants.AUTHORIZE_MESSAGE_PROCESSOR_CLASS_NAME);
         Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(httpCallbackClassName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(httpCallbackClassName), new Class[]{

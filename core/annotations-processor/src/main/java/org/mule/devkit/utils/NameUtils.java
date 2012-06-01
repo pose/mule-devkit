@@ -19,11 +19,11 @@ package org.mule.devkit.utils;
 
 import org.apache.commons.lang.StringUtils;
 import org.mule.devkit.model.DefaultDevKitTypeElement;
-import org.mule.devkit.model.TypeElementImpl;
+import org.mule.devkit.model.DevKitExecutableElement;
+import org.mule.devkit.model.DevKitTypeElement;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.util.ElementFilter;
@@ -215,15 +215,14 @@ public class NameUtils {
         return false;
     }
 
-    public String generateClassName(ExecutableElement executableElement, String append) {
-        TypeElement parentClass = ElementFilter.typesIn(Arrays.asList(executableElement.getEnclosingElement())).get(0);
-        String packageName = getPackageName(getBinaryName(parentClass));
+    public String generateClassName(DevKitExecutableElement executableElement, String append) {
+        String packageName = getPackageName(getBinaryName(executableElement.parent()));
         String className = StringUtils.capitalize(executableElement.getSimpleName().toString()) + append;
 
         return packageName + "." + className;
     }
 
-    public String generateClassName(ExecutableElement executableElement, String extraPackage, String append) {
+    public String generateClassName(DevKitExecutableElement executableElement, String extraPackage, String append) {
         TypeElement parentClass = ElementFilter.typesIn(Arrays.asList(executableElement.getEnclosingElement())).get(0);
         String packageName = getPackageName(elements.getBinaryName(parentClass).toString());
         String className = StringUtils.capitalize(executableElement.getSimpleName().toString()) + append;
@@ -235,9 +234,9 @@ public class NameUtils {
         Element enclosingElement = element.getEnclosingElement();
         String packageName;
         if (enclosingElement.getKind() == ElementKind.CLASS) {
-            packageName = getPackageName(getBinaryName((TypeElement) enclosingElement));
+            packageName = getPackageName(getBinaryName((DevKitTypeElement) enclosingElement));
         } else if (enclosingElement.getEnclosingElement() != null) {
-            TypeElement parentClass = ElementFilter.typesIn(Arrays.asList(enclosingElement.getEnclosingElement())).get(0);
+            DevKitTypeElement parentClass = new DefaultDevKitTypeElement(ElementFilter.typesIn(Arrays.asList(enclosingElement.getEnclosingElement())).get(0));
             packageName = getPackageName(getBinaryName(parentClass));
         } else {
             // inner enum or parametrized type
@@ -247,14 +246,14 @@ public class NameUtils {
         return packageName + "." + className;
     }
 
-    public String generateClassNameInPackage(TypeElement typeElement, String extraPackage, String className) {
+    public String generateClassNameInPackage(DevKitTypeElement typeElement, String extraPackage, String className) {
         String packageName = getPackageName(getBinaryName(typeElement));
 
         return packageName + extraPackage + "." + className;
 
     }
 
-    public String generateModuleObjectRoleKey(TypeElement typeElement) {
+    public String generateModuleObjectRoleKey(DevKitTypeElement typeElement) {
         String typeFullName = getBinaryName(typeElement);
         String pkg = getPackageName(typeFullName);
         String className = getClassName(typeFullName);
@@ -262,7 +261,7 @@ public class NameUtils {
         return pkg + "." + className + "ModuleObject";
     }
 
-    public String generateConnectorObjectRoleKey(TypeElement typeElement) {
+    public String generateConnectorObjectRoleKey(DevKitTypeElement typeElement) {
         String typeFullName = getBinaryName(typeElement);
         String pkg = getPackageName(typeFullName);
         String className = getClassName(typeFullName);
@@ -270,7 +269,7 @@ public class NameUtils {
         return pkg + "." + className + "Connector";
     }
 
-    public String generateConnectionParametersRoleKey(TypeElement typeElement) {
+    public String generateConnectionParametersRoleKey(DevKitTypeElement typeElement) {
         String typeFullName = getBinaryName(typeElement);
         String pkg = getPackageName(typeFullName);
         String className = getClassName(typeFullName);
@@ -278,7 +277,7 @@ public class NameUtils {
         return pkg + "." + className + "ConnectionKey";
     }
 
-    public String generateConnectionManagerRoleKey(TypeElement typeElement) {
+    public String generateConnectionManagerRoleKey(DevKitTypeElement typeElement) {
         String typeFullName = getBinaryName(typeElement);
         String pkg = getPackageName(typeFullName);
         String className = getClassName(typeFullName);
@@ -286,14 +285,11 @@ public class NameUtils {
         return pkg + "." + className + "ConnectionManager";
     }
 
-    public String getBinaryName(TypeElement typeElement) {
-        if (typeElement instanceof TypeElementImpl) {
-            typeElement = ((DefaultDevKitTypeElement) typeElement).unWrap();
-        }
-        return elements.getBinaryName(typeElement).toString();
+    public String getBinaryName(DevKitTypeElement typeElement) {
+        return elements.getBinaryName(typeElement.unwrap()).toString();
     }
 
-    public String generateConfigDefParserRoleKey(TypeElement typeElement) {
+    public String generateConfigDefParserRoleKey(DevKitTypeElement typeElement) {
         String typeFullName = getBinaryName(typeElement);
         String pkg = getPackageName(typeFullName);
         String className = getClassName(typeFullName);
@@ -301,7 +297,7 @@ public class NameUtils {
         return pkg + "." + className + "ConfigDefinitionParser";
     }
 
-    public String generatePoolingProfileDefParserRoleKey(TypeElement typeElement) {
+    public String generatePoolingProfileDefParserRoleKey(DevKitTypeElement typeElement) {
         String typeFullName = getBinaryName(typeElement);
         String pkg = getPackageName(typeFullName);
         String className = getClassName(typeFullName);
@@ -309,7 +305,7 @@ public class NameUtils {
         return pkg + "." + className + "PoolingProfileDefinitionParser";
     }
 
-    public String generatePojoFactoryKey(TypeElement typeElement) {
+    public String generatePojoFactoryKey(DevKitTypeElement typeElement) {
         String typeFullName = getBinaryName(typeElement);
         String pkg = getPackageName(typeFullName);
         String className = getClassName(typeFullName);
@@ -317,7 +313,7 @@ public class NameUtils {
         return pkg + "." + className + "Factory";
     }
 
-    public String generatePoolObjectRoleKey(TypeElement typeElement) {
+    public String generatePoolObjectRoleKey(DevKitTypeElement typeElement) {
         String typeFullName = getBinaryName(typeElement);
         String pkg = getPackageName(typeFullName);
         String className = getClassName(typeFullName);
@@ -325,7 +321,7 @@ public class NameUtils {
         return pkg + "." + className + "PoolObject";
     }
 
-    public String generateClassName(TypeElement typeElement, String extraPackage, String classNameAppend) {
+    public String generateClassName(DevKitTypeElement typeElement, String extraPackage, String classNameAppend) {
         String typeFullName = getBinaryName(typeElement);
         String pkg = getPackageName(typeFullName);
         String className = getClassName(typeFullName);

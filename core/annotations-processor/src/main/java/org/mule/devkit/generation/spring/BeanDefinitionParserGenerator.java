@@ -40,6 +40,9 @@ import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.adapter.HttpCallbackAdapterGenerator;
 import org.mule.devkit.generation.mule.oauth.DefaultRestoreAccessTokenCallbackFactoryGenerator;
 import org.mule.devkit.generation.mule.oauth.DefaultSaveAccessTokenCallbackFactoryGenerator;
+import org.mule.devkit.model.DevKitExecutableElement;
+import org.mule.devkit.model.DevKitFieldElement;
+import org.mule.devkit.model.DevKitParameterElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
@@ -66,8 +69,6 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.xml.DomUtils;
 
 import javax.inject.Inject;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.xml.transform.Transformer;
@@ -91,11 +92,11 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
     protected void doGenerate(DevKitTypeElement typeElement) {
         generateConfigBeanDefinitionParserFor(typeElement);
 
-        for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Processor.class)) {
+        for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Processor.class)) {
             generateBeanDefinitionParserForProcessor(executableElement);
         }
 
-        for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Source.class)) {
+        for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Source.class)) {
             generateBeanDefinitionParserForSource(executableElement);
         }
     }
@@ -134,7 +135,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                 .invoke("isAssignableFrom").arg(pojo.dotclass()));
         isDisposable._then().add(builder.invoke("setDestroyMethodName").arg(ref(Disposable.class).staticRef("PHASE_NAME")));
 
-        for (VariableElement variable : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
+        for (DevKitFieldElement variable : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
 
             String fieldName = variable.getSimpleName().toString();
 
@@ -181,7 +182,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             }
         }
 
-        for (VariableElement variable : typeElement.getFieldsAnnotatedWith(Inject.class)) {
+        for (DevKitFieldElement variable : typeElement.getFieldsAnnotatedWith(Inject.class)) {
             if (variable.asType().toString().equals("org.mule.api.store.ObjectStore")) {
                 Invocation getAttribute = element.invoke("getAttribute").arg("objectStore-ref");
                 Conditional ifNotNull = parse.body()._if(Op.cand(Op.ne(getAttribute, ExpressionFactory._null()),
@@ -194,9 +195,9 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             }
         }
 
-        ExecutableElement connect = connectMethodForClass(typeElement);
+        DevKitExecutableElement connect = connectMethodForClass(typeElement);
         if (connect != null) {
-            for (VariableElement variable : connect.getParameters()) {
+            for (DevKitParameterElement variable : connect.getParameters()) {
                 String fieldName = variable.getSimpleName().toString();
 
                 if (SchemaTypeConversion.isSupported(variable.asType().toString())) {
@@ -317,7 +318,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         ));
     }
 
-    private void generateBeanDefinitionParserForSource(ExecutableElement executableElement) {
+    private void generateBeanDefinitionParserForSource(DevKitExecutableElement executableElement) {
         // get class
         Source sourceAnnotation = executableElement.getAnnotation(Source.class);
         DefinedClass beanDefinitionparser = getBeanDefinitionParserClass(executableElement);
@@ -335,7 +336,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         generateGenerateChildBeanNameMethod(beanDefinitionparser);
     }
 
-    private void generateBeanDefinitionParserForProcessor(ExecutableElement executableElement) {
+    private void generateBeanDefinitionParserForProcessor(DevKitExecutableElement executableElement) {
         DefinedClass beanDefinitionparser = getBeanDefinitionParserClass(executableElement);
         DefinedClass messageProcessorClass;
 
@@ -357,7 +358,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         generateGenerateChildBeanNameMethod(beanDefinitionparser);
     }
 
-    private void generateProcessorParseMethod(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, ExecutableElement executableElement, Variable patternInfo) {
+    private void generateProcessorParseMethod(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, DevKitExecutableElement executableElement, Variable patternInfo) {
         Method parse = beanDefinitionparser.method(Modifier.PUBLIC, ref(BeanDefinition.class), "parse");
         Variable element = parse.param(ref(org.w3c.dom.Element.class), "element");
         Variable parserContext = parse.param(ref(ParserContext.class), "parserContent");
@@ -369,7 +370,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         parse.body()._return(definition);
     }
 
-    private void generateSourceParseMethod(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, ExecutableElement executableElement, Variable patternInfo) {
+    private void generateSourceParseMethod(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, DevKitExecutableElement executableElement, Variable patternInfo) {
         Method parse = beanDefinitionparser.method(Modifier.PUBLIC, ref(BeanDefinition.class), "parse");
         Variable element = parse.param(ref(org.w3c.dom.Element.class), "element");
         Variable parserContext = parse.param(ref(ParserContext.class), "parserContent");
@@ -381,7 +382,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         parse.body()._return(definition);
     }
 
-    private Variable generateParseCommon(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, ExecutableElement executableElement, Method parse, Variable element, Variable patternInfo, Variable parserContext) {
+    private Variable generateParseCommon(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, DevKitExecutableElement executableElement, Method parse, Variable element, Variable patternInfo, Variable parserContext) {
         Variable builder = parse.body().decl(ref(BeanDefinitionBuilder.class), "builder",
                 ref(BeanDefinitionBuilder.class).staticInvoke("rootBeanDefinition").arg(messageProcessorClass.dotclass().invoke("getName")));
 
@@ -394,7 +395,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         Method getAttributeValue = generateGetAttributeValue(beanDefinitionparser);
 
         int requiredChildElements = 0;
-        for (VariableElement variable : executableElement.getParameters()) {
+        for (DevKitParameterElement variable : executableElement.getParameters()) {
             if (context.getTypeMirrorUtils().ignoreParameter(variable)) {
                 continue;
             }
@@ -407,7 +408,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             }
         }
 
-        for (VariableElement variable : executableElement.getParameters()) {
+        for (DevKitParameterElement variable : executableElement.getParameters()) {
             if (variable.asType().toString().startsWith(SourceCallback.class.getName())) {
                 continue;
             }
@@ -476,11 +477,11 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             }
         }
 
-        ExecutableElement connectMethod = connectForMethod(executableElement);
+        DevKitExecutableElement connectMethod = connectForMethod(executableElement);
         if (connectMethod != null) {
             generateParseSupportedType(parse.body(), element, builder, "retryMax");
 
-            for (VariableElement variable : connectMethod.getParameters()) {
+            for (DevKitParameterElement variable : connectMethod.getParameters()) {
                 String fieldName = variable.getSimpleName().toString();
 
                 if (SchemaTypeConversion.isSupported(variable.asType().toString())) {

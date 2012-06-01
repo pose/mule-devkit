@@ -52,7 +52,11 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.NamingContants;
+import org.mule.devkit.model.DevKitExecutableElement;
+import org.mule.devkit.model.DevKitFieldElement;
+import org.mule.devkit.model.DevKitParameterElement;
 import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.DevKitVariableElement;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
@@ -75,8 +79,6 @@ import org.mule.transformer.types.MimeTypes;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -141,12 +143,12 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
 
     private void generateRestCallImplementations(DevKitTypeElement typeElement, Expression httpClient, Variable muleContext, DefinedClass capabilitiesAdapter) {
         Map<String, Variable> variables = new HashMap<String, Variable>();
-        for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(RestCall.class)) {
+        for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(RestCall.class)) {
             Method override = capabilitiesAdapter.method(Modifier.PUBLIC, ref(executableElement.getReturnType()), executableElement.getSimpleName().toString());
             override._throws(ref(IOException.class));
             RestCall restCall = executableElement.getAnnotation(RestCall.class);
 
-            for (VariableElement parameter : executableElement.getParameters()) {
+            for (DevKitParameterElement parameter : executableElement.getParameters()) {
                 if (parameter.getAnnotation(OAuthAccessToken.class) != null ||
                         parameter.getAnnotation(OAuthAccessTokenSecret.class) != null) {
                     continue;
@@ -166,8 +168,8 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
             generateParametersCode(typeElement, variables, executableElement, override, restCall, method, queryString);
 
             if (restCall.method() == HttpMethod.POST || restCall.method() == HttpMethod.PUT) {
-                VariableElement payloadParameter = null;
-                for (VariableElement parameter : executableElement.getParameters()) {
+                DevKitParameterElement payloadParameter = null;
+                for (DevKitParameterElement parameter : executableElement.getParameters()) {
                     if (parameter.getAnnotation(RestUriParam.class) == null &&
                             parameter.getAnnotation(RestHeaderParam.class) == null &&
                             parameter.getAnnotation(RestQueryParam.class) == null) {
@@ -216,9 +218,9 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
         }
     }
 
-    private void generateParametersCode(DevKitTypeElement typeElement, Map<String, Variable> variables, ExecutableElement executableElement, Method override, RestCall restCall, Variable method, Variable queryString) {
+    private void generateParametersCode(DevKitTypeElement typeElement, Map<String, Variable> variables, DevKitExecutableElement executableElement, Method override, RestCall restCall, Variable method, Variable queryString) {
         Variable uri = override.body().decl(ref(String.class), "uri", ExpressionFactory.lit(restCall.uri()));
-        for (VariableElement parameter : executableElement.getParameters()) {
+        for (DevKitParameterElement parameter : executableElement.getParameters()) {
             RestUriParam restUriParam = parameter.getAnnotation(RestUriParam.class);
             if (restUriParam != null) {
                 if (restCall.uri().contains("{" + restUriParam.value() + "}")) {
@@ -226,7 +228,7 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
                 }
             }
         }
-        for (VariableElement field : typeElement.getFieldsAnnotatedWith(RestUriParam.class)) {
+        for (DevKitFieldElement field : typeElement.getFieldsAnnotatedWith(RestUriParam.class)) {
             RestUriParam restUriParam = field.getAnnotation(RestUriParam.class);
             if (restUriParam != null) {
                 if (restCall.uri().contains("{" + restUriParam.value() + "}")) {
@@ -236,7 +238,7 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
         }
 
         override.body().add(method.invoke("setURI").arg(ExpressionFactory._new(ref(URI.class)).arg(uri).arg(ExpressionFactory.FALSE)));
-        for (VariableElement parameter : executableElement.getParameters()) {
+        for (DevKitParameterElement parameter : executableElement.getParameters()) {
             RestUriParam restUriParam = parameter.getAnnotation(RestUriParam.class);
             if (restUriParam != null) {
                 if (restCall.uri().contains("{" + restUriParam.value() + "}")) {
@@ -246,7 +248,7 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
             }
         }
 
-        for (VariableElement field : typeElement.getFieldsAnnotatedWith(RestUriParam.class)) {
+        for (DevKitFieldElement field : typeElement.getFieldsAnnotatedWith(RestUriParam.class)) {
             RestUriParam restUriParam = field.getAnnotation(RestUriParam.class);
             if (restUriParam != null) {
                 if (restCall.uri().contains("{" + restUriParam.value() + "}")) {
@@ -256,14 +258,14 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
             }
         }
 
-        for (VariableElement parameter : executableElement.getParameters()) {
+        for (DevKitParameterElement parameter : executableElement.getParameters()) {
             RestHeaderParam restHeaderParam = parameter.getAnnotation(RestHeaderParam.class);
             if (restHeaderParam != null) {
                 override.body().add(method.invoke("addRequestHeader").arg(restHeaderParam.value()).arg(variables.get(parameter.getSimpleName().toString())));
             }
         }
 
-        for (VariableElement field : typeElement.getFieldsAnnotatedWith(RestHeaderParam.class)) {
+        for (DevKitFieldElement field : typeElement.getFieldsAnnotatedWith(RestHeaderParam.class)) {
             RestHeaderParam restHeaderParam = field.getAnnotation(RestHeaderParam.class);
             if (restHeaderParam != null) {
                 override.body().add(method.invoke("addRequestHeader").arg(restHeaderParam.value()).arg(ExpressionFactory.invoke("get" + StringUtils.capitalize(field.getSimpleName().toString()))));
@@ -298,7 +300,7 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
         }
     }
 
-    private void generateParseResponseCode(TypeElement typeElement, ExecutableElement executableElement, Method override, Variable method, Variable statusCode, Variable muleContext) {
+    private void generateParseResponseCode(DevKitTypeElement typeElement, DevKitExecutableElement executableElement, Method override, Variable method, Variable statusCode, Variable muleContext) {
         Conditional ifMethodExecuted = override.body()._if(Op.cand(Op.ne(method, ExpressionFactory._null()), method.invoke("hasBeenUsed")));
         Variable bufferedReader = ifMethodExecuted._then().decl(ref(BufferedReader.class), "bufferedReader", ExpressionFactory._null());
         Variable stringWriter = ifMethodExecuted._then().decl(ref(StringWriter.class), "stringWriter", ExpressionFactory._new(ref(StringWriter.class)));
@@ -322,7 +324,7 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
         generateTransformAndReturn(typeElement, executableElement, muleContext, ifMethodExecuted, output);
     }
 
-    private void generateTransformAndReturn(TypeElement moduleClass, ExecutableElement executableElement, Variable muleContext, Conditional block, Variable output) {
+    private void generateTransformAndReturn(DevKitTypeElement moduleClass, DevKitExecutableElement executableElement, Variable muleContext, Conditional block, Variable output) {
         Conditional shouldTransform = block._then()._if(Op.cand(
                 Op.ne(output, ExpressionFactory._null()),
                 Op.not(ref(executableElement.getReturnType()).boxify().dotclass().invoke("isAssignableFrom").arg(ref(String.class).dotclass()))
@@ -334,7 +336,7 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
         TryStatement tryToTransform = shouldTransform._then()._try();
 
         Invocation getMethod = ref(moduleClass.asType()).boxify().dotclass().invoke("getMethod").arg(executableElement.getSimpleName().toString());
-        for (VariableElement parameter : executableElement.getParameters()) {
+        for (DevKitParameterElement parameter : executableElement.getParameters()) {
             getMethod.arg(ref(parameter.asType()).boxify().dotclass());
         }
 
@@ -373,7 +375,7 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
         shouldTransform._else()._return(ExpressionFactory.cast(ref(executableElement.getReturnType()), ExpressionFactory.cast(ref(Object.class), output)));
     }
 
-    private void generateExeptionOnBlock(ExecutableElement executableElement, Variable statusCode, Conditional block, Variable message) {
+    private void generateExeptionOnBlock(DevKitExecutableElement executableElement, Variable statusCode, Conditional block, Variable message) {
         RestExceptionOn restExceptionOn = executableElement.getAnnotation(RestExceptionOn.class);
         final String restExceptionOnAnnotationName = RestExceptionOn.class.getName();
         DeclaredType exception = null;
@@ -418,7 +420,7 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
         }
     }
 
-    private void addQueryParameter(Block body, Variable queryString, Expression variable, VariableElement parameter) {
+    private void addQueryParameter(Block body, Variable queryString, Expression variable, DevKitVariableElement parameter) {
         RestUriParam restUriParam = parameter.getAnnotation(RestUriParam.class);
         Expression rvalue = variable.invoke("toString");
         if (restUriParam != null) {
@@ -431,7 +433,7 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
         }
     }
 
-    private DefinedClass getRestClientAdapterClass(TypeElement typeElement) {
+    private DefinedClass getRestClientAdapterClass(DevKitTypeElement typeElement) {
         String restClientAdapterClassName = context.getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.REST_CLIENT_ADAPTER_CLASS_NAME_SUFFIX);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(restClientAdapterClassName));
         TypeReference previous = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));

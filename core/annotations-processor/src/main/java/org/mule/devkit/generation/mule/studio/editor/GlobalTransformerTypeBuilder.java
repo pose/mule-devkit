@@ -18,18 +18,18 @@
 package org.mule.devkit.generation.mule.studio.editor;
 
 import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.GlobalType;
 import org.mule.devkit.model.studio.Group;
 
-import javax.lang.model.element.ExecutableElement;
 import java.util.ArrayList;
 import java.util.List;
 
 public class GlobalTransformerTypeBuilder extends GlobalTypeBuilder {
 
-    public GlobalTransformerTypeBuilder(GeneratorContext context, ExecutableElement executableElement, DevKitTypeElement typeElement) {
+    public GlobalTransformerTypeBuilder(GeneratorContext context, DevKitExecutableElement executableElement, DevKitTypeElement typeElement) {
         super(context, executableElement, typeElement);
     }
 

@@ -55,7 +55,6 @@ import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Variable;
 import org.mule.devkit.model.code.builders.FieldBuilder;
 
-import javax.lang.model.element.TypeElement;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
@@ -124,7 +123,7 @@ public class OAuth1AdapterGenerator extends AbstractOAuthAdapterGenerator {
         return new FieldBuilder(oauthAdapter).type(OAuthConsumer.class).name(CONSUMER_FIELD_NAME).build();
     }
 
-    private Method generateCreateConsumerMethod(DefinedClass oauthAdapter, OAuth oauth, TypeElement typeElement) {
+    private Method generateCreateConsumerMethod(DefinedClass oauthAdapter, OAuth oauth, DevKitTypeElement typeElement) {
         Method createConsumer = oauthAdapter.method(Modifier.PRIVATE, context.getCodeModel().VOID, "createConsumer");
         Invocation getConsumerKey = ExpressionFactory.invoke(getterMethodForFieldAnnotatedWith(typeElement, OAuthConsumerKey.class));
         Invocation getConsumerSecret = ExpressionFactory.invoke(getterMethodForFieldAnnotatedWith(typeElement, OAuthConsumerSecret.class));

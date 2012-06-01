@@ -26,7 +26,6 @@ import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitTypeElement;
 
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import java.util.List;
 
@@ -71,7 +70,7 @@ public class ConnectorValidator implements Validator {
         if (connectMethods.size() != 1) {
             throw new ValidationException(typeElement, "You must have exactly one method annotated with @Connect");
         }
-        ExecutableElement connectMethod = connectMethods.get(0);
+        DevKitExecutableElement connectMethod = connectMethods.get(0);
         if (!connectMethod.getModifiers().contains(Modifier.PUBLIC)) {
             throw new ValidationException(typeElement, "A @Connect method must be public.");
         }
@@ -92,7 +91,7 @@ public class ConnectorValidator implements Validator {
         if (disconnectMethods.size() != 1) {
             throw new ValidationException(typeElement, "You must have exactly one method annotated with @Disconnect");
         }
-        ExecutableElement disconnectMethod = disconnectMethods.get(0);
+        DevKitExecutableElement disconnectMethod = disconnectMethods.get(0);
         if (!disconnectMethod.getModifiers().contains(Modifier.PUBLIC)) {
             throw new ValidationException(typeElement, "A @Disconnect method must be public.");
         }
@@ -108,7 +107,7 @@ public class ConnectorValidator implements Validator {
         if (validateConnectionMethods.size() != 1) {
             throw new ValidationException(typeElement, "You must have exactly one method annotated with @ValidateConnection");
         }
-        ExecutableElement validateConnectionMethod = validateConnectionMethods.get(0);
+        DevKitExecutableElement validateConnectionMethod = validateConnectionMethods.get(0);
         if (!validateConnectionMethod.getModifiers().contains(Modifier.PUBLIC)) {
             throw new ValidationException(typeElement, "A @ValidateConnection method must be public.");
         }
@@ -125,7 +124,7 @@ public class ConnectorValidator implements Validator {
         if (connectionIdentifierMethods.size() != 1) {
             throw new ValidationException(typeElement, "You must have exactly one method annotated with @ConnectionIdentifier");
         }
-        ExecutableElement connectionIdentifierMethod = connectionIdentifierMethods.get(0);
+        DevKitExecutableElement connectionIdentifierMethod = connectionIdentifierMethods.get(0);
         if (!connectionIdentifierMethod.getReturnType().toString().equals("java.lang.String")) {
             throw new ValidationException(typeElement, "A @ConnectionIdentifier must return java.lang.String.");
         }

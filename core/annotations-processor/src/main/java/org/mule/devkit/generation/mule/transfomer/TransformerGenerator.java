@@ -27,6 +27,8 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.NamingContants;
+import org.mule.devkit.model.DevKitExecutableElement;
+import org.mule.devkit.model.DevKitParameterElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.DefinedClass;
@@ -46,8 +48,6 @@ import org.mule.transformer.types.DataTypeFactory;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +61,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
 
     @Override
     protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
-        for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Transformer.class)) {
+        for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Transformer.class)) {
 
             // get class
             DefinedClass transformerClass = getTransformerClass(executableElement);
@@ -96,7 +96,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
         getPriorityWeighting.body()._return(weighting);
     }
 
-    private void generateDoTransform(DefinedClass transformerClass, ExecutableElement executableElement) {
+    private void generateDoTransform(DefinedClass transformerClass, DevKitExecutableElement executableElement) {
         Method doTransform = transformerClass.method(Modifier.PROTECTED, ref(Object.class), "doTransform");
         doTransform._throws(TransformerException.class);
         Variable src = doTransform.param(ref(Object.class), "src");
@@ -134,7 +134,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
         catchBlock.body()._throw(transformerException);
     }
 
-    private void generateConstructor(DefinedClass transformerClass, TypeElement moduleClass, ExecutableElement executableElement) {
+    private void generateConstructor(DefinedClass transformerClass, DevKitTypeElement moduleClass, DevKitExecutableElement executableElement) {
         // generate constructor
         Method constructor = transformerClass.constructor(Modifier.PUBLIC);
 
@@ -147,10 +147,10 @@ public class TransformerGenerator extends AbstractMessageGenerator {
         constructor.body().invoke("setName").arg(context.getNameUtils().generateClassName(executableElement, "Transformer"));
     }
 
-    private void registerDestinationType(Method constructor, TypeElement moduleClass, ExecutableElement executableElement) {
+    private void registerDestinationType(Method constructor, DevKitTypeElement moduleClass, DevKitExecutableElement executableElement) {
         TryStatement tryToFindMethod = constructor.body()._try();
         Invocation getMethod = ref(moduleClass.asType()).boxify().dotclass().invoke("getMethod").arg(executableElement.getSimpleName().toString());
-        for(VariableElement parameter : executableElement.getParameters() ) {
+        for(DevKitParameterElement parameter : executableElement.getParameters() ) {
             getMethod.arg(ref(parameter.asType()).boxify().dotclass());
         }
         Variable method = tryToFindMethod.body().decl(ref(java.lang.reflect.Method.class), "method", getMethod);
@@ -160,7 +160,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
         catchNoSuchMethodException.body()._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg("Unable to find method " + executableElement.getSimpleName().toString()));
     }
 
-    private void registerSourceTypes(Method constructor, ExecutableElement executableElement) {
+    private void registerSourceTypes(Method constructor, DevKitExecutableElement executableElement) {
         final String transformerAnnotationName = Transformer.class.getName();
         List<? extends AnnotationValue> sourceTypes = null;
         List<? extends AnnotationMirror> annotationMirrors = executableElement.getAnnotationMirrors();
@@ -183,7 +183,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
         }
     }
 
-    public DefinedClass getTransformerClass(ExecutableElement executableElement) {
+    public DefinedClass getTransformerClass(DevKitExecutableElement executableElement) {
         String transformerClassName = context.getNameUtils().generateClassName(executableElement, NamingContants.TRANSFORMER_CLASS_NAME_SUFFIX);
         Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(transformerClassName) + NamingContants.TRANSFORMERS_NAMESPACE);
         DefinedClass transformer = pkg._class(context.getNameUtils().getClassName(transformerClassName), AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class});

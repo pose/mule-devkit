@@ -29,7 +29,6 @@ import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Variable;
 
-import javax.lang.model.element.TypeElement;
 import java.util.Map;
 
 public class NestedProcessorStringGenerator extends AbstractModuleGenerator {
@@ -100,7 +99,7 @@ public class NestedProcessorStringGenerator extends AbstractModuleGenerator {
         constructor.body().assign(ExpressionFactory._this().ref(output), output2);
     }
 
-    private DefinedClass getNestedProcessorStringClass(TypeElement type) {
+    private DefinedClass getNestedProcessorStringClass(DevKitTypeElement type) {
         String processorCallbackClassName = context.getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, NamingContants.NESTED_PROCESSOR_STRING_CLASS_NAME);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(processorCallbackClassName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(processorCallbackClassName));

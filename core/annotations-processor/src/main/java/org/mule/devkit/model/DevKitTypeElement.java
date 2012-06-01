@@ -17,11 +17,12 @@
 
 package org.mule.devkit.model;
 
+import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
-public interface DevKitTypeElement extends TypeElement {
+public interface DevKitTypeElement extends DevKitElement<TypeElement, DevKitTypeElement> {
 
     boolean hasProcessorMethodWithParameter(Class<?> parameterType);
 
@@ -51,8 +52,6 @@ public interface DevKitTypeElement extends TypeElement {
 
     boolean isPublic();
 
-    TypeElement getInnerTypeElement();
-
     boolean isModuleOrConnector();
 
     boolean isPoolable();
@@ -74,4 +73,6 @@ public interface DevKitTypeElement extends TypeElement {
     String description();
 
     boolean needsConfig();
+
+    Name getQualifiedName();
 }

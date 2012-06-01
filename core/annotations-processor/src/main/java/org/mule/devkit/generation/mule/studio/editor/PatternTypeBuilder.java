@@ -20,6 +20,7 @@ package org.mule.devkit.generation.mule.studio.editor;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Transformer;
 import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.AttributeType;
@@ -27,14 +28,13 @@ import org.mule.devkit.model.studio.Group;
 import org.mule.devkit.model.studio.PatternType;
 import org.mule.util.StringUtils;
 
-import javax.lang.model.element.ExecutableElement;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 public class PatternTypeBuilder extends BaseStudioXmlBuilder {
 
-    public PatternTypeBuilder(GeneratorContext context, ExecutableElement executableElement, DevKitTypeElement typeElement) {
+    public PatternTypeBuilder(GeneratorContext context, DevKitExecutableElement executableElement, DevKitTypeElement typeElement) {
         super(context, executableElement, typeElement);
     }
 

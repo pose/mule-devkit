@@ -22,12 +22,17 @@ import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.generation.spring.SchemaGenerator;
-import org.mule.devkit.model.studio.*;
+import org.mule.devkit.model.DevKitExecutableElement;
+import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.DevKitVariableElement;
+import org.mule.devkit.model.studio.AttributeType;
+import org.mule.devkit.model.studio.Booleantype;
+import org.mule.devkit.model.studio.NestedElementReference;
+import org.mule.devkit.model.studio.NestedElementType;
+import org.mule.devkit.model.studio.StringAttributeType;
+import org.mule.devkit.model.studio.TextType;
 
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.xml.bind.JAXBElement;
@@ -36,7 +41,7 @@ import java.util.List;
 
 public class NestedsBuilder extends BaseStudioXmlBuilder {
 
-    public NestedsBuilder(GeneratorContext context, ExecutableElement executableElement, DevKitTypeElement typeElement) {
+    public NestedsBuilder(GeneratorContext context, DevKitExecutableElement executableElement, DevKitTypeElement typeElement) {
         super(context, executableElement, typeElement);
     }
 
@@ -46,7 +51,7 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
 
     public List<? extends JAXBElement<NestedElementType>> build() {
         List<JAXBElement<NestedElementType>> nesteds = new ArrayList<JAXBElement<NestedElementType>>();
-        for (VariableElement variableElement : getVariableElements()) {
+        for (DevKitVariableElement variableElement : getVariableElements()) {
             if (needToCreateNestedElement(variableElement)) {
 
                 String localId = helper.getLocalId(executableElement, variableElement);
@@ -120,7 +125,7 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
         return helper.getConnectorIcon(typeElement);
     }
 
-    private List<? extends VariableElement> getVariableElements() {
+    private List<? extends DevKitVariableElement> getVariableElements() {
         if (executableElement != null) {
             return executableElement.getParameters();
         } else {
@@ -128,7 +133,7 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
         }
     }
 
-    private void handleSimpleMap(VariableElement parameter, NestedElementType secondLevelNestedElement) {
+    private void handleSimpleMap(DevKitVariableElement parameter, NestedElementType secondLevelNestedElement) {
         AttributeType attributeTypeForMapKey;
         if (((DeclaredType) parameter.asType()).getTypeArguments().isEmpty()) {
             attributeTypeForMapKey = new StringAttributeType();
@@ -153,7 +158,7 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
         secondLevelNestedElement.getRegexpOrEncodingOrString().add(helper.createJAXBElement(attributeTypeForMapValues));
     }
 
-    private void handleSimpleList(VariableElement parameter, String localId, NestedElementType secondLevelNestedElement) {
+    private void handleSimpleList(DevKitVariableElement parameter, String localId, NestedElementType secondLevelNestedElement) {
         AttributeType attributeTypeForListValues;
         // TODO: temporarily commented out and added follwing 3 lines until Studio supports the isToElement attribute for other attributes types different than text
 //        if (((DeclaredType) parameter.asType()).getTypeArguments().isEmpty() || typeMirrorUtils.isString(typeUtils.asElement(((DeclaredType) parameter.asType()).getTypeArguments().get(0)))) {
@@ -178,7 +183,7 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
         secondLevelNestedElement.getRegexpOrEncodingOrString().add(helper.createJAXBElement(attributeTypeForListValues));
     }
 
-    private NestedElementType createSecondLevelNestedElement(VariableElement parameter, NestedElementReference childElement) {
+    private NestedElementType createSecondLevelNestedElement(DevKitVariableElement parameter, NestedElementReference childElement) {
         NestedElementType nestedElement = new NestedElementType();
         nestedElement.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
         String localIdSuffix = childElement.getName().substring(childElement.getName().lastIndexOf('/') + 1);
@@ -195,7 +200,7 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
         return nestedElement;
     }
 
-    private NestedElementType createFirstLevelNestedElement(VariableElement parameter, String localId) {
+    private NestedElementType createFirstLevelNestedElement(DevKitVariableElement parameter, String localId) {
         NestedElementType nestedElement = new NestedElementType();
         nestedElement.setLocalId(localId);
         nestedElement.setXmlname(nameUtils.uncamel(parameter.getSimpleName().toString()));
@@ -229,22 +234,22 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
         return nestedElement;
     }
 
-    private boolean isListOfMaps(VariableElement parameter) {
+    private boolean isListOfMaps(DevKitVariableElement parameter) {
         List<? extends TypeMirror> typeArguments = ((DeclaredType) parameter.asType()).getTypeArguments();
         return typeMirrorUtils.isArrayOrList(parameter.asType()) && !typeArguments.isEmpty() && typeMirrorUtils.isMap(typeArguments.get(0));
     }
 
-    private boolean isSimpleMap(VariableElement parameter) {
+    private boolean isSimpleMap(DevKitVariableElement parameter) {
         List<? extends TypeMirror> typeArguments = ((DeclaredType) parameter.asType()).getTypeArguments();
         return typeMirrorUtils.isMap(parameter.asType()) && (typeArguments.isEmpty() || !typeMirrorUtils.isCollection(typeArguments.get(1)));
     }
 
-    private boolean isSimpleList(VariableElement parameter) {
+    private boolean isSimpleList(DevKitVariableElement parameter) {
         List<? extends TypeMirror> typeArguments = ((DeclaredType) parameter.asType()).getTypeArguments();
         return typeMirrorUtils.isArrayOrList(parameter.asType()) && (typeArguments.isEmpty() || !typeMirrorUtils.isCollection(typeArguments.get(0)));
     }
 
-    private NestedElementReference createChildElement(VariableElement parameter, String localId) {
+    private NestedElementReference createChildElement(DevKitVariableElement parameter, String localId) {
         NestedElementReference childElement = new NestedElementReference();
         String parameterFriendlyName = nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString());
         if (isListOfMaps(parameter)) {
@@ -264,7 +269,7 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
         return childElement;
     }
 
-    private boolean needToCreateNestedElement(VariableElement parameter) {
+    private boolean needToCreateNestedElement(DevKitVariableElement parameter) {
         return (typeMirrorUtils.isMap(parameter.asType()) ||
                 typeMirrorUtils.isArrayOrList(parameter.asType())) && !typeMirrorUtils.ignoreParameter(parameter);
     }

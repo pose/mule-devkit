@@ -25,7 +25,6 @@ import org.mule.devkit.model.DevKitTypeElement;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeKind;
 import java.lang.annotation.Annotation;
@@ -54,7 +53,7 @@ public class LifecycleValidator implements Validator {
         if (methods.size() > 1) {
             throw new ValidationException(typeElement, "Cannot have more than method annotated with " + annotation.getSimpleName());
         }
-        ExecutableElement method = methods.get(0);
+        DevKitExecutableElement method = methods.get(0);
         if (!method.getParameters().isEmpty()) {
             throw new ValidationException(typeElement, "A method annotated with " + annotation.getSimpleName() + " cannot receive any paramters");
         }

@@ -17,42 +17,37 @@
 
 package org.mule.devkit.validation;
 
-import org.mule.devkit.model.DefaultDevKitTypeElement;
-
-import javax.lang.model.element.Element;
+import org.mule.devkit.model.DevKitElement;
 
 public class ValidationException extends Exception {
-    private Element element;
+    private DevKitElement element;
 
-    public ValidationException(Element element) {
+    public ValidationException(DevKitElement element) {
         super();
 
         this.element = element;
     }
 
-    public ValidationException(Element element, String s) {
+    public ValidationException(DevKitElement element, String s) {
         super(s);
 
         this.element = element;
     }
 
-    public ValidationException(Element element, String s, Throwable throwable) {
+    public ValidationException(DevKitElement element, String s, Throwable throwable) {
         super(s, throwable);
 
         this.element = element;
     }
 
 
-    public ValidationException(Element element, Throwable throwable) {
+    public ValidationException(DevKitElement element, Throwable throwable) {
         super(throwable);
 
         this.element = element;
     }
 
-    public Element getElement() {
-        if (element instanceof DefaultDevKitTypeElement) {
-            return ((DefaultDevKitTypeElement) element).unWrap();
-        }
+    public DevKitElement getElement() {
         return element;
     }
 }

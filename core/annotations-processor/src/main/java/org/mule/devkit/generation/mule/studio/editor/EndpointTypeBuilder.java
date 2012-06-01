@@ -18,16 +18,16 @@
 package org.mule.devkit.generation.mule.studio.editor;
 
 import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.EndpointType;
 
-import javax.lang.model.element.ExecutableElement;
 import java.util.Collection;
 
 public class EndpointTypeBuilder extends BaseStudioXmlBuilder {
 
-    public EndpointTypeBuilder(GeneratorContext context, ExecutableElement executableElement, DevKitTypeElement typeElement) {
+    public EndpointTypeBuilder(GeneratorContext context, DevKitExecutableElement executableElement, DevKitTypeElement typeElement) {
         super(context, executableElement, typeElement);
     }
 

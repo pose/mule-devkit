@@ -44,7 +44,6 @@ import org.mule.devkit.model.code.Variable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
@@ -102,11 +101,11 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
         return Op.eq(expression, ExpressionFactory._null());
     }
 
-    protected String getterMethodForFieldAnnotatedWith(TypeElement typeElement, Class<? extends Annotation> annotation) {
+    protected String getterMethodForFieldAnnotatedWith(DevKitTypeElement typeElement, Class<? extends Annotation> annotation) {
         return methodForFieldAnnotatedWith(typeElement, annotation, "get");
     }
 
-    private String methodForFieldAnnotatedWith(TypeElement typeElement, Class<? extends Annotation> annotation, String prefix) {
+    private String methodForFieldAnnotatedWith(DevKitTypeElement typeElement, Class<? extends Annotation> annotation, String prefix) {
         List<VariableElement> fields = ElementFilter.fieldsIn(typeElement.getEnclosedElements());
         for (VariableElement field : fields) {
             if (field.getAnnotation(annotation) != null) {
@@ -116,31 +115,31 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
         return null;
     }
 
-    protected ExecutableElement connectMethodForClass(DevKitTypeElement typeElement) {
+    protected DevKitExecutableElement connectMethodForClass(DevKitTypeElement typeElement) {
         List<DevKitExecutableElement> connectMethods = typeElement.getMethodsAnnotatedWith(Connect.class);
         return !connectMethods.isEmpty() ? connectMethods.get(0) : null;
     }
 
-    protected ExecutableElement validateConnectionMethodForClass(DevKitTypeElement typeElement) {
+    protected DevKitExecutableElement validateConnectionMethodForClass(DevKitTypeElement typeElement) {
         List<DevKitExecutableElement> connectMethods = typeElement.getMethodsAnnotatedWith(ValidateConnection.class);
         return !connectMethods.isEmpty() ? connectMethods.get(0) : null;
     }
 
-    protected ExecutableElement disconnectMethodForClass(DevKitTypeElement typeElement) {
+    protected DevKitExecutableElement disconnectMethodForClass(DevKitTypeElement typeElement) {
         List<DevKitExecutableElement> disconnectMethods = typeElement.getMethodsAnnotatedWith(Disconnect.class);
         return !disconnectMethods.isEmpty() ? disconnectMethods.get(0) : null;
     }
 
-    protected ExecutableElement connectionIdentifierMethodForClass(DevKitTypeElement typeElement) {
+    protected DevKitExecutableElement connectionIdentifierMethodForClass(DevKitTypeElement typeElement) {
         List<DevKitExecutableElement> connectionIdentifierMethods = typeElement.getMethodsAnnotatedWith(ConnectionIdentifier.class);
         return !connectionIdentifierMethods.isEmpty() ? connectionIdentifierMethods.get(0) : null;
     }
 
-    protected ExecutableElement connectForMethod(ExecutableElement executableElement) {
+    protected DevKitExecutableElement connectForMethod(DevKitExecutableElement executableElement) {
         return connectMethodForClass(new DefaultDevKitTypeElement((TypeElement) executableElement.getEnclosingElement()));
     }
 
-    protected ExecutableElement connectionIdentifierForMethod(ExecutableElement executableElement) {
+    protected DevKitExecutableElement connectionIdentifierForMethod(DevKitExecutableElement executableElement) {
         return connectionIdentifierMethodForClass(new DefaultDevKitTypeElement((TypeElement) executableElement.getEnclosingElement()));
     }
 
@@ -163,8 +162,8 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
             addCapability(isCapableOf, capability, ref(Capability.class).staticRef("POOLING_CAPABLE"));
         }
 
-        ExecutableElement connectMethod = connectMethodForClass(typeElement);
-        ExecutableElement disconnectMethod = disconnectMethodForClass(typeElement);
+        DevKitExecutableElement connectMethod = connectMethodForClass(typeElement);
+        DevKitExecutableElement disconnectMethod = disconnectMethodForClass(typeElement);
 
         if (connectMethod != null && disconnectMethod != null) {
             addCapability(isCapableOf, capability, ref(Capability.class).staticRef("CONNECTION_MANAGEMENT_CAPABLE"));

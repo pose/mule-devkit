@@ -23,7 +23,9 @@ import org.mule.api.annotations.display.Placement;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitFieldElement;
+import org.mule.devkit.model.DevKitParameterElement;
 import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.DevKitVariableElement;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.AttributeType;
 import org.mule.devkit.model.studio.EnumElement;
@@ -40,8 +42,6 @@ import org.mule.util.StringUtils;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Types;
 import javax.xml.bind.JAXBElement;
 import java.util.ArrayList;
@@ -59,7 +59,7 @@ public abstract class BaseStudioXmlBuilder {
     protected ObjectFactory objectFactory;
     protected MuleStudioUtils helper;
     protected DevKitTypeElement typeElement;
-    protected ExecutableElement executableElement;
+    protected DevKitExecutableElement executableElement;
     protected NameUtils nameUtils;
     protected JavaDocUtils javaDocUtils;
     protected TypeMirrorUtils typeMirrorUtils;
@@ -101,7 +101,7 @@ public abstract class BaseStudioXmlBuilder {
     
     protected List<ModeElementType> getModes(List<DevKitExecutableElement> methods) {
 		 List<ModeElementType> modes = new ArrayList<ModeElementType>();
-	     for (ExecutableElement method : methods) {
+	     for (DevKitExecutableElement method : methods) {
 	         ModeElementType mode = new ModeElementType();
 	         mode.setModeId(MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + helper.getLocalId(method));
 	         mode.setModeLabel(StringUtils.capitalize(helper.getFriendlyName(method)));
@@ -111,7 +111,7 @@ public abstract class BaseStudioXmlBuilder {
 	     return modes;
     }
 
-    protected BaseStudioXmlBuilder(GeneratorContext context, ExecutableElement executableElement, DevKitTypeElement typeElement) {
+    protected BaseStudioXmlBuilder(GeneratorContext context, DevKitExecutableElement executableElement, DevKitTypeElement typeElement) {
         this(context, typeElement);
         this.executableElement = executableElement;
     }
@@ -143,7 +143,7 @@ public abstract class BaseStudioXmlBuilder {
         return attributeCategories;
     }
 
-    private List<AttributeCategory> processVariableElements(List<? extends VariableElement> variableElements) {
+    private List<AttributeCategory> processVariableElements(List<? extends DevKitVariableElement> variableElements) {
 
         Map<String, Group> groupsByName = new LinkedHashMap<String, Group>();
         Map<String, AttributeCategory> attributeCategoriesByName = new LinkedHashMap<String, AttributeCategory>();
@@ -151,7 +151,7 @@ public abstract class BaseStudioXmlBuilder {
 
         processConnectionAttributes(groupsByName, attributeCategoriesByName);
 
-        for (VariableElement parameter : variableElements) {
+        for (DevKitVariableElement parameter : variableElements) {
             JAXBElement<? extends AttributeType> jaxbElement = createJaxbElement(parameter);
             AttributeCategory attributeCategory = getOrCreateAttributeCategory(attributeCategoriesByName, parameter.getAnnotation(Placement.class));
             Group group = getOrCreateGroup(groupsByName, parameter);
@@ -200,7 +200,7 @@ public abstract class BaseStudioXmlBuilder {
         }
     }
 
-    private Group getOrCreateGroup(Map<String, Group> groupsByName, VariableElement parameter) {
+    private Group getOrCreateGroup(Map<String, Group> groupsByName, DevKitVariableElement parameter) {
         Placement placement = parameter.getAnnotation(Placement.class);
         if (placement == null || StringUtils.isBlank(placement.group())) {
             if (!groupsByName.containsKey(GENERAL_GROUP_NAME)) {
@@ -222,7 +222,7 @@ public abstract class BaseStudioXmlBuilder {
         }
     }
 
-    private JAXBElement<? extends AttributeType> createJaxbElement(VariableElement parameter) {
+    private JAXBElement<? extends AttributeType> createJaxbElement(DevKitVariableElement parameter) {
         JAXBElement<? extends AttributeType> jaxbElement;
         if (typeMirrorUtils.isEnum(parameter)) {
             EnumType enumType = createEnumType(parameter);
@@ -237,9 +237,9 @@ public abstract class BaseStudioXmlBuilder {
         return jaxbElement;
     }
 
-    private List<? extends VariableElement> getParametersSorted() {
-        List<? extends VariableElement> parameters = new ArrayList<VariableElement>(executableElement.getParameters());
-        Iterator<? extends VariableElement> iterator = parameters.iterator();
+    private List<DevKitVariableElement> getParametersSorted() {
+        List<DevKitVariableElement> parameters = new ArrayList<DevKitVariableElement>(executableElement.getParameters());
+        Iterator<DevKitVariableElement> iterator = parameters.iterator();
         while (iterator.hasNext()) {
             if (typeMirrorUtils.ignoreParameter(iterator.next())) {
                 iterator.remove();
@@ -249,7 +249,7 @@ public abstract class BaseStudioXmlBuilder {
         return parameters;
     }
 
-    private AttributeType createAttributeType(VariableElement parameter) {
+    private AttributeType createAttributeType(DevKitVariableElement parameter) {
         AttributeType attributeType = helper.createAttributeTypeIgnoreEnumsAndCollections(parameter);
         if (attributeType != null) {
             helper.setAttributeTypeInfo(parameter, attributeType);
@@ -259,8 +259,8 @@ public abstract class BaseStudioXmlBuilder {
 
     protected List<AttributeType> getConnectionAttributes(DevKitTypeElement typeElement) {
         List<AttributeType> parameters = new ArrayList<AttributeType>();
-        ExecutableElement connectMethod = typeElement.getMethodsAnnotatedWith(Connect.class).get(0);
-        for (VariableElement connectAttributeType : connectMethod.getParameters()) {
+        DevKitExecutableElement connectMethod = typeElement.getMethodsAnnotatedWith(Connect.class).get(0);
+        for (DevKitParameterElement connectAttributeType : connectMethod.getParameters()) {
             AttributeType parameter = helper.createAttributeTypeIgnoreEnumsAndCollections(connectAttributeType);
             helper.setAttributeTypeInfo(connectAttributeType, parameter);
             parameter.setRequired(false);
@@ -269,7 +269,7 @@ public abstract class BaseStudioXmlBuilder {
         return parameters;
     }
 
-    private NestedElementReference createNestedElementReference(ExecutableElement executableElement, VariableElement parameter) {
+    private NestedElementReference createNestedElementReference(DevKitExecutableElement executableElement, DevKitVariableElement parameter) {
         NestedElementReference childElement = new NestedElementReference();
         String prefix;
         if (executableElement != null) {
@@ -287,7 +287,7 @@ public abstract class BaseStudioXmlBuilder {
         return childElement;
     }
 
-    private EnumType createEnumType(VariableElement parameter) {
+    private EnumType createEnumType(DevKitVariableElement parameter) {
         EnumType enumType = new EnumType();
         enumType.setSupportsExpressions(true);
         enumType.setAllowsCustom(true);

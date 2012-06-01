@@ -28,7 +28,9 @@ import org.mule.api.annotations.param.Optional;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.spring.SchemaGenerator;
 import org.mule.devkit.generation.spring.SchemaTypeConversion;
+import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.DevKitVariableElement;
 import org.mule.devkit.model.studio.AttributeType;
 import org.mule.devkit.model.studio.Booleantype;
 import org.mule.devkit.model.studio.EncodingType;
@@ -48,8 +50,6 @@ import org.mule.util.StringUtils;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.VariableElement;
 import javax.xml.bind.JAXBElement;
 import java.util.ArrayList;
 import java.util.List;
@@ -258,7 +258,7 @@ public class MuleStudioUtils {
         }
     }
 
-    public void setAttributeTypeInfo(VariableElement variableElement, AttributeType attributeType) {
+    public void setAttributeTypeInfo(DevKitVariableElement variableElement, AttributeType attributeType) {
         String parameterName = variableElement.getSimpleName().toString();
         attributeType.setCaption(getFormattedCaption(variableElement));
         attributeType.setDescription(getFormattedDescription(variableElement));
@@ -274,7 +274,7 @@ public class MuleStudioUtils {
         setDefaultValueIfAvailable(variableElement, attributeType);
     }
 
-    public void setDefaultValueIfAvailable(VariableElement variableElement, AttributeType parameter) {
+    public void setDefaultValueIfAvailable(DevKitVariableElement variableElement, AttributeType parameter) {
         Default annotation = variableElement.getAnnotation(Default.class);
         if (annotation != null) {
             if (parameter instanceof Booleantype) {
@@ -289,7 +289,7 @@ public class MuleStudioUtils {
         }
     }
 
-    public String getLocalId(ExecutableElement executableElement, VariableElement variableElement) {
+    public String getLocalId(DevKitExecutableElement executableElement, DevKitVariableElement variableElement) {
         if (executableElement != null) {
             return nameUtils.uncamel(executableElement.getSimpleName().toString()) + '-' + nameUtils.uncamel(variableElement.getSimpleName().toString());
         } else {
@@ -297,7 +297,7 @@ public class MuleStudioUtils {
         }
     }
 
-    public String getLocalId(ExecutableElement executableElement) {
+    public String getLocalId(DevKitExecutableElement executableElement) {
         String localId;
         Processor processor = executableElement.getAnnotation(Processor.class);
         if (processor != null && StringUtils.isNotBlank(processor.name())) {
@@ -308,7 +308,7 @@ public class MuleStudioUtils {
         return nameUtils.uncamel(localId);
     }
 
-    public String getFormattedDescription(VariableElement element) {
+    public String getFormattedDescription(DevKitVariableElement element) {
         Summary description = element.getAnnotation(Summary.class);
         if (description != null && StringUtils.isNotBlank(description.value())) {
             return formatDescription(description.value());
@@ -334,11 +334,11 @@ public class MuleStudioUtils {
         return formatCaption(typeElement.name().replaceAll("-", " "));
     }
 
-    public String getFormattedCaption(ExecutableElement element) {
+    public String getFormattedCaption(DevKitExecutableElement element) {
         return formatCaption(getFriendlyName(element));
     }
 
-    public String getFormattedCaption(VariableElement element) {
+    public String getFormattedCaption(DevKitVariableElement element) {
         FriendlyName caption = element.getAnnotation(FriendlyName.class);
         if (caption != null && StringUtils.isNotBlank(caption.value())) {
             return caption.value();
@@ -353,7 +353,7 @@ public class MuleStudioUtils {
         return formatCaption(friendlyName);
     }
 
-    public String getFriendlyName(ExecutableElement element) {
+    public String getFriendlyName(DevKitExecutableElement element) {
         Processor processor = element.getAnnotation(Processor.class);
         if(processor != null && StringUtils.isNotBlank(processor.friendlyName())) {
             return processor.friendlyName();
@@ -365,7 +365,7 @@ public class MuleStudioUtils {
         return nameUtils.friendlyNameFromCamelCase(element.getSimpleName().toString());
     }
 
-    public boolean isKnownType(VariableElement variable) {
+    public boolean isKnownType(DevKitVariableElement variable) {
         return typeMirrorUtils.isString(variable) ||
                 typeMirrorUtils.isChar(variable) ||
                 typeMirrorUtils.isDate(variable) ||

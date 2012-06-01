@@ -26,7 +26,10 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.NamingContants;
+import org.mule.devkit.model.DevKitExecutableElement;
+import org.mule.devkit.model.DevKitParameterElement;
 import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.DevKitVariableElement;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -41,11 +44,7 @@ import org.mule.devkit.model.code.Variable;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
-import javax.lang.model.util.ElementFilter;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -54,7 +53,6 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
 
 public class JaxbTransformerGenerator extends AbstractModuleGenerator {
 
@@ -65,8 +63,8 @@ public class JaxbTransformerGenerator extends AbstractModuleGenerator {
 
     @Override
     protected void doGenerate(DevKitTypeElement typeElement) {
-        for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Processor.class)) {
-            for (VariableElement variable : executableElement.getParameters()) {
+        for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Processor.class)) {
+            for (DevKitParameterElement variable : executableElement.getParameters()) {
                 if (context.getTypeMirrorUtils().isXmlType(variable.asType()) && !context.isJaxbElementRegistered(variable.asType())) {
                     // get class
                     DefinedClass jaxbTransformerClass = getJaxbTransformerClass(executableElement, variable);
@@ -109,7 +107,7 @@ public class JaxbTransformerGenerator extends AbstractModuleGenerator {
         getPriorityWeighting.body()._return(weighting);
     }
 
-    private void generateDoTransform(DefinedClass jaxbTransformerClass, FieldVariable jaxbContext, VariableElement variable) {
+    private void generateDoTransform(DefinedClass jaxbTransformerClass, FieldVariable jaxbContext, DevKitVariableElement variable) {
         Method doTransform = jaxbTransformerClass.method(Modifier.PROTECTED, Object.class, "doTransform");
         doTransform._throws(TransformerException.class);
         Variable src = doTransform.param(Object.class, "src");
@@ -144,7 +142,7 @@ public class JaxbTransformerGenerator extends AbstractModuleGenerator {
         doTransform.body()._return(result);
     }
 
-    private void generateThrowTransformFailedException(CatchBlock catchBlock, Variable exception, VariableElement variable) {
+    private void generateThrowTransformFailedException(CatchBlock catchBlock, Variable exception, DevKitVariableElement variable) {
         Invocation transformFailedInvoke = ref(CoreMessages.class).staticInvoke("transformFailed");
         transformFailedInvoke.arg("String");
         transformFailedInvoke.arg(ExpressionFactory.lit(ref(variable.asType()).boxify().fullName()));
@@ -172,7 +170,7 @@ public class JaxbTransformerGenerator extends AbstractModuleGenerator {
         return loadJaxbContext;
     }
 
-    private void generateConstructor(DefinedClass jaxbTransformerClass, VariableElement variable) {
+    private void generateConstructor(DefinedClass jaxbTransformerClass, DevKitVariableElement variable) {
         // generate constructor
         Method constructor = jaxbTransformerClass.constructor(Modifier.PUBLIC);
 
@@ -188,7 +186,7 @@ public class JaxbTransformerGenerator extends AbstractModuleGenerator {
         constructor.body().invoke("setName").arg(StringUtils.capitalize(xmlType.name()) + "JaxbTransformer");
     }
 
-    private void registerDestinationType(Method constructor, VariableElement variable) {
+    private void registerDestinationType(Method constructor, DevKitVariableElement  variable) {
         Invocation setReturnClass = constructor.body().invoke("setReturnClass");
         setReturnClass.arg(ExpressionFactory.dotclass(ref(variable.asType()).boxify()));
     }
@@ -198,11 +196,10 @@ public class JaxbTransformerGenerator extends AbstractModuleGenerator {
         registerSourceType.arg(ref(DataTypeFactory.class).staticRef("STRING"));
     }
 
-    private DefinedClass getJaxbTransformerClass(ExecutableElement executableElement, VariableElement variable) {
+    private DefinedClass getJaxbTransformerClass(DevKitExecutableElement executableElement, DevKitVariableElement variable) {
         DeclaredType declaredType = (DeclaredType) variable.asType();
         XmlType xmlType = declaredType.asElement().getAnnotation(XmlType.class);
-        TypeElement parentClass = ElementFilter.typesIn(Arrays.asList(executableElement.getEnclosingElement())).get(0);
-        String packageName = context.getNameUtils().getPackageName(context.getNameUtils().getBinaryName(parentClass)) + NamingContants.TRANSFORMERS_NAMESPACE;
+        String packageName = context.getNameUtils().getPackageName(context.getNameUtils().getBinaryName(executableElement.parent())) + NamingContants.TRANSFORMERS_NAMESPACE;
         Package pkg = context.getCodeModel()._package(packageName);
 
         return pkg._class(StringUtils.capitalize(xmlType.name()) + "JaxbTransformer", AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class});

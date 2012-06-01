@@ -32,6 +32,9 @@ import org.mule.config.PoolingProfile;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.NamingContants;
+import org.mule.devkit.model.DevKitExecutableElement;
+import org.mule.devkit.model.DevKitFieldElement;
+import org.mule.devkit.model.DevKitParameterElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.Cast;
 import org.mule.devkit.model.code.CatchBlock;
@@ -49,9 +52,6 @@ import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -59,8 +59,8 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
 
     @Override
     protected boolean shouldGenerate(DevKitTypeElement typeElement) {
-        ExecutableElement connectMethod = connectMethodForClass(typeElement);
-        ExecutableElement disconnectMethod = disconnectMethodForClass(typeElement);
+        DevKitExecutableElement connectMethod = connectMethodForClass(typeElement);
+        DevKitExecutableElement disconnectMethod = disconnectMethodForClass(typeElement);
 
         if (connectMethod == null || disconnectMethod == null) {
             return false;
@@ -71,9 +71,9 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
 
     @Override
     protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
-        ExecutableElement connectMethod = connectMethodForClass(typeElement);
-        ExecutableElement disconnectMethod = disconnectMethodForClass(typeElement);
-        ExecutableElement validateConnectionMethod = validateConnectionMethodForClass(typeElement);
+        DevKitExecutableElement connectMethod = connectMethodForClass(typeElement);
+        DevKitExecutableElement disconnectMethod = disconnectMethodForClass(typeElement);
+        DevKitExecutableElement validateConnectionMethod = validateConnectionMethodForClass(typeElement);
 
         DefinedClass connectionManagerClass = getConnectionManagerAdapterClass(typeElement);
 
@@ -81,7 +81,7 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         Map<String, AbstractMessageGenerator.FieldVariableElement> fields = generateStandardFieldForEachParameter(connectionManagerClass, connectMethod);
 
         // generate fields for each configurable field
-        for (VariableElement field : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
+        for (DevKitFieldElement field : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
             FieldVariable configField = connectionManagerClass.field(Modifier.PRIVATE, ref(field.asType()), field.getSimpleName().toString());
             generateSetter(connectionManagerClass, configField);
             generateGetter(connectionManagerClass, configField);
@@ -154,11 +154,11 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         generateIsCapableOf(typeElement, connectionManagerClass);
     }
 
-    private void generateConnectionKeyHashCodeMethod(ExecutableElement connect, DefinedClass connectionKeyClass) {
+    private void generateConnectionKeyHashCodeMethod(DevKitExecutableElement connect, DefinedClass connectionKeyClass) {
         Method hashCode = connectionKeyClass.method(Modifier.PUBLIC, context.getCodeModel().INT, "hashCode");
         Variable hash = hashCode.body().decl(context.getCodeModel().INT, "hash", ExpressionFactory.lit(1));
 
-        for (VariableElement variable : connect.getParameters()) {
+        for (DevKitParameterElement variable : connect.getParameters()) {
             if (variable.getAnnotation(ConnectionKey.class) == null) {
                 continue;
             }
@@ -178,12 +178,12 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         );
     }
 
-    private void generateConnectionKeyEqualsMethod(ExecutableElement connect, DefinedClass connectionKey) {
+    private void generateConnectionKeyEqualsMethod(DevKitExecutableElement connect, DefinedClass connectionKey) {
         Method equals = connectionKey.method(Modifier.PUBLIC, context.getCodeModel().BOOLEAN, "equals");
         Variable obj = equals.param(ref(Object.class), "obj");
         Expression areEqual = Op._instanceof(obj, connectionKey);
 
-        for (VariableElement variable : connect.getParameters()) {
+        for (DevKitParameterElement variable : connect.getParameters()) {
             if (variable.getAnnotation(ConnectionKey.class) == null) {
                 continue;
             }
@@ -200,8 +200,8 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         );
     }
 
-    private void generateBorrowConnectionMethod(ExecutableElement connect, DefinedClass connectionManagerClass, FieldVariable connectionPool, DefinedClass connectionKeyClass) {
-        DefinedClass connectorClass = context.getClassForRole(context.getNameUtils().generateConnectorObjectRoleKey((TypeElement) connect.getEnclosingElement()));
+    private void generateBorrowConnectionMethod(DevKitExecutableElement connect, DefinedClass connectionManagerClass, FieldVariable connectionPool, DefinedClass connectionKeyClass) {
+        DefinedClass connectorClass = context.getClassForRole(context.getNameUtils().generateConnectorObjectRoleKey(connect.parent()));
         Method borrowConnector = connectionManagerClass.method(Modifier.PUBLIC, connectorClass, "acquireConnection");
         Variable key = borrowConnector.param(connectionKeyClass, "key");
         borrowConnector._throws(ref(Exception.class));
@@ -214,8 +214,8 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         );
     }
 
-    private void generateReturnConnectionMethod(ExecutableElement connect, DefinedClass connectionManagerClass, FieldVariable connectionPool, DefinedClass connectionKeyClass) {
-        DefinedClass connectorClass = context.getClassForRole(context.getNameUtils().generateConnectorObjectRoleKey((TypeElement) connect.getEnclosingElement()));
+    private void generateReturnConnectionMethod(DevKitExecutableElement connect, DefinedClass connectionManagerClass, FieldVariable connectionPool, DefinedClass connectionKeyClass) {
+        DefinedClass connectorClass = context.getClassForRole(context.getNameUtils().generateConnectorObjectRoleKey(connect.parent()));
         Method returnConnector = connectionManagerClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "releaseConnection");
         Variable key = returnConnector.param(connectionKeyClass, "key");
         returnConnector._throws(ref(Exception.class));
@@ -227,8 +227,8 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         );
     }
 
-    private void generateDestroyConnectionMethod(ExecutableElement connect, DefinedClass connectionManagerClass, FieldVariable connectionPool, DefinedClass connectionKeyClass) {
-        DefinedClass connectorClass = context.getClassForRole(context.getNameUtils().generateConnectorObjectRoleKey((TypeElement) connect.getEnclosingElement()));
+    private void generateDestroyConnectionMethod(DevKitExecutableElement connect, DefinedClass connectionManagerClass, FieldVariable connectionPool, DefinedClass connectionKeyClass) {
+        DefinedClass connectorClass = context.getClassForRole(context.getNameUtils().generateConnectorObjectRoleKey(connect.parent()));
         Method destroyConnector = connectionManagerClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "destroyConnection");
         Variable key = destroyConnector.param(connectionKeyClass, "key");
         destroyConnector._throws(ref(Exception.class));
@@ -259,8 +259,8 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         ).arg(config));
     }
 
-    private void generateActivateObjectMethod(DefinedClass connectionFactoryClass, ExecutableElement validateConnectionMethod, ExecutableElement connect, Map<String, FieldVariableElement> keyFields, DefinedClass connectionKeyClass) {
-        DefinedClass connectorClass = context.getClassForRole(context.getNameUtils().generateConnectorObjectRoleKey((TypeElement) validateConnectionMethod.getEnclosingElement()));
+    private void generateActivateObjectMethod(DefinedClass connectionFactoryClass, DevKitExecutableElement validateConnectionMethod, DevKitExecutableElement connect, Map<String, FieldVariableElement> keyFields, DefinedClass connectionKeyClass) {
+        DefinedClass connectorClass = context.getClassForRole(context.getNameUtils().generateConnectorObjectRoleKey(validateConnectionMethod.parent()));
         Method activateObject = connectionFactoryClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "activateObject");
         activateObject._throws(ref(Exception.class));
         Variable key = activateObject.param(Object.class, "key");
@@ -277,7 +277,7 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         Conditional ifNotConnected = tryDisconnect.body()._if(Op.not(casterConnector.invoke(validateConnectionMethod.getSimpleName().toString())));
         Cast castedConnectionKey = ExpressionFactory.cast(connectionKeyClass, key);
         Invocation connectInvoke = ExpressionFactory.cast(connectorClass, obj).invoke(connect.getSimpleName().toString());
-        for (VariableElement variable : connect.getParameters()) {
+        for (DevKitParameterElement variable : connect.getParameters()) {
             String fieldName = variable.getSimpleName().toString();
             connectInvoke.arg(castedConnectionKey.invoke("get" + StringUtils.capitalize(keyFields.get(fieldName).getField().name())));
         }
@@ -297,8 +297,8 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         passivateObject.param(Object.class, "obj");
     }
 
-    private void generateValidateObjectMethod(DefinedClass connectionFactoryClass, FieldVariable logger, ExecutableElement validateConnectionMethod) {
-        DefinedClass connectorClass = context.getClassForRole(context.getNameUtils().generateConnectorObjectRoleKey((TypeElement) validateConnectionMethod.getEnclosingElement()));
+    private void generateValidateObjectMethod(DefinedClass connectionFactoryClass, FieldVariable logger, DevKitExecutableElement validateConnectionMethod) {
+        DefinedClass connectorClass = context.getClassForRole(context.getNameUtils().generateConnectorObjectRoleKey(validateConnectionMethod.parent()));
         Method validateObject = connectionFactoryClass.method(Modifier.PUBLIC, context.getCodeModel().BOOLEAN, "validateObject");
         validateObject.param(Object.class, "key");
         Variable obj = validateObject.param(Object.class, "obj");
@@ -315,8 +315,8 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         catchAndRethrow.body()._return(ExpressionFactory.FALSE);
     }
 
-    private void generateDestroyObjectMethod(ExecutableElement connect, ExecutableElement disconnect, DefinedClass connectionKeyClass, DefinedClass connectionFactoryClass) {
-        DefinedClass connectorClass = context.getClassForRole(context.getNameUtils().generateConnectorObjectRoleKey((TypeElement) connect.getEnclosingElement()));
+    private void generateDestroyObjectMethod(DevKitExecutableElement connect, DevKitExecutableElement disconnect, DefinedClass connectionKeyClass, DefinedClass connectionFactoryClass) {
+        DefinedClass connectorClass = context.getClassForRole(context.getNameUtils().generateConnectorObjectRoleKey(connect.parent()));
 
         Method destroyObject = connectionFactoryClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "destroyObject");
         destroyObject._throws(ref(Exception.class));
@@ -338,8 +338,8 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         tryDisconnect._finally()._if(Op._instanceof(casterConnector, ref(Disposable.class)))._then().add(casterConnector.invoke("dispose"));
     }
 
-    private void generateMakeObjectMethod(DevKitTypeElement typeElement, ExecutableElement connect, DefinedClass connectionFactoryClass, DefinedClass connectionKey, FieldVariable connectionManagerInFactory) {
-        DefinedClass connectorClass = context.getClassForRole(context.getNameUtils().generateConnectorObjectRoleKey((TypeElement) connect.getEnclosingElement()));
+    private void generateMakeObjectMethod(DevKitTypeElement typeElement, DevKitExecutableElement connect, DefinedClass connectionFactoryClass, DefinedClass connectionKey, FieldVariable connectionManagerInFactory) {
+        DefinedClass connectorClass = context.getClassForRole(context.getNameUtils().generateConnectorObjectRoleKey(connect.parent()));
         Method makeObject = connectionFactoryClass.method(Modifier.PUBLIC, Object.class, "makeObject");
         makeObject._throws(ref(Exception.class));
         Variable key = makeObject.param(Object.class, "key");
@@ -348,7 +348,7 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
 
         Variable connector = makeObject.body().decl(connectorClass, "connector", ExpressionFactory._new(connectorClass));
 
-        for (VariableElement field : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
+        for (DevKitFieldElement field : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
             makeObject.body().add(connector.invoke("set" + StringUtils.capitalize(field.getSimpleName().toString()))
                     .arg(connectionManagerInFactory.invoke("get" + StringUtils.capitalize(field.getSimpleName().toString()))));
         }
@@ -371,9 +371,9 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         }
     }
 
-    private void generateKeyConstructor(ExecutableElement connect, DefinedClass connectionKeyClass, Map<String, FieldVariableElement> keyFields) {
+    private void generateKeyConstructor(DevKitExecutableElement connect, DefinedClass connectionKeyClass, Map<String, FieldVariableElement> keyFields) {
         Method keyConstructor = connectionKeyClass.constructor(Modifier.PUBLIC);
-        for (VariableElement variable : connect.getParameters()) {
+        for (DevKitParameterElement variable : connect.getParameters()) {
             String fieldName = variable.getSimpleName().toString();
             Variable parameter = keyConstructor.param(ref(variable.asType()), fieldName);
             keyConstructor.body().assign(ExpressionFactory._this().ref(keyFields.get(fieldName).getField()), parameter);
@@ -387,7 +387,7 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         return connectionPool;
     }
 
-    private DefinedClass getConnectionManagerAdapterClass(TypeElement typeElement) {
+    private DefinedClass getConnectionManagerAdapterClass(DevKitTypeElement typeElement) {
         String connectionManagerName = context.getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.CONNECTION_MANAGER_ADAPTER_CLASS_NAME_SUFFIX);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(connectionManagerName));
 
@@ -409,7 +409,7 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         return connectionManagerClass;
     }
 
-    private DefinedClass getConnectionParametersClass(TypeElement typeElement, DefinedClass connectionManagerClass) {
+    private DefinedClass getConnectionParametersClass(DevKitTypeElement typeElement, DefinedClass connectionManagerClass) {
         try {
             DefinedClass connectionKey = connectionManagerClass._class(Modifier.PUBLIC | Modifier.STATIC, NamingContants.CONNECTION_KEY_CLASS_NAME_SUFFIX);
             connectionKey.javadoc().add("A tuple of connection parameters");

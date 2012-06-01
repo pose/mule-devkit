@@ -40,8 +40,6 @@ import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Variable;
 
-import javax.lang.model.element.TypeElement;
-
 public class DefaultSaveAccessTokenCallbackGenerator extends AbstractMessageGenerator {
 
     public static final String ROLE = "DefaultSaveAccessTokenCallback";
@@ -149,7 +147,7 @@ public class DefaultSaveAccessTokenCallbackGenerator extends AbstractMessageGene
         );
     }
 
-    private DefinedClass getDefaultSaveAccessTokenCallbackClass(TypeElement type) {
+    private DefinedClass getDefaultSaveAccessTokenCallbackClass(DevKitTypeElement type) {
         String callbackClassName = context.getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, NamingContants.DEFAULT_SAVE_ACCESS_TOKEN_CALLBACK_CLASS_NAME);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(callbackClassName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(callbackClassName), new Class[]{

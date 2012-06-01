@@ -24,10 +24,10 @@ import org.mule.api.annotations.display.FriendlyName;
 import org.mule.api.annotations.display.Placement;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.mule.studio.editor.VariableComparator;
+import org.mule.devkit.model.DevKitVariableElement;
 import org.mule.devkit.utils.TypeMirrorUtils;
 
 import javax.lang.model.element.Name;
-import javax.lang.model.element.VariableElement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -39,17 +39,17 @@ import static org.mockito.Mockito.when;
 public class VariableComparatorTest {
 
     @Mock
-    private VariableElement stringVariable;
+    private DevKitVariableElement stringVariable;
     @Mock
-    private VariableElement intVariable;
+    private DevKitVariableElement intVariable;
     @Mock
-    private VariableElement enumVariable;
+    private DevKitVariableElement enumVariable;
     @Mock
-    private VariableElement mapVariable;
+    private DevKitVariableElement mapVariable;
     @Mock
-    private VariableElement booleanVariable;
+    private DevKitVariableElement booleanVariable;
     @Mock
-    private VariableElement unknownTypeVariable;
+    private DevKitVariableElement unknownTypeVariable;
     @Mock
     private GeneratorContext context;
     @Mock
@@ -68,7 +68,7 @@ public class VariableComparatorTest {
 
     @Test
     public void compareByType() throws Exception {
-        List<VariableElement> variables = new ArrayList<VariableElement>();
+        List<DevKitVariableElement> variables = new ArrayList<DevKitVariableElement>();
         variables.add(mapVariable);
         variables.add(enumVariable);
         variables.add(booleanVariable);
@@ -95,7 +95,7 @@ public class VariableComparatorTest {
         setName(unknownTypeVariable, "a");
         setName(booleanVariable, "b");
 
-        List<VariableElement> variables = new ArrayList<VariableElement>();
+        List<DevKitVariableElement> variables = new ArrayList<DevKitVariableElement>();
         variables.add(unknownTypeVariable);
         variables.add(booleanVariable);
 
@@ -105,9 +105,9 @@ public class VariableComparatorTest {
         assertEquals(booleanVariable, variables.get(1));
     }
 
-    private void setName(VariableElement variableElement, String name) {
+    private void setName(DevKitVariableElement DevKitVariableElement, String name) {
         Name simpleName = mock(Name.class);
-        when(variableElement.getSimpleName()).thenReturn(simpleName);
+        when(DevKitVariableElement.getSimpleName()).thenReturn(simpleName);
         when(simpleName.toString()).thenReturn(name);
     }
 
@@ -119,7 +119,7 @@ public class VariableComparatorTest {
         when(stringVariable.getSimpleName()).thenReturn(b);
         when(intVariable.getSimpleName()).thenReturn(a);
 
-        List<VariableElement> variables = new ArrayList<VariableElement>();
+        List<DevKitVariableElement> variables = new ArrayList<DevKitVariableElement>();
         variables.add(stringVariable);
         variables.add(intVariable);
 
@@ -140,7 +140,7 @@ public class VariableComparatorTest {
         when(mapVariablePlacement.order()).thenReturn(4);
         when(intVariablePlacement.order()).thenReturn(5);
 
-        List<VariableElement> variables = new ArrayList<VariableElement>();
+        List<DevKitVariableElement> variables = new ArrayList<DevKitVariableElement>();
         variables.add(intVariable);
         variables.add(mapVariable);
 
@@ -152,7 +152,7 @@ public class VariableComparatorTest {
 
     @Test
     public void testCompareBothWithFriendlyNames() throws Exception {
-        VariableElement stringVariable2 = mock(VariableElement.class);
+        DevKitVariableElement stringVariable2 = mock(DevKitVariableElement.class);
         when(typeMirrorUtils.isString(stringVariable2)).thenReturn(true);
 
         FriendlyName friendlyName1 = mock(FriendlyName.class);
@@ -164,7 +164,7 @@ public class VariableComparatorTest {
         when(friendlyName1.value()).thenReturn("b");
         when(friendlyName2.value()).thenReturn("a");
 
-        List<VariableElement> variables = new ArrayList<VariableElement>();
+        List<DevKitVariableElement> variables = new ArrayList<DevKitVariableElement>();
         variables.add(stringVariable);
         variables.add(stringVariable2);
 
@@ -176,7 +176,7 @@ public class VariableComparatorTest {
 
     @Test
     public void testCompareFriendlyName() throws Exception {
-        VariableElement stringVariable2 = mock(VariableElement.class);
+        DevKitVariableElement stringVariable2 = mock(DevKitVariableElement.class);
         when(typeMirrorUtils.isString(stringVariable2)).thenReturn(true);
 
         FriendlyName friendlyName1 = mock(FriendlyName.class);
@@ -188,7 +188,7 @@ public class VariableComparatorTest {
         when(stringVariable2.getSimpleName()).thenReturn(a);
 
 
-        List<VariableElement> variables = new ArrayList<VariableElement>();
+        List<DevKitVariableElement> variables = new ArrayList<DevKitVariableElement>();
         variables.add(stringVariable);
         variables.add(stringVariable2);
 

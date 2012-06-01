@@ -20,9 +20,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.util.StringUtils;
 
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.util.Elements;
 
 import static org.junit.Assert.assertEquals;
@@ -34,7 +34,7 @@ public class JavaDocUtilsTest {
     @Mock
     private Elements elements;
     @Mock
-    private ExecutableElement executableElement;
+    private DevKitExecutableElement executableElement;
 
     @Before
     public void setUpTests() {

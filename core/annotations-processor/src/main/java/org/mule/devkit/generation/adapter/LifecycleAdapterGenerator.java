@@ -52,8 +52,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import java.util.List;
 
@@ -71,26 +69,26 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
         lifecycleAdapter.javadoc().add(ref(typeElement.asType()));
         lifecycleAdapter.javadoc().add(" that adds lifecycle methods to the pojo.");
 
-        ExecutableElement startElement = getStartElement(typeElement);
+        DevKitExecutableElement startElement = getStartElement(typeElement);
         lifecycleAdapter._implements(Startable.class);
         Method start = generateLifecycleInvocation(lifecycleAdapter, typeElement, startElement, "start", DefaultMuleException.class, false);
         start._throws(ref(MuleException.class));
 
-        ExecutableElement stopElement = getStopElement(typeElement);
+        DevKitExecutableElement stopElement = getStopElement(typeElement);
         lifecycleAdapter._implements(Stoppable.class);
         Method stop = generateLifecycleInvocation(lifecycleAdapter, typeElement, stopElement, "stop", DefaultMuleException.class, false);
         stop._throws(ref(MuleException.class));
 
-        ExecutableElement postConstructElement = getPostConstructElement(typeElement);
+        DevKitExecutableElement postConstructElement = getPostConstructElement(typeElement);
         lifecycleAdapter._implements(Initialisable.class);
         generateLifecycleInvocation(lifecycleAdapter, typeElement, postConstructElement, "initialise", InitialisationException.class, true);
 
-        ExecutableElement preDestroyElement = getPreDestroyElement(typeElement);
+        DevKitExecutableElement preDestroyElement = getPreDestroyElement(typeElement);
         lifecycleAdapter._implements(Disposable.class);
         generateLifecycleInvocation(lifecycleAdapter, typeElement, preDestroyElement, "dispose", null, false);
     }
 
-    private DefinedClass getLifecycleAdapterClass(TypeElement typeElement) {
+    private DefinedClass getLifecycleAdapterClass(DevKitTypeElement typeElement) {
         String lifecycleAdapterName = context.getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.LIFECYCLE_ADAPTER_CLASS_NAME_SUFFIX);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(lifecycleAdapterName));
 
@@ -111,7 +109,7 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
         return clazz;
     }
 
-    private Method generateLifecycleInvocation(DefinedClass lifecycleWrapper, DevKitTypeElement typeElement, ExecutableElement superExecutableElement, String name, Class<?> catchException, boolean addThis) {
+    private Method generateLifecycleInvocation(DefinedClass lifecycleWrapper, DevKitTypeElement typeElement, DevKitExecutableElement superExecutableElement, String name, Class<?> catchException, boolean addThis) {
         Method lifecycleMethod = lifecycleWrapper.method(Modifier.PUBLIC, context.getCodeModel().VOID, name);
 
         if (name.equals("initialise")) {
@@ -180,22 +178,22 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
         return lifecycleMethod;
     }
 
-    private ExecutableElement getStartElement(DevKitTypeElement typeElement) {
+    private DevKitExecutableElement getStartElement(DevKitTypeElement typeElement) {
         List<DevKitExecutableElement> startMethods = typeElement.getMethodsAnnotatedWith(Start.class);
         return !startMethods.isEmpty() ? startMethods.get(0) : null;
     }
 
-    private ExecutableElement getStopElement(DevKitTypeElement typeElement) {
+    private DevKitExecutableElement getStopElement(DevKitTypeElement typeElement) {
         List<DevKitExecutableElement> stopMethods = typeElement.getMethodsAnnotatedWith(Stop.class);
         return !stopMethods.isEmpty() ? stopMethods.get(0) : null;
     }
 
-    private ExecutableElement getPostConstructElement(DevKitTypeElement typeElement) {
+    private DevKitExecutableElement getPostConstructElement(DevKitTypeElement typeElement) {
         List<DevKitExecutableElement> postConstructMethods = typeElement.getMethodsAnnotatedWith(PostConstruct.class);
         return !postConstructMethods.isEmpty() ? postConstructMethods.get(0) : null;
     }
 
-    private ExecutableElement getPreDestroyElement(DevKitTypeElement typeElement) {
+    private DevKitExecutableElement getPreDestroyElement(DevKitTypeElement typeElement) {
         List<DevKitExecutableElement> preDestroyMethods = typeElement.getMethodsAnnotatedWith(PreDestroy.class);
         return !preDestroyMethods.isEmpty() ? preDestroyMethods.get(0) : null;
     }

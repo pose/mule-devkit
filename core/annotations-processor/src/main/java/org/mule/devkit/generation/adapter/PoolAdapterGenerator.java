@@ -29,6 +29,7 @@ import org.mule.config.PoolingProfile;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.NamingContants;
+import org.mule.devkit.model.DevKitFieldElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.DefinedClass;
@@ -41,9 +42,6 @@ import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.Variable;
 import org.mule.util.pool.DefaultLifecycleEnabledObjectPool;
 import org.mule.util.pool.LifecyleEnabledObjectPool;
-
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 
 public class PoolAdapterGenerator extends AbstractMessageGenerator {
 
@@ -59,7 +57,7 @@ public class PoolAdapterGenerator extends AbstractMessageGenerator {
         poolAdapter.javadoc().add(ref(typeElement.asType()));
         poolAdapter.javadoc().add(" that enables pooling on the POJO.");
 
-        for (VariableElement field : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
+        for (DevKitFieldElement field : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
             FieldVariable configField = poolAdapter.field(Modifier.PRIVATE, ref(field.asType()), field.getSimpleName().toString());
             generateSetter(poolAdapter, configField);
         }
@@ -98,7 +96,7 @@ public class PoolAdapterGenerator extends AbstractMessageGenerator {
         startMethod._throws(MuleException.class);
 
         Variable objectFactoryField = startMethod.body().decl(objectFactory, "objectFactory", ExpressionFactory._new(objectFactory));
-        for (VariableElement field : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
+        for (DevKitFieldElement field : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
             startMethod.body().add(objectFactoryField.invoke("set" + StringUtils.capitalize(field.getSimpleName().toString())).arg(ExpressionFactory._this().ref(field.getSimpleName().toString())));
         }
 
@@ -112,7 +110,7 @@ public class PoolAdapterGenerator extends AbstractMessageGenerator {
         startMethod.body().add(lifecyleEnabledObjectPool.invoke("start"));
     }
 
-    private DefinedClass getPoolAdapterClass(TypeElement typeElement) {
+    private DefinedClass getPoolAdapterClass(DevKitTypeElement typeElement) {
         String poolAdapterName = context.getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.POOL_ADAPTER_CLASS_NAME_SUFFIX);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(poolAdapterName));
 

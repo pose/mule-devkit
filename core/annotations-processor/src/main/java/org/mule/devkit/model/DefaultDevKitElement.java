@@ -17,99 +17,75 @@
 package org.mule.devkit.model;
 
 import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ElementVisitor;
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
-import javax.lang.model.element.TypeParameterElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Set;
 
-public class ExecutableElementImpl implements ExecutableElement {
-    private ExecutableElement executableElement;
+public abstract class DefaultDevKitElement<T extends Element, P extends DevKitElement> implements DevKitElement<T, P> {
+    protected T innerElement;
+    protected P parent;
 
-    public ExecutableElementImpl(ExecutableElement executableElement) {
-        this.executableElement = executableElement;
+    public DefaultDevKitElement(T element, P parent) {
+        this.innerElement = element;
+        this.parent = parent;
     }
 
-    @Override
-    public List<? extends TypeParameterElement> getTypeParameters() {
-        return executableElement.getTypeParameters();
+    public P parent() {
+        return this.parent;
     }
 
-    @Override
-    public TypeMirror getReturnType() {
-        return executableElement.getReturnType();
-    }
-
-    @Override
-    public List<? extends VariableElement> getParameters() {
-        return executableElement.getParameters();
-    }
-
-    @Override
-    public boolean isVarArgs() {
-        return executableElement.isVarArgs();
-    }
-
-    @Override
-    public List<? extends TypeMirror> getThrownTypes() {
-        return executableElement.getThrownTypes();
-    }
-
-    @Override
-    public AnnotationValue getDefaultValue() {
-        return executableElement.getDefaultValue();
+    public T unwrap() {
+        return innerElement;
     }
 
     @Override
     public TypeMirror asType() {
-        return executableElement.asType();
+        return innerElement.asType();
     }
 
     @Override
     public ElementKind getKind() {
-        return executableElement.getKind();
+        return innerElement.getKind();
     }
 
     @Override
     public List<? extends AnnotationMirror> getAnnotationMirrors() {
-        return executableElement.getAnnotationMirrors();
+        return innerElement.getAnnotationMirrors();
     }
 
     @Override
     public <A extends Annotation> A getAnnotation(Class<A> aClass) {
-        return executableElement.getAnnotation(aClass);
+        return innerElement.getAnnotation(aClass);
     }
 
     @Override
     public Set<Modifier> getModifiers() {
-        return executableElement.getModifiers();
+        return innerElement.getModifiers();
     }
 
     @Override
     public Name getSimpleName() {
-        return executableElement.getSimpleName();
+        return innerElement.getSimpleName();
     }
 
     @Override
     public Element getEnclosingElement() {
-        return executableElement.getEnclosingElement();
+        return innerElement.getEnclosingElement();
     }
 
     @Override
     public List<? extends Element> getEnclosedElements() {
-        return executableElement.getEnclosedElements();
+        return innerElement.getEnclosedElements();
     }
 
     @Override
     public <R, P> R accept(ElementVisitor<R, P> rpElementVisitor, P p) {
-        return executableElement.accept(rpElementVisitor, p );
+        return innerElement.accept(rpElementVisitor, p);
     }
 }

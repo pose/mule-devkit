@@ -36,8 +36,6 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 
-import javax.lang.model.element.TypeElement;
-
 public class AuthorizeBeanDefinitionParserGenerator extends AbstractMessageGenerator {
     public static final String AUTHORIZE_DEFINITION_PARSER_ROLE = "AuthorizeDefinitionParser";
 
@@ -78,7 +76,7 @@ public class AuthorizeBeanDefinitionParserGenerator extends AbstractMessageGener
         parse.body()._return(definition);
     }
 
-    private DefinedClass getAuthorizeBeanDefinitionParserClass(TypeElement type) {
+    private DefinedClass getAuthorizeBeanDefinitionParserClass(DevKitTypeElement type) {
         String httpCallbackClassName = context.getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, NamingContants.AUTHORIZE_DEFINITION_PARSER_CLASS_NAME);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(httpCallbackClassName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(httpCallbackClassName), new Class[]{BeanDefinitionParser.class});

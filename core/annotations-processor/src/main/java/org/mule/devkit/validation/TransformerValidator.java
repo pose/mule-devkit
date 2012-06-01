@@ -19,6 +19,7 @@ package org.mule.devkit.validation;
 
 import org.mule.api.annotations.Transformer;
 import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitTypeElement;
 
 import javax.lang.model.element.AnnotationMirror;
@@ -37,7 +38,7 @@ public class TransformerValidator implements Validator {
 
     @Override
     public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
-        for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Transformer.class)) {
+        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Transformer.class)) {
 
             if (!method.getModifiers().contains(Modifier.STATIC)) {
                 throw new ValidationException(method, "@Transformer must be a static method");
@@ -66,7 +67,7 @@ public class TransformerValidator implements Validator {
         }
     }
 
-    private List<? extends AnnotationValue> getSourceTypes(ExecutableElement method) {
+    private List<? extends AnnotationValue> getSourceTypes(DevKitExecutableElement method) {
         String transformerAnnotationName = Transformer.class.getName();
         List<? extends AnnotationMirror> annotationMirrors = method.getAnnotationMirrors();
         for (AnnotationMirror annotationMirror : annotationMirrors) {

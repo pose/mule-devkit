@@ -27,8 +27,6 @@ import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.TypeReference;
 
-import javax.lang.model.element.TypeElement;
-
 public class CapabilitiesAdapterGenerator extends AbstractModuleGenerator {
 
     @Override
@@ -47,7 +45,7 @@ public class CapabilitiesAdapterGenerator extends AbstractModuleGenerator {
 
     }
 
-    private DefinedClass getCapabilitiesAdapterClass(TypeElement typeElement) {
+    private DefinedClass getCapabilitiesAdapterClass(DevKitTypeElement typeElement) {
         String lifecycleAdapterName = context.getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.CAPABILITIES_ADAPTER_CLASS_NAME_SUFFIX);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(lifecycleAdapterName));
 

@@ -33,6 +33,7 @@ import org.mule.api.store.ObjectStoreManager;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.NamingContants;
+import org.mule.devkit.model.DevKitFieldElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.Cast;
 import org.mule.devkit.model.code.Conditional;
@@ -47,8 +48,6 @@ import org.mule.devkit.model.code.Variable;
 import org.mule.util.queue.QueueManager;
 
 import javax.inject.Inject;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.transaction.TransactionManager;
 
 public class InjectAdapterGenerator extends AbstractModuleGenerator {
@@ -69,7 +68,7 @@ public class InjectAdapterGenerator extends AbstractModuleGenerator {
         setMuleContext.annotate(Override.class);
         Variable context = setMuleContext.param(ref(MuleContext.class), "context");
 
-        for (VariableElement variable : typeElement.getFieldsAnnotatedWith(Inject.class)) {
+        for (DevKitFieldElement variable : typeElement.getFieldsAnnotatedWith(Inject.class)) {
             if (variable.asType().toString().startsWith(MuleContext.class.getName())) {
                 setMuleContext.body().add(ExpressionFactory._super().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(context));
             } else if (variable.asType().toString().startsWith(ObjectStoreManager.class.getName())) {
@@ -121,7 +120,7 @@ public class InjectAdapterGenerator extends AbstractModuleGenerator {
         }
     }
 
-    private DefinedClass getMuleContextAwareAdapter(TypeElement typeElement) {
+    private DefinedClass getMuleContextAwareAdapter(DevKitTypeElement typeElement) {
         String muleContextAwareAdapter = context.getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.INJECTION_ADAPTER_CLASS_NAME_SUFFIX);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(muleContextAwareAdapter));
 
