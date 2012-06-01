@@ -340,7 +340,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             first = false;
         }
         messageProcessorClass.javadoc().add(")} method in ");
-        messageProcessorClass.javadoc().add(ref(executableElement.getEnclosingElement().asType()));
+        messageProcessorClass.javadoc().add(ref(executableElement.parent().asType()));
         messageProcessorClass.javadoc().add(". For each argument there is a field in this processor to match it. ");
         messageProcessorClass.javadoc().add(" Before invoking the actual method the processor will evaluate and transform");
         messageProcessorClass.javadoc().add(" where possible to the expected argument type.");

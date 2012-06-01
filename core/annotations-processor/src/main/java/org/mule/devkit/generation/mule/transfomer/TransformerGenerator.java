@@ -107,7 +107,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
         TryStatement tryBlock = doTransform.body()._try();
 
         // do something
-        Invocation invoke = ref(executableElement.getEnclosingElement().asType()).boxify().staticInvoke(executableElement.getSimpleName().toString());
+        Invocation invoke = ref(executableElement.parent().asType()).boxify().staticInvoke(executableElement.getSimpleName().toString());
 
         TypeMirror expectedType = executableElement.getParameters().get(0).asType();
 

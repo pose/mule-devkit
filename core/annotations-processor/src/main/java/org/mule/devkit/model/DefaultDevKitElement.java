@@ -81,11 +81,6 @@ public class DefaultDevKitElement<T extends Element, P extends DevKitElement> im
     }
 
     @Override
-    public Element getEnclosingElement() {
-        return innerElement.getEnclosingElement();
-    }
-
-    @Override
     public List<? extends Element> getEnclosedElements() {
         return innerElement.getEnclosedElements();
     }

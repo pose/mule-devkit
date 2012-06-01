@@ -87,7 +87,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
             first = false;
         }
         messageSourceClass.javadoc().add(")} method in ");
-        messageSourceClass.javadoc().add(ref(executableElement.getEnclosingElement().asType()));
+        messageSourceClass.javadoc().add(ref(executableElement.parent().asType()));
         messageSourceClass.javadoc().add(" as a message source capable of generating Mule events. ");
         messageSourceClass.javadoc().add(" The POJO's method is invoked in its own thread.");
 
