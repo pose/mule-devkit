@@ -20,19 +20,20 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Types;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DefaultDevKitExecutableElement extends DefaultDevKitElement<ExecutableElement, DevKitTypeElement> implements DevKitExecutableElement {
-    public DefaultDevKitExecutableElement(ExecutableElement element, DevKitTypeElement parent) {
-        super(element, parent);
+    public DefaultDevKitExecutableElement(ExecutableElement element, DevKitTypeElement parent, Types types) {
+        super(element, parent, types);
     }
 
     @Override
     public List<DevKitParameterElement> getParameters() {
         List<DevKitParameterElement> parameters = new ArrayList<DevKitParameterElement>();
         for(VariableElement variableElement : innerElement.getParameters() ) {
-            parameters.add(new DefaultDevKitParameterElement(variableElement, this));
+            parameters.add(new DefaultDevKitParameterElement(variableElement, this, types));
         }
 
         return parameters;

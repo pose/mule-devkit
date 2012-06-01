@@ -78,7 +78,8 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
                             //Element enumElement = context.getTypeUtils().asElement(variableTypeParameter);
                             DevKitElement<Element, DevKitParameterElement> enumElement = new DefaultDevKitElement<Element, DevKitParameterElement>(
                                     context.getTypeUtils().asElement(variableTypeParameter),
-                                    variable
+                                    variable,
+                                    null
                             );
                             registerEnumTransformer(enumElement);
                             context.registerEnum(variableTypeParameter);

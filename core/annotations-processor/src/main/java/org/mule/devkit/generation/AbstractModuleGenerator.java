@@ -136,11 +136,11 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
     }
 
     protected DevKitExecutableElement connectForMethod(DevKitExecutableElement executableElement) {
-        return connectMethodForClass(new DefaultDevKitTypeElement((TypeElement) executableElement.getEnclosingElement()));
+        return connectMethodForClass(executableElement.parent());
     }
 
     protected DevKitExecutableElement connectionIdentifierForMethod(DevKitExecutableElement executableElement) {
-        return connectionIdentifierMethodForClass(new DefaultDevKitTypeElement((TypeElement) executableElement.getEnclosingElement()));
+        return connectionIdentifierMethodForClass(executableElement.parent());
     }
 
     protected void generateIsCapableOf(DevKitTypeElement typeElement, DefinedClass capabilitiesAdapter) {

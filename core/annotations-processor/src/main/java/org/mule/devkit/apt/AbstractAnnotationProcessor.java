@@ -61,7 +61,7 @@ public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
             Set<? extends Element> elements = env.getElementsAnnotatedWith(annotation);
             Set<TypeElement> typeElements = ElementFilter.typesIn(elements);
             for (TypeElement e : typeElements) {
-                DevKitTypeElement devKitTypeElement = new DefaultDevKitTypeElement(e);
+                DevKitTypeElement devKitTypeElement = new DefaultDevKitTypeElement(e, processingEnv.getTypeUtils());
                 context.note("Validating " + devKitTypeElement.getSimpleName().toString() + " class");
                 for (Validator validator : getValidators()) {
                     try {
@@ -75,7 +75,7 @@ public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
                 }
             }
             for (TypeElement e : typeElements) {
-                DevKitTypeElement devKitTypeElement = new DefaultDevKitTypeElement(e);
+                DevKitTypeElement devKitTypeElement = new DefaultDevKitTypeElement(e, processingEnv.getTypeUtils());
                 context.note("Generating code for " + devKitTypeElement.getSimpleName().toString() + " class");
                 for (Generator generator : getGenerators()) {
                     try {

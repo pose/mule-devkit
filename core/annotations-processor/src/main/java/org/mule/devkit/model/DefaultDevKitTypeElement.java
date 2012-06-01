@@ -36,14 +36,15 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
+import javax.lang.model.util.Types;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DefaultDevKitTypeElement extends DefaultDevKitElement<TypeElement, DevKitTypeElement> implements DevKitTypeElement {
 
-    public DefaultDevKitTypeElement(TypeElement innerElement) {
-        super(innerElement, null);
+    public DefaultDevKitTypeElement(TypeElement innerElement, Types types) {
+        super(innerElement, null, types);
     }
 
     @Override
@@ -163,7 +164,7 @@ public class DefaultDevKitTypeElement extends DefaultDevKitElement<TypeElement, 
     public List<DevKitFieldElement> getFields() {
         List<DevKitFieldElement> fields = new ArrayList<DevKitFieldElement>();
         for(VariableElement variableElement : ElementFilter.fieldsIn(innerElement.getEnclosedElements()) ) {
-            fields.add(new DefaultDevKitFieldElement(variableElement, this));
+            fields.add(new DefaultDevKitFieldElement(variableElement, this, types));
         }
 
         return fields;
@@ -173,7 +174,7 @@ public class DefaultDevKitTypeElement extends DefaultDevKitElement<TypeElement, 
     public List<DevKitExecutableElement> getMethods() {
         List<DevKitExecutableElement> methods = new ArrayList<DevKitExecutableElement>();
         for(ExecutableElement executableElement : ElementFilter.methodsIn(innerElement.getEnclosedElements()) ) {
-            methods.add(new DefaultDevKitExecutableElement(executableElement, this));
+            methods.add(new DefaultDevKitExecutableElement(executableElement, this, types));
         }
 
         return methods;

@@ -23,6 +23,7 @@ import javax.lang.model.element.ElementVisitor;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Types;
 import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Set;
@@ -30,10 +31,12 @@ import java.util.Set;
 public class DefaultDevKitElement<T extends Element, P extends DevKitElement> implements DevKitElement<T, P> {
     protected T innerElement;
     protected P parent;
+    protected Types types;
 
-    public DefaultDevKitElement(T element, P parent) {
+    public DefaultDevKitElement(T element, P parent, Types types) {
         this.innerElement = element;
         this.parent = parent;
+        this.types = types;
     }
 
     public P parent() {

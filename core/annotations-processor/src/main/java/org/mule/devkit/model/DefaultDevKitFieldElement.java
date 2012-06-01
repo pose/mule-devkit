@@ -17,9 +17,10 @@
 package org.mule.devkit.model;
 
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.util.Types;
 
 public class DefaultDevKitFieldElement extends DefaultDevKitVariableElement<DevKitTypeElement> implements DevKitFieldElement {
-    public DefaultDevKitFieldElement(VariableElement variableElement, DevKitTypeElement parent) {
-        super(variableElement, parent);
+    public DefaultDevKitFieldElement(VariableElement variableElement, DevKitTypeElement parent, Types types) {
+        super(variableElement, parent, types);
     }
 }
