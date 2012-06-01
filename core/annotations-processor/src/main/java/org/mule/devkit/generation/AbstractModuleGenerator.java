@@ -28,6 +28,7 @@ import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.devkit.model.DefaultDevKitTypeElement;
 import org.mule.devkit.model.DevKitExecutableElement;
+import org.mule.devkit.model.DevKitFieldElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
@@ -106,8 +107,8 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
     }
 
     private String methodForFieldAnnotatedWith(DevKitTypeElement typeElement, Class<? extends Annotation> annotation, String prefix) {
-        List<VariableElement> fields = ElementFilter.fieldsIn(typeElement.getEnclosedElements());
-        for (VariableElement field : fields) {
+        List<DevKitFieldElement> fields = typeElement.getFields();
+        for (DevKitFieldElement field : fields) {
             if (field.getAnnotation(annotation) != null) {
                 return prefix + StringUtils.capitalize(field.getSimpleName().toString());
             }

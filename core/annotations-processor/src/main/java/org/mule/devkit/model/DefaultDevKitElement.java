@@ -70,11 +70,6 @@ public class DefaultDevKitElement<T extends Element, P extends DevKitElement> im
         return innerElement.getSimpleName();
     }
 
-    @Override
-    public List<? extends Element> getEnclosedElements() {
-        return innerElement.getEnclosedElements();
-    }
-
 
     @Override
     public boolean isXmlType() {

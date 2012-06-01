@@ -33,8 +33,6 @@ public interface DevKitElement<T extends Element, P extends DevKitElement> exten
 
     Name getSimpleName();
 
-    List<? extends Element> getEnclosedElements();
-
     boolean isXmlType();
 
     boolean isPublic();
