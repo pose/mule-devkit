@@ -241,11 +241,11 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
     }
 
     private boolean isSimpleMap(DevKitVariableElement parameter) {
-        return parameter.isMap() && (!parameter.hasTypeArguments() || !((DevKitTypeElement)parameter.getTypeArguments().get(1)).isCollection());
+        return parameter.isMap() && (!parameter.hasTypeArguments() || !((DevKitElement)parameter.getTypeArguments().get(1)).isCollection());
     }
 
     private boolean isSimpleList(DevKitVariableElement parameter) {
-        return parameter.isArrayOrList() && (!parameter.hasTypeArguments() || !((DevKitTypeElement)parameter.getTypeArguments().get(0)).isCollection());
+        return parameter.isArrayOrList() && (!parameter.hasTypeArguments() || !((DevKitElement)parameter.getTypeArguments().get(0)).isCollection());
     }
 
     private NestedElementReference createChildElement(DevKitVariableElement parameter, String localId) {
