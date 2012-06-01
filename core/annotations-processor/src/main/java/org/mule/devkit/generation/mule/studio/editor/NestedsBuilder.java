@@ -24,6 +24,7 @@ import org.mule.api.annotations.Transformer;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.spring.SchemaGenerator;
 import org.mule.devkit.model.DefaultDevKitElement;
+import org.mule.devkit.model.DevKitElement;
 import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.DevKitVariableElement;
@@ -236,7 +237,7 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
     }
 
     private boolean isListOfMaps(DevKitVariableElement parameter) {
-        return parameter.isArrayOrList() && parameter.hasTypeArguments() && ((DevKitTypeElement)parameter.getTypeArguments().get(0)).isMap();
+        return parameter.isArrayOrList() && parameter.hasTypeArguments() && ((DevKitElement)parameter.getTypeArguments().get(0)).isMap();
     }
 
     private boolean isSimpleMap(DevKitVariableElement parameter) {
