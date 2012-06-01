@@ -30,6 +30,7 @@ import org.mule.devkit.generation.spring.SchemaGenerator;
 import org.mule.devkit.generation.spring.SchemaTypeConversion;
 import org.mule.devkit.model.DevKitElement;
 import org.mule.devkit.model.DevKitExecutableElement;
+import org.mule.devkit.model.DevKitParameterElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.DevKitVariableElement;
 import org.mule.devkit.model.studio.AttributeType;
@@ -314,7 +315,7 @@ public class MuleStudioUtils {
         if (description != null && StringUtils.isNotBlank(description.value())) {
             return formatDescription(description.value());
         }
-        if (element.getKind() == ElementKind.PARAMETER) {
+        if (element instanceof DevKitParameterElement) {
             return formatDescription(javaDocUtils.getParameterSummary(element.getSimpleName().toString(), element.parent()));
         }
         return formatDescription(javaDocUtils.getSummary(element));

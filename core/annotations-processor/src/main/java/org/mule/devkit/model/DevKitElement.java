@@ -31,8 +31,6 @@ public interface DevKitElement<T extends Element, P extends DevKitElement> exten
 
     TypeMirror asType();
 
-    ElementKind getKind();
-
     Set<Modifier> getModifiers();
 
     Name getSimpleName();

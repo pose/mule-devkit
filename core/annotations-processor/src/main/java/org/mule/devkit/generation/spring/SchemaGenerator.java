@@ -372,62 +372,60 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         complexContentExtension.setSequence(all);
 
         if (element != null) {
-            if (element.getKind() == ElementKind.METHOD) {
-                int requiredChildElements = 0;
-                for (DevKitParameterElement variable : element.getParameters()) {
-                    if (context.getTypeMirrorUtils().ignoreParameter(variable)) {
-                        continue;
-                    }
-                    if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
-                        requiredChildElements++;
-                    } else if (variable.isXmlType()) {
-                        requiredChildElements++;
-                    } else if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
-                        requiredChildElements++;
-                    }
+            int requiredChildElements = 0;
+            for (DevKitParameterElement variable : element.getParameters()) {
+                if (context.getTypeMirrorUtils().ignoreParameter(variable)) {
+                    continue;
                 }
-                for (DevKitParameterElement variable : element.getParameters()) {
-                    if (context.getTypeMirrorUtils().ignoreParameter(variable)) {
-                        continue;
-                    }
-                    if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
-                        if (requiredChildElements == 1) {
-                            GroupRef groupRef = generateNestedProcessorGroup();
-                            complexContentExtension.setGroup(groupRef);
-                            complexContentExtension.setAll(null);
+                if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
+                    requiredChildElements++;
+                } else if (variable.isXmlType()) {
+                    requiredChildElements++;
+                } else if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
+                    requiredChildElements++;
+                }
+            }
+            for (DevKitParameterElement variable : element.getParameters()) {
+                if (context.getTypeMirrorUtils().ignoreParameter(variable)) {
+                    continue;
+                }
+                if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
+                    if (requiredChildElements == 1) {
+                        GroupRef groupRef = generateNestedProcessorGroup();
+                        complexContentExtension.setGroup(groupRef);
+                        complexContentExtension.setAll(null);
 
-                            Attribute attribute = new Attribute();
-                            attribute.setUse(SchemaConstants.USE_OPTIONAL);
-                            attribute.setName("text");
-                            attribute.setType(SchemaConstants.STRING);
+                        Attribute attribute = new Attribute();
+                        attribute.setUse(SchemaConstants.USE_OPTIONAL);
+                        attribute.setName("text");
+                        attribute.setType(SchemaConstants.STRING);
 
-                            complexContentExtension.getAttributeOrAttributeGroup().add(attribute);
-                        } else {
-                            generateNestedProcessorElement(all, variable);
-                        }
-                    } else if (variable.isXmlType()) {
-                        all.getParticle().add(objectFactory.createElement(generateXmlElement(variable.getSimpleName().toString(), targetNamespace)));
-                    } else if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
-                        generateCollectionElement(schema, targetNamespace, all, variable);
+                        complexContentExtension.getAttributeOrAttributeGroup().add(attribute);
                     } else {
-                        complexContentExtension.getAttributeOrAttributeGroup().add(createParameterAttribute(schema, variable));
+                        generateNestedProcessorElement(all, variable);
                     }
+                } else if (variable.isXmlType()) {
+                    all.getParticle().add(objectFactory.createElement(generateXmlElement(variable.getSimpleName().toString(), targetNamespace)));
+                } else if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
+                    generateCollectionElement(schema, targetNamespace, all, variable);
+                } else {
+                    complexContentExtension.getAttributeOrAttributeGroup().add(createParameterAttribute(schema, variable));
+                }
+            }
+
+            DevKitExecutableElement connectExecutableElement = connectForMethod(element);
+            if (connectExecutableElement != null) {
+                if (element.getAnnotation(Processor.class) != null) {
+                    Attribute retryMaxAttr = createAttribute(ATTRIBUTE_RETRY_MAX, true, SchemaConstants.STRING, ATTRIBUTE_RETRY_MAX_DESCRIPTION);
+                    retryMaxAttr.setDefault("1");
+                    complexContentExtension.getAttributeOrAttributeGroup().add(retryMaxAttr);
                 }
 
-                DevKitExecutableElement connectExecutableElement = connectForMethod(element);
-                if (connectExecutableElement != null) {
-                    if (element.getAnnotation(Processor.class) != null) {
-                        Attribute retryMaxAttr = createAttribute(ATTRIBUTE_RETRY_MAX, true, SchemaConstants.STRING, ATTRIBUTE_RETRY_MAX_DESCRIPTION);
-                        retryMaxAttr.setDefault("1");
-                        complexContentExtension.getAttributeOrAttributeGroup().add(retryMaxAttr);
-                    }
-
-                    for (DevKitParameterElement connectVariable : connectExecutableElement.getParameters()) {
-                        if (context.getTypeMirrorUtils().isCollection(connectVariable.asType())) {
-                            generateCollectionElement(schema, targetNamespace, all, connectVariable, true);
-                        } else {
-                            complexContentExtension.getAttributeOrAttributeGroup().add(createParameterAttribute(schema, connectVariable, true));
-                        }
+                for (DevKitParameterElement connectVariable : connectExecutableElement.getParameters()) {
+                    if (context.getTypeMirrorUtils().isCollection(connectVariable.asType())) {
+                        generateCollectionElement(schema, targetNamespace, all, connectVariable, true);
+                    } else {
+                        complexContentExtension.getAttributeOrAttributeGroup().add(createParameterAttribute(schema, connectVariable, true));
                     }
                 }
             }

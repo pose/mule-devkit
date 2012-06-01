@@ -56,11 +56,6 @@ public class DefaultDevKitElement<T extends Element, P extends DevKitElement> im
     }
 
     @Override
-    public ElementKind getKind() {
-        return innerElement.getKind();
-    }
-
-    @Override
     public List<? extends AnnotationMirror> getAnnotationMirrors() {
         return innerElement.getAnnotationMirrors();
     }
