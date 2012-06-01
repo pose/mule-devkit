@@ -67,20 +67,6 @@ public class TypeMirrorUtils {
         this.types = types;
     }
 
-    public boolean isXmlType(TypeMirror type) {
-        if (type.getKind() == TypeKind.DECLARED) {
-
-            DeclaredType declaredType = (DeclaredType) type;
-            XmlType xmlType = declaredType.asElement().getAnnotation(XmlType.class);
-
-            if (xmlType != null) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     public boolean isCollection(TypeMirror type) {
         return isArrayOrList(type) || isMap(type);
     }

@@ -380,7 +380,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                     }
                     if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
                         requiredChildElements++;
-                    } else if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
+                    } else if (variable.isXmlType()) {
                         requiredChildElements++;
                     } else if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
                         requiredChildElements++;
@@ -405,7 +405,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                         } else {
                             generateNestedProcessorElement(all, variable);
                         }
-                    } else if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
+                    } else if (variable.isXmlType()) {
                         all.getParticle().add(objectFactory.createElement(generateXmlElement(variable.getSimpleName().toString(), targetNamespace)));
                     } else if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
                         generateCollectionElement(schema, targetNamespace, all, variable);

@@ -65,7 +65,7 @@ public class JaxbTransformerGenerator extends AbstractModuleGenerator {
     protected void doGenerate(DevKitTypeElement typeElement) {
         for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Processor.class)) {
             for (DevKitParameterElement variable : executableElement.getParameters()) {
-                if (context.getTypeMirrorUtils().isXmlType(variable.asType()) && !context.isJaxbElementRegistered(variable.asType())) {
+                if (variable.isXmlType() && !context.isJaxbElementRegistered(variable.asType())) {
                     // get class
                     DefinedClass jaxbTransformerClass = getJaxbTransformerClass(executableElement, variable);
 

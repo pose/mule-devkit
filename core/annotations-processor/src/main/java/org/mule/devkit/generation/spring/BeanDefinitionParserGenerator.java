@@ -141,7 +141,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
             if (SchemaTypeConversion.isSupported(variable.asType().toString())) {
                 generateParseSupportedType(parse.body(), element, builder, fieldName);
-            } else if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
+            } else if (variable.isXmlType()) {
                 generateParseXmlType(parse.body(), element, builder, fieldName);
             } else if (context.getTypeMirrorUtils().isArrayOrList(variable.asType())) {
                 Variable listElement = parse.body().decl(ref(org.w3c.dom.Element.class),
@@ -401,7 +401,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             }
             if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
                 requiredChildElements++;
-            } else if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
+            } else if (variable.isXmlType()) {
                 requiredChildElements++;
             } else if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
                 requiredChildElements++;
@@ -424,7 +424,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                 }
             } else if (SchemaTypeConversion.isSupported(variable.asType().toString())) {
                 generateParseSupportedType(parse.body(), element, builder, fieldName);
-            } else if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
+            } else if (variable.isXmlType()) {
                 generateParseXmlType(parse.body(), element, builder, fieldName);
             } else if (context.getTypeMirrorUtils().isArrayOrList(variable.asType())) {
                 Variable listElement = parse.body().decl(ref(org.w3c.dom.Element.class),
