@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <name>Mule DevKit</name>
@@ -51,7 +52,7 @@
             <plugins>
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>2.1</version>
+                    <version>2.5</version>
                     <configuration>
                         <source>${jdk.version}</source>
                         <target>${jdk.version}</target>
@@ -61,37 +62,7 @@
             </plugins>
         </pluginManagement>
         <plugins>
-            <plugin>
-                <groupId>com.mycila.maven-license-plugin</groupId>
-                <artifactId>maven-license-plugin</artifactId>
-                <version>1.8.0</version>
-                <configuration>
-                    <header>LICENSE_HEADER</header>
-                    <excludes>
-                        <exclude>target/**</exclude>
-                        <exclude>.gitignore</exclude>
-                        <exclude>**/*.txt</exclude>
-                        <exclude>**/*.ftl</exclude>
-                        <exclude>**/build-number.txt</exclude>
-                        <exclude>**/*.ftl</exclude>
-                        <exclude>**/org/mule/devkit/model/code/**</exclude>
-                        <exclude>**/org/mule/devkit/doclet/**</exclude>
-                        <exclude>**/assets/**</exclude>
-                        <exclude>**/*.xsd</exclude>
-                        <exclude>**/*.properties</exclude>
-                        <exclude>**/*.xml</exclude>
-						<exclude>**/archetype-resources/**</exclude>
-                        <exclude>**/src/main/java/package.html</exclude>
-                    </excludes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
@@ -115,45 +86,89 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>2.1.2</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <version>2.5</version>
-                <executions>
-                    <execution>
-                        <id>pmd</id>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                        <configuration>
-                            <rulesets>
-                                <ruleset>${project.basedir}/pmd.xml</ruleset>
-                            </rulesets>
-                            <targetJdk>${jdk.version}</targetJdk>
-                            <verbose>true</verbose>
-                            <aggregate>true</aggregate>
-                            <linkXRef>false</linkXRef>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 
     <profiles>
+        <profile>
+            <id>ci</id>
+            <activation>
+                <property>
+                    <name>env</name>
+                    <value>ci</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-pmd-plugin</artifactId>
+                        <version>2.5</version>
+                        <executions>
+                            <execution>
+                                <id>pmd</id>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                                <configuration>
+                                    <rulesets>
+                                        <ruleset>${project.basedir}/pmd.xml</ruleset>
+                                    </rulesets>
+                                    <targetJdk>${jdk.version}</targetJdk>
+                                    <verbose>true</verbose>
+                                    <aggregate>true</aggregate>
+                                    <linkXRef>false</linkXRef>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.mycila.maven-license-plugin</groupId>
+                        <artifactId>maven-license-plugin</artifactId>
+                        <version>1.8.0</version>
+                        <configuration>
+                            <header>LICENSE_HEADER</header>
+                            <excludes>
+                                <exclude>target/**</exclude>
+                                <exclude>.gitignore</exclude>
+                                <exclude>**/*.txt</exclude>
+                                <exclude>**/*.ftl</exclude>
+                                <exclude>**/build-number.txt</exclude>
+                                <exclude>**/*.ftl</exclude>
+                                <exclude>**/org/mule/devkit/model/code/**</exclude>
+                                <exclude>**/org/mule/devkit/doclet/**</exclude>
+                                <exclude>**/assets/**</exclude>
+                                <exclude>**/*.xsd</exclude>
+                                <exclude>**/*.properties</exclude>
+                                <exclude>**/*.xml</exclude>
+                                <exclude>**/archetype-resources/**</exclude>
+                                <exclude>**/src/main/java/package.html</exclude>
+                            </excludes>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>2.1.2</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>windows_profile</id>
             <activation>
