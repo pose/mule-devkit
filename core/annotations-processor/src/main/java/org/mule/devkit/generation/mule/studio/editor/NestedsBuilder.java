@@ -176,7 +176,7 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
         attributeTypeForListValues.setName(nameUtils.singularize(localId));
         attributeTypeForListValues.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
         if (executableElement != null) {
-            attributeTypeForListValues.setDescription(helper.formatDescription(javaDocUtils.getParameterSummary(parameter.getSimpleName().toString(), executableElement)));
+            attributeTypeForListValues.setDescription(helper.formatDescription(javaDocUtils.getParameterSummary(parameter.getSimpleName().toString(), executableElement.unwrap())));
         } else {
             attributeTypeForListValues.setDescription(helper.formatDescription(javaDocUtils.getSummary(parameter)));
         }

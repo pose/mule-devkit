@@ -63,7 +63,6 @@ import org.mule.devkit.model.code.TypeVariable;
 import org.mule.devkit.model.code.Variable;
 import org.mule.expression.ExpressionUtils;
 
-import javax.lang.model.element.Element;
 import javax.lang.model.type.TypeKind;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -168,7 +167,7 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
 
         Invocation newArray = ExpressionFactory._new(ref(Class.class).array());
         for (DevKitParameterElement parameter : executableElement.getParameters()) {
-            if( parameter.asType().getKind() == TypeKind.BOOLEAN ||
+            if (parameter.asType().getKind() == TypeKind.BOOLEAN ||
                     parameter.asType().getKind() == TypeKind.BYTE ||
                     parameter.asType().getKind() == TypeKind.SHORT ||
                     parameter.asType().getKind() == TypeKind.CHAR ||
@@ -442,7 +441,7 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
         setName.body()._throw(ExpressionFactory._new(ref(UnsupportedOperationException.class)));
     }
 
-    private DefinedClass getEnricherClass(String name, Element variableElement) {
+    private DefinedClass getEnricherClass(String name, DevKitTypeElement variableElement) {
         String evaluatorClassName = context.getNameUtils().generateClassNameInPackage(variableElement, context.getNameUtils().camel(name) + NamingContants.EXPRESSION_ENRICHER_CLASS_NAME_SUFFIX);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(evaluatorClassName) + NamingContants.EXPRESSIONS_NAMESPACE);
         DefinedClass enricherClass = pkg._class(context.getNameUtils().getClassName(evaluatorClassName), new Class<?>[]{org.mule.api.expression.ExpressionEnricher.class});

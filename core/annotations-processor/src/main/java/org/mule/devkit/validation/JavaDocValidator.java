@@ -96,7 +96,7 @@ public class JavaDocValidator implements Validator {
 
         if (!method.getReturnType().toString().equals("void") &&
                 !method.getReturnType().toString().contains("StopSourceCallback")) {
-            if (!context.getJavaDocUtils().hasTag("return", method)) {
+            if (!context.getJavaDocUtils().hasTag("return", method.unwrap())) {
                 throw new ValidationException(typeElement, "The return type of a non-void method must be documented. Method " + method.getSimpleName().toString() + " is at fault. Missing @return.");
             }
         }
@@ -121,7 +121,7 @@ public class JavaDocValidator implements Validator {
 
     protected boolean exampleDoesNotExist(GeneratorContext context, DevKitExecutableElement method) throws ValidationException {
 
-        if (!context.getJavaDocUtils().hasTag("sample.xml", method)) {
+        if (!context.getJavaDocUtils().hasTag("sample.xml", method.unwrap())) {
             throw new ValidationException(method, "Method " + method.getSimpleName().toString() + " does not contain an example using {@sample.xml} tag.");
         }
 

@@ -18,12 +18,11 @@
 package org.mule.devkit.utils;
 
 import org.apache.commons.lang.StringUtils;
-import org.mule.devkit.model.DefaultDevKitTypeElement;
+import org.mule.devkit.model.DevKitElement;
 import org.mule.devkit.model.DevKitExecutableElement;
+import org.mule.devkit.model.DevKitParameterElement;
 import org.mule.devkit.model.DevKitTypeElement;
 
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.util.ElementFilter;
@@ -124,7 +123,7 @@ public class NameUtils {
     private static void uncountable(String word) {
         uncountable.add(word);
     }
-    
+
     public String camel(String uncamelCaseName) {
         String result = "";
         String[] parts = uncamelCaseName.split("-");
@@ -135,7 +134,7 @@ public class NameUtils {
 
         return result;
     }
-    
+
 
     public String uncamel(String camelCaseName) {
         String result = "";
@@ -230,14 +229,16 @@ public class NameUtils {
         return packageName + extraPackage + "." + className;
     }
 
-    public String generateClassNameInPackage(Element element, String className) {
-        Element enclosingElement = element.getEnclosingElement();
+    public String generateClassNameInPackage(DevKitElement element, String className) {
+        //Element enclosingElement = element.getEnclosingElement();
+        System.out.println("generateClassNameInPackage: " + element.getClass().getName());
         String packageName;
-        if (enclosingElement.getKind() == ElementKind.CLASS) {
-            packageName = getPackageName(getBinaryName((DevKitTypeElement) enclosingElement));
-        } else if (enclosingElement.getEnclosingElement() != null) {
-            DevKitTypeElement parentClass = new DefaultDevKitTypeElement(ElementFilter.typesIn(Arrays.asList(enclosingElement.getEnclosingElement())).get(0));
-            packageName = getPackageName(getBinaryName(parentClass));
+        if (element instanceof DevKitTypeElement) {
+            packageName = getPackageName(getBinaryName((DevKitTypeElement) element));
+        } else if (element instanceof DevKitParameterElement) {
+            packageName = getPackageName(getBinaryName((DevKitTypeElement) element.parent().parent()));
+        } else if (element.parent() instanceof DevKitTypeElement) {
+            packageName = getPackageName(getBinaryName((DevKitTypeElement) element.parent()));
         } else {
             // inner enum or parametrized type
             DeclaredType declaredType = (DeclaredType) element.asType();

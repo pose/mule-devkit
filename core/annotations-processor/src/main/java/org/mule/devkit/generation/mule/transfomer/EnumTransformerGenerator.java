@@ -26,6 +26,8 @@ import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.NamingContants;
+import org.mule.devkit.model.DefaultDevKitElement;
+import org.mule.devkit.model.DevKitElement;
 import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitFieldElement;
 import org.mule.devkit.model.DevKitParameterElement;
@@ -73,7 +75,11 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
                     DeclaredType variableType = (DeclaredType) variable.asType();
                     for (TypeMirror variableTypeParameter : variableType.getTypeArguments()) {
                         if (context.getTypeMirrorUtils().isEnum(variableTypeParameter) && !context.isEnumRegistered(variableTypeParameter)) {
-                            Element enumElement = context.getTypeUtils().asElement(variableTypeParameter);
+                            //Element enumElement = context.getTypeUtils().asElement(variableTypeParameter);
+                            DevKitElement<Element, DevKitParameterElement> enumElement = new DefaultDevKitElement<Element, DevKitParameterElement>(
+                                    context.getTypeUtils().asElement(variableTypeParameter),
+                                    variable
+                            );
                             registerEnumTransformer(enumElement);
                             context.registerEnum(variableTypeParameter);
                         }
@@ -96,7 +102,7 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
         }
     }
 
-    private void registerEnumTransformer(Element variableElement) {
+    private void registerEnumTransformer(DevKitElement variableElement) {
         // get class
         DefinedClass transformerClass = getEnumTransformerClass(variableElement);
 
@@ -173,7 +179,7 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
         registerSourceType.arg(ref(DataTypeFactory.class).staticInvoke("create").arg(ref(String.class).boxify().dotclass()));
     }
 
-    private DefinedClass getEnumTransformerClass(Element variableElement) {
+    private DefinedClass getEnumTransformerClass(DevKitElement variableElement) {
         javax.lang.model.element.Element enumElement = context.getTypeUtils().asElement(variableElement.asType());
         String transformerClassName = context.getNameUtils().generateClassNameInPackage(variableElement, enumElement.getSimpleName().toString() + NamingContants.ENUM_TRANSFORMER_CLASS_NAME_SUFFIX);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(transformerClassName) + NamingContants.TRANSFORMERS_NAMESPACE);

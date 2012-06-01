@@ -27,7 +27,7 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Set;
 
-public abstract class DefaultDevKitElement<T extends Element, P extends DevKitElement> implements DevKitElement<T, P> {
+public class DefaultDevKitElement<T extends Element, P extends DevKitElement> implements DevKitElement<T, P> {
     protected T innerElement;
     protected P parent;
 

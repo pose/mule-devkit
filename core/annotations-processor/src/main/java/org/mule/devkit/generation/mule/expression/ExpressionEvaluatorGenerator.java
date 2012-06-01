@@ -59,7 +59,6 @@ import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 import org.mule.expression.ExpressionUtils;
 
-import javax.lang.model.element.Element;
 import javax.lang.model.type.TypeKind;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -276,7 +275,7 @@ public class ExpressionEvaluatorGenerator extends AbstractMessageGenerator {
         setName.body()._throw(ExpressionFactory._new(ref(UnsupportedOperationException.class)));
     }
 
-    private DefinedClass getEvaluatorClass(String name, Element variableElement) {
+    private DefinedClass getEvaluatorClass(String name, DevKitTypeElement variableElement) {
         String evaluatorClassName = context.getNameUtils().generateClassNameInPackage(variableElement, context.getNameUtils().camel(name) + NamingContants.EXPRESSION_EVALUATOR_CLASS_NAME_SUFFIX);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(evaluatorClassName) + NamingContants.EXPRESSIONS_NAMESPACE);
         DefinedClass evaluator = pkg._class(context.getNameUtils().getClassName(evaluatorClassName), new Class<?>[]{org.mule.api.expression.ExpressionEvaluator.class});
