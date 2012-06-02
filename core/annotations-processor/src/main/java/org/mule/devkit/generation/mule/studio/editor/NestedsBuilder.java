@@ -140,8 +140,7 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
         if (((DeclaredType) parameter.asType()).getTypeArguments().isEmpty()) {
             attributeTypeForMapKey = new StringAttributeType();
         } else {
-            TypeMirror typeMirror = ((DeclaredType) parameter.asType()).getTypeArguments().get(0);
-            attributeTypeForMapKey = helper.createAttributeTypeIgnoreEnumsAndCollections(new DefaultDevKitElement(typeUtils.asElement(typeMirror), null, null));
+            attributeTypeForMapKey = helper.createAttributeTypeIgnoreEnumsAndCollections(((DevKitElement)parameter.getTypeArguments().get(0)));
             if (attributeTypeForMapKey == null) { // nested
                 attributeTypeForMapKey = new StringAttributeType();
             }
