@@ -25,7 +25,6 @@ import org.mule.api.annotations.display.Placement;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.mule.studio.editor.VariableComparator;
 import org.mule.devkit.model.DevKitVariableElement;
-import org.mule.devkit.utils.TypeMirrorUtils;
 
 import javax.lang.model.element.Name;
 import java.util.ArrayList;
@@ -52,13 +51,10 @@ public class VariableComparatorTest {
     private DevKitVariableElement unknownTypeVariable;
     @Mock
     private GeneratorContext context;
-    @Mock
-    private TypeMirrorUtils typeMirrorUtils;
 
     @Before
     public void setUpTests() throws Exception {
         MockitoAnnotations.initMocks(this);
-        when(context.getTypeMirrorUtils()).thenReturn(typeMirrorUtils);
         when(stringVariable.isString()).thenReturn(true);
         when(intVariable.isInteger()).thenReturn(true);
         when(enumVariable.isEnum()).thenReturn(true);
@@ -81,7 +77,7 @@ public class VariableComparatorTest {
         setName(intVariable, "d");
         setName(stringVariable, "e");
 
-        Collections.sort(variables, new VariableComparator(context));
+        Collections.sort(variables, new VariableComparator());
 
         assertEquals(intVariable, variables.get(0));
         assertEquals(stringVariable, variables.get(1));
@@ -99,7 +95,7 @@ public class VariableComparatorTest {
         variables.add(unknownTypeVariable);
         variables.add(booleanVariable);
 
-        Collections.sort(variables, new VariableComparator(context));
+        Collections.sort(variables, new VariableComparator());
 
         assertEquals(unknownTypeVariable, variables.get(0));
         assertEquals(booleanVariable, variables.get(1));
@@ -123,7 +119,7 @@ public class VariableComparatorTest {
         variables.add(stringVariable);
         variables.add(intVariable);
 
-        Collections.sort(variables, new VariableComparator(context));
+        Collections.sort(variables, new VariableComparator());
 
         assertEquals(stringVariable, variables.get(0));
         assertEquals(intVariable, variables.get(1));
@@ -144,7 +140,7 @@ public class VariableComparatorTest {
         variables.add(intVariable);
         variables.add(mapVariable);
 
-        Collections.sort(variables, new VariableComparator(context));
+        Collections.sort(variables, new VariableComparator());
 
         assertEquals(mapVariable, variables.get(0));
         assertEquals(intVariable, variables.get(1));
@@ -168,7 +164,7 @@ public class VariableComparatorTest {
         variables.add(stringVariable);
         variables.add(stringVariable2);
 
-        Collections.sort(variables, new VariableComparator(context));
+        Collections.sort(variables, new VariableComparator());
 
         assertEquals(stringVariable2, variables.get(0));
         assertEquals(stringVariable, variables.get(1));
@@ -192,7 +188,7 @@ public class VariableComparatorTest {
         variables.add(stringVariable);
         variables.add(stringVariable2);
 
-        Collections.sort(variables, new VariableComparator(context));
+        Collections.sort(variables, new VariableComparator());
 
         assertEquals(stringVariable2, variables.get(0));
         assertEquals(stringVariable, variables.get(1));

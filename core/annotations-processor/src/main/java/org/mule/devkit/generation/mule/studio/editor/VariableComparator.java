@@ -22,7 +22,6 @@ import org.mule.api.annotations.display.FriendlyName;
 import org.mule.api.annotations.display.Placement;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.model.DevKitVariableElement;
-import org.mule.devkit.utils.TypeMirrorUtils;
 
 import javax.lang.model.element.VariableElement;
 import java.util.Comparator;
@@ -31,11 +30,6 @@ public class VariableComparator implements Comparator<DevKitVariableElement> {
 
     private static final int VARIABLE1_FIRST = -1;
     private static final int VARIABLE2_FIRST = 1;
-    private TypeMirrorUtils typeMirrorUtils;
-
-    public VariableComparator(GeneratorContext context) {
-        typeMirrorUtils = context.getTypeMirrorUtils();
-    }
 
     /**
      * Compares two {@link VariableElement} using the following order:

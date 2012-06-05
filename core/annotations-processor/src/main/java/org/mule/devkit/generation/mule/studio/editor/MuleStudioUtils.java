@@ -47,7 +47,6 @@ import org.mule.devkit.model.studio.TextType;
 import org.mule.devkit.model.studio.UrlType;
 import org.mule.devkit.utils.JavaDocUtils;
 import org.mule.devkit.utils.NameUtils;
-import org.mule.devkit.utils.TypeMirrorUtils;
 import org.mule.util.StringUtils;
 
 import javax.xml.bind.JAXBElement;
@@ -60,12 +59,10 @@ public class MuleStudioUtils {
     private static final String ICON_PREFIX = "icons/small/";
     private NameUtils nameUtils;
     private JavaDocUtils javaDocUtils;
-    private TypeMirrorUtils typeMirrorUtils;
 
     public MuleStudioUtils(GeneratorContext context) {
         nameUtils = context.getNameUtils();
         javaDocUtils = context.getJavaDocUtils();
-        typeMirrorUtils = context.getTypeMirrorUtils();
     }
 
     public String formatCaption(String caption) {

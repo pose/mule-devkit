@@ -26,7 +26,6 @@ import org.mule.devkit.model.studio.StudioModel;
 import org.mule.devkit.utils.JavaDocUtils;
 import org.mule.devkit.utils.NameUtils;
 import org.mule.devkit.utils.SourceUtils;
-import org.mule.devkit.utils.TypeMirrorUtils;
 
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -52,7 +51,6 @@ public class GeneratorContext {
     private Map<String, DefinedClass> roles;
     private Types types;
     private Elements elements;
-    private TypeMirrorUtils typeMirrorUtils;
     private NameUtils nameUtils;
     private JavaDocUtils javaDocUtils;
     private Map<String, String> options;
@@ -68,7 +66,6 @@ public class GeneratorContext {
         roles = new HashMap<String, DefinedClass>();
         elements = env.getElementUtils();
         types = env.getTypeUtils();
-        typeMirrorUtils = new TypeMirrorUtils(this.types);
         nameUtils = new NameUtils(this.elements);
         javaDocUtils = new JavaDocUtils(this.elements);
         studioModel = new StudioModel(new FilerCodeWriter(env.getFiler()));
@@ -110,10 +107,6 @@ public class GeneratorContext {
 
     public DefinedClass getClassForRole(String role) {
         return roles.get(role);
-    }
-
-    public TypeMirrorUtils getTypeMirrorUtils() {
-        return typeMirrorUtils;
     }
 
     public NameUtils getNameUtils() {

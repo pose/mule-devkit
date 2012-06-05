@@ -37,7 +37,6 @@ import org.mule.devkit.model.studio.NestedElementReference;
 import org.mule.devkit.model.studio.ObjectFactory;
 import org.mule.devkit.utils.JavaDocUtils;
 import org.mule.devkit.utils.NameUtils;
-import org.mule.devkit.utils.TypeMirrorUtils;
 import org.mule.util.StringUtils;
 
 import javax.lang.model.element.Element;
@@ -62,7 +61,6 @@ public abstract class BaseStudioXmlBuilder {
     protected DevKitExecutableElement executableElement;
     protected NameUtils nameUtils;
     protected JavaDocUtils javaDocUtils;
-    protected TypeMirrorUtils typeMirrorUtils;
     protected Types typeUtils;
     protected String moduleName;
     protected GeneratorContext context;
@@ -72,7 +70,6 @@ public abstract class BaseStudioXmlBuilder {
         this.context = context;
         nameUtils = context.getNameUtils();
         javaDocUtils = context.getJavaDocUtils();
-        typeMirrorUtils = context.getTypeMirrorUtils();
         typeUtils = context.getTypeUtils();
         helper = new MuleStudioUtils(context);
         objectFactory = new ObjectFactory();
@@ -245,7 +242,7 @@ public abstract class BaseStudioXmlBuilder {
                 iterator.remove();
             }
         }
-        Collections.sort(parameters, new VariableComparator(context));
+        Collections.sort(parameters, new VariableComparator());
         return parameters;
     }
 
@@ -306,7 +303,7 @@ public abstract class BaseStudioXmlBuilder {
 
     private List<DevKitFieldElement> getConfigurableFieldsSorted() {
         List<DevKitFieldElement> configurableFields = typeElement.getFieldsAnnotatedWith(Configurable.class);
-        Collections.sort(configurableFields, new VariableComparator(context));
+        Collections.sort(configurableFields, new VariableComparator());
         return configurableFields;
     }
 }
