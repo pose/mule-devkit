@@ -23,6 +23,7 @@ import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.NamingContants;
+import org.mule.devkit.generation.spring.AbstractBeanDefinitionParserGenerator;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
@@ -33,6 +34,7 @@ import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.Variable;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 
@@ -60,16 +62,11 @@ public class AuthorizeBeanDefinitionParserGenerator extends AbstractMessageGener
         Variable builder = parse.body().decl(ref(BeanDefinitionBuilder.class), "builder",
                 ref(BeanDefinitionBuilder.class).staticInvoke("rootBeanDefinition").arg(messageProcessorClass.dotclass().invoke("getName")));
 
-        Variable configRef = parse.body().decl(ref(String.class), "configRef", element.invoke("getAttribute").arg("config-ref"));
-        Conditional ifConfigRef = parse.body()._if(Op.cand(Op.ne(configRef, ExpressionFactory._null()),
-                Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(configRef))));
-        ifConfigRef._then().add(builder.invoke("addPropertyValue").arg("moduleObject").arg(
-                configRef));
+        parse.body().invoke("parseConfigRef").arg(element).arg(builder);
 
         Variable definition = parse.body().decl(ref(BeanDefinition.class), "definition", builder.invoke("getBeanDefinition"));
 
-        parse.body().add(definition.invoke("setAttribute").arg(
-                ref(MuleHierarchicalBeanDefinitionParserDelegate.class).staticRef("MULE_NO_RECURSE")).arg(ref(Boolean.class).staticRef("TRUE")));
+        parse.body().invoke("setNoRecurseOnDefinition").arg(definition);
 
         parse.body().invoke("attachProcessorDefinition").arg(parserContext).arg(definition);
 
@@ -77,9 +74,10 @@ public class AuthorizeBeanDefinitionParserGenerator extends AbstractMessageGener
     }
 
     private DefinedClass getAuthorizeBeanDefinitionParserClass(DevKitTypeElement type) {
-        String httpCallbackClassName = context.getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, NamingContants.AUTHORIZE_DEFINITION_PARSER_CLASS_NAME);
-        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(httpCallbackClassName));
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(httpCallbackClassName), new Class[]{BeanDefinitionParser.class});
+        String authorizeBeanDefinitionParserClass = context.getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, NamingContants.AUTHORIZE_DEFINITION_PARSER_CLASS_NAME);
+        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(authorizeBeanDefinitionParserClass));
+        DefinedClass abstractDefinitionParser = context.getClassForRole(AbstractBeanDefinitionParserGenerator.ROLE);
+        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(authorizeBeanDefinitionParserClass), abstractDefinitionParser);
 
         context.setClassRole(AUTHORIZE_DEFINITION_PARSER_ROLE, clazz);
 

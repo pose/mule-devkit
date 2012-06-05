@@ -97,14 +97,14 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
     }
 
     private String getImage() {
-        if(executableElement != null) {
-            if(executableElement.getAnnotation(Processor.class) != null) {
+        if (executableElement != null) {
+            if (executableElement.getAnnotation(Processor.class) != null) {
                 return helper.getConnectorImage(typeElement);
             }
-            if(executableElement.getAnnotation(Source.class) != null) {
+            if (executableElement.getAnnotation(Source.class) != null) {
                 return helper.getEndpointImage(typeElement);
             }
-            if(executableElement.getAnnotation(Transformer.class) != null) {
+            if (executableElement.getAnnotation(Transformer.class) != null) {
                 return helper.getTransformerImage(typeElement);
             }
         }
@@ -112,14 +112,14 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
     }
 
     private String getIcon() {
-        if(executableElement != null) {
-            if(executableElement.getAnnotation(Processor.class) != null) {
+        if (executableElement != null) {
+            if (executableElement.getAnnotation(Processor.class) != null) {
                 return helper.getConnectorIcon(typeElement);
             }
-            if(executableElement.getAnnotation(Source.class) != null) {
+            if (executableElement.getAnnotation(Source.class) != null) {
                 return helper.getEndpointIcon(typeElement);
             }
-            if(executableElement.getAnnotation(Transformer.class) != null) {
+            if (executableElement.getAnnotation(Transformer.class) != null) {
                 return helper.getTransformerIcon(typeElement);
             }
         }
@@ -139,7 +139,7 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
         if (((DeclaredType) parameter.asType()).getTypeArguments().isEmpty()) {
             attributeTypeForMapKey = new StringAttributeType();
         } else {
-            attributeTypeForMapKey = helper.createAttributeTypeIgnoreEnumsAndCollections(((DevKitElement)parameter.getTypeArguments().get(0)));
+            attributeTypeForMapKey = helper.createAttributeTypeIgnoreEnumsAndCollections(((DevKitElement) parameter.getTypeArguments().get(0)));
             if (attributeTypeForMapKey == null) { // nested
                 attributeTypeForMapKey = new StringAttributeType();
             }
@@ -235,15 +235,15 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
     }
 
     private boolean isListOfMaps(DevKitVariableElement parameter) {
-        return parameter.isArrayOrList() && parameter.hasTypeArguments() && ((DevKitElement)parameter.getTypeArguments().get(0)).isMap();
+        return parameter.isArrayOrList() && parameter.hasTypeArguments() && ((DevKitElement) parameter.getTypeArguments().get(0)).isMap();
     }
 
     private boolean isSimpleMap(DevKitVariableElement parameter) {
-        return parameter.isMap() && (!parameter.hasTypeArguments() || !((DevKitElement)parameter.getTypeArguments().get(1)).isCollection());
+        return parameter.isMap() && (!parameter.hasTypeArguments() || !((DevKitElement) parameter.getTypeArguments().get(1)).isCollection());
     }
 
     private boolean isSimpleList(DevKitVariableElement parameter) {
-        return parameter.isArrayOrList() && (!parameter.hasTypeArguments() || !((DevKitElement)parameter.getTypeArguments().get(0)).isCollection());
+        return parameter.isArrayOrList() && (!parameter.hasTypeArguments() || !((DevKitElement) parameter.getTypeArguments().get(0)).isCollection());
     }
 
     private NestedElementReference createChildElement(DevKitVariableElement parameter, String localId) {
@@ -267,9 +267,15 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
     }
 
     private boolean needToCreateNestedElement(DevKitVariableElement parameter) {
-        return (parameter.isMap() ||
-                parameter.isArrayOrList()) && (parameter instanceof DevKitParameterElement &&
-                !((DevKitParameterElement)parameter).shouldBeIgnored());
+        boolean needTo = (parameter.isMap() ||
+                parameter.isArrayOrList());
+
+        if (parameter instanceof DevKitParameterElement &&
+                ((DevKitParameterElement) parameter).shouldBeIgnored()) {
+            needTo = false;
+        }
+
+        return needTo;
     }
 
 }
