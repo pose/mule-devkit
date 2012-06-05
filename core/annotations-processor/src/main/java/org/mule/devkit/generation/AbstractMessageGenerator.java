@@ -52,6 +52,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.construct.Flow;
 import org.mule.devkit.generation.callback.DefaultHttpCallbackGenerator;
+import org.mule.devkit.generation.spring.AbstractBeanDefinitionParserGenerator;
 import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitParameterElement;
 import org.mule.devkit.model.DevKitTypeElement;
@@ -79,8 +80,10 @@ import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.TemplateParser;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
+import org.springframework.beans.factory.xml.ParserContext;
 
 import javax.lang.model.type.TypeMirror;
 import java.lang.reflect.ParameterizedType;
@@ -420,15 +423,18 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     protected DefinedClass getBeanDefinitionParserClass(DevKitExecutableElement executableElement) {
         String beanDefinitionParserName = context.getNameUtils().generateClassName(executableElement, NamingContants.DEFINITION_PARSER_CLASS_NAME_SUFFIX);
         Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(beanDefinitionParserName) + NamingContants.CONFIG_NAMESPACE);
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(beanDefinitionParserName), new Class[]{BeanDefinitionParser.class});
+        DefinedClass abstractBeanDefinitionParser = context.getClassForRole(AbstractBeanDefinitionParserGenerator.ROLE);
+        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(beanDefinitionParserName), abstractBeanDefinitionParser);
 
         return clazz;
     }
 
     protected DefinedClass getConfigBeanDefinitionParserClass(DevKitTypeElement typeElement) {
-        String poolAdapterName = context.getNameUtils().generateClassName(typeElement, NamingContants.CONFIG_NAMESPACE, NamingContants.CONFIG_DEFINITION_PARSER_CLASS_NAME_SUFFIX);
-        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(poolAdapterName));
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(poolAdapterName), new Class[]{BeanDefinitionParser.class});
+        String configBeanDefinitionParserClass = context.getNameUtils().generateClassName(typeElement, NamingContants.CONFIG_NAMESPACE, NamingContants.CONFIG_DEFINITION_PARSER_CLASS_NAME_SUFFIX);
+        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(configBeanDefinitionParserClass));
+
+        DefinedClass abstractBeanDefinitionParser = context.getClassForRole(AbstractBeanDefinitionParserGenerator.ROLE);
+        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(configBeanDefinitionParserClass), abstractBeanDefinitionParser);
 
         context.setClassRole(context.getNameUtils().generateConfigDefParserRoleKey(typeElement), clazz);
 
@@ -802,22 +808,22 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
     protected void generateTransform(Block block, Variable transformedField, Variable evaluatedField, TypeMirror expectedType, FieldVariable muleContext) {
         Invocation isAssignableFrom = ExpressionFactory.dotclass(ref(expectedType).boxify()).invoke("isAssignableFrom").arg(evaluatedField.invoke("getClass"));
-        Conditional ifIsAssignableFrom = block._if(Op.not(isAssignableFrom));
-        Block isAssignable = ifIsAssignableFrom._then();
-        Variable dataTypeSource = isAssignable.decl(ref(DataType.class), "source");
-        Variable dataTypeTarget = isAssignable.decl(ref(DataType.class), "target");
+        Conditional ifNotIsAssignableFrom = block._if(Op.not(isAssignableFrom));
+        Block isNotAssignable = ifNotIsAssignableFrom._then();
+        Variable dataTypeSource = isNotAssignable.decl(ref(DataType.class), "source");
+        Variable dataTypeTarget = isNotAssignable.decl(ref(DataType.class), "target");
 
-        isAssignable.assign(dataTypeSource, ref(DataTypeFactory.class).staticInvoke("create").arg(evaluatedField.invoke("getClass")));
-        isAssignable.assign(dataTypeTarget, ref(DataTypeFactory.class).staticInvoke("create").arg(ExpressionFactory.dotclass(ref(expectedType).boxify())));
+        isNotAssignable.assign(dataTypeSource, ref(DataTypeFactory.class).staticInvoke("create").arg(evaluatedField.invoke("getClass")));
+        isNotAssignable.assign(dataTypeTarget, ref(DataTypeFactory.class).staticInvoke("create").arg(ExpressionFactory.dotclass(ref(expectedType).boxify())));
 
-        Variable transformer = isAssignable.decl(ref(Transformer.class), "t");
+        Variable transformer = isNotAssignable.decl(ref(Transformer.class), "t");
         Invocation lookupTransformer = muleContext.invoke("getRegistry").invoke("lookupTransformer");
         lookupTransformer.arg(dataTypeSource);
         lookupTransformer.arg(dataTypeTarget);
-        isAssignable.assign(transformer, lookupTransformer);
-        isAssignable.assign(transformedField, ExpressionFactory.cast(ref(expectedType).boxify(), transformer.invoke("transform").arg(evaluatedField)));
+        isNotAssignable.assign(transformer, lookupTransformer);
+        isNotAssignable.assign(transformedField, ExpressionFactory.cast(ref(expectedType).boxify(), transformer.invoke("transform").arg(evaluatedField)));
 
-        Block notAssignable = ifIsAssignableFrom._else();
+        Block notAssignable = ifNotIsAssignableFrom._else();
         notAssignable.assign(transformedField, ExpressionFactory.cast(ref(expectedType).boxify(), evaluatedField));
     }
 
@@ -1127,50 +1133,5 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
 
         }
-    }
-
-
-    protected Method generateGetAttributeValue(DefinedClass beanDefinitionparser) {
-        Method getAttributeValue = beanDefinitionparser.method(Modifier.PROTECTED, ref(String.class), "getAttributeValue");
-        Variable element = getAttributeValue.param(ref(org.w3c.dom.Element.class), "element");
-        Variable attributeName = getAttributeValue.param(ref(String.class), "attributeName");
-
-        Invocation getAttribute = element.invoke("getAttribute").arg(attributeName);
-
-        Invocation isEmpty = ref(StringUtils.class).staticInvoke("isEmpty");
-        isEmpty.arg(getAttribute);
-
-        Block ifIsEmpty = getAttributeValue.body()._if(isEmpty.not())._then();
-        ifIsEmpty._return(getAttribute);
-
-        getAttributeValue.body()._return(ExpressionFactory._null());
-        return getAttributeValue;
-    }
-
-
-    protected void generateAttachMessageProcessor(Method parse, Variable definition, Variable parserContext) {
-        Variable propertyValues = parse.body().decl(ref(MutablePropertyValues.class), "propertyValues",
-                parserContext.invoke("getContainingBeanDefinition").invoke("getPropertyValues"));
-
-        Conditional ifIsPoll = parse.body()._if(parserContext.invoke("getContainingBeanDefinition").invoke("getBeanClassName")
-                .invoke("equals").arg("org.mule.config.spring.factories.PollingMessageSourceFactoryBean"));
-
-        ifIsPoll._then().add(propertyValues.invoke("addPropertyValue").arg("messageProcessor").arg(definition));
-
-        Conditional ifIsEnricher = ifIsPoll._else()._if(parserContext.invoke("getContainingBeanDefinition").invoke("getBeanClassName")
-                .invoke("equals").arg("org.mule.enricher.MessageEnricher"));
-
-        ifIsEnricher._then().add(propertyValues.invoke("addPropertyValue").arg("enrichmentMessageProcessor").arg(definition));
-
-        Variable messageProcessors = ifIsEnricher._else().decl(ref(PropertyValue.class), "messageProcessors",
-                propertyValues.invoke("getPropertyValue").arg("messageProcessors"));
-        Conditional noList = ifIsEnricher._else()._if(Op.cor(Op.eq(messageProcessors, ExpressionFactory._null()), Op.eq(messageProcessors.invoke("getValue"),
-                ExpressionFactory._null())));
-        noList._then().add(propertyValues.invoke("addPropertyValue").arg("messageProcessors").arg(ExpressionFactory._new(ref(ManagedList.class))));
-        Variable listMessageProcessors = ifIsEnricher._else().decl(ref(List.class), "listMessageProcessors",
-                ExpressionFactory.cast(ref(List.class), propertyValues.invoke("getPropertyValue").arg("messageProcessors").invoke("getValue")));
-        ifIsEnricher._else().add(listMessageProcessors.invoke("add").arg(
-                definition
-        ));
     }
 }

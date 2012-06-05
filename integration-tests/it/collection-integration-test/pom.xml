@@ -9,7 +9,7 @@
     <name>Mule DevKit Collection Integration Tests</name>
 
     <properties>
-        <mule.version>3.3.0-RC4-SNAPSHOT</mule.version>
+        <mule.version>3.3.0-EA</mule.version>
         <devkit.version>3.4-SNAPSHOT</devkit.version>
     </properties>
 

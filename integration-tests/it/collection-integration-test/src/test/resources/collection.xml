@@ -39,6 +39,10 @@
         <spring:constructor-arg value="ObjectC"/>
     </spring:bean>
 
+    <spring:bean id="myParameterBean" class="org.mule.devkit.it.Parameter">
+
+    </spring:bean>
+
     <spring:bean id="list" class="org.springframework.beans.factory.config.ListFactoryBean">
         <spring:property name="sourceList">
             <spring:list>
@@ -187,5 +191,16 @@
                 <collection:object ref="#[payload]"/>
             </collection:objects>
         </collection:list-of-maps>
+    </flow>
+
+    <flow name="countParameters">
+        <collection:count-parameters config-ref="configA">
+            <collection:parameters>
+                <collection:parameter name="String1" description="MyDescription" dataType="java.lang.String"/>
+                <collection:parameter name="int" description="MyDescription" dataType="java.lang.String"/>
+                <collection:parameter name="ListOfStrings" description="MyDescription" dataType="List&lt;java.lang.String&gt;"/>
+                <!-- <collection:parameter value-ref="myParameterBean"/> -->
+            </collection:parameters>
+        </collection:count-parameters>
     </flow>
 </mule>

@@ -29,4 +29,6 @@ public interface DevKitExecutableElement extends DevKitElement<ExecutableElement
     TypeMirror getReturnType();
 
     List<? extends TypeParameterElement> getTypeParameters();
+
+    boolean hasOnlyOneChildElement();
 }

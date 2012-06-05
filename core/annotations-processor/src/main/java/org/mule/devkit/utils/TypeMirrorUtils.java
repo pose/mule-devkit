@@ -65,21 +65,6 @@ public class TypeMirrorUtils {
         this.types = types;
     }
 
-    public boolean ignoreParameter(DevKitElement element) {
-        String variableType = element.asType().toString();
-        for (Class<?> typeToIgnore : PARAMETER_TYPES_TO_IGNORE) {
-            if (variableType.contains(typeToIgnore.getName())) {
-                return true;
-            }
-        }
-        for (Class<? extends Annotation> annotationToIgnore : PARAMETERS_ANNOTATIONS_TO_IGNORE) {
-            if (element.getAnnotation(annotationToIgnore) != null) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public boolean isString(DevKitElement element) {
         String className = element.asType().toString();
         return className.startsWith(String.class.getName());

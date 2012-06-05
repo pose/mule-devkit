@@ -76,9 +76,12 @@
         <basic:passthru-big-decimal value="10.2"/>
     </flow>
 
-
     <flow name="passthruBigInteger">
         <basic:passthru-big-integer value="18"/>
+    </flow>
+
+    <flow name="passthruClass">
+        <basic:passthru-class value="java.lang.String"/>
     </flow>
 
 

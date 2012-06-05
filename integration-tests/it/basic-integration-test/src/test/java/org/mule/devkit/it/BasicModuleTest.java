@@ -71,4 +71,8 @@ public class BasicModuleTest extends AbstractModuleTest {
         runFlow("passthruBigInteger", BigInteger.valueOf(18));
     }
 
+    public void testClass() throws Exception {
+        runFlow("passthruClass", String.class);
+    }
+
 }

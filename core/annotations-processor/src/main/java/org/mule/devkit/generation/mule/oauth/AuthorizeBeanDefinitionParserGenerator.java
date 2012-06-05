@@ -71,7 +71,7 @@ public class AuthorizeBeanDefinitionParserGenerator extends AbstractMessageGener
         parse.body().add(definition.invoke("setAttribute").arg(
                 ref(MuleHierarchicalBeanDefinitionParserDelegate.class).staticRef("MULE_NO_RECURSE")).arg(ref(Boolean.class).staticRef("TRUE")));
 
-        generateAttachMessageProcessor(parse, definition, parserContext);
+        parse.body().invoke("attachProcessorDefinition").arg(parserContext).arg(definition);
 
         parse.body()._return(definition);
     }

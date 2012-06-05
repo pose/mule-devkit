@@ -38,6 +38,7 @@ public class NamingContants {
     public static final String AUTHORIZE_MESSAGE_PROCESSOR_CLASS_NAME = "AuthorizeMessageProcessor";
     public static final String STRING_TO_DATE_TRANSFORMER_CLASS_NAME = "StringToDateTransformer";
     public static final String STRING_TO_BIGINTEGER_TRANSFORMER_CLASS_NAME = "StringToBigIntegerTransformer";
+    public static final String STRING_TO_CLASS_TRANSFORMER_CLASS_NAME = "StringToClassTransformer";
     public static final String STRING_TO_BIGDECIMAL_TRANSFORMER_CLASS_NAME = "StringToBigDecimalTransformer";
     public static final String CONFIG_NAMESPACE = ".config";
     public static final String RESTORE_ACCESS_TOKEN_CALLBACK_FACTORY_BEAN_CLASS_NAME = "RestoreAccessTokenCallbackFactoryBean";
@@ -46,6 +47,7 @@ public class NamingContants {
     public static final String DEFAULT_SAVE_ACCESS_TOKEN_CALLBACK_CLASS_NAME = "DefaultSaveAccessTokenCallback";
     public static final String DEFINITION_PARSER_CLASS_NAME_SUFFIX = "DefinitionParser";
     public static final String CONFIG_DEFINITION_PARSER_CLASS_NAME_SUFFIX = "ConfigDefinitionParser";
+    public static final String ABSTRACT_DEFINITION_PARSER_CLASS_NAME_SUFFIX = "AbstractDefinitionParser";
     public static final String NESTED_PROCESSOR_CHAIN_CLASS_NAME = "NestedProcessorChain";
     public static final String NESTED_PROCESSOR_STRING_CLASS_NAME = "NestedProcessorString";
     public static final String AUTHORIZE_DEFINITION_PARSER_CLASS_NAME = "AuthorizeDefinitionParser";

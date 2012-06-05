@@ -53,4 +53,23 @@ public class DefaultDevKitExecutableElement extends DefaultDevKitElement<Executa
     public List<? extends TypeParameterElement> getTypeParameters() {
         return innerElement.getTypeParameters();
     }
+
+    @Override
+    public boolean hasOnlyOneChildElement() {
+        int requiredChildElements = 0;
+        for (DevKitParameterElement variable : getParameters()) {
+            if (variable.shouldBeIgnored()) {
+                continue;
+            }
+            if (variable.isNestedProcessor()) {
+                requiredChildElements++;
+            } else if (variable.isXmlType()) {
+                requiredChildElements++;
+            } else if (variable.isCollection()) {
+                requiredChildElements++;
+            }
+        }
+
+        return requiredChildElements == 1;
+    }
 }

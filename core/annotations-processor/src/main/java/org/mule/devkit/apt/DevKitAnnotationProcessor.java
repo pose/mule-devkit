@@ -48,8 +48,10 @@ import org.mule.devkit.generation.mule.transfomer.EnumTransformerGenerator;
 import org.mule.devkit.generation.mule.transfomer.JaxbTransformerGenerator;
 import org.mule.devkit.generation.mule.transfomer.StringToBigDecimalTransformerGenerator;
 import org.mule.devkit.generation.mule.transfomer.StringToBigIntegerTransformerGenerator;
+import org.mule.devkit.generation.mule.transfomer.StringToClassTransformerGenerator;
 import org.mule.devkit.generation.mule.transfomer.StringToDateTransformerGenerator;
 import org.mule.devkit.generation.mule.transfomer.TransformerGenerator;
+import org.mule.devkit.generation.spring.AbstractBeanDefinitionParserGenerator;
 import org.mule.devkit.generation.spring.BeanDefinitionParserGenerator;
 import org.mule.devkit.generation.spring.NamespaceHandlerGenerator;
 import org.mule.devkit.generation.spring.SchemaGenerator;
@@ -85,6 +87,7 @@ public class DevKitAnnotationProcessor extends AbstractAnnotationProcessor {
         generators.add(new StringToDateTransformerGenerator());
         generators.add(new StringToBigDecimalTransformerGenerator());
         generators.add(new StringToBigIntegerTransformerGenerator());
+        generators.add(new StringToClassTransformerGenerator());
         generators.add(new DefaultHttpCallbackGenerator());
         generators.add(new CapabilitiesAdapterGenerator());
         generators.add(new LifecycleAdapterGenerator());
@@ -105,6 +108,7 @@ public class DevKitAnnotationProcessor extends AbstractAnnotationProcessor {
         generators.add(new DefaultRestoreAccessTokenCallbackGenerator());
         generators.add(new DefaultRestoreAccessTokenCallbackFactoryGenerator());
         generators.add(new DefaultSaveAccessTokenCallbackFactoryGenerator());
+        generators.add(new AbstractBeanDefinitionParserGenerator());
         generators.add(new BeanDefinitionParserGenerator());
         generators.add(new MessageSourceGenerator());
         generators.add(new MessageProcessorGenerator());

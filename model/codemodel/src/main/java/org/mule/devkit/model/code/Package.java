@@ -272,6 +272,22 @@ public final class Package implements Declaration, Generable, ClassContainer, An
         }
     }
 
+    /**
+     * Adds a public class to this package.
+     */
+    public DefinedClass _class(int modifiers, String name, Class<?>[] _implements) {
+        try {
+            DefinedClass clazz = _class(modifiers, name);
+            for (Class<?> _implement : _implements) {
+                clazz._implements(_implement);
+            }
+
+            return clazz;
+        } catch (ClassAlreadyExistsException ee) {
+            return ee.getExistingClass();
+        }
+    }
+
 
     /**
      * Gets a reference to the already created {@link DefinedClass}.

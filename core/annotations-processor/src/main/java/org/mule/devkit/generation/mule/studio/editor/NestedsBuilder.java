@@ -26,6 +26,7 @@ import org.mule.devkit.generation.spring.SchemaGenerator;
 import org.mule.devkit.model.DefaultDevKitElement;
 import org.mule.devkit.model.DevKitElement;
 import org.mule.devkit.model.DevKitExecutableElement;
+import org.mule.devkit.model.DevKitParameterElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.DevKitVariableElement;
 import org.mule.devkit.model.studio.AttributeType;
@@ -269,7 +270,8 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
 
     private boolean needToCreateNestedElement(DevKitVariableElement parameter) {
         return (parameter.isMap() ||
-                parameter.isArrayOrList()) && !typeMirrorUtils.ignoreParameter(parameter);
+                parameter.isArrayOrList()) && (parameter instanceof DevKitParameterElement &&
+                !((DevKitParameterElement)parameter).shouldBeIgnored());
     }
 
 }

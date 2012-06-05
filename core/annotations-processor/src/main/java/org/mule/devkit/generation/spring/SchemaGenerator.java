@@ -71,7 +71,6 @@ import org.mule.util.StringUtils;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.lang.model.element.ElementKind;
-import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
@@ -100,6 +99,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     private static final String ATTRIBUTE_RETRY_MAX = "retryMax";
     private static final String XSD_EXTENSION = ".xsd";
     private static final String ENUM_TYPE_SUFFIX = "EnumType";
+    private static final String OBJECT_TYPE_SUFFIX = "ObjectType";
     private static final String TYPE_SUFFIX = "Type";
     private static final String XML_TYPE_SUFFIX = "XmlType";
     private static final String UNBOUNDED = "unbounded";
@@ -149,6 +149,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         registerProcessorsAndSources(schema, targetNamespace, typeElement);
         registerTransformers(schema, typeElement);
         registerEnums(schema, typeElement);
+        registerComplexTypes(schema, typeElement);
 
         String fileName = "META-INF/mule-" + typeElement.name() + XSD_EXTENSION;
 
@@ -186,6 +187,63 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             targetNamespace = SchemaConstants.BASE_NAMESPACE + typeElement.name();
         }
         return targetNamespace;
+    }
+
+    private void registerComplexTypes(Schema schema, DevKitTypeElement typeElement) {
+        Set<TypeMirror> registeredComplexTypes = new HashSet<TypeMirror>();
+
+        for (DevKitFieldElement field : typeElement.getFields()) {
+
+            if (!isTypeSupported(field.asType()) && !(field.isArrayOrList() || field.isMap()) &&
+                    !field.isEnum() && !field.asType().toString().equals("java.lang.Object")) {
+                if (!registeredComplexTypes.contains(field.asType())) {
+                    registerComplexType(schema, field);
+                    registeredComplexTypes.add(field.asType());
+                }
+            }
+
+        }
+
+        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Processor.class)) {
+            for (DevKitParameterElement variable : method.getParameters()) {
+                if (!isTypeSupported(variable.asType()) && !(variable.isArrayOrList() || variable.isMap()) &&
+                        !variable.isEnum() && !variable.asType().toString().equals("java.lang.Object") && !registeredComplexTypes.contains(variable.asType())) {
+                    registerComplexType(schema, variable);
+                    registeredComplexTypes.add(variable.asType());
+                } else if (variable.isCollection()) {
+                    for (DevKitElement variableTypeParameter : variable.getTypeArguments()) {
+                        if (!isTypeSupported(variableTypeParameter.asType()) && !(variableTypeParameter.isArrayOrList() || variableTypeParameter.isMap()) &&
+                                !variableTypeParameter.isEnum() && !variableTypeParameter.asType().toString().equals("java.lang.Object")
+                                && !registeredComplexTypes.contains(variableTypeParameter.asType())) {
+                            registerComplexType(schema, variableTypeParameter);
+                            registeredComplexTypes.add(variableTypeParameter.asType());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void registerComplexType(Schema schema, DevKitElement element) {
+        TopLevelComplexType complexType = new TopLevelComplexType();
+        complexType.setName(element.getSimpleName() + OBJECT_TYPE_SUFFIX);
+
+        ExplicitGroup all = new ExplicitGroup();
+        complexType.setSequence(all);
+
+        if( element instanceof DevKitTypeElement ) {
+            DevKitTypeElement typeElement = (DevKitTypeElement)element;
+            for( DevKitFieldElement field : typeElement.getFields() ) {
+                if( field.isCollection() ) {
+                    generateCollectionElement(schema, schema.getTargetNamespace(), all, field);
+                } else {
+                    complexType.getAttributeOrAttributeGroup().add(createAttribute(schema, field));
+                }
+            }
+        }
+
+        schema.getSimpleTypeOrComplexTypeOrGroup().add(complexType);
+
     }
 
     private void registerEnums(Schema schema, DevKitTypeElement typeElement) {
@@ -374,7 +432,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         if (element != null) {
             int requiredChildElements = 0;
             for (DevKitParameterElement variable : element.getParameters()) {
-                if (context.getTypeMirrorUtils().ignoreParameter(variable)) {
+                if (variable.shouldBeIgnored()) {
                     continue;
                 }
                 if (variable.isNestedProcessor()) {
@@ -386,7 +444,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                 }
             }
             for (DevKitParameterElement variable : element.getParameters()) {
-                if (context.getTypeMirrorUtils().ignoreParameter(variable)) {
+                if (variable.shouldBeIgnored()) {
                     continue;
                 }
                 if (variable.isNestedProcessor()) {
@@ -571,7 +629,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                 } else if (genericType.isEnum()) {
                     return genereateEnumComplexType(genericType, targetNamespace);
                 } else {
-                    return generateRefComplexType(ATTRIBUTE_NAME_VALUE_REF);
+                    return generateExtendedRefComplexType(schema, genericType, ATTRIBUTE_NAME_VALUE_REF);
                 }
             } else {
                 return generateRefComplexType(ATTRIBUTE_NAME_VALUE_REF);
@@ -666,6 +724,23 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         simpleContentExtension.getAttributeOrAttributeGroup().add(refAttribute);
         return complexType;
+    }
+
+    private LocalComplexType generateExtendedRefComplexType(Schema schema, DevKitElement element, String name) {
+        LocalComplexType itemComplexType = new LocalComplexType();
+        itemComplexType.setComplexContent(new ComplexContent());
+        itemComplexType.getComplexContent().setExtension(new ExtensionType());
+        itemComplexType.getComplexContent().getExtension().setBase(
+                new QName(schema.getTargetNamespace(), element.getSimpleName() + OBJECT_TYPE_SUFFIX)
+        ); // base to the element type
+
+        Attribute refAttribute = new Attribute();
+        refAttribute.setUse(SchemaConstants.USE_OPTIONAL);
+        refAttribute.setName(name);
+        refAttribute.setType(SchemaConstants.STRING);
+
+        itemComplexType.getComplexContent().getExtension().getAttributeOrAttributeGroup().add(refAttribute);
+        return itemComplexType;
     }
 
     private LocalComplexType generateRefComplexType(String name) {

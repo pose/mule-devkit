@@ -17,7 +17,6 @@
 
 package org.mule.devkit.generation.spring;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.UnhandledException;
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Connector;
@@ -29,13 +28,9 @@ import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.api.callback.HttpCallback;
 import org.mule.api.callback.SourceCallback;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
 import org.mule.config.PoolingProfile;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.factories.MessageProcessorChainFactoryBean;
-import org.mule.config.spring.parsers.generic.AutoIdUtils;
-import org.mule.config.spring.util.SpringXMLUtils;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.adapter.HttpCallbackAdapterGenerator;
 import org.mule.devkit.generation.mule.oauth.DefaultRestoreAccessTokenCallbackFactoryGenerator;
@@ -50,8 +45,6 @@ import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
-import org.mule.devkit.model.code.FieldVariable;
-import org.mule.devkit.model.code.ForEach;
 import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
@@ -59,19 +52,14 @@ import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
-import org.mule.util.TemplateParser;
-import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.ManagedList;
-import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.xml.DomUtils;
+import org.w3c.dom.Element;
 
 import javax.inject.Inject;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeMirror;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -81,6 +69,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
 import java.util.List;
+import java.util.Map;
 
 public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
@@ -108,33 +97,17 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
         context.note("Generating config element definition parser as " + beanDefinitionparser.fullName() + " for class " + typeElement.getSimpleName().toString());
 
-        FieldVariable patternInfo = generateFieldForPatternInfo(beanDefinitionparser);
-
-        Method constructor = beanDefinitionparser.constructor(Modifier.PUBLIC);
-        constructor.body().assign(patternInfo, ref(TemplateParser.class).staticInvoke("createMuleStyleParser").invoke("getStyle"));
-
         Method parse = beanDefinitionparser.method(Modifier.PUBLIC, ref(BeanDefinition.class), "parse");
         Variable element = parse.param(ref(org.w3c.dom.Element.class), "element");
         Variable parserContext = parse.param(ref(ParserContext.class), "parserContent");
 
-        Variable name = parse.body().decl(ref(String.class), "name", element.invoke("getAttribute").arg("name"));
-        Conditional ifNotNamed = parse.body()._if(Op.cor(Op.eq(name, ExpressionFactory._null()),
-                ref(StringUtils.class).staticInvoke("isBlank").arg(name)));
-
-        ifNotNamed._then().add(element.invoke("setAttribute")
-                .arg("name")
-                .arg(ref(AutoIdUtils.class).staticInvoke("getUniqueName").arg(element).arg("mule-bean")));
+        parse.body().invoke("parseConfigName").arg(element);
 
         Variable builder = parse.body().decl(ref(BeanDefinitionBuilder.class), "builder",
                 ref(BeanDefinitionBuilder.class).staticInvoke("rootBeanDefinition").arg(pojo.dotclass().invoke("getName")));
 
-        Conditional isInitialisable = parse.body()._if(ref(Initialisable.class).dotclass()
-                .invoke("isAssignableFrom").arg(pojo.dotclass()));
-        isInitialisable._then().add(builder.invoke("setInitMethodName").arg(ref(Initialisable.class).staticRef("PHASE_NAME")));
-
-        Conditional isDisposable = parse.body()._if(ref(Disposable.class).dotclass()
-                .invoke("isAssignableFrom").arg(pojo.dotclass()));
-        isDisposable._then().add(builder.invoke("setDestroyMethodName").arg(ref(Disposable.class).staticRef("PHASE_NAME")));
+        parse.body().invoke("setInitMethodIfNeeded").arg(builder).arg(pojo.dotclass());
+        parse.body().invoke("setDestroyMethodIfNeeded").arg(builder).arg(pojo.dotclass());
 
         for (DevKitFieldElement variable : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
 
@@ -145,38 +118,14 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             } else if (variable.isXmlType()) {
                 generateParseXmlType(parse.body(), element, builder, fieldName);
             } else if (variable.isArrayOrList()) {
-                Variable listElement = parse.body().decl(ref(org.w3c.dom.Element.class),
-                        fieldName + "ListElement",
-                        ExpressionFactory._null());
-
-                parse.body().assign(listElement, ref(DomUtils.class).staticInvoke("getChildElementByTagName")
-                        .arg(element)
-                        .arg(context.getNameUtils().uncamel(fieldName)));
-
-                UpperBlockClosure managedList = generateParseArrayOrList(parse.body(), variable, listElement, builder, fieldName, patternInfo, parserContext);
-
-                managedList.getNotRefBlock().add(builder.invoke("addPropertyValue").arg(fieldName).arg(managedList.getManagedCollection()));
+                generateParseList(parse, element, builder, variable, fieldName);
             } else if (variable.isMap()) {
-                Variable listElement = parse.body().decl(ref(org.w3c.dom.Element.class),
-                        fieldName + "ListElement",
-                        ExpressionFactory._null());
-
-                parse.body().assign(listElement, ref(DomUtils.class).staticInvoke("getChildElementByTagName")
-                        .arg(element)
-                        .arg(context.getNameUtils().uncamel(fieldName)));
-
-                UpperBlockClosure managedMap = generateParseMap(parse.body(), variable, listElement, builder, fieldName, patternInfo, parserContext);
-
-                managedMap.getNotRefBlock().add(builder.invoke("addPropertyValue").arg(fieldName).arg(managedMap.getManagedCollection()));
+                generateParseMap(parse, element, builder, variable, fieldName);
             } else if (variable.isEnum()) {
                 generateParseEnum(parse.body(), element, builder, fieldName);
             } else {
                 // not supported use the -ref approach
-                Invocation getAttribute = element.invoke("getAttribute").arg(fieldName + "-ref");
-                Conditional ifNotNull = parse.body()._if(Op.cand(Op.ne(getAttribute, ExpressionFactory._null()),
-                        Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(
-                                getAttribute
-                        ))));
+                Conditional ifNotNull = parse.body()._if(ExpressionFactory.invoke("hasAttribute").arg(element).arg(fieldName + "-ref"));
                 ifNotNull._then().add(builder.invoke("addPropertyValue").arg(fieldName).arg(
                         ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(element.invoke("getAttribute").arg(fieldName + "-ref"))
                 ));
@@ -185,11 +134,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
         for (DevKitFieldElement variable : typeElement.getFieldsAnnotatedWith(Inject.class)) {
             if (variable.asType().toString().equals("org.mule.api.store.ObjectStore")) {
-                Invocation getAttribute = element.invoke("getAttribute").arg("objectStore-ref");
-                Conditional ifNotNull = parse.body()._if(Op.cand(Op.ne(getAttribute, ExpressionFactory._null()),
-                        Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(
-                                getAttribute
-                        ))));
+                Conditional ifNotNull = parse.body()._if(ExpressionFactory.invoke("hasAttribute").arg(element).arg("objectStore-ref"));
                 ifNotNull._then().add(builder.invoke("addPropertyValue").arg(variable.getSimpleName().toString()).arg(
                         ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(element.invoke("getAttribute").arg("objectStore-ref"))
                 ));
@@ -204,29 +149,9 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                 if (SchemaTypeConversion.isSupported(variable.asType().toString())) {
                     generateParseSupportedType(parse.body(), element, builder, fieldName);
                 } else if (variable.isArrayOrList()) {
-                    Variable listElement = parse.body().decl(ref(org.w3c.dom.Element.class),
-                            fieldName + "ListElement",
-                            ExpressionFactory._null());
-
-                    parse.body().assign(listElement, ref(DomUtils.class).staticInvoke("getChildElementByTagName")
-                            .arg(element)
-                            .arg(context.getNameUtils().uncamel(fieldName)));
-
-                    UpperBlockClosure managedList = generateParseArrayOrList(parse.body(), variable, listElement, builder, fieldName, patternInfo, parserContext);
-
-                    managedList.getNotRefBlock().add(builder.invoke("addPropertyValue").arg(fieldName).arg(managedList.getManagedCollection()));
+                    generateParseList(parse, element, builder, variable, fieldName);
                 } else if (variable.isMap()) {
-                    Variable listElement = parse.body().decl(ref(org.w3c.dom.Element.class),
-                            fieldName + "ListElement",
-                            ExpressionFactory._null());
-
-                    parse.body().assign(listElement, ref(DomUtils.class).staticInvoke("getChildElementByTagName")
-                            .arg(element)
-                            .arg(context.getNameUtils().uncamel(fieldName)));
-
-                    UpperBlockClosure managedMap = generateParseMap(parse.body(), variable, listElement, builder, fieldName, patternInfo, parserContext);
-
-                    managedMap.getNotRefBlock().add(builder.invoke("addPropertyValue").arg(fieldName).arg(managedMap.getManagedCollection()));
+                    generateParseMap(parse, element, builder, variable, fieldName);
                 } else if (variable.isEnum()) {
                     generateParseEnum(parse.body(), element, builder, fieldName);
                 }
@@ -240,8 +165,6 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             DefinedClass restoreAccessTokenCallbackFactory = context.getClassForRole(DefaultRestoreAccessTokenCallbackFactoryGenerator.ROLE);
             generateParseNestedProcessor(parse.body(), element, parserContext, builder, "oauthSaveAccessToken", false, false, false, saveAccessTokenCallbackFactory);
             generateParseNestedProcessor(parse.body(), element, parserContext, builder, "oauthRestoreAccessToken", false, false, false, restoreAccessTokenCallbackFactory);
-
-            generateGenerateChildBeanNameMethod(beanDefinitionparser);
         }
         if (typeElement.hasProcessorMethodWithParameter(HttpCallback.class)) {
             generateParseHttpCallback(SchemaGenerator.HTTP_CALLBACK_CONFIG_ELEMENT_NAME, parse, element, builder);
@@ -273,11 +196,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         generateParseSupportedType(ifHttpCallbackConfigPresent, httpCallbackConfigElement, builder, HttpCallbackAdapterGenerator.REMOTE_PORT_FIELD_NAME);
         generateParseSupportedType(ifHttpCallbackConfigPresent, httpCallbackConfigElement, builder, HttpCallbackAdapterGenerator.ASYNC_FIELD_NAME);
 
-        Invocation getAttribute = httpCallbackConfigElement.invoke("getAttribute").arg(HttpCallbackAdapterGenerator.CONNECTOR_FIELD_NAME + "-ref");
-        Conditional ifNotNull = ifHttpCallbackConfigPresent._if(Op.cand(Op.ne(getAttribute, ExpressionFactory._null()),
-                Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(
-                        getAttribute
-                ))));
+        Conditional ifNotNull = ifHttpCallbackConfigPresent._if(ExpressionFactory.invoke("hasAttribute").arg(element).arg(HttpCallbackAdapterGenerator.CONNECTOR_FIELD_NAME + "-ref"));
         ifNotNull._then().add(builder.invoke("addPropertyValue").arg(HttpCallbackAdapterGenerator.CONNECTOR_FIELD_NAME).arg(
                 ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(httpCallbackConfigElement.invoke("getAttribute").arg(HttpCallbackAdapterGenerator.CONNECTOR_FIELD_NAME + "-ref"))
         ));
@@ -296,20 +215,12 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         generateParseSupportedType(ifElementNotNull._then(), poolingProfileElement, poolingProfileBuilder, "maxIdle");
         generateParseSupportedType(ifElementNotNull._then(), poolingProfileElement, poolingProfileBuilder, "maxWait");
 
-        Invocation getAttribute = poolingProfileElement.invoke("getAttribute").arg("exhaustedAction");
-        Conditional ifNotNull = ifElementNotNull._then()._if(Op.cand(Op.ne(getAttribute, ExpressionFactory._null()),
-                Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(
-                        getAttribute
-                ))));
+        Conditional ifNotNull = ifElementNotNull._then()._if(ExpressionFactory.invoke("hasAttribute").arg(poolingProfileElement).arg("exhaustedAction"));
         ifNotNull._then().add(poolingProfileBuilder.invoke("addPropertyValue").arg("exhaustedAction").arg(
                 ref(PoolingProfile.class).staticRef("POOL_EXHAUSTED_ACTIONS").invoke("get").arg(poolingProfileElement.invoke("getAttribute").arg("exhaustedAction"))
         ));
 
-        getAttribute = poolingProfileElement.invoke("getAttribute").arg("exhaustedAction");
-        ifNotNull = ifElementNotNull._then()._if(Op.cand(Op.ne(getAttribute, ExpressionFactory._null()),
-                Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(
-                        getAttribute
-                ))));
+        ifNotNull = ifElementNotNull._then()._if(ExpressionFactory.invoke("hasAttribute").arg(poolingProfileElement).arg("initialisationPolicy"));
         ifNotNull._then().add(poolingProfileBuilder.invoke("addPropertyValue").arg("initialisationPolicy").arg(
                 ref(PoolingProfile.class).staticRef("POOL_INITIALISATION_POLICIES").invoke("get").arg(poolingProfileElement.invoke("getAttribute").arg("initialisationPolicy"))
         ));
@@ -325,16 +236,9 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         DefinedClass beanDefinitionparser = getBeanDefinitionParserClass(executableElement);
         DefinedClass messageSourceClass = getMessageSourceClass(executableElement, sourceAnnotation.threadingModel() == SourceThreadingModel.SINGLE_THREAD);
 
-        FieldVariable patternInfo = generateFieldForPatternInfo(beanDefinitionparser);
-
         context.note("Generating bean definition parser as " + beanDefinitionparser.fullName() + " for message source " + messageSourceClass.fullName());
 
-        Method constructor = beanDefinitionparser.constructor(Modifier.PUBLIC);
-        constructor.body().assign(patternInfo, ref(TemplateParser.class).staticInvoke("createMuleStyleParser").invoke("getStyle"));
-
-        generateSourceParseMethod(beanDefinitionparser, messageSourceClass, executableElement, patternInfo);
-
-        generateGenerateChildBeanNameMethod(beanDefinitionparser);
+        generateSourceParseMethod(beanDefinitionparser, messageSourceClass, executableElement);
     }
 
     private void generateBeanDefinitionParserForProcessor(DevKitExecutableElement executableElement) {
@@ -349,65 +253,39 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
         context.note("Generating bean definition parser as " + beanDefinitionparser.fullName() + " for message processor " + messageProcessorClass.fullName());
 
-        FieldVariable patternInfo = generateFieldForPatternInfo(beanDefinitionparser);
-
-        Method constructor = beanDefinitionparser.constructor(Modifier.PUBLIC);
-        constructor.body().assign(patternInfo, ref(TemplateParser.class).staticInvoke("createMuleStyleParser").invoke("getStyle"));
-
-        generateProcessorParseMethod(beanDefinitionparser, messageProcessorClass, executableElement, patternInfo);
-
-        generateGenerateChildBeanNameMethod(beanDefinitionparser);
+        generateProcessorParseMethod(beanDefinitionparser, messageProcessorClass, executableElement);
     }
 
-    private void generateProcessorParseMethod(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, DevKitExecutableElement executableElement, Variable patternInfo) {
+    private void generateProcessorParseMethod(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, DevKitExecutableElement executableElement) {
         Method parse = beanDefinitionparser.method(Modifier.PUBLIC, ref(BeanDefinition.class), "parse");
         Variable element = parse.param(ref(org.w3c.dom.Element.class), "element");
         Variable parserContext = parse.param(ref(ParserContext.class), "parserContent");
 
-        Variable definition = generateParseCommon(beanDefinitionparser, messageProcessorClass, executableElement, parse, element, patternInfo, parserContext);
+        Variable definition = generateParseCommon(beanDefinitionparser, messageProcessorClass, executableElement, parse, element, parserContext);
 
-        generateAttachMessageProcessor(parse, definition, parserContext);
+        parse.body().invoke("attachProcessorDefinition").arg(parserContext).arg(definition);
 
         parse.body()._return(definition);
     }
 
-    private void generateSourceParseMethod(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, DevKitExecutableElement executableElement, Variable patternInfo) {
+    private void generateSourceParseMethod(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, DevKitExecutableElement executableElement) {
         Method parse = beanDefinitionparser.method(Modifier.PUBLIC, ref(BeanDefinition.class), "parse");
         Variable element = parse.param(ref(org.w3c.dom.Element.class), "element");
         Variable parserContext = parse.param(ref(ParserContext.class), "parserContent");
 
-        Variable definition = generateParseCommon(beanDefinitionparser, messageProcessorClass, executableElement, parse, element, patternInfo, parserContext);
+        Variable definition = generateParseCommon(beanDefinitionparser, messageProcessorClass, executableElement, parse, element, parserContext);
 
-        generateAttachMessageSource(parse, definition, parserContext);
+        parse.body().invoke("attachSourceDefinition").arg(parserContext).arg(definition);
 
         parse.body()._return(definition);
     }
 
-    private Variable generateParseCommon(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, DevKitExecutableElement executableElement, Method parse, Variable element, Variable patternInfo, Variable parserContext) {
+    private Variable generateParseCommon(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, DevKitExecutableElement executableElement, Method parse, Variable element, Variable parserContext) {
         Variable builder = parse.body().decl(ref(BeanDefinitionBuilder.class), "builder",
                 ref(BeanDefinitionBuilder.class).staticInvoke("rootBeanDefinition").arg(messageProcessorClass.dotclass().invoke("getName")));
 
-        Variable configRef = parse.body().decl(ref(String.class), "configRef", element.invoke("getAttribute").arg("config-ref"));
-        Conditional ifConfigRef = parse.body()._if(Op.cand(Op.ne(configRef, ExpressionFactory._null()),
-                Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(configRef))));
-        ifConfigRef._then().add(builder.invoke("addPropertyValue").arg("moduleObject").arg(
-                configRef));
+        parse.body().invoke("parseConfigRef").arg(element).arg(builder);
 
-        Method getAttributeValue = generateGetAttributeValue(beanDefinitionparser);
-
-        int requiredChildElements = 0;
-        for (DevKitParameterElement variable : executableElement.getParameters()) {
-            if (context.getTypeMirrorUtils().ignoreParameter(variable)) {
-                continue;
-            }
-            if (variable.isNestedProcessor()) {
-                requiredChildElements++;
-            } else if (variable.isXmlType()) {
-                requiredChildElements++;
-            } else if (variable.isCollection()) {
-                requiredChildElements++;
-            }
-        }
 
         for (DevKitParameterElement variable : executableElement.getParameters()) {
             if (variable.asType().toString().startsWith(SourceCallback.class.getName())) {
@@ -418,7 +296,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
             if (variable.isNestedProcessor()) {
                 boolean isList = variable.isArrayOrList();
-                if (requiredChildElements == 1) {
+                if (executableElement.hasOnlyOneChildElement()) {
                     generateParseNestedProcessor(parse.body(), element, parserContext, builder, fieldName, true, isList, true, ref(MessageProcessorChainFactoryBean.class));
                 } else {
                     generateParseNestedProcessor(parse.body(), element, parserContext, builder, fieldName, false, isList, true, ref(MessageProcessorChainFactoryBean.class));
@@ -428,43 +306,19 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             } else if (variable.isXmlType()) {
                 generateParseXmlType(parse.body(), element, builder, fieldName);
             } else if (variable.isArrayOrList()) {
-                Variable listElement = parse.body().decl(ref(org.w3c.dom.Element.class),
-                        fieldName + "ListElement",
-                        ExpressionFactory._null());
-
-                parse.body().assign(listElement, ref(DomUtils.class).staticInvoke("getChildElementByTagName")
-                        .arg(element)
-                        .arg(context.getNameUtils().uncamel(fieldName)));
-
-                UpperBlockClosure managedList = generateParseArrayOrList(parse.body(), variable, listElement, builder, fieldName, patternInfo, parserContext);
-
-                managedList.getNotRefBlock().add(builder.invoke("addPropertyValue").arg(fieldName).arg(managedList.getManagedCollection()));
+                generateParseList(parse, element, builder, variable, fieldName);
             } else if (variable.isMap()) {
-                Variable listElement = parse.body().decl(ref(org.w3c.dom.Element.class),
-                        fieldName + "ListElement",
-                        ExpressionFactory._null());
-
-                parse.body().assign(listElement, ref(DomUtils.class).staticInvoke("getChildElementByTagName")
-                        .arg(element)
-                        .arg(context.getNameUtils().uncamel(fieldName)));
-
-                UpperBlockClosure managedMap = generateParseMap(parse.body(), variable, listElement, builder, fieldName, patternInfo, parserContext);
-
-                managedMap.getNotRefBlock().add(builder.invoke("addPropertyValue").arg(fieldName).arg(managedMap.getManagedCollection()));
+                generateParseMap(parse, element, builder, variable, fieldName);
             } else if (variable.isEnum()) {
                 generateParseEnum(parse.body(), element, builder, fieldName);
             } else if (variable.asType().toString().startsWith(HttpCallback.class.getName())) {
-                Variable callbackFlowName = parse.body().decl(ref(String.class), fieldName + "CallbackFlowName", ExpressionFactory.invoke(getAttributeValue).arg(element).arg(context.getNameUtils().uncamel(fieldName) + "-flow-ref"));
+                Variable callbackFlowName = parse.body().decl(ref(String.class), fieldName + "CallbackFlowName", ExpressionFactory.invoke("getAttributeValue").arg(element).arg(context.getNameUtils().uncamel(fieldName) + "-flow-ref"));
                 Block block = parse.body()._if(Op.ne(callbackFlowName, ExpressionFactory._null()))._then();
                 block.invoke(builder, "addPropertyValue").arg(fieldName + "CallbackFlow").arg(ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(callbackFlowName));
             } else {
                 // not supported use the -ref approach
-                Invocation getAttribute = element.invoke("getAttribute").arg(fieldName + "-ref");
-                Conditional ifNotNull = parse.body()._if(Op.cand(Op.ne(getAttribute, ExpressionFactory._null()),
-                        Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(
-                                getAttribute
-                        ))));
-                Conditional ifNotExpression = ifNotNull._then()._if(getAttribute.invoke("startsWith").arg("#"));
+                Conditional ifNotNull = parse.body()._if(ExpressionFactory.invoke("hasAttribute").arg(element).arg(fieldName + "-ref"));
+                Conditional ifNotExpression = ifNotNull._then()._if(element.invoke("getAttribute").arg(fieldName + "-ref").invoke("startsWith").arg("#"));
 
                 ifNotExpression._else().add(builder.invoke("addPropertyValue").arg(fieldName).arg(
                         Op.plus(Op.plus(ExpressionFactory.lit("#[registry:"),
@@ -488,29 +342,9 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                 if (SchemaTypeConversion.isSupported(variable.asType().toString())) {
                     generateParseSupportedType(parse.body(), element, builder, fieldName);
                 } else if (variable.isArrayOrList()) {
-                    Variable listElement = parse.body().decl(ref(org.w3c.dom.Element.class),
-                            fieldName + "ListElement",
-                            ExpressionFactory._null());
-
-                    parse.body().assign(listElement, ref(DomUtils.class).staticInvoke("getChildElementByTagName")
-                            .arg(element)
-                            .arg(context.getNameUtils().uncamel(fieldName)));
-
-                    UpperBlockClosure managedList = generateParseArrayOrList(parse.body(), variable, listElement, builder, fieldName, patternInfo, parserContext);
-
-                    managedList.getNotRefBlock().add(builder.invoke("addPropertyValue").arg(fieldName).arg(managedList.getManagedCollection()));
+                    generateParseList(parse, element, builder, variable, fieldName);
                 } else if (variable.isMap()) {
-                    Variable listElement = parse.body().decl(ref(org.w3c.dom.Element.class),
-                            fieldName + "ListElement",
-                            ExpressionFactory._null());
-
-                    parse.body().assign(listElement, ref(DomUtils.class).staticInvoke("getChildElementByTagName")
-                            .arg(element)
-                            .arg(context.getNameUtils().uncamel(fieldName)));
-
-                    UpperBlockClosure managedMap = generateParseMap(parse.body(), variable, listElement, builder, fieldName, patternInfo, parserContext);
-
-                    managedMap.getNotRefBlock().add(builder.invoke("addPropertyValue").arg(fieldName).arg(managedMap.getManagedCollection()));
+                    generateParseMap(parse, element, builder, variable, fieldName);
                 } else if (variable.isEnum()) {
                     generateParseEnum(parse.body(), element, builder, fieldName);
                 }
@@ -522,6 +356,56 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         parse.body().add(definition.invoke("setAttribute").arg(
                 ref(MuleHierarchicalBeanDefinitionParserDelegate.class).staticRef("MULE_NO_RECURSE")).arg(ref(Boolean.class).staticRef("TRUE")));
         return definition;
+    }
+
+    private void generateParseList(Method parse, Variable element, Variable builder, DevKitElement variable, String fieldName) {
+        Invocation parseListAndSetProperty = parse.body().invoke("parseListAndSetProperty")
+                .arg(element)
+                .arg(builder)
+                .arg(fieldName)
+                .arg(context.getNameUtils().uncamel(fieldName))
+                .arg(context.getNameUtils().uncamel(context.getNameUtils().singularize(fieldName)));
+
+        if (variable.hasTypeArguments()) {
+            DevKitElement typeArgument = (DevKitElement) variable.getTypeArguments().get(0);
+
+            if (typeArgument.isArrayOrList()) {
+                String innerChildElementName = "inner-" + context.getNameUtils().uncamel(context.getNameUtils().singularize(fieldName));
+                parseListAndSetProperty.arg(ExpressionFactory._new(generateParserDelegateForList(innerChildElementName)));
+            } else if (typeArgument.isMap()) {
+                String innerChildElementName = "inner-" + context.getNameUtils().uncamel(context.getNameUtils().singularize(fieldName));
+                parseListAndSetProperty.arg(ExpressionFactory._new(generateParserDelegateForMap(innerChildElementName)));
+            } else {
+                parseListAndSetProperty.arg(ExpressionFactory._new(generateParserDelegateForTextContent()));
+            }
+        } else {
+            parseListAndSetProperty.arg(ExpressionFactory._new(generateParserDelegateForTextContent()));
+        }
+    }
+
+    private void generateParseMap(Method parse, Variable element, Variable builder, DevKitElement variable, String fieldName) {
+        Invocation parseMapAndSetProperty = parse.body().invoke("parseMapAndSetProperty")
+                .arg(element)
+                .arg(builder)
+                .arg(fieldName)
+                .arg(context.getNameUtils().uncamel(fieldName))
+                .arg(context.getNameUtils().uncamel(context.getNameUtils().singularize(fieldName)));
+
+        if (variable.hasTypeArguments()) {
+            DevKitElement typeArgument = (DevKitElement) variable.getTypeArguments().get(0);
+
+            if (typeArgument.isArrayOrList()) {
+                String innerChildElementName = "inner-" + context.getNameUtils().uncamel(context.getNameUtils().singularize(fieldName));
+                parseMapAndSetProperty.arg(ExpressionFactory._new(generateParserDelegateForList(innerChildElementName)));
+            } else if (typeArgument.isMap()) {
+                String innerChildElementName = "inner-" + context.getNameUtils().uncamel(context.getNameUtils().singularize(fieldName));
+                parseMapAndSetProperty.arg(ExpressionFactory._new(generateParserDelegateForMap(innerChildElementName)));
+            } else {
+                parseMapAndSetProperty.arg(ExpressionFactory._new(generateParserDelegateForTextContent()));
+            }
+        } else {
+            parseMapAndSetProperty.arg(ExpressionFactory._new(generateParserDelegateForTextContent()));
+        }
     }
 
     private void generateParseNestedProcessor(Block block, Variable element, Variable parserContext, Variable builder, String fieldName, boolean skipElement, boolean isList, boolean allowTextAttribute, TypeReference factoryBean) {
@@ -537,12 +421,10 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
         Block beanDefinitionBuidlerBlock = null;
         if (allowTextAttribute) {
-            Variable text = ifNotNull._then().decl(ref(String.class), "text", elements.invoke("getAttribute").arg("text"));
-            Conditional ifTextElement = ifNotNull._then()._if(Op.cand(Op.ne(text, ExpressionFactory._null()),
-                    Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(text))));
+            Conditional ifTextElement = ifNotNull._then()._if(ExpressionFactory.invoke("hasAttribute").arg(elements).arg("text"));
 
             ifTextElement._then().add(builder.invoke("addPropertyValue")
-                    .arg(fieldName).arg(text));
+                    .arg(fieldName).arg(elements.invoke("getAttribute").arg("text")));
 
             beanDefinitionBuidlerBlock = ifTextElement._else();
         } else {
@@ -629,11 +511,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
     }
 
     private void generateParseSupportedType(Block block, Variable element, Variable builder, String fieldName) {
-        Invocation getAttribute = element.invoke("getAttribute").arg(fieldName);
-        Conditional ifNotNull = block._if(Op.cand(Op.ne(getAttribute, ExpressionFactory._null()),
-                Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(
-                        getAttribute
-                ))));
+        Conditional ifNotNull = block._if(ExpressionFactory.invoke("hasAttribute").arg(element).arg(fieldName));
         ifNotNull._then().add(builder.invoke("addPropertyValue").arg(fieldName).arg(
                 element.invoke("getAttribute").arg(fieldName)
         ));
@@ -647,246 +525,40 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         ));
     }
 
-    private UpperBlockClosure generateParseMap(Block body, DevKitElement typeMirror, Variable listElement, Variable builder, String fieldName, Variable patternInfo, Variable parserContext) {
-        List<DevKitElement> variableTypeParameters = typeMirror.getTypeArguments();
+    private DefinedClass generateParserDelegateForTextContent() {
+        DefinedClass parserDelegateInterface = context.getClassForRole(AbstractBeanDefinitionParserGenerator.DELEGATE_ROLE);
+        DefinedClass anonymousClass = context.getCodeModel().anonymousClass(parserDelegateInterface.narrow(ref(String.class)));
+        Method parseMethod = anonymousClass.method(Modifier.PUBLIC, ref(String.class), "parse");
+        Variable element = parseMethod.param(ref(Element.class), "element");
 
-        Variable listChilds = body.decl(ref(List.class).narrow(ref(org.w3c.dom.Element.class)),
-                fieldName.replace("-", "") + "MapChilds",
-                ExpressionFactory._null());
+        parseMethod.body()._return(element.invoke("getTextContent"));
 
-        Conditional listElementNotNull = body._if(Op.ne(listElement, ExpressionFactory._null()));
-
-        Invocation getElementRef = listElement.invoke("getAttribute").arg("ref");
-        Variable ref = listElementNotNull._then().decl(ref(String.class), fieldName.replace("-", "") + "Ref",
-                getElementRef);
-
-        Conditional ifRef = listElementNotNull._then()._if(
-                Op.cand(
-                        Op.ne(ref, ExpressionFactory._null()),
-                        Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(ref))
-                )
-        );
-
-        Conditional ifRefNotExpresion = ifRef._then()._if(Op.cand(
-                Op.not(ref.invoke("startsWith").arg(patternInfo.invoke("getPrefix"))),
-                Op.not(ref.invoke("endsWith").arg(patternInfo.invoke("getSuffix")))
-        ));
-
-        ifRefNotExpresion._then().add(builder.invoke("addPropertyValue").arg(fieldName).arg(
-                ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(ref)
-        ));
-
-        ifRefNotExpresion._else().add(builder.invoke("addPropertyValue").arg(fieldName).arg(
-                ref));
-
-        Variable managedMap = ifRef._else().decl(ref(ManagedMap.class), fieldName.replace("-", ""),
-                ExpressionFactory._new(ref(ManagedMap.class)));
-
-        ifRef._else().assign(listChilds,
-                ref(DomUtils.class).staticInvoke("getChildElementsByTagName")
-                        .arg(listElement)
-                        .arg(context.getNameUtils().uncamel(context.getNameUtils().singularize(fieldName))));
-
-        String childName = context.getNameUtils().uncamel(context.getNameUtils().singularize(fieldName));
-
-        Conditional listChildsNotNull = ifRef._else()._if(Op.ne(listChilds, ExpressionFactory._null()));
-
-        Conditional isListEmpty = listChildsNotNull._then()._if(Op.eq(listChilds.invoke("size"), ExpressionFactory.lit(0)));
-
-        isListEmpty._then().assign(listChilds, ref(DomUtils.class).staticInvoke("getChildElements").arg(
-                listElement
-        ));
-
-        ForEach forEach = listChildsNotNull._then().forEach(ref(org.w3c.dom.Element.class), fieldName.replace("-", "") + "Child", listChilds);
-
-        Invocation getValueRef = forEach.var().invoke("getAttribute").arg("value-ref");
-        Invocation getKeyRef = forEach.var().invoke("getAttribute").arg("key-ref");
-        Variable valueRef = forEach.body().decl(ref(String.class), fieldName.replace("-", "") + "ValueRef",
-                getValueRef);
-        Variable keyRef = forEach.body().decl(ref(String.class), fieldName.replace("-", "") + "KeyRef",
-                getKeyRef);
-
-        Variable valueObject = forEach.body().decl(ref(Object.class), "valueObject",
-                ExpressionFactory._null());
-        Variable keyObject = forEach.body().decl(ref(Object.class), "keyObject",
-                ExpressionFactory._null());
-
-        Conditional ifValueRef = forEach.body()._if(Op.cand(Op.ne(valueRef, ExpressionFactory._null()),
-                Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(valueRef))));
-
-        Conditional ifValueRefNotExpresion = ifValueRef._then()._if(Op.cand(
-                Op.not(valueRef.invoke("startsWith").arg(patternInfo.invoke("getPrefix"))),
-                Op.not(valueRef.invoke("endsWith").arg(patternInfo.invoke("getSuffix")))
-        ));
-
-        ifValueRefNotExpresion._then().assign(valueObject, ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(valueRef));
-
-        ifValueRefNotExpresion._else().assign(valueObject, valueRef);
-
-        Block ifNotValueRef = ifValueRef._else();
-        if (variableTypeParameters.size() > 1 && variableTypeParameters.get(1).isArrayOrList()) {
-            UpperBlockClosure subList = generateParseArrayOrList(ifNotValueRef, variableTypeParameters.get(1), forEach.var(), builder, "inner-" + childName, patternInfo, parserContext);
-
-            subList.getNotRefBlock().assign(valueObject, subList.getManagedCollection());
-        } else if (variableTypeParameters.size() > 1 && variableTypeParameters.get(1).isMap()) {
-            UpperBlockClosure subMap = generateParseMap(ifNotValueRef, variableTypeParameters.get(1), forEach.var(), builder, "inner-" + childName, patternInfo, parserContext);
-
-            subMap.getNotRefBlock().assign(valueObject, subMap.getManagedCollection());
-        } else {
-            ifNotValueRef.assign(valueObject,
-                    forEach.var().invoke("getTextContent"));
-        }
-
-        Conditional ifKeyRef = forEach.body()._if(Op.cand(Op.ne(keyRef, ExpressionFactory._null()),
-                Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(keyRef))));
-
-        ifKeyRef._then().assign(keyObject,
-                ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(keyRef));
-
-        ifKeyRef._else().assign(keyObject,
-                forEach.var().invoke("getAttribute").arg("key"));
-
-        Conditional noKey = forEach.body()._if(Op.cor(
-                Op.eq(keyObject, ExpressionFactory._null()),
-                Op.cand(Op._instanceof(keyObject, ref(String.class)),
-                        ref(StringUtils.class).staticInvoke("isBlank").arg(
-                                ExpressionFactory.cast(ref(String.class), keyObject)
-                        ))
-        ));
-
-        noKey._then().assign(keyObject, forEach.var().invoke("getTagName"));
-
-        forEach.body().add(managedMap.invoke("put").arg(keyObject).arg(valueObject));
-
-        return new UpperBlockClosure(managedMap, ifRef._else());
+        return anonymousClass;
     }
 
-    private UpperBlockClosure generateParseArrayOrList(Block body, DevKitElement typeMirror, Variable listElement, Variable builder, String fieldName, Variable patternInfo, Variable parserContext) {
-        List<DevKitElement> variableTypeParameters = typeMirror.getTypeArguments();
+    private DefinedClass generateParserDelegateForList(String childElementName) {
+        DefinedClass parserDelegateInterface = context.getClassForRole(AbstractBeanDefinitionParserGenerator.DELEGATE_ROLE);
+        DefinedClass anonymousClass = context.getCodeModel().anonymousClass(parserDelegateInterface.narrow(ref(List.class)));
+        Method parseMethod = anonymousClass.method(Modifier.PUBLIC, ref(List.class), "parse");
+        Variable element = parseMethod.param(ref(Element.class), "element");
 
-        Variable listChilds = body.decl(ref(List.class).narrow(ref(org.w3c.dom.Element.class)),
-                fieldName.replace("-", "") + "ListChilds",
-                ExpressionFactory._null());
+        parseMethod.body()._return(ExpressionFactory.invoke("parseList")
+                .arg(element).arg(childElementName).arg(ExpressionFactory._new(generateParserDelegateForTextContent())
+                ));
 
-        Conditional listElementNotNull = body._if(Op.ne(listElement, ExpressionFactory._null()));
-
-        Invocation getElementRef = listElement.invoke("getAttribute").arg("ref");
-        Variable ref = listElementNotNull._then().decl(ref(String.class), fieldName.replace("-", "") + "Ref",
-                getElementRef);
-
-        Conditional ifRef = listElementNotNull._then()._if(Op.cand(Op.ne(ref, ExpressionFactory._null()),
-                Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(ref))));
-
-        Conditional ifRefNotExpresion = ifRef._then()._if(Op.cand(
-                Op.not(ref.invoke("startsWith").arg(patternInfo.invoke("getPrefix"))),
-                Op.not(ref.invoke("endsWith").arg(patternInfo.invoke("getSuffix")))
-        ));
-
-        ifRefNotExpresion._then().add(builder.invoke("addPropertyValue").arg(fieldName).arg(
-                ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(ref)
-        ));
-
-        ifRefNotExpresion._else().add(builder.invoke("addPropertyValue").arg(fieldName).arg(
-                ref));
-
-        Variable managedList = ifRef._else().decl(ref(ManagedList.class), fieldName.replace("-", ""),
-                ExpressionFactory._new(ref(ManagedList.class)));
-
-        String childName = context.getNameUtils().uncamel(context.getNameUtils().singularize(fieldName));
-
-        ifRef._else().assign(listChilds,
-                ref(DomUtils.class).staticInvoke("getChildElementsByTagName")
-                        .arg(listElement)
-                        .arg(childName));
-
-        Conditional listChildsNotNull = ifRef._else()._if(Op.ne(listChilds, ExpressionFactory._null()));
-
-        ForEach forEach = listChildsNotNull._then().forEach(ref(org.w3c.dom.Element.class), fieldName.replace("-", "") + "Child", listChilds);
-
-        Invocation getValueRef = forEach.var().invoke("getAttribute").arg("ref");
-        Variable valueRef = forEach.body().decl(ref(String.class), "valueRef",
-                getValueRef);
-
-        Conditional ifValueRef = forEach.body()._if(Op.cand(Op.ne(valueRef, ExpressionFactory._null()),
-                Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(valueRef))));
-
-        Conditional ifValueRefNotExpresion = ifValueRef._then()._if(Op.cand(
-                Op.not(valueRef.invoke("startsWith").arg(patternInfo.invoke("getPrefix"))),
-                Op.not(valueRef.invoke("endsWith").arg(patternInfo.invoke("getSuffix")))
-        ));
-
-        ifValueRefNotExpresion._then().add(
-                managedList.invoke("add").arg(
-                        ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(valueRef)));
-
-        ifValueRefNotExpresion._else().add(managedList.invoke("add").arg(valueRef));
-
-        if (!variableTypeParameters.isEmpty() && variableTypeParameters.get(0).isArrayOrList()) {
-            UpperBlockClosure subList = generateParseArrayOrList(ifValueRef._else(), variableTypeParameters.get(0), forEach.var(), builder, "inner-" + childName, patternInfo, parserContext);
-
-            subList.getNotRefBlock().add(
-                    managedList.invoke("add").arg(subList.getManagedCollection()));
-        } else if (!variableTypeParameters.isEmpty() && variableTypeParameters.get(0).isMap()) {
-            UpperBlockClosure subMap = generateParseMap(ifValueRef._else(), variableTypeParameters.get(0), forEach.var(), builder, "inner-" + childName, patternInfo, parserContext);
-
-            subMap.getNotRefBlock().add(
-                    managedList.invoke("add").arg(subMap.getManagedCollection()));
-        } else {
-            ifValueRef._else().add(
-                    managedList.invoke("add").arg(forEach.var().invoke("getTextContent")));
-        }
-
-        return new UpperBlockClosure(managedList, ifRef._else());
+        return anonymousClass;
     }
 
+    private DefinedClass generateParserDelegateForMap(String childElementName) {
+        DefinedClass parserDelegateInterface = context.getClassForRole(AbstractBeanDefinitionParserGenerator.DELEGATE_ROLE);
+        DefinedClass anonymousClass = context.getCodeModel().anonymousClass(parserDelegateInterface.narrow(ref(Map.class)));
+        Method parseMethod = anonymousClass.method(Modifier.PUBLIC, ref(Map.class), "parse");
+        Variable element = parseMethod.param(ref(Element.class), "element");
 
-    private void generateAttachMessageSource(Method parse, Variable definition, Variable parserContext) {
-        Variable propertyValues = parse.body().decl(ref(MutablePropertyValues.class), "propertyValues",
-                parserContext.invoke("getContainingBeanDefinition").invoke("getPropertyValues"));
+        parseMethod.body()._return(ExpressionFactory.invoke("parseMap")
+                .arg(element).arg(childElementName).arg(ExpressionFactory._new(generateParserDelegateForTextContent())
+                ));
 
-        parse.body().add(propertyValues.invoke("addPropertyValue").arg("messageSource").arg(
-                definition
-        ));
-    }
-
-    private void generateGenerateChildBeanNameMethod(DefinedClass beanDefinitionparser) {
-        Method generateChildBeanName = beanDefinitionparser.method(Modifier.PRIVATE, ref(String.class), "generateChildBeanName");
-        Variable element = generateChildBeanName.param(ref(org.w3c.dom.Element.class), "element");
-
-        Variable id = generateChildBeanName.body().decl(ref(String.class), "id", ref(SpringXMLUtils.class).staticInvoke("getNameOrId").arg(element));
-        Conditional isBlank = generateChildBeanName.body()._if(ref(StringUtils.class).staticInvoke("isBlank").arg(id));
-        Invocation getParentName = ref(SpringXMLUtils.class).staticInvoke("getNameOrId").arg(ExpressionFactory.cast(
-                ref(org.w3c.dom.Element.class), element.invoke("getParentNode")
-        ));
-        Variable parentId = isBlank._then().decl(ref(String.class), "parentId", getParentName);
-        isBlank._then()._return(Op.plus(Op.plus(Op.plus(ExpressionFactory.lit("."), parentId), ExpressionFactory.lit(":")), element.invoke("getLocalName")));
-        isBlank._else()._return(id);
-    }
-
-
-    private class UpperBlockClosure {
-        private Variable managedCollection;
-        private Block notRefBlock;
-
-        private UpperBlockClosure(Variable managedCollection, Block notRefBlock) {
-            this.managedCollection = managedCollection;
-            this.notRefBlock = notRefBlock;
-        }
-
-        public Variable getManagedCollection() {
-            return managedCollection;
-        }
-
-        public void setManagedCollection(Variable managedCollection) {
-            this.managedCollection = managedCollection;
-        }
-
-        public Block getNotRefBlock() {
-            return notRefBlock;
-        }
-
-        public void setNotRefBlock(Block notRefBlock) {
-            this.notRefBlock = notRefBlock;
-        }
+        return anonymousClass;
     }
 }

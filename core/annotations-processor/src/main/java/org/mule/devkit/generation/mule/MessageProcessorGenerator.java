@@ -292,7 +292,10 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         Variable sourceDataType = shouldTransform._then().decl(ref(DataType.class), "sourceDataType",
                 ref(DataTypeFactory.class).staticInvoke("create").arg(target.invoke("getClass")));
         Variable targetDataType = shouldTransform._then().decl(ref(DataType.class), "targetDataType", ExpressionFactory._null());
-        
+
+        Conditional ifParameterizedType = shouldTransform._then()._if(Op._instanceof(expectedType, ref(ParameterizedType.class)));
+        ifParameterizedType._then().assign(expectedType, ExpressionFactory.cast(ref(ParameterizedType.class), expectedType).invoke("getRawType"));
+
         Conditional ifExpectedMimeTypeNotNull = shouldTransform._then()._if(Op.ne(expectedMimeType, ExpressionFactory._null()));
         ifExpectedMimeTypeNotNull._then().assign(targetDataType, ref(DataTypeFactory.class).staticInvoke("create").arg(
                                 ExpressionFactory.cast(ref(Class.class), expectedType)).arg(expectedMimeType));

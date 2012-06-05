@@ -169,6 +169,11 @@ public class CollectionModule {
         return objects;
     }
 
+    @Processor
+    public int countParameters(List<Parameter> parameters) {
+        return parameters.size();
+    }
+
     public void setStrings(List strings) {
         this.strings = strings;
     }

@@ -75,6 +75,12 @@ public class CollectionModuleTest extends AbstractModuleTest {
         runFlow("flowMapOfLists");
     }
 
+    /*
+    public void testCountParameters() throws Exception {
+        runFlow("countParameters", 3);
+    }
+    */
+
     public void testRetrieveKey() throws Exception {
         Map<String, String> a1 = new HashMap<String, String>();
         a1.put("a", "Mule");

@@ -232,7 +232,7 @@ public class MuleStudioUtils {
     }
 
     private boolean skipAttributeTypeGeneration(DevKitElement element) {
-        return element.isCollection() || element.isEnum() || typeMirrorUtils.ignoreParameter(element);
+        return element.isCollection() || element.isEnum() || ((element instanceof DevKitParameterElement) && ((DevKitParameterElement) element).shouldBeIgnored());
     }
 
     private AttributeType createAttributeTypeOfSupportedType(DevKitElement element) {

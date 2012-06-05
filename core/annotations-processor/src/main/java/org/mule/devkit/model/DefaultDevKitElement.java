@@ -22,9 +22,11 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.type.TypeVariable;
 import javax.lang.model.type.WildcardType;
 import javax.lang.model.util.Types;
 import javax.xml.bind.annotation.XmlType;
@@ -217,10 +219,15 @@ public class DefaultDevKitElement<T extends Element, P extends DevKitElement> im
         List<DevKitElement> typeArguments = new ArrayList<DevKitElement>();
         DeclaredType declaredType = (DeclaredType)asType();
         for( TypeMirror typeMirror : declaredType.getTypeArguments() ) {
-            if( typeMirror instanceof WildcardType) {
+            if( typeMirror instanceof WildcardType || typeMirror instanceof TypeVariable ) {
                 continue;
             }
-            typeArguments.add(new DefaultDevKitElement(types.asElement(typeMirror), this, types));
+            Element element = types.asElement(typeMirror);
+            if( element instanceof TypeElement ) {
+                typeArguments.add(new DefaultDevKitTypeElement((TypeElement)element, types));
+            } else {
+                typeArguments.add(new DefaultDevKitElement(element, this, types));
+            }
         }
 
         return typeArguments;
@@ -228,6 +235,6 @@ public class DefaultDevKitElement<T extends Element, P extends DevKitElement> im
 
     @Override
     public boolean hasTypeArguments() {
-        return ((DeclaredType)asType()).getTypeArguments().size() > 0;
+        return getTypeArguments().size() > 0;
     }
 }

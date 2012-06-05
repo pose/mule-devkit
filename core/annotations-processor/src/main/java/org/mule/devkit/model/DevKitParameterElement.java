@@ -17,4 +17,5 @@
 package org.mule.devkit.model;
 
 public interface DevKitParameterElement extends DevKitVariableElement<DevKitExecutableElement> {
+    boolean shouldBeIgnored();
 }

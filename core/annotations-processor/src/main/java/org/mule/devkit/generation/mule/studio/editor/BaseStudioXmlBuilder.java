@@ -237,11 +237,11 @@ public abstract class BaseStudioXmlBuilder {
         return jaxbElement;
     }
 
-    private List<DevKitVariableElement> getParametersSorted() {
-        List<DevKitVariableElement> parameters = new ArrayList<DevKitVariableElement>(executableElement.getParameters());
-        Iterator<DevKitVariableElement> iterator = parameters.iterator();
+    private List<DevKitParameterElement> getParametersSorted() {
+        List<DevKitParameterElement> parameters = new ArrayList<DevKitParameterElement>(executableElement.getParameters());
+        Iterator<DevKitParameterElement> iterator = parameters.iterator();
         while (iterator.hasNext()) {
-            if (typeMirrorUtils.ignoreParameter(iterator.next())) {
+            if (iterator.next().shouldBeIgnored()) {
                 iterator.remove();
             }
         }

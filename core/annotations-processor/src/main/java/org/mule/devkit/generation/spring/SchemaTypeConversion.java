@@ -70,6 +70,9 @@ public final class SchemaTypeConversion {
             return new QName(targetNamespace, "integerType");
         } else if (typeName.equals("java.util.Date")) {
             return new QName(targetNamespace, "dateTimeType");
+        } else if (typeName.equals("java.lang.Class") ||
+                   typeName.startsWith("java.lang.Class<")) {
+            return new QName(SchemaConstants.XSD_NAMESPACE, "string", "xs");
         } else if (typeName.equals("java.net.URL")) {
             return new QName(targetNamespace, "anyUriType");
         } else if (typeName.equals("java.net.URI")) {

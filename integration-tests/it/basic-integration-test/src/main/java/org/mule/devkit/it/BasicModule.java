@@ -193,6 +193,17 @@ public class BasicModule {
     }
 
     /**
+     * Passthru class
+     *
+     * @param value Class to passthru
+     * @return The same class object
+     */
+    @Processor
+    public Class<?> passthruClass(Class<?> value) {
+        return value;
+    }
+
+    /**
      * Passthru complex object
      *
      * @param myComplexObject Value to passthru
