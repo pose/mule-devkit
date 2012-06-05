@@ -57,4 +57,28 @@ public interface DevKitElement<T extends Element, P extends DevKitElement> exten
     List<DevKitElement> getTypeArguments();
 
     boolean hasTypeArguments();
+
+    boolean isString();
+    
+    boolean isBoolean();
+    
+    boolean isInteger();
+    
+    boolean isLong();
+    
+    boolean isFloat();
+    
+    boolean isDouble();
+    
+    boolean isChar();
+    
+    boolean isHttpCallback();
+    
+    boolean isURL();
+    
+    boolean isDate();
+    
+    boolean isBigDecimal();
+    
+    boolean isBigInteger();
 }

@@ -17,6 +17,7 @@
 package org.mule.devkit.model;
 
 import org.mule.api.NestedProcessor;
+import org.mule.api.callback.HttpCallback;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
@@ -31,7 +32,11 @@ import javax.lang.model.type.WildcardType;
 import javax.lang.model.util.Types;
 import javax.xml.bind.annotation.XmlType;
 import java.lang.annotation.Annotation;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -237,4 +242,71 @@ public class DefaultDevKitElement<T extends Element, P extends DevKitElement> im
     public boolean hasTypeArguments() {
         return getTypeArguments().size() > 0;
     }
+
+    @Override
+    public boolean isString() {
+        String className = innerElement.asType().toString();
+        return className.startsWith(String.class.getName());
+    }
+
+    @Override
+    public boolean isBoolean() {
+        String className = innerElement.asType().toString();
+        return className.startsWith(Boolean.class.getName()) || className.startsWith("boolean");
+    }
+
+    @Override
+    public boolean isInteger() {
+        String className = innerElement.asType().toString();
+        return className.startsWith(Integer.class.getName()) || className.startsWith("int");
+    }
+
+    @Override
+    public boolean isLong() {
+        String className = innerElement.asType().toString();
+        return className.startsWith(Long.class.getName()) || className.startsWith("long");
+    }
+
+    @Override
+    public boolean isFloat() {
+        String className = innerElement.asType().toString();
+        return className.startsWith(Float.class.getName()) || className.startsWith("float");
+    }
+
+    @Override
+    public boolean isDouble() {
+        String className = innerElement.asType().toString();
+        return className.startsWith(Double.class.getName()) || className.startsWith("double");
+    }
+
+    @Override
+    public boolean isChar() {
+        String className = innerElement.asType().toString();
+        return className.startsWith(Character.class.getName()) || className.startsWith("char");
+    }
+
+    @Override
+    public boolean isHttpCallback() {
+        return innerElement.asType().toString().startsWith(HttpCallback.class.getName());
+    }
+
+    @Override
+    public boolean isURL() {
+        return innerElement.asType().toString().startsWith(URL.class.getName());
+    }
+
+    @Override
+    public boolean isDate() {
+        return innerElement.asType().toString().startsWith(Date.class.getName());
+    }
+
+    @Override
+    public boolean isBigDecimal() {
+        return innerElement.asType().toString().startsWith(BigDecimal.class.getName());
+    }
+
+    @Override
+    public boolean isBigInteger() {
+        return innerElement.asType().toString().startsWith(BigInteger.class.getName());
+    }    
 }

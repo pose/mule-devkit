@@ -1071,7 +1071,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             attribute.setName(name);
             javax.lang.model.element.Element enumElement = context.getTypeUtils().asElement(variable.asType());
             attribute.setType(new QName(schema.getTargetNamespace(), enumElement.getSimpleName() + ENUM_TYPE_SUFFIX));
-        } else if (context.getTypeMirrorUtils().isHttpCallback(variable)) {
+        } else if (variable.isHttpCallback()) {
             attribute.setName(context.getNameUtils().uncamel(name) + FLOW_REF_SUFFIX);
             attribute.setType(SchemaConstants.STRING);
         } else {

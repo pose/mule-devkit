@@ -59,11 +59,11 @@ public class VariableComparatorTest {
     public void setUpTests() throws Exception {
         MockitoAnnotations.initMocks(this);
         when(context.getTypeMirrorUtils()).thenReturn(typeMirrorUtils);
-        when(typeMirrorUtils.isString(stringVariable)).thenReturn(true);
-        when(typeMirrorUtils.isInteger(intVariable)).thenReturn(true);
+        when(stringVariable.isString()).thenReturn(true);
+        when(intVariable.isInteger()).thenReturn(true);
         when(enumVariable.isEnum()).thenReturn(true);
         when(mapVariable.isCollection()).thenReturn(true);
-        when(typeMirrorUtils.isBoolean(booleanVariable)).thenReturn(true);
+        when(booleanVariable.isBoolean()).thenReturn(true);
     }
 
     @Test
@@ -153,7 +153,7 @@ public class VariableComparatorTest {
     @Test
     public void testCompareBothWithFriendlyNames() throws Exception {
         DevKitVariableElement stringVariable2 = mock(DevKitVariableElement.class);
-        when(typeMirrorUtils.isString(stringVariable2)).thenReturn(true);
+        when(stringVariable2.isString()).thenReturn(true);
 
         FriendlyName friendlyName1 = mock(FriendlyName.class);
         FriendlyName friendlyName2 = mock(FriendlyName.class);
@@ -177,7 +177,7 @@ public class VariableComparatorTest {
     @Test
     public void testCompareFriendlyName() throws Exception {
         DevKitVariableElement stringVariable2 = mock(DevKitVariableElement.class);
-        when(typeMirrorUtils.isString(stringVariable2)).thenReturn(true);
+        when(stringVariable2.isString()).thenReturn(true);
 
         FriendlyName friendlyName1 = mock(FriendlyName.class);
         when(friendlyName1.value()).thenReturn("b");

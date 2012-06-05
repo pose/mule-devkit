@@ -75,10 +75,10 @@ public class VariableComparator implements Comparator<DevKitVariableElement> {
             return VARIABLE1_FIRST;
         }
 
-        if (typeMirrorUtils.isBoolean(variable1)) {
+        if (variable1.isBoolean()) {
             return VARIABLE2_FIRST;
         }
-        if (typeMirrorUtils.isBoolean(variable2)) {
+        if (variable2.isBoolean()) {
             return VARIABLE1_FIRST;
         }
 
@@ -106,10 +106,10 @@ public class VariableComparator implements Comparator<DevKitVariableElement> {
     }
 
     private boolean bothOfSameType(DevKitVariableElement variable1, DevKitVariableElement variable2) {
-        return typeMirrorUtils.isString(variable1) && typeMirrorUtils.isString(variable2) ||
-                typeMirrorUtils.isInteger(variable1) && typeMirrorUtils.isInteger(variable2) ||
+        return variable1.isString() && variable2.isString() ||
+                variable1.isInteger() && variable2.isInteger() ||
                 variable1.isEnum() && variable2.isEnum() ||
-                typeMirrorUtils.isBoolean(variable1) && typeMirrorUtils.isBoolean(variable2) ||
+                variable1.isBoolean() && variable2.isBoolean() ||
                 variable1.isCollection() && variable2.isCollection();
     }
 

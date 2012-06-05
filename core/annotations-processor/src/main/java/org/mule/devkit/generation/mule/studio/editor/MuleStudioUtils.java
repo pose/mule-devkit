@@ -221,7 +221,7 @@ public class MuleStudioUtils {
             return null;
         } else if (SchemaTypeConversion.isSupported(element.asType().toString())) {
             return createAttributeTypeOfSupportedType(element);
-        } else if (typeMirrorUtils.isHttpCallback(element)) {
+        } else if (element.isHttpCallback()) {
             FlowRefType flowRefType = new FlowRefType();
             flowRefType.setSupportFlow(true);
             flowRefType.setSupportSubflow(true);
@@ -239,19 +239,19 @@ public class MuleStudioUtils {
         if (element.getAnnotation(Password.class) != null) {
             return new PasswordType();
         }
-        if (typeMirrorUtils.isString(element) || typeMirrorUtils.isDate(element) || typeMirrorUtils.isChar(element) ||
-                typeMirrorUtils.isFloat(element) || typeMirrorUtils.isDouble(element)) {
+        if (element.isString() || element.isDate() || element.isChar() ||
+                element.isFloat() || element.isDouble()) {
             return new StringAttributeType();
-        } else if (typeMirrorUtils.isBoolean(element)) {
+        } else if (element.isBoolean()) {
             Booleantype booleantype = new Booleantype();
             booleantype.setSupportsExpressions(true);
             return booleantype;
-        } else if (typeMirrorUtils.isInteger(element) || typeMirrorUtils.isLong(element) || typeMirrorUtils.isBigDecimal(element) || typeMirrorUtils.isBigInteger(element)) {
+        } else if (element.isInteger() || element.isLong() || element.isBigDecimal() || element.isBigInteger()) {
             IntegerType integerType = new IntegerType();
             integerType.setMin(0);
             integerType.setStep(1);
             return integerType;
-        } else if (typeMirrorUtils.isURL(element)) {
+        } else if (element.isURL()) {
             return new UrlType();
         } else {
             throw new RuntimeException("Failed to create Studio XML, type not recognized: type=" + element.asType().toString() + " name=" + element.getSimpleName().toString());
@@ -343,7 +343,7 @@ public class MuleStudioUtils {
             return caption.value();
         }
         String friendlyName = nameUtils.friendlyNameFromCamelCase(element.getSimpleName().toString());
-        if (typeMirrorUtils.isHttpCallback(element)) {
+        if (element.isHttpCallback()) {
             return formatCaption(friendlyName + " Flow");
         }
         if (!isKnownType(element)) {
@@ -365,20 +365,20 @@ public class MuleStudioUtils {
     }
 
     public boolean isKnownType(DevKitVariableElement variable) {
-        return typeMirrorUtils.isString(variable) ||
-                typeMirrorUtils.isChar(variable) ||
-                typeMirrorUtils.isDate(variable) ||
-                typeMirrorUtils.isDouble(variable) ||
-                typeMirrorUtils.isFloat(variable) ||
-                typeMirrorUtils.isLong(variable) ||
-                typeMirrorUtils.isHttpCallback(variable) ||
-                typeMirrorUtils.isInteger(variable) ||
-                typeMirrorUtils.isBigDecimal(variable) ||
-                typeMirrorUtils.isBigInteger(variable) ||
-                typeMirrorUtils.isBoolean(variable) ||
+        return variable.isString() ||
+                variable.isChar() ||
+                variable.isDate() ||
+                variable.isDouble() ||
+                variable.isFloat() ||
+                variable.isLong() ||
+                variable.isHttpCallback() ||
+                variable.isInteger() ||
+                variable.isBigDecimal() ||
+                variable.isBigInteger() ||
+                variable.isBoolean() ||
                 variable.isEnum() ||
                 variable.isCollection() ||
-                typeMirrorUtils.isURL(variable);
+                variable.isURL();
     }
 
     public String getUrl(DevKitTypeElement typeElement) {

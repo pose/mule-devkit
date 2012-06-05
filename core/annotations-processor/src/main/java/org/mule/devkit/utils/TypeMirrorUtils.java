@@ -60,60 +60,7 @@ public class TypeMirrorUtils {
         this.types = types;
     }
 
-    public boolean isString(DevKitElement element) {
-        String className = element.asType().toString();
-        return className.startsWith(String.class.getName());
-    }
 
-    public boolean isBoolean(DevKitElement element) {
-        String className = element.asType().toString();
-        return className.startsWith(Boolean.class.getName()) || className.startsWith("boolean");
-    }
-
-    public boolean isInteger(DevKitElement element) {
-        String className = element.asType().toString();
-        return className.startsWith(Integer.class.getName()) || className.startsWith("int");
-    }
-
-    public boolean isLong(DevKitElement element) {
-        String className = element.asType().toString();
-        return className.startsWith(Long.class.getName()) || className.startsWith("long");
-    }
-
-    public boolean isFloat(DevKitElement element) {
-        String className = element.asType().toString();
-        return className.startsWith(Float.class.getName()) || className.startsWith("float");
-    }
-
-    public boolean isDouble(DevKitElement element) {
-        String className = element.asType().toString();
-        return className.startsWith(Double.class.getName()) || className.startsWith("double");
-    }
-
-    public boolean isChar(DevKitElement element) {
-        String className = element.asType().toString();
-        return className.startsWith(Character.class.getName()) || className.startsWith("char");
-    }
-
-    public boolean isHttpCallback(DevKitElement element) {
-        return element.asType().toString().startsWith(HttpCallback.class.getName());
-    }
-
-    public boolean isURL(DevKitElement element) {
-        return element.asType().toString().startsWith(URL.class.getName());
-    }
-
-    public boolean isDate(DevKitElement element) {
-        return element.asType().toString().startsWith(Date.class.getName());
-    }
-
-    public boolean isBigDecimal(DevKitElement element) {
-        return element.asType().toString().startsWith(BigDecimal.class.getName());
-    }
-
-    public boolean isBigInteger(DevKitElement element) {
-        return element.asType().toString().startsWith(BigInteger.class.getName());
-    }
 
     public String getJavaType(DevKitElement element) {
         return element.asType().toString();
