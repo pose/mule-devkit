@@ -39,19 +39,19 @@ import org.mule.devkit.model.code.Variable;
 public class LifecycleAdapterFactoryGenerator extends AbstractModuleGenerator {
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
         return (typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class)) && typeElement.isPoolable();
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) {
+    public void generate(DevKitTypeElement typeElement) {
         DefinedClass lifecycleAdapterFactory = getLifecycleAdapterFactoryClass(typeElement);
         lifecycleAdapterFactory.javadoc().add("A <code>" + lifecycleAdapterFactory.name() + "</code> is an implementation  ");
         lifecycleAdapterFactory.javadoc().add(" of {@link ObjectFactory} interface for ");
         lifecycleAdapterFactory.javadoc().add(ref(typeElement.asType()));
 
-        DefinedClass poolObjectClass = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
-        context.setClassRole(context.getNameUtils().generatePoolObjectRoleKey(typeElement), poolObjectClass);
+        DefinedClass poolObjectClass = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement));
+        ctx().setClassRole(ctx().getNameUtils().generatePoolObjectRoleKey(typeElement), poolObjectClass);
 
         generateFields(typeElement, lifecycleAdapterFactory);
 
@@ -66,22 +66,22 @@ public class LifecycleAdapterFactoryGenerator extends AbstractModuleGenerator {
     }
 
     private void generateIsExternallyManagedLifecycle(DefinedClass lifecycleAdapterFactory) {
-        Method isExternallyManagedLifecycle = lifecycleAdapterFactory.method(Modifier.PUBLIC, context.getCodeModel().BOOLEAN, "isExternallyManagedLifecycle");
+        Method isExternallyManagedLifecycle = lifecycleAdapterFactory.method(Modifier.PUBLIC, ctx().getCodeModel().BOOLEAN, "isExternallyManagedLifecycle");
         isExternallyManagedLifecycle.body()._return(ExpressionFactory.FALSE);
     }
 
     private void generateIsAutoWireObject(DefinedClass lifecycleAdapterFactory) {
-        Method isAutoWireObject = lifecycleAdapterFactory.method(Modifier.PUBLIC, context.getCodeModel().BOOLEAN, "isAutoWireObject");
+        Method isAutoWireObject = lifecycleAdapterFactory.method(Modifier.PUBLIC, ctx().getCodeModel().BOOLEAN, "isAutoWireObject");
         isAutoWireObject.body()._return(ExpressionFactory.FALSE);
     }
 
     private void generateIsSingleton(DefinedClass lifecycleAdapterFactory) {
-        Method isSingleton = lifecycleAdapterFactory.method(Modifier.PUBLIC, context.getCodeModel().BOOLEAN, "isSingleton");
+        Method isSingleton = lifecycleAdapterFactory.method(Modifier.PUBLIC, ctx().getCodeModel().BOOLEAN, "isSingleton");
         isSingleton.body()._return(ExpressionFactory.FALSE);
     }
 
     private void generateAddObjectInitialisationCallback(DefinedClass lifecycleAdapterFactory) {
-        Method addObjectInitialisationCallback = lifecycleAdapterFactory.method(Modifier.PUBLIC, context.getCodeModel().VOID, "addObjectInitialisationCallback");
+        Method addObjectInitialisationCallback = lifecycleAdapterFactory.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "addObjectInitialisationCallback");
         addObjectInitialisationCallback.param(ref(InitialisationCallback.class), "callback");
         addObjectInitialisationCallback.body()._throw(ExpressionFactory._new(ref(UnsupportedOperationException.class)));
     }
@@ -104,11 +104,11 @@ public class LifecycleAdapterFactoryGenerator extends AbstractModuleGenerator {
     }
 
     private void generateDisposeMethod(DefinedClass lifecycleAdapterFactory) {
-        lifecycleAdapterFactory.method(Modifier.PUBLIC, context.getCodeModel().VOID, "dispose");
+        lifecycleAdapterFactory.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "dispose");
     }
 
     private void generateInitialiseMethod(DefinedClass lifecycleAdapterFactory) {
-        Method initialise = lifecycleAdapterFactory.method(Modifier.PUBLIC, context.getCodeModel().VOID, "initialise");
+        Method initialise = lifecycleAdapterFactory.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "initialise");
         initialise._throws(ref(InitialisationException.class));
     }
 
@@ -120,12 +120,12 @@ public class LifecycleAdapterFactoryGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass getLifecycleAdapterFactoryClass(DevKitTypeElement typeElement) {
-        String lifecycleAdapterName = context.getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.LIFECYCLE_ADAPTER_FACTORY_CLASS_NAME_SUFFIX);
-        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(lifecycleAdapterName));
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(lifecycleAdapterName));
+        String lifecycleAdapterName = ctx().getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.LIFECYCLE_ADAPTER_FACTORY_CLASS_NAME_SUFFIX);
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(lifecycleAdapterName));
+        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(lifecycleAdapterName));
         clazz._implements(ref(ObjectFactory.class));
 
-        context.setClassRole(context.getNameUtils().generatePojoFactoryKey(typeElement), clazz);
+        ctx().setClassRole(ctx().getNameUtils().generatePojoFactoryKey(typeElement), clazz);
 
         return clazz;
     }

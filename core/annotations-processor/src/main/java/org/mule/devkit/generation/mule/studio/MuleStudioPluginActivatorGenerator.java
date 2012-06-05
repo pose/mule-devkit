@@ -39,12 +39,12 @@ public class MuleStudioPluginActivatorGenerator extends AbstractMessageGenerator
     private static final String ACTIVATOR_FQN = "org.mule.tooling.ui.contribution.Activator";
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return !context.hasOption("skipStudioPluginPackage");
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
+        return !ctx().hasOption("skipStudioPluginPackage");
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
+    public void generate(DevKitTypeElement typeElement) throws GenerationException {
         DefinedClass activatorClass = getActivatorClass();
         activatorClass.javadoc().add("The activator class controls the plug-in life cycle");
         new FieldBuilder(activatorClass).
@@ -54,7 +54,7 @@ public class MuleStudioPluginActivatorGenerator extends AbstractMessageGenerator
                 type(String.class).
                 name("PLUGIN_ID").
                 initialValue("org.mule.tooling.ui.contribution." + typeElement.name()).build();
-        TypeReference activatorTypeRef = context.getCodeModel().directClass(ACTIVATOR_FQN);
+        TypeReference activatorTypeRef = ctx().getCodeModel().directClass(ACTIVATOR_FQN);
         FieldVariable plugin = new FieldBuilder(activatorClass).staticField().type(activatorTypeRef).name("plugin").build();
 
         generateStartMethod(activatorClass, plugin);
@@ -66,17 +66,17 @@ public class MuleStudioPluginActivatorGenerator extends AbstractMessageGenerator
     }
 
     private DefinedClass getActivatorClass() {
-        NameUtils nameUtils = context.getNameUtils();
+        NameUtils nameUtils = ctx().getNameUtils();
         String activatorFQN = ACTIVATOR_FQN;
-        Package pkg = context.getCodeModel()._package(nameUtils.getPackageName(activatorFQN));
+        Package pkg = ctx().getCodeModel()._package(nameUtils.getPackageName(activatorFQN));
         DefinedClass clazz;
-        clazz = pkg._class(context.getNameUtils().getClassName(activatorFQN));
+        clazz = pkg._class(ctx().getNameUtils().getClassName(activatorFQN));
         clazz._extends(AbstractUIPlugin.class);
         return clazz;
     }
 
     private void generateStartMethod(DefinedClass activatorClass, FieldVariable plugin) {
-        Method start = activatorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "start");
+        Method start = activatorClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "start");
         start._throws(Exception.class);
         Variable context = start.param(BundleContext.class, "context");
         start.body().invoke(ExpressionFactory._super(), "start").arg(context);
@@ -84,7 +84,7 @@ public class MuleStudioPluginActivatorGenerator extends AbstractMessageGenerator
     }
 
     private void generateStopMethod(DefinedClass activatorClass, FieldVariable plugin) {
-        Method stop = activatorClass.method(Modifier.PUBLIC, super.context.getCodeModel().VOID, "stop");
+        Method stop = activatorClass.method(Modifier.PUBLIC, super.ctx().getCodeModel().VOID, "stop");
         stop._throws(Exception.class);
         Variable context = stop.param(BundleContext.class, "context");
         stop.body().assign(plugin, ExpressionFactory._null());

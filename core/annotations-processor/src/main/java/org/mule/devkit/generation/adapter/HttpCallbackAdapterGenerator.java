@@ -49,14 +49,14 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
     private static final int DEFAULT_REMOTE_PORT = 80;
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
         return typeElement.hasAnnotation(OAuth.class) ||
                 typeElement.hasAnnotation(OAuth2.class) ||
                 typeElement.hasProcessorMethodWithParameter(HttpCallback.class);
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) {
+    public void generate(DevKitTypeElement typeElement) {
         DefinedClass httpCallbackAdapter = getHttpCallbackAdapterClass(typeElement);
         FieldVariable localPort = localPortFieldWithGetterAndSetter(httpCallbackAdapter);
         FieldVariable remotePort = remotePortFieldWithGetterAndSetter(httpCallbackAdapter);
@@ -68,7 +68,7 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
     }
 
     private void generateInitialiseMethod(DefinedClass httpCallbackAdapter, FieldVariable localPort, FieldVariable remotePort, FieldVariable domain, FieldVariable logger) {
-        Method initialise = httpCallbackAdapter.method(Modifier.PUBLIC, this.context.getCodeModel().VOID, "initialise");
+        Method initialise = httpCallbackAdapter.method(Modifier.PUBLIC, this.ctx().getCodeModel().VOID, "initialise");
         if (ref(Initialisable.class).isAssignableFrom(httpCallbackAdapter._extends())) {
             initialise.body().invoke(ExpressionFactory._super(), "initialise");
         }
@@ -103,15 +103,15 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass getHttpCallbackAdapterClass(DevKitTypeElement typeElement) {
-        String httpCallbackAdapterClassName = context.getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.HTTP_CALLBACK_ADAPTER_CLASS_NAME_SUFFIX);
-        Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(httpCallbackAdapterClassName));
+        String httpCallbackAdapterClassName = ctx().getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.HTTP_CALLBACK_ADAPTER_CLASS_NAME_SUFFIX);
+        Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(httpCallbackAdapterClassName));
 
-        DefinedClass classToExtend = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
+        DefinedClass classToExtend = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement));
 
-        DefinedClass oauthAdapter = pkg._class(context.getNameUtils().getClassName(httpCallbackAdapterClassName), classToExtend);
+        DefinedClass oauthAdapter = pkg._class(ctx().getNameUtils().getClassName(httpCallbackAdapterClassName), classToExtend);
         oauthAdapter._implements(ref(Initialisable.class));
 
-        context.setClassRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement), oauthAdapter);
+        ctx().setClassRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement), oauthAdapter);
 
         return oauthAdapter;
     }

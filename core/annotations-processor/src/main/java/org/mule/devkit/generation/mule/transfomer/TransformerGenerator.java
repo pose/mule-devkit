@@ -55,12 +55,12 @@ import java.util.Map;
 public class TransformerGenerator extends AbstractMessageGenerator {
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
         return typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class);
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
+    public void generate(DevKitTypeElement typeElement) throws GenerationException {
         for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Transformer.class)) {
 
             // get class
@@ -68,7 +68,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
 
             // declare weight
             Transformer transformer = executableElement.getAnnotation(Transformer.class);
-            FieldVariable weighting = transformerClass.field(Modifier.PRIVATE, context.getCodeModel().INT, "weighting", Op.plus(ref(DiscoverableTransformer.class).staticRef("DEFAULT_PRIORITY_WEIGHTING"), ExpressionFactory.lit(transformer.priorityWeighting())));
+            FieldVariable weighting = transformerClass.field(Modifier.PRIVATE, ctx().getCodeModel().INT, "weighting", Op.plus(ref(DiscoverableTransformer.class).staticRef("DEFAULT_PRIORITY_WEIGHTING"), ExpressionFactory.lit(transformer.priorityWeighting())));
 
             //generate constructor
             generateConstructor(transformerClass, typeElement, executableElement);
@@ -80,19 +80,19 @@ public class TransformerGenerator extends AbstractMessageGenerator {
             generateGetPriorityWeighting(transformerClass, weighting);
             generateSetPriorityWeighting(transformerClass, weighting);
 
-            context.registerAtBoot(transformerClass);
+            ctx().registerAtBoot(transformerClass);
         }
 
     }
 
     private void generateSetPriorityWeighting(DefinedClass jaxbTransformerClass, FieldVariable weighting) {
-        Method setPriorityWeighting = jaxbTransformerClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setPriorityWeighting");
-        Variable localWeighting = setPriorityWeighting.param(context.getCodeModel().INT, "weighting");
+        Method setPriorityWeighting = jaxbTransformerClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setPriorityWeighting");
+        Variable localWeighting = setPriorityWeighting.param(ctx().getCodeModel().INT, "weighting");
         setPriorityWeighting.body().assign(ExpressionFactory._this().ref(weighting), localWeighting);
     }
 
     private void generateGetPriorityWeighting(DefinedClass jaxbTransformerClass, FieldVariable weighting) {
-        Method getPriorityWeighting = jaxbTransformerClass.method(Modifier.PUBLIC, context.getCodeModel().INT, "getPriorityWeighting");
+        Method getPriorityWeighting = jaxbTransformerClass.method(Modifier.PUBLIC, ctx().getCodeModel().INT, "getPriorityWeighting");
         getPriorityWeighting.body()._return(weighting);
     }
 
@@ -144,7 +144,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
         // register destination data type
         registerDestinationType(constructor, moduleClass, executableElement);
 
-        constructor.body().invoke("setName").arg(context.getNameUtils().generateClassName(executableElement, "Transformer"));
+        constructor.body().invoke("setName").arg(ctx().getNameUtils().generateClassName(executableElement, "Transformer"));
     }
 
     private void registerDestinationType(Method constructor, DevKitTypeElement moduleClass, DevKitExecutableElement executableElement) {
@@ -184,9 +184,9 @@ public class TransformerGenerator extends AbstractMessageGenerator {
     }
 
     public DefinedClass getTransformerClass(DevKitExecutableElement executableElement) {
-        String transformerClassName = context.getNameUtils().generateClassName(executableElement, NamingContants.TRANSFORMER_CLASS_NAME_SUFFIX);
-        Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(transformerClassName) + NamingContants.TRANSFORMERS_NAMESPACE);
-        DefinedClass transformer = pkg._class(context.getNameUtils().getClassName(transformerClassName), AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class});
+        String transformerClassName = ctx().getNameUtils().generateClassName(executableElement, NamingContants.TRANSFORMER_CLASS_NAME_SUFFIX);
+        Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(transformerClassName) + NamingContants.TRANSFORMERS_NAMESPACE);
+        DefinedClass transformer = pkg._class(ctx().getNameUtils().getClassName(transformerClassName), AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class});
 
         return transformer;
     }

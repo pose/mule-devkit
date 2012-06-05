@@ -46,7 +46,7 @@ public class DefaultRestoreAccessTokenCallbackGenerator extends AbstractMessageG
     public static final String ROLE = "DefaultRestoreAccessTokenCallback";
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
         if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class)) {
             return true;
         }
@@ -55,7 +55,7 @@ public class DefaultRestoreAccessTokenCallbackGenerator extends AbstractMessageG
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
+    public void generate(DevKitTypeElement typeElement) throws GenerationException {
         DefinedClass callbackClass = getDefaultRestoreAccessTokenCallbackClass(typeElement);
 
         FieldVariable messageProcessor = generateFieldForMessageProcessor(callbackClass, "messageProcessor");
@@ -72,7 +72,7 @@ public class DefaultRestoreAccessTokenCallbackGenerator extends AbstractMessageG
         generateGetter(callbackClass, messageProcessor);
         generateSetter(callbackClass, messageProcessor);
 
-        Method restoreAccessTokenMethod = callbackClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "restoreAccessToken");
+        Method restoreAccessTokenMethod = callbackClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "restoreAccessToken");
         Variable event = restoreAccessTokenMethod.body().decl(ref(MuleEvent.class), "event", ref(RequestContext.class).staticInvoke("getEvent"));
 
         Conditional ifMuleContextAware = restoreAccessTokenMethod.body()._if(Op._instanceof(messageProcessor, ref(MuleContextAware.class)));
@@ -151,12 +151,12 @@ public class DefaultRestoreAccessTokenCallbackGenerator extends AbstractMessageG
     }
 
     private DefinedClass getDefaultRestoreAccessTokenCallbackClass(DevKitTypeElement type) {
-        String callbackClassName = context.getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, NamingContants.DEFAULT_RESTORE_ACCESS_TOKEN_CALLBACK_CLASS_NAME);
-        Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(callbackClassName));
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(callbackClassName), new Class[]{
+        String callbackClassName = ctx().getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, NamingContants.DEFAULT_RESTORE_ACCESS_TOKEN_CALLBACK_CLASS_NAME);
+        Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(callbackClassName));
+        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(callbackClassName), new Class[]{
                 RestoreAccessTokenCallback.class});
 
-        context.setClassRole(ROLE, clazz);
+        ctx().setClassRole(ROLE, clazz);
 
         return clazz;
     }

@@ -126,12 +126,12 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     }
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
         return typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class);
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
+    public void generate(DevKitTypeElement typeElement) throws GenerationException {
         String targetNamespace = getNamespace(typeElement);
 
         Schema schema = new Schema();
@@ -160,16 +160,16 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         }
 
         // TODO: replace with a class role
-        String namespaceHandlerName = context.getNameUtils().generateClassName(typeElement, NamingContants.CONFIG_NAMESPACE, NamingContants.NAMESPACE_HANDLER_CLASS_NAME_SUFFIX);
-        String className = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement)).boxify().fullName();
+        String namespaceHandlerName = ctx().getNameUtils().generateClassName(typeElement, NamingContants.CONFIG_NAMESPACE, NamingContants.NAMESPACE_HANDLER_CLASS_NAME_SUFFIX);
+        String className = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement)).boxify().fullName();
 
         SchemaLocation versionedSchemaLocation = new SchemaLocation(schema, schema.getTargetNamespace(), fileName, versionedLocation, namespaceHandlerName, className);
 
-        context.getSchemaModel().addSchemaLocation(versionedSchemaLocation);
+        ctx().getSchemaModel().addSchemaLocation(versionedSchemaLocation);
 
         if (currentLocation != null) {
             SchemaLocation currentSchemaLocation = new SchemaLocation(null, schema.getTargetNamespace(), fileName, currentLocation, namespaceHandlerName, className);
-            context.getSchemaModel().addSchemaLocation(currentSchemaLocation);
+            ctx().getSchemaModel().addSchemaLocation(currentSchemaLocation);
         }
     }
 
@@ -290,7 +290,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     }
 
     private void registerEnum(Schema schema, TypeMirror enumType) {
-        javax.lang.model.element.Element enumElement = context.getTypeUtils().asElement(enumType);
+        javax.lang.model.element.Element enumElement = ctx().getTypeUtils().asElement(enumType);
 
         TopLevelSimpleType enumSimpleType = new TopLevelSimpleType();
         enumSimpleType.setName(enumElement.getSimpleName() + ENUM_TYPE_SUFFIX);
@@ -323,7 +323,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
     private void registerTransformers(Schema schema, DevKitTypeElement typeElement) {
         for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Transformer.class)) {
-            Element transformerElement = registerTransformer(context.getNameUtils().uncamel(method.getSimpleName().toString()));
+            Element transformerElement = registerTransformer(ctx().getNameUtils().uncamel(method.getSimpleName().toString()));
             schema.getSimpleTypeOrComplexTypeOrGroup().add(transformerElement);
         }
     }
@@ -343,7 +343,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             }
             String typeName = StringUtils.capitalize(name) + TYPE_SUFFIX;
 
-            registerProcessorElement(schema, processor.intercepting(), targetNamespace, name, typeName, context.getJavaDocUtils().getSummary(method));
+            registerProcessorElement(schema, processor.intercepting(), targetNamespace, name, typeName, ctx().getJavaDocUtils().getSummary(method));
 
             registerProcessorType(schema, processor.intercepting(), targetNamespace, typeName, method);
         }
@@ -365,7 +365,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
     private void registerProcessorElement(Schema schema, boolean intercepting, String targetNamespace, String name, String typeName, String docText) {
         Element element = new TopLevelElement();
-        element.setName(context.getNameUtils().uncamel(name));
+        element.setName(ctx().getNameUtils().uncamel(name));
         if (intercepting) {
             element.setSubstitutionGroup(SchemaConstants.MULE_ABSTRACT_INTERCEPTING_MESSAGE_PROCESSOR);
         } else {
@@ -386,14 +386,14 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
     private void registerSourceElement(Schema schema, String targetNamespace, String name, String typeName, DevKitExecutableElement executableElement) {
         Element element = new TopLevelElement();
-        element.setName(context.getNameUtils().uncamel(name));
+        element.setName(ctx().getNameUtils().uncamel(name));
         element.setSubstitutionGroup(SchemaConstants.MULE_ABSTRACT_INBOUND_ENDPOINT);
         element.setType(new QName(targetNamespace, typeName));
 
         // add doc
         Annotation annotation = new Annotation();
         Documentation doc = new Documentation();
-        doc.getContent().add(context.getJavaDocUtils().getSummary(executableElement));
+        doc.getContent().add(ctx().getJavaDocUtils().getSummary(executableElement));
         annotation.getAppinfoOrDocumentation().add(doc);
 
         element.setAnnotation(annotation);
@@ -502,7 +502,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         TopLevelElement collectionElement = new TopLevelElement();
         all.getParticle().add(objectFactory.createElement(collectionElement));
-        collectionElement.setName(context.getNameUtils().uncamel(variable.getSimpleName().toString()));
+        collectionElement.setName(ctx().getNameUtils().uncamel(variable.getSimpleName().toString()));
 
         if (optional != null) {
             collectionElement.setMinOccurs(BigInteger.valueOf(0L));
@@ -520,7 +520,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         // add doc
         Annotation annotation = new Annotation();
         Documentation doc = new Documentation();
-        doc.getContent().add(context.getJavaDocUtils().getParameterSummary(variable.getSimpleName().toString(), variable.parent()));
+        doc.getContent().add(ctx().getJavaDocUtils().getParameterSummary(variable.getSimpleName().toString(), variable.parent()));
         annotation.getAppinfoOrDocumentation().add(doc);
 
         collectionElement.setAnnotation(annotation);
@@ -550,7 +550,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         TopLevelElement collectionElement = new TopLevelElement();
         all.getParticle().add(objectFactory.createElement(collectionElement));
-        collectionElement.setName(context.getNameUtils().uncamel(variable.getSimpleName().toString()));
+        collectionElement.setName(ctx().getNameUtils().uncamel(variable.getSimpleName().toString()));
 
         if (!forceOptional) {
             if (optional != null) {
@@ -566,12 +566,12 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         // add doc
         Annotation annotation = new Annotation();
         Documentation doc = new Documentation();
-        doc.getContent().add(context.getJavaDocUtils().getParameterSummary(variable.getSimpleName().toString(), variable.parent()));
+        doc.getContent().add(ctx().getJavaDocUtils().getParameterSummary(variable.getSimpleName().toString(), variable.parent()));
         annotation.getAppinfoOrDocumentation().add(doc);
 
         collectionElement.setAnnotation(annotation);
 
-        String collectionName = context.getNameUtils().uncamel(context.getNameUtils().singularize(collectionElement.getName()));
+        String collectionName = ctx().getNameUtils().uncamel(ctx().getNameUtils().singularize(collectionElement.getName()));
         LocalComplexType collectionComplexType = generateCollectionComplexType(schema, targetNamespace, collectionName, variable);
         collectionElement.setComplexType(collectionComplexType);
     }
@@ -781,7 +781,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
     private void registerConfigElement(Schema schema, String targetNamespace, DevKitTypeElement typeElement) {
 
-        DefinedClass moduleClass = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
+        DefinedClass moduleClass = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement));
         Map<QName, String> otherAttributes = new HashMap<QName, String>();
         otherAttributes.put(SchemaConstants.MULE_DEVKIT_JAVA_CLASS_TYPE, moduleClass.fullName());
         ExtensionType config = registerExtension(schema, SchemaConstants.ELEMENT_NAME_CONFIG, otherAttributes);
@@ -864,7 +864,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         Annotation annotation = new Annotation();
         Documentation doc = new Documentation();
-        doc.getContent().add(context.getJavaDocUtils().getSummary(typeElement));
+        doc.getContent().add(ctx().getJavaDocUtils().getSummary(typeElement));
         annotation.getAppinfoOrDocumentation().add(doc);
         config.setAnnotation(annotation);
 
@@ -989,7 +989,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         // add doc
         Annotation annotation = new Annotation();
         Documentation doc = new Documentation();
-        doc.getContent().add(context.getJavaDocUtils().getSummary(variable));
+        doc.getContent().add(ctx().getJavaDocUtils().getSummary(variable));
         annotation.getAppinfoOrDocumentation().add(doc);
 
         attribute.setAnnotation(annotation);
@@ -1017,7 +1017,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             attribute.setType(SchemaTypeConversion.convertType(variable.asType().toString(), schema.getTargetNamespace()));
         } else if (variable.isEnum()) {
             attribute.setName(name);
-            javax.lang.model.element.Element enumElement = context.getTypeUtils().asElement(variable.asType());
+            javax.lang.model.element.Element enumElement = ctx().getTypeUtils().asElement(variable.asType());
             attribute.setType(new QName(schema.getTargetNamespace(), enumElement.getSimpleName() + ENUM_TYPE_SUFFIX));
         } else {
             // non-supported types will get "-ref" so beans can be injected
@@ -1028,7 +1028,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         // add doc
         Annotation annotation = new Annotation();
         Documentation doc = new Documentation();
-        doc.getContent().add(context.getJavaDocUtils().getSummary(variable));
+        doc.getContent().add(ctx().getJavaDocUtils().getSummary(variable));
         annotation.getAppinfoOrDocumentation().add(doc);
 
         attribute.setAnnotation(annotation);
@@ -1069,10 +1069,10 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             attribute.setType(SchemaTypeConversion.convertType(variable.asType().toString(), schema.getTargetNamespace()));
         } else if (variable.isEnum()) {
             attribute.setName(name);
-            javax.lang.model.element.Element enumElement = context.getTypeUtils().asElement(variable.asType());
+            javax.lang.model.element.Element enumElement = ctx().getTypeUtils().asElement(variable.asType());
             attribute.setType(new QName(schema.getTargetNamespace(), enumElement.getSimpleName() + ENUM_TYPE_SUFFIX));
         } else if (variable.isHttpCallback()) {
-            attribute.setName(context.getNameUtils().uncamel(name) + FLOW_REF_SUFFIX);
+            attribute.setName(ctx().getNameUtils().uncamel(name) + FLOW_REF_SUFFIX);
             attribute.setType(SchemaConstants.STRING);
         } else {
             // non-supported types will get "-ref" so beans can be injected
@@ -1083,7 +1083,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         // add doc
         Annotation annotation = new Annotation();
         Documentation doc = new Documentation();
-        doc.getContent().add(context.getJavaDocUtils().getParameterSummary(variable.getSimpleName().toString(), variable.parent()));
+        doc.getContent().add(ctx().getJavaDocUtils().getParameterSummary(variable.getSimpleName().toString(), variable.parent()));
         annotation.getAppinfoOrDocumentation().add(doc);
 
         attribute.setAnnotation(annotation);

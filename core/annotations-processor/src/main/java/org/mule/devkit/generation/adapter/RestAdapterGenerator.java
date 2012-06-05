@@ -93,18 +93,18 @@ import java.util.Map;
 public class RestAdapterGenerator extends AbstractModuleGenerator {
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
         return typeElement.isModuleOrConnector() && typeElement.hasMethodsAnnotatedWith(RestCall.class);
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) {
+    public void generate(DevKitTypeElement typeElement) {
         DefinedClass restClientAdapterClass = getRestClientAdapterClass(typeElement);
 
         // logger field
         //FieldVariable logger = generateLoggerField(restClientAdapterClass);
 
-        FieldVariable responseTimeout = restClientAdapterClass.field(Modifier.PRIVATE, context.getCodeModel().INT, "responseTimeout");
+        FieldVariable responseTimeout = restClientAdapterClass.field(Modifier.PRIVATE, ctx().getCodeModel().INT, "responseTimeout");
         FieldVariable muleContext = restClientAdapterClass.field(Modifier.PRIVATE, ref(MuleContext.class), "muleContext");
 
         Expression httpClient = null;
@@ -116,7 +116,7 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
 
         generateSetMuleContext(restClientAdapterClass, muleContext);
 
-        Method initialise = restClientAdapterClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "initialise");
+        Method initialise = restClientAdapterClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "initialise");
         initialise.annotate(ref(Override.class));
         initialise.body().add(ExpressionFactory._super().invoke("initialise"));
         if (!typeElement.hasFieldAnnotatedWith(RestHttpClient.class)) {
@@ -135,7 +135,7 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
     }
 
     private void generateSetMuleContext(DefinedClass restClientAdapterClass, FieldVariable muleContext) {
-        Method setMuleContext = restClientAdapterClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setMuleContext");
+        Method setMuleContext = restClientAdapterClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setMuleContext");
         setMuleContext.annotate(Override.class);
         Variable context = setMuleContext.param(ref(MuleContext.class), "context");
         setMuleContext.body().assign(muleContext, context);
@@ -210,7 +210,7 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
                 }
             }
 
-            Variable statusCode = override.body().decl(context.getCodeModel().INT, "statusCode", httpClient.invoke("executeMethod").arg(method));
+            Variable statusCode = override.body().decl(ctx().getCodeModel().INT, "statusCode", httpClient.invoke("executeMethod").arg(method));
 
             generateParseResponseCode(typeElement, executableElement, override, method, statusCode, muleContext);
 
@@ -434,20 +434,20 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass getRestClientAdapterClass(DevKitTypeElement typeElement) {
-        String restClientAdapterClassName = context.getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.REST_CLIENT_ADAPTER_CLASS_NAME_SUFFIX);
-        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(restClientAdapterClassName));
-        TypeReference previous = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
+        String restClientAdapterClassName = ctx().getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.REST_CLIENT_ADAPTER_CLASS_NAME_SUFFIX);
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(restClientAdapterClassName));
+        TypeReference previous = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement));
 
         if (previous == null) {
             previous = (TypeReference) ref(typeElement.asType());
         }
 
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(restClientAdapterClassName), previous);
+        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(restClientAdapterClassName), previous);
         clazz._implements(ref(Initialisable.class));
         clazz._implements(ref(Disposable.class));
         clazz._implements(ref(MuleContextAware.class));
 
-        context.setClassRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement), clazz);
+        ctx().setClassRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement), clazz);
 
         return clazz;
     }

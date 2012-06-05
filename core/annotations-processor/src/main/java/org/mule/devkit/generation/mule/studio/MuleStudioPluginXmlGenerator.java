@@ -37,12 +37,12 @@ public class MuleStudioPluginXmlGenerator extends AbstractMessageGenerator {
     public static final String PLUGIN_XML_FILE_NAME = "plugin.xml";
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return !context.hasOption("skipStudioPluginPackage");
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
+        return !ctx().hasOption("skipStudioPluginPackage");
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
+    public void generate(DevKitTypeElement typeElement) throws GenerationException {
         try {
 
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -69,7 +69,7 @@ public class MuleStudioPluginXmlGenerator extends AbstractMessageGenerator {
             externalContributionElement.setAttribute("contributionType", "cloud-connector");
             externalContributionElement.setAttribute("path", MuleStudioEditorXmlGenerator.EDITOR_XML_FILE_NAME);
             externalContributionElement.setAttribute("version", "%PROJECT_VERSION%");
-            externalContributionElement.setAttribute("name", context.getNameUtils().friendlyNameFromCamelCase(typeElement.name()));
+            externalContributionElement.setAttribute("name", ctx().getNameUtils().friendlyNameFromCamelCase(typeElement.name()));
 
             extensionElement.appendChild(externalContributionElement);
 
@@ -77,7 +77,7 @@ public class MuleStudioPluginXmlGenerator extends AbstractMessageGenerator {
             Transformer transformer = transformerFactory.newTransformer();
 
             DOMSource source = new DOMSource(document);
-            StreamResult result = new StreamResult(context.getCodeModel().getCodeWriter().openBinary(null, PLUGIN_XML_FILE_NAME));
+            StreamResult result = new StreamResult(ctx().getCodeModel().getCodeWriter().openBinary(null, PLUGIN_XML_FILE_NAME));
             transformer.transform(source, result);
 
         } catch (Exception e) {

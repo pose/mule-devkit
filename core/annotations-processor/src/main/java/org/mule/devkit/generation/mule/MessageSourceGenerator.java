@@ -58,13 +58,13 @@ import java.util.Map;
 public class MessageSourceGenerator extends AbstractMessageGenerator {
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
         return (typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class)) &&
                 typeElement.hasMethodsAnnotatedWith(Source.class);
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) {
+    public void generate(DevKitTypeElement typeElement) {
         for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Source.class)) {
             generateMessageSource(typeElement, executableElement);
         }
@@ -158,7 +158,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         } else {
             // get pool object if poolable
             if (typeElement.isPoolable()) {
-                DefinedClass poolObjectClass = context.getClassForRole(context.getNameUtils().generatePoolObjectRoleKey(typeElement));
+                DefinedClass poolObjectClass = ctx().getClassForRole(ctx().getNameUtils().generatePoolObjectRoleKey(typeElement));
 
                 // add start method method
                 generateNoThreadStartMethod(messageSourceClass, executableElement, fields, connectFields, object, muleContext, poolObjectClass, flowConstruct, stopSourceCallback);
@@ -173,7 +173,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         if (sourceAnnotation.threadingModel() == SourceThreadingModel.SINGLE_THREAD) {
             // get pool object if poolable
             if (typeElement.isPoolable()) {
-                DefinedClass poolObjectClass = context.getClassForRole(context.getNameUtils().generatePoolObjectRoleKey(typeElement));
+                DefinedClass poolObjectClass = ctx().getClassForRole(ctx().getNameUtils().generatePoolObjectRoleKey(typeElement));
 
                 // add run method
                 generateRunMethod(messageSourceClass, executableElement, fields, connectFields, object, muleContext, poolObjectClass, flowConstruct, stopSourceCallback);
@@ -191,14 +191,14 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
     private void generateRunMethod(DefinedClass messageSourceClass, DevKitExecutableElement executableElement, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> connectFields, FieldVariable object, FieldVariable muleContext, DefinedClass poolObjectClass, FieldVariable flowConstruct, FieldVariable stopSourceCallback) {
         String methodName = executableElement.getSimpleName().toString();
-        Method run = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "run");
+        Method run = messageSourceClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "run");
         run.javadoc().add("Implementation {@link Runnable#run()} that will invoke the method on the pojo that this message source wraps.");
 
         generateSourceExecution(run.body(), executableElement, fields, connectFields, object, muleContext, poolObjectClass, flowConstruct, methodName, stopSourceCallback);
     }
 
     private void generateSourceExecution(Block body, DevKitExecutableElement executableElement, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> connectFields, FieldVariable object, FieldVariable muleContext, DefinedClass poolObjectClass, FieldVariable flowConstruct, String methodName, FieldVariable stopSourceCallback) {
-        DefinedClass moduleObjectClass = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(executableElement.parent()));
+        DefinedClass moduleObjectClass = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(executableElement.parent()));
         Variable moduleObject = body.decl(moduleObjectClass, "castedModuleObject", ExpressionFactory._null());
 
         Variable poolObject = null;
@@ -211,7 +211,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         DevKitExecutableElement connectMethod = connectForMethod(executableElement);
         Variable connection = null;
         if (connectMethod != null) {
-            DefinedClass connectionClass = context.getClassForRole(context.getNameUtils().generateConnectorObjectRoleKey(connectMethod.parent()));
+            DefinedClass connectionClass = ctx().getClassForRole(ctx().getNameUtils().generateConnectorObjectRoleKey(connectMethod.parent()));
             connection = body.decl(connectionClass, "connection", ExpressionFactory._null());
 
             for (DevKitParameterElement variable : connectMethod.getParameters()) {
@@ -289,7 +289,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
             callSource.body().assign(poolObject, ExpressionFactory.cast(poolObject.type(), moduleObject.invoke("getLifecyleEnabledObjectPool").invoke("borrowObject")));
             methodCall = poolObject.invoke(methodName);
         } else if (connectMethod != null) {
-            DefinedClass connectionKey = context.getClassForRole(context.getNameUtils().generateConnectionParametersRoleKey(executableElement.parent()));
+            DefinedClass connectionKey = ctx().getClassForRole(ctx().getNameUtils().generateConnectionParametersRoleKey(executableElement.parent()));
 
             Invocation newKey = ExpressionFactory._new(connectionKey);
             Invocation createConnection = moduleObject.invoke("acquireConnection");
@@ -347,7 +347,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
             TryStatement tryToReleaseSession = connectionNotNull._try();
 
-            DefinedClass connectionKey = context.getClassForRole(context.getNameUtils().generateConnectionParametersRoleKey(executableElement.parent()));
+            DefinedClass connectionKey = ctx().getClassForRole(ctx().getNameUtils().generateConnectionParametersRoleKey(executableElement.parent()));
             Invocation newKey = ExpressionFactory._new(connectionKey);
             for (String field : connectionParameters.keySet()) {
                 newKey.arg(connectionParameters.get(field));
@@ -364,7 +364,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
     }
 
     private void generateSingleThreadStartMethod(DefinedClass messageSourceClass, FieldVariable thread) {
-        Method start = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "start");
+        Method start = messageSourceClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "start");
         start.javadoc().add("Method to be called when Mule instance gets started.");
         start._throws(ref(MuleException.class));
         Conditional ifNoThread = start.body()._if(Op.eq(thread, ExpressionFactory._null()));
@@ -378,7 +378,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
 
     private void generateSingleThreadStopMethod(DefinedClass messageSourceClass, FieldVariable thread) {
-        Method stop = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "stop");
+        Method stop = messageSourceClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "stop");
         stop.javadoc().add("Method to be called when Mule instance gets stopped.");
         stop._throws(ref(MuleException.class));
 
@@ -391,7 +391,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
     private void generateNoThreadStartMethod(DefinedClass messageSourceClass, DevKitExecutableElement executableElement, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> connectFields, FieldVariable object, FieldVariable muleContext, DefinedClass poolObjectClass, FieldVariable flowConstruct, FieldVariable stopSourceCallback) {
         String methodName = executableElement.getSimpleName().toString();
-        Method start = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "start");
+        Method start = messageSourceClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "start");
         start.javadoc().add("Method to be called when Mule instance gets started.");
         start._throws(ref(MuleException.class));
 
@@ -401,7 +401,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
     private void generateNoThreadStopMethod(DefinedClass messageSourceClass, FieldVariable stopSourceCallback, DevKitExecutableElement executableElement) {
         String methodName = executableElement.getSimpleName().toString();
-        Method stop = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "stop");
+        Method stop = messageSourceClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "stop");
         stop.javadoc().add("Method to be called when Mule instance gets stopped.");
         stop._throws(ref(MuleException.class));
 

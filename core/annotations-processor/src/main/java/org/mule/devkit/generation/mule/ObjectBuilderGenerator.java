@@ -1,13 +1,17 @@
 package org.mule.devkit.generation.mule;
 
-import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.generation.AbstractGenerator;
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.generation.Generator;
 import org.mule.devkit.model.DevKitTypeElement;
 
-public class ObjectBuilderGenerator implements Generator {
+public class ObjectBuilderGenerator extends AbstractGenerator {
     @Override
-    public void generate(DevKitTypeElement typeElement, GeneratorContext context) throws GenerationException {
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void generate(DevKitTypeElement typeElement) throws GenerationException {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 }

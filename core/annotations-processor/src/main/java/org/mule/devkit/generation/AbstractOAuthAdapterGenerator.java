@@ -82,19 +82,19 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
     public static final String OAUTH_RESTORE_ACCESS_TOKEN_CALLBACK_FIELD_NAME = "oauthRestoreAccessToken";
 
     protected DefinedClass getOAuthAdapterClass(DevKitTypeElement typeElement, String classSuffix, Class<?> interf) {
-        String oauthAdapterName = context.getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, classSuffix);
-        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(oauthAdapterName));
+        String oauthAdapterName = ctx().getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, classSuffix);
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(oauthAdapterName));
 
-        DefinedClass classToExtend = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
+        DefinedClass classToExtend = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement));
 
-        DefinedClass oauthAdapter = pkg._class(context.getNameUtils().getClassName(oauthAdapterName), classToExtend);
+        DefinedClass oauthAdapter = pkg._class(ctx().getNameUtils().getClassName(oauthAdapterName), classToExtend);
         oauthAdapter._implements(MuleContextAware.class);
         oauthAdapter._implements(Startable.class);
         oauthAdapter._implements(Initialisable.class);
         oauthAdapter._implements(Stoppable.class);
         oauthAdapter._implements(interf);
 
-        context.setClassRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement), oauthAdapter);
+        ctx().setClassRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement), oauthAdapter);
 
         oauthAdapter.javadoc().add("A {@code " + oauthAdapter.name() + "} is a wrapper around ");
         oauthAdapter.javadoc().add(ref(typeElement.asType()));
@@ -133,7 +133,7 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
     }
 
     protected void generateStartMethod(DefinedClass oauthAdapter) {
-        Method start = oauthAdapter.method(Modifier.PUBLIC, context.getCodeModel().VOID, Startable.PHASE_NAME);
+        Method start = oauthAdapter.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, Startable.PHASE_NAME);
         start._throws(MuleException.class);
         start.body().invoke(ExpressionFactory._super(), Startable.PHASE_NAME);
         start.body().invoke(oauthAdapter.fields().get(CALLBACK_FIELD_NAME), Startable.PHASE_NAME);
@@ -141,14 +141,14 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
     }
 
     protected void generateStopMethod(DefinedClass oauthAdapter) {
-        Method start = oauthAdapter.method(Modifier.PUBLIC, context.getCodeModel().VOID, Stoppable.PHASE_NAME);
+        Method start = oauthAdapter.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, Stoppable.PHASE_NAME);
         start._throws(MuleException.class);
         start.body().invoke(ExpressionFactory._super(), (Stoppable.PHASE_NAME));
         start.body().invoke(oauthAdapter.fields().get(CALLBACK_FIELD_NAME), Stoppable.PHASE_NAME);
     }
 
     protected Method generateInitialiseMethod(DefinedClass oauthAdapter, DefinedClass messageProcessor, String callbackPath) {
-        Method initialise = oauthAdapter.method(Modifier.PUBLIC, context.getCodeModel().VOID, Initialisable.PHASE_NAME);
+        Method initialise = oauthAdapter.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, Initialisable.PHASE_NAME);
         if (ref(Initialisable.class).isAssignableFrom(oauthAdapter._extends())) {
             initialise.body().invoke(ExpressionFactory._super(), Initialisable.PHASE_NAME);
         }
@@ -160,10 +160,10 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
         FieldVariable callback = oauthAdapter.fields().get(CALLBACK_FIELD_NAME);
         FieldVariable muleContext = oauthAdapter.fields().get(MULE_CONTEXT_FIELD_NAME);
         if (StringUtils.isEmpty(callbackPath)) {
-            initialise.body().assign(callback, ExpressionFactory._new(context.getClassForRole(DefaultHttpCallbackGenerator.HTTP_CALLBACK_ROLE)).
+            initialise.body().assign(callback, ExpressionFactory._new(ctx().getClassForRole(DefaultHttpCallbackGenerator.HTTP_CALLBACK_ROLE)).
                     arg(ExpressionFactory._new(messageProcessor)).arg(muleContext).arg(domain).arg(localPort).arg(remotePort).arg(async).arg(connector));
         } else {
-            initialise.body().assign(callback, ExpressionFactory._new(context.getClassForRole(DefaultHttpCallbackGenerator.HTTP_CALLBACK_ROLE)).
+            initialise.body().assign(callback, ExpressionFactory._new(ctx().getClassForRole(DefaultHttpCallbackGenerator.HTTP_CALLBACK_ROLE)).
                     arg(ExpressionFactory._new(messageProcessor)).arg(muleContext).arg(domain).arg(localPort).arg(remotePort).arg(callbackPath).arg(async));
         }
         return initialise;
@@ -243,7 +243,7 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
                 }
             }
 
-            if (ref(executableElement.getReturnType()) != context.getCodeModel().VOID) {
+            if (ref(executableElement.getReturnType()) != ctx().getCodeModel().VOID) {
                 override.body()._return(callSuper);
             } else {
                 override.body().add(callSuper);
@@ -252,7 +252,7 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
     }
 
     protected void generateHasBeenAuthorizedMethod(DefinedClass oauthAdapter, FieldVariable oauthAccessToken) {
-        Method hasBeenAuthorized = oauthAdapter.method(Modifier.PUBLIC, context.getCodeModel().VOID, "hasBeenAuthorized");
+        Method hasBeenAuthorized = oauthAdapter.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "hasBeenAuthorized");
         hasBeenAuthorized._throws(ref(NotAuthorizedException.class));
         Block ifAccessTokenIsNull = hasBeenAuthorized.body()._if(isNull(oauthAccessToken))._then();
 

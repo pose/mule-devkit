@@ -38,12 +38,12 @@ public class MuleStudioSiteXmlGenerator extends AbstractMessageGenerator {
     public static final String SITE_XML = "site.xml";
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return !context.hasOption("skipStudioPluginPackage");
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
+        return !ctx().hasOption("skipStudioPluginPackage");
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
+    public void generate(DevKitTypeElement typeElement) throws GenerationException {
         try {
 
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -74,7 +74,7 @@ public class MuleStudioSiteXmlGenerator extends AbstractMessageGenerator {
             Transformer transformer = transformerFactory.newTransformer();
 
             DOMSource source = new DOMSource(document);
-            StreamResult result = new StreamResult(context.getCodeModel().getCodeWriter().openBinary(null, SITE_XML));
+            StreamResult result = new StreamResult(ctx().getCodeModel().getCodeWriter().openBinary(null, SITE_XML));
             transformer.transform(source, result);
 
 

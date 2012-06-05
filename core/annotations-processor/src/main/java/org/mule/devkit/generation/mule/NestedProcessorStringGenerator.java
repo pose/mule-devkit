@@ -36,13 +36,13 @@ public class NestedProcessorStringGenerator extends AbstractModuleGenerator {
     public static final String ROLE = "NestedProcessorString";
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
         return typeElement.hasProcessorMethodWithParameter(NestedProcessor.class) ||
                typeElement.hasProcessorMethodWithParameterListOf(NestedProcessor.class);
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
+    public void generate(DevKitTypeElement typeElement) throws GenerationException {
         DefinedClass callbackClass = getNestedProcessorStringClass(typeElement);
         callbackClass._implements(ref(NestedProcessor.class));
 
@@ -61,7 +61,7 @@ public class NestedProcessorStringGenerator extends AbstractModuleGenerator {
 
         generateCallbackProcessWithPayloadAndProperties(callbackClass, output);
 
-        context.setClassRole(ROLE, callbackClass);
+        ctx().setClassRole(ROLE, callbackClass);
     }
 
     private void generateCallbackProcessWithPayload(DefinedClass callbackClass, FieldVariable output) {
@@ -100,11 +100,11 @@ public class NestedProcessorStringGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass getNestedProcessorStringClass(DevKitTypeElement type) {
-        String processorCallbackClassName = context.getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, NamingContants.NESTED_PROCESSOR_STRING_CLASS_NAME);
-        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(processorCallbackClassName));
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(processorCallbackClassName));
+        String processorCallbackClassName = ctx().getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, NamingContants.NESTED_PROCESSOR_STRING_CLASS_NAME);
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(processorCallbackClassName));
+        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(processorCallbackClassName));
 
-        context.setClassRole(ROLE, clazz);
+        ctx().setClassRole(ROLE, clazz);
 
         return clazz;
     }

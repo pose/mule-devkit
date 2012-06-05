@@ -49,26 +49,26 @@ public class StringToDateTransformerGenerator extends AbstractMessageGenerator {
     private static final String SIMPLE_DATE_FORMAT_FIELD_NAME = "SIMPLE_DATE_FORMAT";
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
         return typeElement.hasProcessorMethodWithParameter(Date.class);
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) {
+    public void generate(DevKitTypeElement typeElement) {
         DefinedClass transformerClass = getTransformerClass(typeElement);
 
-        context.note("Generating String to Date transformer as " + transformerClass.fullName());
+        ctx().note("Generating String to Date transformer as " + transformerClass.fullName());
 
         FieldVariable muleContext = generateFieldForMuleContext(transformerClass);
         FieldVariable simpleDateFormat = generateSimpleDateFormatField(transformerClass);
-        FieldVariable weighting = transformerClass.field(Modifier.PRIVATE, context.getCodeModel().INT, "weighting", ref(DiscoverableTransformer.class).staticRef("DEFAULT_PRIORITY_WEIGHTING"));
+        FieldVariable weighting = transformerClass.field(Modifier.PRIVATE, ctx().getCodeModel().INT, "weighting", ref(DiscoverableTransformer.class).staticRef("DEFAULT_PRIORITY_WEIGHTING"));
         generateConstructor(transformerClass);
         generateSetMuleContextMethod(transformerClass, muleContext);
         generateDoTransform(transformerClass, simpleDateFormat);
         generateGetPriorityWeighting(transformerClass, weighting);
         generateSetPriorityWeighting(transformerClass, weighting);
 
-        context.registerAtBoot(transformerClass);
+        ctx().registerAtBoot(transformerClass);
     }
 
     private FieldVariable generateSimpleDateFormatField(DefinedClass transformerClass) {
@@ -79,13 +79,13 @@ public class StringToDateTransformerGenerator extends AbstractMessageGenerator {
     }
 
     private void generateSetPriorityWeighting(DefinedClass transformerClass, FieldVariable weighting) {
-        Method setPriorityWeighting = transformerClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setPriorityWeighting");
-        Variable localWeighting = setPriorityWeighting.param(context.getCodeModel().INT, "weighting");
+        Method setPriorityWeighting = transformerClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setPriorityWeighting");
+        Variable localWeighting = setPriorityWeighting.param(ctx().getCodeModel().INT, "weighting");
         setPriorityWeighting.body().assign(ExpressionFactory._this().ref(weighting), localWeighting);
     }
 
     private void generateGetPriorityWeighting(DefinedClass transformerClass, FieldVariable weighting) {
-        Method getPriorityWeighting = transformerClass.method(Modifier.PUBLIC, context.getCodeModel().INT, "getPriorityWeighting");
+        Method getPriorityWeighting = transformerClass.method(Modifier.PUBLIC, ctx().getCodeModel().INT, "getPriorityWeighting");
         getPriorityWeighting.body()._return(weighting);
     }
 
@@ -126,8 +126,8 @@ public class StringToDateTransformerGenerator extends AbstractMessageGenerator {
     }
 
     private DefinedClass getTransformerClass(DevKitTypeElement typeElement) {
-        String transformerClassName = context.getNameUtils().generateClassNameInPackage(typeElement, NamingContants.STRING_TO_DATE_TRANSFORMER_CLASS_NAME);
-        Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(transformerClassName) + NamingContants.TRANSFORMERS_NAMESPACE);
-        return pkg._class(context.getNameUtils().getClassName(transformerClassName), AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class, MuleContextAware.class});
+        String transformerClassName = ctx().getNameUtils().generateClassNameInPackage(typeElement, NamingContants.STRING_TO_DATE_TRANSFORMER_CLASS_NAME);
+        Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(transformerClassName) + NamingContants.TRANSFORMERS_NAMESPACE);
+        return pkg._class(ctx().getNameUtils().getClassName(transformerClassName), AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class, MuleContextAware.class});
     }
 }

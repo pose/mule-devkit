@@ -79,7 +79,10 @@ public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
                 context.note("Generating code for " + devKitTypeElement.getSimpleName().toString() + " class");
                 for (Generator generator : getGenerators()) {
                     try {
-                        generator.generate(devKitTypeElement, context);
+                        generator.setCtx(context);
+                        if( generator.shouldGenerate(devKitTypeElement) ) {
+                            generator.generate(devKitTypeElement);
+                        }
                     } catch (GenerationException ge) {
                         context.error(ge.getMessage());
                         return false;

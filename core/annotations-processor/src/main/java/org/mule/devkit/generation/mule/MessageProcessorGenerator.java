@@ -94,13 +94,13 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
         return (typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class)) &&
                 typeElement.hasMethodsAnnotatedWith(Processor.class);
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) {
+    public void generate(DevKitTypeElement typeElement) {
         for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Processor.class)) {
             generateMessageProcessor(typeElement, executableElement);
         }
@@ -117,7 +117,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             messageProcessorClass = getMessageProcessorClass(executableElement);
         }
 
-        context.note("Generating message processor as " + messageProcessorClass.fullName() + " for method " + executableElement.getSimpleName().toString() + " in " + typeElement.getSimpleName().toString());
+        ctx().note("Generating message processor as " + messageProcessorClass.fullName() + " for method " + executableElement.getSimpleName().toString() + " in " + typeElement.getSimpleName().toString());
 
         // add javadoc
         generateMessageProcessorClassDoc(executableElement, messageProcessorClass);
@@ -205,7 +205,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
         // get pool object if poolable
         if (typeElement.isPoolable()) {
-            DefinedClass poolObjectClass = context.getClassForRole(context.getNameUtils().generatePoolObjectRoleKey(typeElement));
+            DefinedClass poolObjectClass = ctx().getClassForRole(ctx().getNameUtils().generatePoolObjectRoleKey(typeElement));
 
             // add process method
             generateProcessMethod(executableElement, messageProcessorClass, fields, connectFields, messageProcessorListener, muleContext, object, poolObjectClass, logger, retryCount, retryMax);
@@ -366,7 +366,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         Variable event = process.param(muleEvent, "event");
         Variable muleMessage = process.body().decl(ref(MuleMessage.class), "_muleMessage", event.invoke("getMessage"));
 
-        DefinedClass moduleObjectClass = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(executableElement.parent()));
+        DefinedClass moduleObjectClass = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(executableElement.parent()));
         Variable moduleObject = process.body().decl(moduleObjectClass, "_castedModuleObject", ExpressionFactory._null());
         findConfig(process.body(), muleContext, object, methodName, event, moduleObjectClass, moduleObject);
 
@@ -450,7 +450,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         }
 
         if (connectMethod != null) {
-            DefinedClass connectionKey = context.getClassForRole(context.getNameUtils().generateConnectionParametersRoleKey(executableElement.parent()));
+            DefinedClass connectionKey = ctx().getClassForRole(ctx().getNameUtils().generateConnectionParametersRoleKey(executableElement.parent()));
 
             Conditional ifDebugEnabled = callProcessor.body()._if(logger.invoke("isDebugEnabled"));
             Variable messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "_messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
@@ -564,7 +564,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
             TryStatement innerTry = catchBlock.body()._try();
 
-            DefinedClass connectionKey = context.getClassForRole(context.getNameUtils().generateConnectionParametersRoleKey(executableElement.parent()));
+            DefinedClass connectionKey = ctx().getClassForRole(ctx().getNameUtils().generateConnectionParametersRoleKey(executableElement.parent()));
             Invocation newKey = ExpressionFactory._new(connectionKey);
             for (DevKitParameterElement variable : connectMethod.getParameters()) {
                 String fieldName = variable.getSimpleName().toString();
@@ -636,7 +636,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             ifDebugEnabled._then().add(logger.invoke("debug").arg(messageStringBuilder.invoke("toString")));
 
 
-            DefinedClass connectionKey = context.getClassForRole(context.getNameUtils().generateConnectionParametersRoleKey(executableElement.parent()));
+            DefinedClass connectionKey = ctx().getClassForRole(ctx().getNameUtils().generateConnectionParametersRoleKey(executableElement.parent()));
             Invocation newKey = ExpressionFactory._new(connectionKey);
             for (DevKitParameterElement variable : connectMethod.getParameters()) {
                 String fieldName = variable.getSimpleName().toString();
@@ -740,8 +740,8 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
     }
 
     private void declareNestedProcessorParameter(Map<String, FieldVariableElement> fields, FieldVariable muleContext, Variable event, TryStatement callProcessor, List<Expression> parameters, DevKitVariableElement variable, String fieldName) {
-        DefinedClass callbackClass = context.getClassForRole(NestedProcessorChainGenerator.ROLE);
-        DefinedClass stringCallbackClass = context.getClassForRole(NestedProcessorStringGenerator.ROLE);
+        DefinedClass callbackClass = ctx().getClassForRole(NestedProcessorChainGenerator.ROLE);
+        DefinedClass stringCallbackClass = ctx().getClassForRole(NestedProcessorStringGenerator.ROLE);
 
         boolean isList = variable.isArrayOrList();
 
@@ -820,7 +820,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
     private Variable addConnectionVariableIfNeeded(DevKitExecutableElement executableElement, Method process) {
         DevKitExecutableElement connectMethod = connectForMethod(executableElement);
         if (connectForMethod(executableElement) != null) {
-            DefinedClass connectionClass = context.getClassForRole(context.getNameUtils().generateConnectorObjectRoleKey(connectMethod.parent()));
+            DefinedClass connectionClass = ctx().getClassForRole(ctx().getNameUtils().generateConnectorObjectRoleKey(connectMethod.parent()));
             return process.body().decl(connectionClass, "connection", ExpressionFactory._null());
         }
         return null;
@@ -835,7 +835,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
     private Variable generateMethodCall(Block body, Variable object, String methodName, List<Expression> parameters, Variable event, Type returnType, Variable poolObject, Variable interceptCallback, FieldVariable messageProcessorListener) {
         Variable resultPayload = null;
-        if (returnType != context.getCodeModel().VOID) {
+        if (returnType != ctx().getCodeModel().VOID) {
             resultPayload = body.decl(ref(Object.class), "resultPayload");
         }
 
@@ -851,7 +851,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             methodCall.arg(parameter);
         }
 
-        if (returnType != context.getCodeModel().VOID) {
+        if (returnType != ctx().getCodeModel().VOID) {
             body.assign(resultPayload, methodCall);
         } else {
             body.add(methodCall);
@@ -867,7 +867,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             scope = shallContinue._else();
         }
 
-        if (returnType != context.getCodeModel().VOID) {
+        if (returnType != ctx().getCodeModel().VOID) {
             generatePayloadOverwrite(scope, event, resultPayload);
         }
 

@@ -57,20 +57,20 @@ import java.io.UnsupportedEncodingException;
 public class JaxbTransformerGenerator extends AbstractModuleGenerator {
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
         return typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class);
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) {
+    public void generate(DevKitTypeElement typeElement) {
         for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Processor.class)) {
             for (DevKitParameterElement variable : executableElement.getParameters()) {
-                if (variable.isXmlType() && !context.isJaxbElementRegistered(variable.asType())) {
+                if (variable.isXmlType() && !ctx().isJaxbElementRegistered(variable.asType())) {
                     // get class
                     DefinedClass jaxbTransformerClass = getJaxbTransformerClass(executableElement, variable);
 
                     // declare weight
-                    FieldVariable weighting = jaxbTransformerClass.field(Modifier.PRIVATE, context.getCodeModel().INT, "weighting", Op.plus(ref(DiscoverableTransformer.class).staticRef("DEFAULT_PRIORITY_WEIGHTING"), ExpressionFactory.lit(1)));
+                    FieldVariable weighting = jaxbTransformerClass.field(Modifier.PRIVATE, ctx().getCodeModel().INT, "weighting", Op.plus(ref(DiscoverableTransformer.class).staticRef("DEFAULT_PRIORITY_WEIGHTING"), ExpressionFactory.lit(1)));
 
                     // load JAXB context
                     Method loadJaxbContext = generateLoadJaxbContext(jaxbTransformerClass);
@@ -88,8 +88,8 @@ public class JaxbTransformerGenerator extends AbstractModuleGenerator {
                     generateGetPriorityWeighting(jaxbTransformerClass, weighting);
                     generateSetPriorityWeighting(jaxbTransformerClass, weighting);
 
-                    context.registerAtBoot(jaxbTransformerClass);
-                    context.registerJaxbElement(variable.asType());
+                    ctx().registerAtBoot(jaxbTransformerClass);
+                    ctx().registerJaxbElement(variable.asType());
                 }
             }
         }
@@ -97,13 +97,13 @@ public class JaxbTransformerGenerator extends AbstractModuleGenerator {
     }
 
     private void generateSetPriorityWeighting(DefinedClass jaxbTransformerClass, FieldVariable weighting) {
-        Method setPriorityWeighting = jaxbTransformerClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setPriorityWeighting");
-        Variable localWeighting = setPriorityWeighting.param(context.getCodeModel().INT, "weighting");
+        Method setPriorityWeighting = jaxbTransformerClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setPriorityWeighting");
+        Variable localWeighting = setPriorityWeighting.param(ctx().getCodeModel().INT, "weighting");
         setPriorityWeighting.body().assign(ExpressionFactory._this().ref(weighting), localWeighting);
     }
 
     private void generateGetPriorityWeighting(DefinedClass jaxbTransformerClass, FieldVariable weighting) {
-        Method getPriorityWeighting = jaxbTransformerClass.method(Modifier.PUBLIC, context.getCodeModel().INT, "getPriorityWeighting");
+        Method getPriorityWeighting = jaxbTransformerClass.method(Modifier.PUBLIC, ctx().getCodeModel().INT, "getPriorityWeighting");
         getPriorityWeighting.body()._return(weighting);
     }
 
@@ -199,8 +199,8 @@ public class JaxbTransformerGenerator extends AbstractModuleGenerator {
     private DefinedClass getJaxbTransformerClass(DevKitExecutableElement executableElement, DevKitVariableElement variable) {
         DeclaredType declaredType = (DeclaredType) variable.asType();
         XmlType xmlType = declaredType.asElement().getAnnotation(XmlType.class);
-        String packageName = context.getNameUtils().getPackageName(context.getNameUtils().getBinaryName(executableElement.parent())) + NamingContants.TRANSFORMERS_NAMESPACE;
-        Package pkg = context.getCodeModel()._package(packageName);
+        String packageName = ctx().getNameUtils().getPackageName(ctx().getNameUtils().getBinaryName(executableElement.parent())) + NamingContants.TRANSFORMERS_NAMESPACE;
+        Package pkg = ctx().getCodeModel()._package(packageName);
 
         return pkg._class(StringUtils.capitalize(xmlType.name()) + "JaxbTransformer", AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class});
     }

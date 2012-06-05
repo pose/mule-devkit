@@ -60,12 +60,12 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
     public static final String DELEGATE_ROLE = "ParserDelegateInterface";
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
         return typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class);
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) {
+    public void generate(DevKitTypeElement typeElement) {
         DefinedClass abstractBeanDefinitionParserClass = getAbstractBeanDefinitionParserClass(typeElement);
 
         FieldVariable patternInfo = generateFieldForPatternInfo(abstractBeanDefinitionParserClass);
@@ -100,11 +100,11 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
     }
 
     private DefinedClass getAbstractBeanDefinitionParserClass(DevKitTypeElement typeElement) {
-        String abstractBeanDefinitionParserClass = context.getNameUtils().generateClassNameInPackage(typeElement, NamingContants.CONFIG_NAMESPACE, NamingContants.ABSTRACT_DEFINITION_PARSER_CLASS_NAME_SUFFIX);
-        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(abstractBeanDefinitionParserClass));
-        DefinedClass clazz = pkg._class(Modifier.ABSTRACT, context.getNameUtils().getClassName(abstractBeanDefinitionParserClass), new Class[]{BeanDefinitionParser.class});
+        String abstractBeanDefinitionParserClass = ctx().getNameUtils().generateClassNameInPackage(typeElement, NamingContants.CONFIG_NAMESPACE, NamingContants.ABSTRACT_DEFINITION_PARSER_CLASS_NAME_SUFFIX);
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(abstractBeanDefinitionParserClass));
+        DefinedClass clazz = pkg._class(Modifier.ABSTRACT, ctx().getNameUtils().getClassName(abstractBeanDefinitionParserClass), new Class[]{BeanDefinitionParser.class});
 
-        context.setClassRole(ROLE, clazz);
+        ctx().setClassRole(ROLE, clazz);
 
         return clazz;
     }
@@ -117,7 +117,7 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
             Method parse = parseDelegate.method(Modifier.PUBLIC, typeVariable, "parse");
             parse.param(ref(Element.class), "element");
 
-            context.setClassRole(DELEGATE_ROLE, parseDelegate);
+            ctx().setClassRole(DELEGATE_ROLE, parseDelegate);
 
             return parseDelegate;
         } catch (ClassAlreadyExistsException e) {
@@ -161,7 +161,7 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
     }
 
     private void generateParseNestedProcessorAsListAndSetPropertyMethod(DefinedClass beanDefinitionParserClass) {
-        Method parseNestedProcessor = beanDefinitionParserClass.method(Modifier.PROTECTED, context.getCodeModel().VOID, "parseNestedProcessorAsListAndSetProperty");
+        Method parseNestedProcessor = beanDefinitionParserClass.method(Modifier.PROTECTED, ctx().getCodeModel().VOID, "parseNestedProcessorAsListAndSetProperty");
         Variable element = parseNestedProcessor.param(ref(Element.class), "element");
         Variable parserContext = parseNestedProcessor.param(ref(ParserContext.class), "parserContext");
         Variable factory = parseNestedProcessor.param(ref(Class.class), "factory");
@@ -173,7 +173,7 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
     }
 
     private void generateParseNestedProcessorAndSetPropertyMethod(DefinedClass beanDefinitionParserClass) {
-        Method parseNestedProcessor = beanDefinitionParserClass.method(Modifier.PROTECTED, context.getCodeModel().VOID, "parseNestedProcessorAndSetProperty");
+        Method parseNestedProcessor = beanDefinitionParserClass.method(Modifier.PROTECTED, ctx().getCodeModel().VOID, "parseNestedProcessorAndSetProperty");
         Variable element = parseNestedProcessor.param(ref(Element.class), "element");
         Variable parserContext = parseNestedProcessor.param(ref(ParserContext.class), "parserContext");
         Variable factory = parseNestedProcessor.param(ref(Class.class), "factory");
@@ -185,7 +185,7 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
     }
 
     private void generateParseNestedProcessorAsListWithChildNameAndSetPropertyMethod(DefinedClass beanDefinitionParserClass) {
-        Method parseNestedProcessor = beanDefinitionParserClass.method(Modifier.PROTECTED, context.getCodeModel().VOID, "parseNestedProcessorAsListAndSetProperty");
+        Method parseNestedProcessor = beanDefinitionParserClass.method(Modifier.PROTECTED, ctx().getCodeModel().VOID, "parseNestedProcessorAsListAndSetProperty");
         Variable element = parseNestedProcessor.param(ref(Element.class), "element");
         Variable childElementName = parseNestedProcessor.param(ref(String.class), "childElementName");
         Variable parserContext = parseNestedProcessor.param(ref(ParserContext.class), "parserContext");
@@ -203,7 +203,7 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
     }
 
     private void generateParseNestedProcessorWithChildNameAndSetPropertyMethod(DefinedClass beanDefinitionParserClass) {
-        Method parseNestedProcessor = beanDefinitionParserClass.method(Modifier.PROTECTED, context.getCodeModel().VOID, "parseNestedProcessorAndSetProperty");
+        Method parseNestedProcessor = beanDefinitionParserClass.method(Modifier.PROTECTED, ctx().getCodeModel().VOID, "parseNestedProcessorAndSetProperty");
         Variable element = parseNestedProcessor.param(ref(Element.class), "element");
         Variable childElementName = parseNestedProcessor.param(ref(String.class), "childElementName");
         Variable parserContext = parseNestedProcessor.param(ref(ParserContext.class), "parserContext");
@@ -287,7 +287,7 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
     }
 
     private void generateParseMapAndSetPropertyMethod(DefinedClass beanDefinitionParserClass, DefinedClass parserInterface) {
-        Method parseMap = beanDefinitionParserClass.method(Modifier.PROTECTED, context.getCodeModel().VOID, "parseMapAndSetProperty");
+        Method parseMap = beanDefinitionParserClass.method(Modifier.PROTECTED, ctx().getCodeModel().VOID, "parseMapAndSetProperty");
         Variable element = parseMap.param(ref(Element.class), "element");
         Variable builder = parseMap.param(ref(BeanDefinitionBuilder.class), "builder");
         Variable fieldName = parseMap.param(ref(String.class), "fieldName");
@@ -327,7 +327,7 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
     }
 
     private void generateParseListAndSetPropertyMethod(DefinedClass beanDefinitionParserClass, DefinedClass parserInterface) {
-        Method parseList = beanDefinitionParserClass.method(Modifier.PROTECTED, context.getCodeModel().VOID, "parseListAndSetProperty");
+        Method parseList = beanDefinitionParserClass.method(Modifier.PROTECTED, ctx().getCodeModel().VOID, "parseListAndSetProperty");
         Variable element = parseList.param(ref(Element.class), "element");
         Variable builder = parseList.param(ref(BeanDefinitionBuilder.class), "builder");
         Variable fieldName = parseList.param(ref(String.class), "fieldName");
@@ -347,7 +347,7 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
     }
 
     private void generateParseConfigRefMethod(DefinedClass beanDefinitionParserClass) {
-        Method parseConfigRef = beanDefinitionParserClass.method(Modifier.PROTECTED, context.getCodeModel().VOID, "parseConfigRef");
+        Method parseConfigRef = beanDefinitionParserClass.method(Modifier.PROTECTED, ctx().getCodeModel().VOID, "parseConfigRef");
         Variable element = parseConfigRef.param(ref(Element.class), "element");
         Variable builder = parseConfigRef.param(ref(BeanDefinitionBuilder.class), "builder");
 
@@ -357,7 +357,7 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
     }
 
     private void generateAttachSourceDefinitionMethod(DefinedClass beanDefinitionParserClass) {
-        Method attachDefinition = beanDefinitionParserClass.method(Modifier.PROTECTED, context.getCodeModel().VOID, "attachSourceDefinition");
+        Method attachDefinition = beanDefinitionParserClass.method(Modifier.PROTECTED, ctx().getCodeModel().VOID, "attachSourceDefinition");
         Variable parserContext = attachDefinition.param(ref(ParserContext.class), "parserContext");
         Variable definition = attachDefinition.param(ref(BeanDefinition.class), "definition");
 
@@ -371,7 +371,7 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
 
 
     private void generateAttachProcessorDefinitionMethod(DefinedClass beanDefinitionParserClass) {
-        Method attachDefinition = beanDefinitionParserClass.method(Modifier.PROTECTED, context.getCodeModel().VOID, "attachProcessorDefinition");
+        Method attachDefinition = beanDefinitionParserClass.method(Modifier.PROTECTED, ctx().getCodeModel().VOID, "attachProcessorDefinition");
         Variable parserContext = attachDefinition.param(ref(ParserContext.class), "parserContext");
         Variable definition = attachDefinition.param(ref(BeanDefinition.class), "definition");
 
@@ -401,7 +401,7 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
     }
 
     private void generateHasAttributeMethod(DefinedClass beanDefinitionParserClass) {
-        Method hasAttribute = beanDefinitionParserClass.method(Modifier.PROTECTED, context.getCodeModel().BOOLEAN, "hasAttribute");
+        Method hasAttribute = beanDefinitionParserClass.method(Modifier.PROTECTED, ctx().getCodeModel().BOOLEAN, "hasAttribute");
         Variable element = hasAttribute.param(ref(Element.class), "element");
         Variable attributeName = hasAttribute.param(ref(String.class), "attributeName");
         Variable value = hasAttribute.body().decl(ref(String.class), "value", element.invoke("getAttribute").arg(attributeName));
@@ -413,7 +413,7 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
     }
 
     private void generateSetRefMethod(DefinedClass beanDefinitionParserClass) {
-        Method setRef = beanDefinitionParserClass.method(Modifier.PROTECTED, context.getCodeModel().VOID, "setRef");
+        Method setRef = beanDefinitionParserClass.method(Modifier.PROTECTED, ctx().getCodeModel().VOID, "setRef");
         Variable builder = setRef.param(ref(BeanDefinitionBuilder.class), "builder");
         Variable propertyName = setRef.param(ref(String.class), "propertyName");
         Variable ref = setRef.param(ref(String.class), "ref");
@@ -429,7 +429,7 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
     }
 
     private void generateIsMuleExpressionMethod(DefinedClass beanDefinitionParserClass, FieldVariable patternInfo) {
-        Method isMuleExpression = beanDefinitionParserClass.method(Modifier.PROTECTED, context.getCodeModel().BOOLEAN, "isMuleExpression");
+        Method isMuleExpression = beanDefinitionParserClass.method(Modifier.PROTECTED, ctx().getCodeModel().BOOLEAN, "isMuleExpression");
         Variable value = isMuleExpression.param(ref(String.class), "value");
 
         Conditional ifRefNotExpresion = isMuleExpression.body()._if(Op.cand(
@@ -459,7 +459,7 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
     }
 
     private void generateParseConfigNameMethod(DefinedClass beanDefinitionParserClass) {
-        Method parseConfigName = beanDefinitionParserClass.method(Modifier.PROTECTED, context.getCodeModel().VOID, "parseConfigName");
+        Method parseConfigName = beanDefinitionParserClass.method(Modifier.PROTECTED, ctx().getCodeModel().VOID, "parseConfigName");
         Variable element = parseConfigName.param(ref(org.w3c.dom.Element.class), "element");
 
         Conditional ifNotNamed = parseConfigName.body()._if(ExpressionFactory.invoke("hasAttribute").arg(element).arg("name"));
@@ -470,7 +470,7 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
     }
 
     private void generateSetInitMethodIfNeededMethod(DefinedClass beanDefinitionParserClass) {
-        Method setInitMethodIfNeeded = beanDefinitionParserClass.method(Modifier.PROTECTED, context.getCodeModel().VOID, "setInitMethodIfNeeded");
+        Method setInitMethodIfNeeded = beanDefinitionParserClass.method(Modifier.PROTECTED, ctx().getCodeModel().VOID, "setInitMethodIfNeeded");
         Variable builder = setInitMethodIfNeeded.param(ref(BeanDefinitionBuilder.class), "builder");
         Variable clazz = setInitMethodIfNeeded.param(ref(Class.class), "clazz");
 
@@ -480,7 +480,7 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
     }
 
     private void generateSetDestroyMethodIfNeededMethod(DefinedClass beanDefinitionParserClass) {
-        Method setDestroyMethodIfNeeded = beanDefinitionParserClass.method(Modifier.PROTECTED, context.getCodeModel().VOID, "setDestroyMethodIfNeeded");
+        Method setDestroyMethodIfNeeded = beanDefinitionParserClass.method(Modifier.PROTECTED, ctx().getCodeModel().VOID, "setDestroyMethodIfNeeded");
         Variable builder = setDestroyMethodIfNeeded.param(ref(BeanDefinitionBuilder.class), "builder");
         Variable clazz = setDestroyMethodIfNeeded.param(ref(Class.class), "clazz");
 
@@ -490,7 +490,7 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
     }
 
     private void generateParsePropertyMethod(DefinedClass beanDefinitionParserClass) {
-        Method parseProperty = beanDefinitionParserClass.method(Modifier.PROTECTED, context.getCodeModel().VOID, "parseProperty");
+        Method parseProperty = beanDefinitionParserClass.method(Modifier.PROTECTED, ctx().getCodeModel().VOID, "parseProperty");
         Variable builder = parseProperty.param(ref(BeanDefinitionBuilder.class), "builder");
         Variable element = parseProperty.param(ref(Element.class), "element");
         Variable propertyName = parseProperty.param(ref(String.class), "propertyName");
@@ -503,7 +503,7 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
     }
 
     private void generateSetNoRecurseOnDefinitionMethod(DefinedClass beanDefinitionParserClass) {
-        Method setNoRecurseOnDefinition = beanDefinitionParserClass.method(Modifier.PROTECTED, context.getCodeModel().VOID, "setNoRecurseOnDefinition");
+        Method setNoRecurseOnDefinition = beanDefinitionParserClass.method(Modifier.PROTECTED, ctx().getCodeModel().VOID, "setNoRecurseOnDefinition");
         Variable definition = setNoRecurseOnDefinition.param(ref(BeanDefinition.class), "definition");
 
         setNoRecurseOnDefinition.body().add(definition.invoke("setAttribute").arg(

@@ -36,12 +36,12 @@ public class MuleStudioIconsGenerator extends AbstractMessageGenerator {
     public static final String ICONS_FOLDER = "icons/";
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return !context.hasOption("skipStudioPluginPackage");
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
+        return !ctx().hasOption("skipStudioPluginPackage");
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
+    public void generate(DevKitTypeElement typeElement) throws GenerationException {
         Icons icons = typeElement.getAnnotation(Icons.class);
         if (icons != null) {
             copyFile(icons.connectorSmall(), "icons/small", typeElement);
@@ -69,7 +69,7 @@ public class MuleStudioIconsGenerator extends AbstractMessageGenerator {
     }
 
     private void copyFile(String fileName, String folder, DevKitTypeElement typeElement) throws GenerationException {
-        String sourcePath = context.getSourceUtils().getPath(typeElement.unwrap());
+        String sourcePath = ctx().getSourceUtils().getPath(typeElement.unwrap());
         int packageCount = StringUtils.countMatches(typeElement.getQualifiedName().toString(), ".") + 1;
         while (packageCount > 0) {
             sourcePath = sourcePath.substring(0, sourcePath.lastIndexOf("/"));
@@ -95,7 +95,7 @@ public class MuleStudioIconsGenerator extends AbstractMessageGenerator {
             fileName = fileName.substring(fileName.lastIndexOf("/") + 1);
         }
         try {
-            return context.getCodeModel().getCodeWriter().openBinary(null, folder + '/' + fileName);
+            return ctx().getCodeModel().getCodeWriter().openBinary(null, folder + '/' + fileName);
         } catch (IOException e) {
             throw new GenerationException("Could not create file or folder " + fileName + ": " + e.getMessage(), e);
         }

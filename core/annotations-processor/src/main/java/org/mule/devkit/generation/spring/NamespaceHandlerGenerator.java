@@ -42,15 +42,15 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
         return typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class);
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) {
+    public void generate(DevKitTypeElement typeElement) {
         DefinedClass namespaceHandlerClass = getNamespaceHandlerClass(typeElement);
 
-        Method init = namespaceHandlerClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "init");
+        Method init = namespaceHandlerClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "init");
         init.javadoc().add("Invoked by the {@link DefaultBeanDefinitionDocumentReader} after construction but before any custom elements are parsed. \n@see NamespaceHandlerSupport#registerBeanDefinitionParser(String, BeanDefinitionParser)");
 
         registerConfig(init, typeElement);
@@ -60,9 +60,9 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
     }
 
     private DefinedClass getNamespaceHandlerClass(DevKitTypeElement typeElement) {
-        String namespaceHandlerName = context.getNameUtils().generateClassName(typeElement, NamingContants.CONFIG_NAMESPACE, NamingContants.NAMESPACE_HANDLER_CLASS_NAME_SUFFIX);
-        Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(namespaceHandlerName));
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(namespaceHandlerName), NamespaceHandlerSupport.class);
+        String namespaceHandlerName = ctx().getNameUtils().generateClassName(typeElement, NamingContants.CONFIG_NAMESPACE, NamingContants.NAMESPACE_HANDLER_CLASS_NAME_SUFFIX);
+        Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(namespaceHandlerName));
+        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(namespaceHandlerName), NamespaceHandlerSupport.class);
 
         String targetNamespace = typeElement.namespace();
         if (targetNamespace == null || targetNamespace.length() == 0) {
@@ -74,13 +74,13 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
     }
 
     private void registerConfig(Method init, DevKitTypeElement pojo) {
-        DefinedClass configBeanDefinitionParser = context.getClassForRole(context.getNameUtils().generateConfigDefParserRoleKey(pojo));
+        DefinedClass configBeanDefinitionParser = ctx().getClassForRole(ctx().getNameUtils().generateConfigDefParserRoleKey(pojo));
         init.body().invoke("registerBeanDefinitionParser").arg("config").arg(ExpressionFactory._new(configBeanDefinitionParser));
     }
 
     private void registerBeanDefinitionParserForEachProcessor(DevKitTypeElement typeElement, Method init) {
         if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class)) {
-            DefinedClass authorizeMessageProcessorClass = context.getClassForRole(AuthorizeBeanDefinitionParserGenerator.AUTHORIZE_DEFINITION_PARSER_ROLE);
+            DefinedClass authorizeMessageProcessorClass = ctx().getClassForRole(AuthorizeBeanDefinitionParserGenerator.AUTHORIZE_DEFINITION_PARSER_ROLE);
             init.body().invoke("registerBeanDefinitionParser").arg(ExpressionFactory.lit("authorize")).arg(ExpressionFactory._new(authorizeMessageProcessorClass));
         }
         for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Processor.class)) {
@@ -97,9 +97,9 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
     private void registerBeanDefinitionParserForEachTransformer(DevKitTypeElement typeElement, Method init) {
         for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Transformer.class)) {
             Invocation registerMuleBeanDefinitionParser = init.body().invoke("registerBeanDefinitionParser");
-            registerMuleBeanDefinitionParser.arg(ExpressionFactory.lit(context.getNameUtils().uncamel(executableElement.getSimpleName().toString())));
-            String transformerClassName = context.getNameUtils().generateClassName(executableElement, NamingContants.TRANSFORMER_CLASS_NAME_SUFFIX);
-            transformerClassName = context.getNameUtils().getPackageName(transformerClassName) + NamingContants.TRANSFORMERS_NAMESPACE + "." + context.getNameUtils().getClassName(transformerClassName);
+            registerMuleBeanDefinitionParser.arg(ExpressionFactory.lit(ctx().getNameUtils().uncamel(executableElement.getSimpleName().toString())));
+            String transformerClassName = ctx().getNameUtils().generateClassName(executableElement, NamingContants.TRANSFORMER_CLASS_NAME_SUFFIX);
+            transformerClassName = ctx().getNameUtils().getPackageName(transformerClassName) + NamingContants.TRANSFORMERS_NAMESPACE + "." + ctx().getNameUtils().getClassName(transformerClassName);
             registerMuleBeanDefinitionParser.arg(ExpressionFactory._new(ref(MessageProcessorDefinitionParser.class)).arg(ref(transformerClassName).boxify().dotclass()));
         }
     }
@@ -113,7 +113,7 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
             elementName = processor.name();
         }
 
-        init.body().invoke("registerBeanDefinitionParser").arg(ExpressionFactory.lit(context.getNameUtils().uncamel(elementName))).arg(ExpressionFactory._new(beanDefinitionParser));
+        init.body().invoke("registerBeanDefinitionParser").arg(ExpressionFactory.lit(ctx().getNameUtils().uncamel(elementName))).arg(ExpressionFactory._new(beanDefinitionParser));
     }
 
     private void registerBeanDefinitionParserForSource(Method init, DevKitExecutableElement executableElement) {
@@ -125,6 +125,6 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
             elementName = source.name();
         }
 
-        init.body().invoke("registerBeanDefinitionParser").arg(ExpressionFactory.lit(context.getNameUtils().uncamel(elementName))).arg(ExpressionFactory._new(beanDefinitionParser));
+        init.body().invoke("registerBeanDefinitionParser").arg(ExpressionFactory.lit(ctx().getNameUtils().uncamel(elementName))).arg(ExpressionFactory._new(beanDefinitionParser));
     }
 }

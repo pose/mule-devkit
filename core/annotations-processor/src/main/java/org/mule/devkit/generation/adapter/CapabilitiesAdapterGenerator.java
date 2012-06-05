@@ -30,12 +30,12 @@ import org.mule.devkit.model.code.TypeReference;
 public class CapabilitiesAdapterGenerator extends AbstractModuleGenerator {
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
         return typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class);
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) {
+    public void generate(DevKitTypeElement typeElement) {
         DefinedClass capabilitiesAdapter = getCapabilitiesAdapterClass(typeElement);
         capabilitiesAdapter.javadoc().add("A <code>" + capabilitiesAdapter.name() + "</code> is a wrapper around ");
         capabilitiesAdapter.javadoc().add(ref(typeElement.asType()));
@@ -46,10 +46,10 @@ public class CapabilitiesAdapterGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass getCapabilitiesAdapterClass(DevKitTypeElement typeElement) {
-        String lifecycleAdapterName = context.getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.CAPABILITIES_ADAPTER_CLASS_NAME_SUFFIX);
-        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(lifecycleAdapterName));
+        String lifecycleAdapterName = ctx().getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.CAPABILITIES_ADAPTER_CLASS_NAME_SUFFIX);
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(lifecycleAdapterName));
 
-        TypeReference previous = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
+        TypeReference previous = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement));
 
         if( previous == null ) {
             previous = (TypeReference) ref(typeElement.asType());
@@ -60,10 +60,10 @@ public class CapabilitiesAdapterGenerator extends AbstractModuleGenerator {
             modifiers |= Modifier.ABSTRACT;
         }
 
-        DefinedClass clazz = pkg._class(modifiers, context.getNameUtils().getClassName(lifecycleAdapterName), previous);
+        DefinedClass clazz = pkg._class(modifiers, ctx().getNameUtils().getClassName(lifecycleAdapterName), previous);
         clazz._implements(Capabilities.class);
 
-        context.setClassRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement), clazz);
+        ctx().setClassRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement), clazz);
 
         return clazz;
     }

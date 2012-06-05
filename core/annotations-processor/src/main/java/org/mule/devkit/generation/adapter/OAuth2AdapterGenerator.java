@@ -54,12 +54,12 @@ import java.util.regex.Pattern;
 public class OAuth2AdapterGenerator extends AbstractOAuthAdapterGenerator {
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
         return typeElement.hasAnnotation(OAuth2.class);
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
+    public void generate(DevKitTypeElement typeElement) throws GenerationException {
         DefinedClass oauthAdapter = getOAuthAdapterClass(typeElement, "OAuth2Adapter", OAuth2Adapter.class);
         OAuth2 oauth2 = typeElement.getAnnotation(OAuth2.class);
 
@@ -116,7 +116,7 @@ public class OAuth2AdapterGenerator extends AbstractOAuthAdapterGenerator {
     }
 
     private void generateGetAuthorizationUrlMethod(DefinedClass oauthAdapter, DevKitTypeElement typeElement, OAuth2 oauth2, FieldVariable logger) {
-        Method getAuthorizationUrl = oauthAdapter.method(Modifier.PUBLIC, context.getCodeModel().VOID, GET_AUTHORIZATION_URL_METHOD_NAME);
+        Method getAuthorizationUrl = oauthAdapter.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, GET_AUTHORIZATION_URL_METHOD_NAME);
         getAuthorizationUrl.type(ref(String.class));
 
         Variable urlBuilder = getAuthorizationUrl.body().decl(ref(StringBuilder.class), "urlBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
@@ -141,7 +141,7 @@ public class OAuth2AdapterGenerator extends AbstractOAuthAdapterGenerator {
     }
 
     private void generateRestoreAccessTokenMethod(DefinedClass oauthAdapter, FieldVariable restoreAccessTokenCallbackField, FieldVariable logger) {
-        Method restoreAccessTokenMethod = oauthAdapter.method(Modifier.PUBLIC, context.getCodeModel().BOOLEAN, "restoreAccessToken");
+        Method restoreAccessTokenMethod = oauthAdapter.method(Modifier.PUBLIC, ctx().getCodeModel().BOOLEAN, "restoreAccessToken");
         Conditional ifRestoreCallbackNotNull = restoreAccessTokenMethod.body()._if(Op.ne(restoreAccessTokenCallbackField, ExpressionFactory._null()));
 
         Conditional ifDebugEnabled = ifRestoreCallbackNotNull._then()._if(logger.invoke("isDebugEnabled"));
@@ -172,7 +172,7 @@ public class OAuth2AdapterGenerator extends AbstractOAuthAdapterGenerator {
     }
 
     private void generateFetchAccessTokenMethod(DefinedClass oauthAdapter, DevKitTypeElement typeElement, OAuth2 oauth2, FieldVariable saveAccessTokenCallback, FieldVariable logger) {
-        Method fetchAccessToken = oauthAdapter.method(Modifier.PUBLIC, context.getCodeModel().VOID, "fetchAccessToken");
+        Method fetchAccessToken = oauthAdapter.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "fetchAccessToken");
         fetchAccessToken._throws(ref(UnableToAcquireAccessTokenException.class));
 
         fetchAccessToken.body().invoke("restoreAccessToken");
@@ -305,7 +305,7 @@ public class OAuth2AdapterGenerator extends AbstractOAuthAdapterGenerator {
     }
 
     private void generateHasTokenExpiredMethod(DefinedClass oauthAdapter, OAuth2 oauth2) {
-        Method hasTokenExpired = oauthAdapter.method(Modifier.PUBLIC, context.getCodeModel().BOOLEAN, HAS_TOKEN_EXPIRED_METHOD_NAME);
+        Method hasTokenExpired = oauthAdapter.method(Modifier.PUBLIC, ctx().getCodeModel().BOOLEAN, HAS_TOKEN_EXPIRED_METHOD_NAME);
         if (!StringUtils.isEmpty(oauth2.expirationRegex())) {
             FieldVariable expirationDate = oauthAdapter.fields().get(EXPIRATION_FIELD_NAME);
             hasTokenExpired.body()._return(Op.cand(
@@ -317,7 +317,7 @@ public class OAuth2AdapterGenerator extends AbstractOAuthAdapterGenerator {
     }
 
     private void generateResetMethod(DefinedClass oauthAdapter, OAuth2 oauth2) {
-        Method reset = oauthAdapter.method(Modifier.PUBLIC, context.getCodeModel().VOID, RESET_METHOD_NAME);
+        Method reset = oauthAdapter.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, RESET_METHOD_NAME);
         if (!StringUtils.isEmpty(oauth2.expirationRegex())) {
             reset.body().assign(oauthAdapter.fields().get(EXPIRATION_FIELD_NAME), ExpressionFactory._null());
         }

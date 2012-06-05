@@ -59,7 +59,7 @@ public class AuthorizeMessageProcessorGenerator extends AbstractMessageGenerator
     private static final String LOCATION_PROPERTY = "Location";
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
         if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class)) {
             return true;
         }
@@ -68,7 +68,7 @@ public class AuthorizeMessageProcessorGenerator extends AbstractMessageGenerator
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
+    public void generate(DevKitTypeElement typeElement) throws GenerationException {
         // get class
         DefinedClass messageProcessorClass;
 
@@ -111,7 +111,7 @@ public class AuthorizeMessageProcessorGenerator extends AbstractMessageGenerator
         process._throws(MuleException.class);
         Variable event = process.param(muleEvent, "event");
 
-        DefinedClass moduleObjectClass = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
+        DefinedClass moduleObjectClass = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement));
         Variable moduleObject = process.body().decl(moduleObjectClass, "castedModuleObject", ExpressionFactory._null());
         findConfig(process.body(), muleContext, object, "authorize", event, moduleObjectClass, moduleObject);
 
@@ -164,9 +164,9 @@ public class AuthorizeMessageProcessorGenerator extends AbstractMessageGenerator
     }
 
     private DefinedClass getAuthorizeMessageProcessorClass(DevKitTypeElement type) {
-        String httpCallbackClassName = context.getNameUtils().generateClassNameInPackage(type, NamingContants.MESSAGE_PROCESSOR_NAMESPACE, NamingContants.AUTHORIZE_MESSAGE_PROCESSOR_CLASS_NAME);
-        Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(httpCallbackClassName));
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(httpCallbackClassName), new Class[]{
+        String httpCallbackClassName = ctx().getNameUtils().generateClassNameInPackage(type, NamingContants.MESSAGE_PROCESSOR_NAMESPACE, NamingContants.AUTHORIZE_MESSAGE_PROCESSOR_CLASS_NAME);
+        Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(httpCallbackClassName));
+        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(httpCallbackClassName), new Class[]{
                 Initialisable.class,
                 Startable.class,
                 Disposable.class,
@@ -175,7 +175,7 @@ public class AuthorizeMessageProcessorGenerator extends AbstractMessageGenerator
                 MuleContextAware.class,
                 FlowConstructAware.class});
 
-        context.setClassRole(AUTHORIZE_MESSAGE_PROCESSOR_ROLE, clazz);
+        ctx().setClassRole(AUTHORIZE_MESSAGE_PROCESSOR_ROLE, clazz);
 
         return clazz;
     }

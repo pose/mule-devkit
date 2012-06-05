@@ -35,7 +35,7 @@ public class DefaultSaveAccessTokenCallbackFactoryGenerator extends AbstractMess
     public static final String ROLE = "SaveAccessTokenCallbackFactoryBean";
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
         if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class)) {
             return true;
         }
@@ -44,10 +44,10 @@ public class DefaultSaveAccessTokenCallbackFactoryGenerator extends AbstractMess
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
+    public void generate(DevKitTypeElement typeElement) throws GenerationException {
         DefinedClass factory = getDefaultSaveAccessTokenCallbackFactoryClass(typeElement);
 
-        DefinedClass callback = context.getClassForRole(DefaultSaveAccessTokenCallbackGenerator.ROLE);
+        DefinedClass callback = ctx().getClassForRole(DefaultSaveAccessTokenCallbackGenerator.ROLE);
         Method getObjectType = factory.method(Modifier.PUBLIC, ref(Class.class), "getObjectType");
         getObjectType.body()._return(callback.dotclass());
 
@@ -63,12 +63,12 @@ public class DefaultSaveAccessTokenCallbackFactoryGenerator extends AbstractMess
     }
 
     private DefinedClass getDefaultSaveAccessTokenCallbackFactoryClass(DevKitTypeElement type) {
-        String callbackClassName = context.getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, NamingContants.SAVE_ACCESS_TOKEN_CALLBACK_FACTORY_BEAN_CLASS_NAME);
-        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(callbackClassName));
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(callbackClassName));
+        String callbackClassName = ctx().getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, NamingContants.SAVE_ACCESS_TOKEN_CALLBACK_FACTORY_BEAN_CLASS_NAME);
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(callbackClassName));
+        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(callbackClassName));
         clazz._extends(ref(MessageProcessorChainFactoryBean.class));
 
-        context.setClassRole(ROLE, clazz);
+        ctx().setClassRole(ROLE, clazz);
 
         return clazz;
     }

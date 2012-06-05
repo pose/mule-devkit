@@ -22,5 +22,11 @@ import org.mule.devkit.model.DevKitTypeElement;
 
 public interface Generator {
 
-    void generate(DevKitTypeElement typeElement, GeneratorContext context) throws GenerationException;
+    boolean shouldGenerate(DevKitTypeElement typeElement);
+
+    void generate(DevKitTypeElement typeElement) throws GenerationException;
+
+    void setCtx(GeneratorContext generationContext);
+
+    GeneratorContext ctx();
 }

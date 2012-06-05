@@ -53,15 +53,15 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
     protected static final String MULE_CONTEXT_FIELD_NAME = "muleContext";
 
     public Type ref(TypeMirror typeMirror) {
-        return context.getCodeModel().ref(typeMirror);
+        return ctx().getCodeModel().ref(typeMirror);
     }
 
     public TypeReference ref(Class<?> clazz) {
-        return context.getCodeModel().ref(clazz);
+        return ctx().getCodeModel().ref(clazz);
     }
 
     public Type ref(String fullyQualifiedClassName) {
-        return context.getCodeModel().ref(fullyQualifiedClassName);
+        return ctx().getCodeModel().ref(fullyQualifiedClassName);
     }
 
     protected FieldVariable generateLoggerField(DefinedClass clazz) {
@@ -70,7 +70,7 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
     }
 
     protected Method generateSetter(DefinedClass clazz, FieldVariable field) {
-        Method setter = clazz.method(Modifier.PUBLIC, context.getCodeModel().VOID, "set" + StringUtils.capitalize(field.name()));
+        Method setter = clazz.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "set" + StringUtils.capitalize(field.name()));
         setter.javadoc().add("Sets " + field.name());
         setter.javadoc().addParam("value Value to set");
         Variable value = setter.param(field.type(), "value");
@@ -141,7 +141,7 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
     }
 
     protected void generateIsCapableOf(DevKitTypeElement typeElement, DefinedClass capabilitiesAdapter) {
-        Method isCapableOf = capabilitiesAdapter.method(Modifier.PUBLIC, context.getCodeModel().BOOLEAN, "isCapableOf");
+        Method isCapableOf = capabilitiesAdapter.method(Modifier.PUBLIC, ctx().getCodeModel().BOOLEAN, "isCapableOf");
         Variable capability = isCapableOf.param(ref(Capability.class), "capability");
         isCapableOf.javadoc().add("Returns true if this module implements such capability");
 

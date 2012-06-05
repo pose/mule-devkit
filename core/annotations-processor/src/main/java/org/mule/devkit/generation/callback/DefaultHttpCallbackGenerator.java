@@ -86,17 +86,17 @@ public class DefaultHttpCallbackGenerator extends AbstractModuleGenerator {
     private FieldVariable connectorField;
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
         return typeElement.hasAnnotation(OAuth.class) ||
                 typeElement.hasAnnotation(OAuth2.class) ||
                 typeElement.hasProcessorMethodWithParameter(HttpCallback.class);
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) {
+    public void generate(DevKitTypeElement typeElement) {
         DefinedClass callbackClass = getDefaultHttpCallbackClass(typeElement);
 
-        context.note("Generating HTTP callback implementation as " + callbackClass.fullName());
+        ctx().note("Generating HTTP callback implementation as " + callbackClass.fullName());
 
         generateFields(callbackClass);
         generateConstructorArgSimpleFlowConstruct(callbackClass);
@@ -113,7 +113,7 @@ public class DefaultHttpCallbackGenerator extends AbstractModuleGenerator {
         generateStartMethod(callbackClass);
         generateStopMethod(callbackClass);
 
-        context.setClassRole(HTTP_CALLBACK_ROLE, callbackClass);
+        ctx().setClassRole(HTTP_CALLBACK_ROLE, callbackClass);
     }
 
     private void generateFields(DefinedClass callbackClass) {
@@ -356,7 +356,7 @@ public class DefaultHttpCallbackGenerator extends AbstractModuleGenerator {
     }
 
     private void generateStartMethod(DefinedClass callbackClass) {
-        Method startMethod = callbackClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "start")._throws(ref(MuleException.class));
+        Method startMethod = callbackClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "start")._throws(ref(MuleException.class));
         Block body = startMethod.body();
         body.assign(ExpressionFactory._this().ref(urlField), ExpressionFactory.invoke(buildUrlMethod));
         body.assign(ExpressionFactory._this().ref(localUrlField), urlField.invoke("replaceFirst").arg(domainField).arg("localhost"));
@@ -383,7 +383,7 @@ public class DefaultHttpCallbackGenerator extends AbstractModuleGenerator {
     }
 
     private void generateStopMethod(DefinedClass callbackClass) {
-        Method stopMethod = callbackClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "stop")._throws(ref(MuleException.class));
+        Method stopMethod = callbackClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "stop")._throws(ref(MuleException.class));
         Block body = stopMethod.body();
         Block block = body._if(Op.ne(flowConstructVariable, ExpressionFactory._null()))._then();
         block.invoke(flowConstructVariable, "stop");
@@ -399,11 +399,11 @@ public class DefaultHttpCallbackGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass getDefaultHttpCallbackClass(DevKitTypeElement type) {
-        String httpCallbackClassName = context.getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, CLASS_NAME);
-        Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(httpCallbackClassName));
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(httpCallbackClassName), new Class[]{HttpCallback.class});
+        String httpCallbackClassName = ctx().getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, CLASS_NAME);
+        Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(httpCallbackClassName));
+        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(httpCallbackClassName), new Class[]{HttpCallback.class});
 
-        context.setClassRole(HTTP_CALLBACK_ROLE, clazz);
+        ctx().setClassRole(HTTP_CALLBACK_ROLE, clazz);
 
         return clazz;
     }

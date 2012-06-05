@@ -31,15 +31,15 @@ public class MuleStudioManifestGenerator extends AbstractMessageGenerator {
     public static final String MANIFEST_FILE_NAME = "META-INF/MANIFEST.MF";
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return !context.hasOption("skipStudioPluginPackage");
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
+        return !ctx().hasOption("skipStudioPluginPackage");
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
+    public void generate(DevKitTypeElement typeElement) throws GenerationException {
         PrintStream printStream = null;
         try {
-            OutputStream outputStream = context.getCodeModel().getCodeWriter().openBinary(null, MANIFEST_FILE_NAME);
+            OutputStream outputStream = ctx().getCodeModel().getCodeWriter().openBinary(null, MANIFEST_FILE_NAME);
             printStream = new PrintStream(outputStream);
             printStream.append(getManifestContents(typeElement));
             printStream.flush();
@@ -55,11 +55,11 @@ public class MuleStudioManifestGenerator extends AbstractMessageGenerator {
         StringBuilder manfiestContentBuilder = new StringBuilder(100);
         manfiestContentBuilder.append("Manifest-Version: 1.0\n");
         manfiestContentBuilder.append("Bundle-ManifestVersion: 2\n");
-        manfiestContentBuilder.append("Bundle-Name: ").append(context.getNameUtils().friendlyNameFromCamelCase(typeElement.name())).append("\n");
+        manfiestContentBuilder.append("Bundle-Name: ").append(ctx().getNameUtils().friendlyNameFromCamelCase(typeElement.name())).append("\n");
         manfiestContentBuilder.append("Bundle-SymbolicName: " + MuleStudioFeatureGenerator.STUDIO_PREFIX).append(typeElement.name()).append(";singleton:=true\n");
         manfiestContentBuilder.append("Bundle-Version: %VERSION%\n");
         manfiestContentBuilder.append("Bundle-Activator: org.mule.tooling.ui.contribution.Activator\n");
-        manfiestContentBuilder.append("Bundle-Vendor: ").append(context.getJavaDocUtils().getTagContent("author", typeElement)).append("\n");
+        manfiestContentBuilder.append("Bundle-Vendor: ").append(ctx().getJavaDocUtils().getTagContent("author", typeElement)).append("\n");
         manfiestContentBuilder.append("Require-Bundle: org.eclipse.ui,\n");
         manfiestContentBuilder.append(" org.eclipse.core.runtime,\n");
         manfiestContentBuilder.append(" org.mule.tooling.core;bundle-version=\"1.0.0\"\n");

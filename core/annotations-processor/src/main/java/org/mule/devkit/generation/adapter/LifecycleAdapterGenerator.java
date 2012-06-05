@@ -58,12 +58,12 @@ import java.util.List;
 public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
         return typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class) || typeElement.hasAnnotation(ExpressionLanguage.class);
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) {
+    public void generate(DevKitTypeElement typeElement) {
         DefinedClass lifecycleAdapter = getLifecycleAdapterClass(typeElement);
         lifecycleAdapter.javadoc().add("A <code>" + lifecycleAdapter.name() + "</code> is a wrapper around ");
         lifecycleAdapter.javadoc().add(ref(typeElement.asType()));
@@ -89,10 +89,10 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass getLifecycleAdapterClass(DevKitTypeElement typeElement) {
-        String lifecycleAdapterName = context.getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.LIFECYCLE_ADAPTER_CLASS_NAME_SUFFIX);
-        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(lifecycleAdapterName));
+        String lifecycleAdapterName = ctx().getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.LIFECYCLE_ADAPTER_CLASS_NAME_SUFFIX);
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(lifecycleAdapterName));
 
-        TypeReference previous = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
+        TypeReference previous = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement));
         if (previous == null) {
             previous = (TypeReference) ref(typeElement.asType());
         }
@@ -102,15 +102,15 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
             modifiers |= Modifier.ABSTRACT;
         }
 
-        DefinedClass clazz = pkg._class(modifiers, context.getNameUtils().getClassName(lifecycleAdapterName), previous);
+        DefinedClass clazz = pkg._class(modifiers, ctx().getNameUtils().getClassName(lifecycleAdapterName), previous);
 
-        context.setClassRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement), clazz);
+        ctx().setClassRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement), clazz);
 
         return clazz;
     }
 
     private Method generateLifecycleInvocation(DefinedClass lifecycleWrapper, DevKitTypeElement typeElement, DevKitExecutableElement superExecutableElement, String name, Class<?> catchException, boolean addThis) {
-        Method lifecycleMethod = lifecycleWrapper.method(Modifier.PUBLIC, context.getCodeModel().VOID, name);
+        Method lifecycleMethod = lifecycleWrapper.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, name);
 
         if (name.equals("initialise")) {
             Variable log = lifecycleMethod.body().decl(ref(Logger.class), "log", ref(LoggerFactory.class).staticInvoke("getLogger").arg(lifecycleWrapper.dotclass()));
@@ -127,7 +127,7 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
             Variable currentRuntimeVersion = ifKnownVersion.decl(ref(String[].class), "currentRuntimeVersion", runtimeVersion.invoke("split").arg("\\."));
 
             ForLoop forEachVersionComponent = ifKnownVersion._for();
-            Variable i = forEachVersionComponent.init(context.getCodeModel().INT, "i", ExpressionFactory.lit(0));
+            Variable i = forEachVersionComponent.init(ctx().getCodeModel().INT, "i", ExpressionFactory.lit(0));
             forEachVersionComponent.test(Op.lt(i, expectedMinVersion.ref("length")));
             forEachVersionComponent.update(Op.incr(i));
 

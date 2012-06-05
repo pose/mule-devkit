@@ -53,18 +53,18 @@ import javax.transaction.TransactionManager;
 public class InjectAdapterGenerator extends AbstractModuleGenerator {
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
         return typeElement.getFieldsAnnotatedWith(Inject.class).size() > 0;
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
+    public void generate(DevKitTypeElement typeElement) throws GenerationException {
         DefinedClass adapter = getMuleContextAwareAdapter(typeElement);
         adapter.javadoc().add("A <code>" + adapter.name() + "</code> is a wrapper around ");
         adapter.javadoc().add(ref(typeElement.asType()));
         adapter.javadoc().add(" that allows the injection of several Mule facilities when a MuleContext is set.");
 
-        Method setMuleContext = adapter.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setMuleContext");
+        Method setMuleContext = adapter.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setMuleContext");
         setMuleContext.annotate(Override.class);
         Variable context = setMuleContext.param(ref(MuleContext.class), "context");
 
@@ -121,10 +121,10 @@ public class InjectAdapterGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass getMuleContextAwareAdapter(DevKitTypeElement typeElement) {
-        String muleContextAwareAdapter = context.getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.INJECTION_ADAPTER_CLASS_NAME_SUFFIX);
-        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(muleContextAwareAdapter));
+        String muleContextAwareAdapter = ctx().getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.INJECTION_ADAPTER_CLASS_NAME_SUFFIX);
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(muleContextAwareAdapter));
 
-        TypeReference previous = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
+        TypeReference previous = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement));
         if (previous == null) {
             previous = (TypeReference) ref(typeElement.asType());
         }
@@ -134,10 +134,10 @@ public class InjectAdapterGenerator extends AbstractModuleGenerator {
             modifiers |= Modifier.ABSTRACT;
         }
 
-        DefinedClass clazz = pkg._class(modifiers, context.getNameUtils().getClassName(muleContextAwareAdapter), previous);
+        DefinedClass clazz = pkg._class(modifiers, ctx().getNameUtils().getClassName(muleContextAwareAdapter), previous);
         clazz._implements(ref(MuleContextAware.class));
 
-        context.setClassRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement), clazz);
+        ctx().setClassRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement), clazz);
 
         return clazz;
     }

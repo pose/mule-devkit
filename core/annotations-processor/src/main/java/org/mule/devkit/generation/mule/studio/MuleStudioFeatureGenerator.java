@@ -39,12 +39,12 @@ public class MuleStudioFeatureGenerator extends AbstractMessageGenerator {
     public static final String LABEL_SUFFIX = " Mule Studio Extension";
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return !context.hasOption("skipStudioPluginPackage");
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
+        return !ctx().hasOption("skipStudioPluginPackage");
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
+    public void generate(DevKitTypeElement typeElement) throws GenerationException {
         try {
 
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -53,7 +53,7 @@ public class MuleStudioFeatureGenerator extends AbstractMessageGenerator {
 
             Element feature = document.createElement("feature");
             feature.setAttribute("id", STUDIO_PREFIX + typeElement.name());
-            feature.setAttribute("label", context.getNameUtils().friendlyNameFromCamelCase(typeElement.name()) + LABEL_SUFFIX);
+            feature.setAttribute("label", ctx().getNameUtils().friendlyNameFromCamelCase(typeElement.name()) + LABEL_SUFFIX);
             feature.setAttribute("version", "%VERSION%");
             feature.setAttribute("provider-name", "Mulesoft, Inc.");
             document.appendChild(feature);
@@ -75,7 +75,7 @@ public class MuleStudioFeatureGenerator extends AbstractMessageGenerator {
             Transformer transformer = transformerFactory.newTransformer();
 
             DOMSource source = new DOMSource(document);
-            StreamResult result = new StreamResult(context.getCodeModel().getCodeWriter().openBinary(null, FEATURE_XML_FILENAME));
+            StreamResult result = new StreamResult(ctx().getCodeModel().getCodeWriter().openBinary(null, FEATURE_XML_FILENAME));
             transformer.transform(source, result);
 
         } catch (Exception e) {

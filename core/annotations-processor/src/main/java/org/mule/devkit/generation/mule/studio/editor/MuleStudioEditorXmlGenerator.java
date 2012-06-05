@@ -45,12 +45,12 @@ public class MuleStudioEditorXmlGenerator extends AbstractMessageGenerator {
     private ObjectFactory objectFactory = new ObjectFactory();
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return !context.hasOption("skipStudioPluginPackage");
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
+        return !ctx().hasOption("skipStudioPluginPackage");
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) {
+    public void generate(DevKitTypeElement typeElement) {
         String moduleName = typeElement.name();
         boolean isOAuth = typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class);
 
@@ -59,32 +59,32 @@ public class MuleStudioEditorXmlGenerator extends AbstractMessageGenerator {
         namespace.setUrl(URI_PREFIX + moduleName);
 
         PatternTypeOperationsBuilder operationsBuilder = isOAuth
-        				? new OAuthPatternTypeOperationsBuilder(context, typeElement, PatternTypes.CLOUD_CONNECTOR)
-        				: new PatternTypeOperationsBuilder(context, typeElement, PatternTypes.CLOUD_CONNECTOR);
+        				? new OAuthPatternTypeOperationsBuilder(ctx(), typeElement, PatternTypes.CLOUD_CONNECTOR)
+        				: new PatternTypeOperationsBuilder(ctx(), typeElement, PatternTypes.CLOUD_CONNECTOR);
         
-        GlobalType globalCloudConnector = new GlobalCloudConnectorTypeBuilder(context, typeElement).build();
+        GlobalType globalCloudConnector = new GlobalCloudConnectorTypeBuilder(ctx(), typeElement).build();
         namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeGlobalCloudConnector(globalCloudConnector));
         namespace.getConnectorOrEndpointOrGlobal().add(operationsBuilder.build());
-        namespace.getConnectorOrEndpointOrGlobal().add(new ConfigRefBuilder(context, typeElement).build());
-        namespace.getConnectorOrEndpointOrGlobal().addAll(new NestedsBuilder(context, typeElement).build());
+        namespace.getConnectorOrEndpointOrGlobal().add(new ConfigRefBuilder(ctx(), typeElement).build());
+        namespace.getConnectorOrEndpointOrGlobal().addAll(new NestedsBuilder(ctx(), typeElement).build());
 
         processProcessorMethods(typeElement, namespace, isOAuth);
         processTransformerMethods(typeElement, namespace);
         processSourceMethods(typeElement, namespace);
 
-        context.getStudioModel().setNamespaceType(namespace);
-        context.getStudioModel().setOutputFileName(EDITOR_XML_FILE_NAME);
+        ctx().getStudioModel().setNamespaceType(namespace);
+        ctx().getStudioModel().setOutputFileName(EDITOR_XML_FILE_NAME);
     }
 
     private void processProcessorMethods(DevKitTypeElement typeElement, NamespaceType namespace, boolean isOAuth) {
         for (DevKitExecutableElement processorMethod : typeElement.getMethodsAnnotatedWith(Processor.class)) {
-            PatternType cloudConnector = new PatternTypeBuilder(context, processorMethod, typeElement).build();
+            PatternType cloudConnector = new PatternTypeBuilder(ctx(), processorMethod, typeElement).build();
             namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeCloudConnector(cloudConnector));
-            namespace.getConnectorOrEndpointOrGlobal().addAll(new NestedsBuilder(context, processorMethod, typeElement).build());
+            namespace.getConnectorOrEndpointOrGlobal().addAll(new NestedsBuilder(ctx(), processorMethod, typeElement).build());
         }
         
         if (isOAuth) {
-        	PatternType authorize = new OAuthPatternTypeBuilder(context, typeElement).build();
+        	PatternType authorize = new OAuthPatternTypeBuilder(ctx(), typeElement).build();
         	namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeCloudConnector(authorize));
         }
     }
@@ -92,36 +92,36 @@ public class MuleStudioEditorXmlGenerator extends AbstractMessageGenerator {
     private void processTransformerMethods(DevKitTypeElement typeElement, NamespaceType namespace) {
         List<DevKitExecutableElement> transformerMethods = typeElement.getMethodsAnnotatedWith(Transformer.class);
         if (!transformerMethods.isEmpty()) {
-            namespace.getConnectorOrEndpointOrGlobal().add(new PatternTypeOperationsBuilder(context, typeElement, PatternTypes.TRANSFORMER).build());
-            namespace.getConnectorOrEndpointOrGlobal().add(new AbstractTransformerBuilder(context, typeElement).build());
-            GlobalType globalTransformer = new GlobalTransformerTypeOperationsBuilder(context, typeElement).build();
+            namespace.getConnectorOrEndpointOrGlobal().add(new PatternTypeOperationsBuilder(ctx(), typeElement, PatternTypes.TRANSFORMER).build());
+            namespace.getConnectorOrEndpointOrGlobal().add(new AbstractTransformerBuilder(ctx(), typeElement).build());
+            GlobalType globalTransformer = new GlobalTransformerTypeOperationsBuilder(ctx(), typeElement).build();
             namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeGlobalTransformer(globalTransformer));
         }
         for (DevKitExecutableElement transformerMethod : transformerMethods) {
-            PatternType transformer = new PatternTypeBuilder(context, transformerMethod, typeElement).build();
+            PatternType transformer = new PatternTypeBuilder(ctx(), transformerMethod, typeElement).build();
             namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeTransformer(transformer));
-            GlobalType globalTransformer = new GlobalTransformerTypeBuilder(context, transformerMethod, typeElement).build();
+            GlobalType globalTransformer = new GlobalTransformerTypeBuilder(ctx(), transformerMethod, typeElement).build();
             namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeGlobalTransformer(globalTransformer));
-            namespace.getConnectorOrEndpointOrGlobal().addAll(new NestedsBuilder(context, transformerMethod, typeElement).build());
+            namespace.getConnectorOrEndpointOrGlobal().addAll(new NestedsBuilder(ctx(), transformerMethod, typeElement).build());
         }
     }
 
     private void processSourceMethods(DevKitTypeElement typeElement, NamespaceType namespace) {
         List<DevKitExecutableElement> sourceMethods = typeElement.getMethodsAnnotatedWith(Source.class);
         if (!sourceMethods.isEmpty()) {
-            GlobalType abstractGlobalEndpoint = new GlobalEndpointTypeWithNameBuilder(context, typeElement).build();
+            GlobalType abstractGlobalEndpoint = new GlobalEndpointTypeWithNameBuilder(ctx(), typeElement).build();
             namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeGlobalEndpoint(abstractGlobalEndpoint));
-            EndpointType endpointTypeListingOps = new EndpointTypeOperationsBuilder(context, typeElement).build();
+            EndpointType endpointTypeListingOps = new EndpointTypeOperationsBuilder(ctx(), typeElement).build();
             namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createEndpoint(endpointTypeListingOps));
-            GlobalType globalEndpointListingOps = new GlobalEndpointTypeOperationsBuilder(context, typeElement).build();
+            GlobalType globalEndpointListingOps = new GlobalEndpointTypeOperationsBuilder(ctx(), typeElement).build();
             namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeGlobalEndpoint(globalEndpointListingOps));
         }
         for (DevKitExecutableElement sourceMethod : sourceMethods) {
-            EndpointType endpoint = new EndpointTypeBuilder(context, sourceMethod, typeElement).build();
+            EndpointType endpoint = new EndpointTypeBuilder(ctx(), sourceMethod, typeElement).build();
             namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createEndpoint(endpoint));
-            GlobalType globalEndpoint = new GlobalEndpointTypeBuilder(context, sourceMethod, typeElement).build();
+            GlobalType globalEndpoint = new GlobalEndpointTypeBuilder(ctx(), sourceMethod, typeElement).build();
             namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeGlobalEndpoint(globalEndpoint));
-            namespace.getConnectorOrEndpointOrGlobal().addAll(new NestedsBuilder(context, sourceMethod, typeElement).build());
+            namespace.getConnectorOrEndpointOrGlobal().addAll(new NestedsBuilder(ctx(), sourceMethod, typeElement).build());
         }
     }
 }

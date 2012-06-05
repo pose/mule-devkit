@@ -42,7 +42,7 @@ public class AuthorizeBeanDefinitionParserGenerator extends AbstractMessageGener
     public static final String AUTHORIZE_DEFINITION_PARSER_ROLE = "AuthorizeDefinitionParser";
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
         if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class)) {
             return true;
         }
@@ -51,9 +51,9 @@ public class AuthorizeBeanDefinitionParserGenerator extends AbstractMessageGener
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
+    public void generate(DevKitTypeElement typeElement) throws GenerationException {
         DefinedClass beanDefinitionParser = getAuthorizeBeanDefinitionParserClass(typeElement);
-        DefinedClass messageProcessorClass = context.getClassForRole(AuthorizeMessageProcessorGenerator.AUTHORIZE_MESSAGE_PROCESSOR_ROLE);
+        DefinedClass messageProcessorClass = ctx().getClassForRole(AuthorizeMessageProcessorGenerator.AUTHORIZE_MESSAGE_PROCESSOR_ROLE);
 
         Method parse = beanDefinitionParser.method(Modifier.PUBLIC, ref(BeanDefinition.class), "parse");
         Variable element = parse.param(ref(org.w3c.dom.Element.class), "element");
@@ -74,12 +74,12 @@ public class AuthorizeBeanDefinitionParserGenerator extends AbstractMessageGener
     }
 
     private DefinedClass getAuthorizeBeanDefinitionParserClass(DevKitTypeElement type) {
-        String authorizeBeanDefinitionParserClass = context.getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, NamingContants.AUTHORIZE_DEFINITION_PARSER_CLASS_NAME);
-        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(authorizeBeanDefinitionParserClass));
-        DefinedClass abstractDefinitionParser = context.getClassForRole(AbstractBeanDefinitionParserGenerator.ROLE);
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(authorizeBeanDefinitionParserClass), abstractDefinitionParser);
+        String authorizeBeanDefinitionParserClass = ctx().getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, NamingContants.AUTHORIZE_DEFINITION_PARSER_CLASS_NAME);
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(authorizeBeanDefinitionParserClass));
+        DefinedClass abstractDefinitionParser = ctx().getClassForRole(AbstractBeanDefinitionParserGenerator.ROLE);
+        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(authorizeBeanDefinitionParserClass), abstractDefinitionParser);
 
-        context.setClassRole(AUTHORIZE_DEFINITION_PARSER_ROLE, clazz);
+        ctx().setClassRole(AUTHORIZE_DEFINITION_PARSER_ROLE, clazz);
 
         return clazz;
     }

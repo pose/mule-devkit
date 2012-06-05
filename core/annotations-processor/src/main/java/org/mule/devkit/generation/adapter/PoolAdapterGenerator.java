@@ -46,12 +46,12 @@ import org.mule.util.pool.LifecyleEnabledObjectPool;
 public class PoolAdapterGenerator extends AbstractMessageGenerator {
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
         return typeElement.isPoolable();
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
+    public void generate(DevKitTypeElement typeElement) throws GenerationException {
         DefinedClass poolAdapter = getPoolAdapterClass(typeElement);
         poolAdapter.javadoc().add("A <code>" + poolAdapter.name() + "</code> is a wrapper around ");
         poolAdapter.javadoc().add(ref(typeElement.asType()));
@@ -80,7 +80,7 @@ public class PoolAdapterGenerator extends AbstractMessageGenerator {
     }
 
     private void generateStopMethod(DefinedClass poolAdapter, FieldVariable lifecyleEnabledObjectPool) {
-        Method stopMethod = poolAdapter.method(Modifier.PUBLIC, context.getCodeModel().VOID, "stop");
+        Method stopMethod = poolAdapter.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "stop");
         stopMethod._throws(MuleException.class);
 
         Block newBody = stopMethod.body()._if(Op.ne(lifecyleEnabledObjectPool, ExpressionFactory._null()))._then();
@@ -90,9 +90,9 @@ public class PoolAdapterGenerator extends AbstractMessageGenerator {
     }
 
     private void generateStartMethod(DevKitTypeElement typeElement, DefinedClass poolAdapter, FieldVariable lifecyleEnabledObjectPool, FieldVariable muleContext, FieldVariable poolingProfile) {
-        DefinedClass objectFactory = context.getClassForRole(context.getNameUtils().generatePojoFactoryKey(typeElement));
+        DefinedClass objectFactory = ctx().getClassForRole(ctx().getNameUtils().generatePojoFactoryKey(typeElement));
 
-        Method startMethod = poolAdapter.method(Modifier.PUBLIC, context.getCodeModel().VOID, "start");
+        Method startMethod = poolAdapter.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "start");
         startMethod._throws(MuleException.class);
 
         Variable objectFactoryField = startMethod.body().decl(objectFactory, "objectFactory", ExpressionFactory._new(objectFactory));
@@ -111,16 +111,16 @@ public class PoolAdapterGenerator extends AbstractMessageGenerator {
     }
 
     private DefinedClass getPoolAdapterClass(DevKitTypeElement typeElement) {
-        String poolAdapterName = context.getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.POOL_ADAPTER_CLASS_NAME_SUFFIX);
-        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(poolAdapterName));
+        String poolAdapterName = ctx().getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.POOL_ADAPTER_CLASS_NAME_SUFFIX);
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(poolAdapterName));
 
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(poolAdapterName));
+        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(poolAdapterName));
         clazz._implements(Startable.class);
         clazz._implements(Stoppable.class);
         clazz._implements(MuleContextAware.class);
         clazz._implements(FlowConstructAware.class);
         clazz._implements(Capabilities.class);
-        context.setClassRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement), clazz);
+        ctx().setClassRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement), clazz);
 
         return clazz;
     }

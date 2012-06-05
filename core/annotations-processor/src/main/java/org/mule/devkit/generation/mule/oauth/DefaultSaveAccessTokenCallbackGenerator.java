@@ -45,7 +45,7 @@ public class DefaultSaveAccessTokenCallbackGenerator extends AbstractMessageGene
     public static final String ROLE = "DefaultSaveAccessTokenCallback";
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
         if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class)) {
             return true;
         }
@@ -54,7 +54,7 @@ public class DefaultSaveAccessTokenCallbackGenerator extends AbstractMessageGene
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
+    public void generate(DevKitTypeElement typeElement) throws GenerationException {
         DefinedClass callbackClass = getDefaultSaveAccessTokenCallbackClass(typeElement);
 
         FieldVariable messageProcessor = generateFieldForMessageProcessor(callbackClass, "messageProcessor");
@@ -69,7 +69,7 @@ public class DefaultSaveAccessTokenCallbackGenerator extends AbstractMessageGene
         generateGetter(callbackClass, messageProcessor);
         generateSetter(callbackClass, messageProcessor);
 
-        Method saveAccessTokenMethod = callbackClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "saveAccessToken");
+        Method saveAccessTokenMethod = callbackClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "saveAccessToken");
         Variable accessToken = saveAccessTokenMethod.param(ref(String.class), "accessToken");
         Variable accessTokenSecret = saveAccessTokenMethod.param(ref(String.class), "accessTokenSecret");
 
@@ -148,11 +148,11 @@ public class DefaultSaveAccessTokenCallbackGenerator extends AbstractMessageGene
     }
 
     private DefinedClass getDefaultSaveAccessTokenCallbackClass(DevKitTypeElement type) {
-        String callbackClassName = context.getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, NamingContants.DEFAULT_SAVE_ACCESS_TOKEN_CALLBACK_CLASS_NAME);
-        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(callbackClassName));
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(callbackClassName), new Class[]{
+        String callbackClassName = ctx().getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, NamingContants.DEFAULT_SAVE_ACCESS_TOKEN_CALLBACK_CLASS_NAME);
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(callbackClassName));
+        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(callbackClassName), new Class[]{
                 SaveAccessTokenCallback.class});
-        context.setClassRole(ROLE, clazz);
+        ctx().setClassRole(ROLE, clazz);
 
         return clazz;
     }

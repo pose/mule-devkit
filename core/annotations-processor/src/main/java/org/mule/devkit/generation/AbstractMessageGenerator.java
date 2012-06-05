@@ -92,7 +92,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
     protected void generateIsListMethod(DefinedClass messageProcessorClass) {
-        Method isList = messageProcessorClass.method(Modifier.PRIVATE, context.getCodeModel().BOOLEAN, "isList");
+        Method isList = messageProcessorClass.method(Modifier.PRIVATE, ctx().getCodeModel().BOOLEAN, "isList");
         Variable type = isList.param(ref(java.lang.reflect.Type.class), "type");
 
         Conditional isClass = isList.body()._if(Op.cand(Op._instanceof(type, ref(Class.class)),
@@ -118,7 +118,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected void generateIsMapMethod(DefinedClass messageProcessorClass) {
-        Method isMap = messageProcessorClass.method(Modifier.PRIVATE, context.getCodeModel().BOOLEAN, "isMap");
+        Method isMap = messageProcessorClass.method(Modifier.PRIVATE, ctx().getCodeModel().BOOLEAN, "isMap");
         Variable type = isMap.param(ref(java.lang.reflect.Type.class), "type");
 
         Conditional isClass = isMap.body()._if(Op.cand(Op._instanceof(type, ref(Class.class)),
@@ -144,7 +144,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected void generateIsListClassMethod(DefinedClass messageProcessorClass) {
-        Method isListClass = messageProcessorClass.method(Modifier.PRIVATE, context.getCodeModel().BOOLEAN, "isListClass");
+        Method isListClass = messageProcessorClass.method(Modifier.PRIVATE, ctx().getCodeModel().BOOLEAN, "isListClass");
         isListClass.javadoc().add("Checks whether the specified class parameter is an instance of ");
         isListClass.javadoc().add(ref(List.class));
         isListClass.javadoc().addParam("clazz <code>Class</code> to check.");
@@ -158,7 +158,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected void generateIsAssignableFrom(DefinedClass messageProcessorClass) {
-        Method isAssignableFrom = messageProcessorClass.method(Modifier.PRIVATE, context.getCodeModel().BOOLEAN, "isAssignableFrom");
+        Method isAssignableFrom = messageProcessorClass.method(Modifier.PRIVATE, ctx().getCodeModel().BOOLEAN, "isAssignableFrom");
         Variable expectedType = isAssignableFrom.param(ref(java.lang.reflect.Type.class), "expectedType");
         Variable clazz = isAssignableFrom.param(ref(Class.class), "clazz");
 
@@ -338,7 +338,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
 
     protected void generateIsMapClassMethod(DefinedClass messageProcessorClass) {
-        Method isMapClass = messageProcessorClass.method(Modifier.PRIVATE, context.getCodeModel().BOOLEAN, "isMapClass");
+        Method isMapClass = messageProcessorClass.method(Modifier.PRIVATE, ctx().getCodeModel().BOOLEAN, "isMapClass");
         isMapClass.javadoc().add("Checks whether the specified class parameter is an instance of ");
         isMapClass.javadoc().add(ref(Map.class));
         isMapClass.javadoc().addParam("clazz <code>Class</code> to check.");
@@ -352,7 +352,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected void generateComputeClassHierarchyMethod(DefinedClass messageProcessorClass) {
-        Method computeClassHierarchy = messageProcessorClass.method(Modifier.PRIVATE, context.getCodeModel().VOID, "computeClassHierarchy");
+        Method computeClassHierarchy = messageProcessorClass.method(Modifier.PRIVATE, ctx().getCodeModel().VOID, "computeClassHierarchy");
         computeClassHierarchy.javadoc().add("Get all superclasses and interfaces recursively.");
         computeClassHierarchy.javadoc().addParam("clazz   The class to start the search with.");
         computeClassHierarchy.javadoc().addParam("classes List of classes to which to add all found super classes and interfaces.");
@@ -392,7 +392,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected FieldVariable generateFieldForBoolean(DefinedClass messageProcessorClass, String name) {
-        FieldVariable expressionManager = messageProcessorClass.field(Modifier.PRIVATE, context.getCodeModel().BOOLEAN, name);
+        FieldVariable expressionManager = messageProcessorClass.field(Modifier.PRIVATE, ctx().getCodeModel().BOOLEAN, name);
         return expressionManager;
     }
 
@@ -415,35 +415,35 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected DefinedClass getBeanDefinitionParserClass(DevKitExecutableElement executableElement) {
-        String beanDefinitionParserName = context.getNameUtils().generateClassName(executableElement, NamingContants.DEFINITION_PARSER_CLASS_NAME_SUFFIX);
-        Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(beanDefinitionParserName) + NamingContants.CONFIG_NAMESPACE);
-        DefinedClass abstractBeanDefinitionParser = context.getClassForRole(AbstractBeanDefinitionParserGenerator.ROLE);
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(beanDefinitionParserName), abstractBeanDefinitionParser);
+        String beanDefinitionParserName = ctx().getNameUtils().generateClassName(executableElement, NamingContants.DEFINITION_PARSER_CLASS_NAME_SUFFIX);
+        Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(beanDefinitionParserName) + NamingContants.CONFIG_NAMESPACE);
+        DefinedClass abstractBeanDefinitionParser = ctx().getClassForRole(AbstractBeanDefinitionParserGenerator.ROLE);
+        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(beanDefinitionParserName), abstractBeanDefinitionParser);
 
         return clazz;
     }
 
     protected DefinedClass getConfigBeanDefinitionParserClass(DevKitTypeElement typeElement) {
-        String configBeanDefinitionParserClass = context.getNameUtils().generateClassName(typeElement, NamingContants.CONFIG_NAMESPACE, NamingContants.CONFIG_DEFINITION_PARSER_CLASS_NAME_SUFFIX);
-        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(configBeanDefinitionParserClass));
+        String configBeanDefinitionParserClass = ctx().getNameUtils().generateClassName(typeElement, NamingContants.CONFIG_NAMESPACE, NamingContants.CONFIG_DEFINITION_PARSER_CLASS_NAME_SUFFIX);
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(configBeanDefinitionParserClass));
 
-        DefinedClass abstractBeanDefinitionParser = context.getClassForRole(AbstractBeanDefinitionParserGenerator.ROLE);
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(configBeanDefinitionParserClass), abstractBeanDefinitionParser);
+        DefinedClass abstractBeanDefinitionParser = ctx().getClassForRole(AbstractBeanDefinitionParserGenerator.ROLE);
+        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(configBeanDefinitionParserClass), abstractBeanDefinitionParser);
 
-        context.setClassRole(context.getNameUtils().generateConfigDefParserRoleKey(typeElement), clazz);
+        ctx().setClassRole(ctx().getNameUtils().generateConfigDefParserRoleKey(typeElement), clazz);
 
         return clazz;
     }
 
     protected DefinedClass getMessageProcessorClass(DevKitExecutableElement executableElement) {
-        String className = context.getNameUtils().generateClassName(executableElement, NamingContants.MESSAGE_PROCESSOR_CLASS_NAME_SUFFIX);
+        String className = ctx().getNameUtils().generateClassName(executableElement, NamingContants.MESSAGE_PROCESSOR_CLASS_NAME_SUFFIX);
         return getMessageProcessorClass(className,
-                context.getNameUtils().getPackageName(className) + NamingContants.MESSAGE_PROCESSOR_NAMESPACE);
+                ctx().getNameUtils().getPackageName(className) + NamingContants.MESSAGE_PROCESSOR_NAMESPACE);
     }
 
     protected DefinedClass getMessageProcessorClass(String className, String packageName) {
-        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(packageName);
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(className), new Class[]{
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(packageName);
+        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(className), new Class[]{
                 Initialisable.class,
                 Startable.class,
                 Disposable.class,
@@ -456,9 +456,9 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected DefinedClass getInterceptingMessageProcessorClass(DevKitExecutableElement executableElement) {
-        String beanDefinitionParserName = context.getNameUtils().generateClassName(executableElement, NamingContants.MESSAGE_PROCESSOR_CLASS_NAME_SUFFIX);
-        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(beanDefinitionParserName) + NamingContants.MESSAGE_PROCESSOR_NAMESPACE);
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(beanDefinitionParserName), new Class[]{
+        String beanDefinitionParserName = ctx().getNameUtils().generateClassName(executableElement, NamingContants.MESSAGE_PROCESSOR_CLASS_NAME_SUFFIX);
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(beanDefinitionParserName) + NamingContants.MESSAGE_PROCESSOR_NAMESPACE);
+        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(beanDefinitionParserName), new Class[]{
                 Initialisable.class,
                 Startable.class,
                 Disposable.class,
@@ -473,8 +473,8 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
 
     protected DefinedClass getMessageSourceClass(DevKitExecutableElement executableElement, boolean runnable) {
-        String beanDefinitionParserName = context.getNameUtils().generateClassName(executableElement, NamingContants.MESSAGE_SOURCE_CLASS_NAME_SUFFIX);
-        Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(beanDefinitionParserName) + NamingContants.MESSAGE_SOURCE_NAMESPACE);
+        String beanDefinitionParserName = ctx().getNameUtils().generateClassName(executableElement, NamingContants.MESSAGE_SOURCE_CLASS_NAME_SUFFIX);
+        Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(beanDefinitionParserName) + NamingContants.MESSAGE_SOURCE_NAMESPACE);
         ArrayList<Class> inherits = new ArrayList<Class>();
         inherits.add(MuleContextAware.class);
         inherits.add(Startable.class);
@@ -493,7 +493,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             inherits.add(MessageSource.class);
         }
 
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(beanDefinitionParserName), inherits.toArray( new Class<?>[] {} ));
+        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(beanDefinitionParserName), inherits.toArray( new Class<?>[] {} ));
 
         return clazz;
     }
@@ -576,16 +576,16 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                     type(ref(variable.asType())).
                     name(fieldName).
                     build();
-            field.javadoc().add(context.getJavaDocUtils().getParameterSummary(variable.getSimpleName().toString(), variable));
+            field.javadoc().add(ctx().getJavaDocUtils().getParameterSummary(variable.getSimpleName().toString(), variable));
             fields.put(variable.getSimpleName().toString(), new AbstractMessageGenerator.FieldVariableElement(field, fieldType, variable));
         }
         return fields;
     }
 
     protected Method generateInitialiseMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, DevKitTypeElement typeElement, FieldVariable muleContext, FieldVariable expressionManager, FieldVariable patternInfo, FieldVariable object, FieldVariable retryCount, boolean shouldAutoCreate) {
-        DefinedClass pojoClass = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
+        DefinedClass pojoClass = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement));
 
-        Method initialise = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "initialise");
+        Method initialise = messageProcessorClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "initialise");
         initialise.javadoc().add("Obtains the expression manager from the Mule context and initialises the connector. If a target object ");
         initialise.javadoc().add(" has not been set already it will search the Mule registry for a default one.");
         initialise.javadoc().addThrows(ref(InitialisationException.class));
@@ -662,7 +662,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                     Invocation localPort = castedModuleObject.invoke("get" + StringUtils.capitalize(DefaultHttpCallbackGenerator.LOCAL_PORT_FIELD_NAME));
                     Invocation remotePort = castedModuleObject.invoke("get" + StringUtils.capitalize(DefaultHttpCallbackGenerator.REMOTE_PORT_FIELD_NAME));
                     Invocation async = castedModuleObject.invoke("get" + StringUtils.capitalize(DefaultHttpCallbackGenerator.ASYNC_FIELD_NAME));
-                    ifCallbackFlowNameIsNull.assign(variableElement.getFieldType(), ExpressionFactory._new(context.getClassForRole(DefaultHttpCallbackGenerator.HTTP_CALLBACK_ROLE)).
+                    ifCallbackFlowNameIsNull.assign(variableElement.getFieldType(), ExpressionFactory._new(ctx().getClassForRole(DefaultHttpCallbackGenerator.HTTP_CALLBACK_ROLE)).
                             arg(callbackFlowName).arg(muleContext).arg(domain).arg(localPort).arg(remotePort).arg(async));
                 }
             }
@@ -676,7 +676,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected Method generateSetMuleContextMethod(DefinedClass clazz, FieldVariable muleContext, Map<String, FieldVariableElement> fields) {
-        Method setMuleContext = clazz.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setMuleContext");
+        Method setMuleContext = clazz.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setMuleContext");
         setMuleContext.javadoc().add("Set the Mule context");
         setMuleContext.javadoc().addParam("context Mule context to set");
         Variable muleContextParam = setMuleContext.param(ref(MuleContext.class), "context");
@@ -714,7 +714,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected Method generateSetFlowConstructMethod(DefinedClass messageSourceClass, FieldVariable flowConstruct, Map<String, FieldVariableElement> fields) {
-        Method setFlowConstruct = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setFlowConstruct");
+        Method setFlowConstruct = messageSourceClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setFlowConstruct");
         setFlowConstruct.javadoc().add("Sets flow construct");
         setFlowConstruct.javadoc().addParam("flowConstruct Flow construct to set");
         Variable newFlowConstruct = setFlowConstruct.param(ref(FlowConstruct.class), "flowConstruct");
@@ -784,14 +784,14 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected FieldVariable generateRetryMaxField(DefinedClass messageSourceClass) {
-        FieldVariable retryMax = messageSourceClass.field(Modifier.PRIVATE, context.getCodeModel().INT, "retryMax");
+        FieldVariable retryMax = messageSourceClass.field(Modifier.PRIVATE, ctx().getCodeModel().INT, "retryMax");
         retryMax.javadoc().add("Maximum number of retries that can be attempted.");
         return retryMax;
     }
 
 
     protected Method generateSetModuleObjectMethod(DefinedClass messageProcessorClass, FieldVariable object) {
-        Method setObject = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setModuleObject");
+        Method setObject = messageProcessorClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setModuleObject");
         setObject.javadoc().add("Sets the instance of the object under which the processor will execute");
         setObject.javadoc().addParam("moduleObject Instace of the module");
         Variable objectParam = setObject.param(object.type(), "moduleObject");
@@ -823,7 +823,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
 
     protected Method generateSetListenerMethod(DefinedClass messageSourceClass, FieldVariable messageProcessor) {
-        Method setListener = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setListener");
+        Method setListener = messageSourceClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setListener");
         setListener.javadoc().add("Sets the message processor that will \"listen\" the events generated by this message source");
         setListener.javadoc().addParam("listener Message processor");
         Variable listener = setListener.param(ref(MessageProcessor.class), "listener");
@@ -1037,7 +1037,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
 
     protected void generateStartMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields) {
-        Method startMethod = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "start");
+        Method startMethod = messageProcessorClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "start");
         startMethod._throws(ref(MuleException.class));
 
         if (fields != null) {
@@ -1068,7 +1068,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected void generateStopMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields) {
-        Method stopMethod = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "stop");
+        Method stopMethod = messageProcessorClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "stop");
         stopMethod._throws(ref(MuleException.class));
 
         if (fields != null) {
@@ -1100,7 +1100,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected void generateDiposeMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields) {
-        Method diposeMethod = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "dispose");
+        Method diposeMethod = messageProcessorClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "dispose");
 
         if (fields != null) {
             for (String fieldName : fields.keySet()) {

@@ -66,12 +66,12 @@ public class OAuth1AdapterGenerator extends AbstractOAuthAdapterGenerator {
     private static final String CONSUMER_FIELD_NAME = "consumer";
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
         return typeElement.hasAnnotation(OAuth.class);
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
+    public void generate(DevKitTypeElement typeElement) throws GenerationException {
         DefinedClass oauthAdapter = getOAuthAdapterClass(typeElement, "OAuth1Adapter", OAuth1Adapter.class);
         OAuth oauth = typeElement.getAnnotation(OAuth.class);
         authorizationCodePatternConstant(oauthAdapter, oauth.verifierRegex());
@@ -124,7 +124,7 @@ public class OAuth1AdapterGenerator extends AbstractOAuthAdapterGenerator {
     }
 
     private Method generateCreateConsumerMethod(DefinedClass oauthAdapter, OAuth oauth, DevKitTypeElement typeElement) {
-        Method createConsumer = oauthAdapter.method(Modifier.PRIVATE, context.getCodeModel().VOID, "createConsumer");
+        Method createConsumer = oauthAdapter.method(Modifier.PRIVATE, ctx().getCodeModel().VOID, "createConsumer");
         Invocation getConsumerKey = ExpressionFactory.invoke(getterMethodForFieldAnnotatedWith(typeElement, OAuthConsumerKey.class));
         Invocation getConsumerSecret = ExpressionFactory.invoke(getterMethodForFieldAnnotatedWith(typeElement, OAuthConsumerSecret.class));
         FieldVariable consumer = oauthAdapter.fields().get(CONSUMER_FIELD_NAME);
@@ -148,7 +148,7 @@ public class OAuth1AdapterGenerator extends AbstractOAuthAdapterGenerator {
     }
 
     private void generateGetAuthorizationUrlMethod(DefinedClass oauthAdapter, FieldVariable requestToken, FieldVariable requestTokenSecret, FieldVariable redirectUrl, DevKitTypeElement typeElement, OAuth oauth, FieldVariable logger) {
-        Method getAuthorizationUrl = oauthAdapter.method(Modifier.PUBLIC, context.getCodeModel().VOID, GET_AUTHORIZATION_URL_METHOD_NAME);
+        Method getAuthorizationUrl = oauthAdapter.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, GET_AUTHORIZATION_URL_METHOD_NAME);
         getAuthorizationUrl._throws(ref(UnableToAcquireRequestTokenException.class));
         
         getAuthorizationUrl.type(ref(String.class));
@@ -192,7 +192,7 @@ public class OAuth1AdapterGenerator extends AbstractOAuthAdapterGenerator {
     
     private void generateRestoreAccessTokenMethod(DefinedClass oauthAdapter, FieldVariable restoreAccessTokenCallbackField, FieldVariable logger)
     {
-        Method restoreAccessTokenMethod = oauthAdapter.method(Modifier.PUBLIC, context.getCodeModel().BOOLEAN, "restoreAccessToken");
+        Method restoreAccessTokenMethod = oauthAdapter.method(Modifier.PUBLIC, ctx().getCodeModel().BOOLEAN, "restoreAccessToken");
 
         Conditional ifRestoreCallbackNotNull = restoreAccessTokenMethod.body()._if(Op.ne(restoreAccessTokenCallbackField, ExpressionFactory._null()));
 
@@ -230,7 +230,7 @@ public class OAuth1AdapterGenerator extends AbstractOAuthAdapterGenerator {
     }
 
     private void generateFetchAccessTokenMethod(DefinedClass oauthAdapter, FieldVariable requestToken, FieldVariable requestTokenSecret, FieldVariable saveAccessTokenCallback, FieldVariable oauthVerifier, DevKitTypeElement typeElement, OAuth oauth, FieldVariable logger) {
-        Method fetchAccessToken = oauthAdapter.method(Modifier.PUBLIC, context.getCodeModel().VOID, FETCH_ACCESS_TOKEN_METHOD_NAME);
+        Method fetchAccessToken = oauthAdapter.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, FETCH_ACCESS_TOKEN_METHOD_NAME);
         fetchAccessToken._throws(ref(UnableToAcquireAccessTokenException.class));
 
         fetchAccessToken.body().invoke("restoreAccessToken");

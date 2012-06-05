@@ -73,12 +73,12 @@ import java.util.Map;
 public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
         return typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class);
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) {
+    public void generate(DevKitTypeElement typeElement) {
         generateConfigBeanDefinitionParserFor(typeElement);
 
         for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Processor.class)) {
@@ -92,9 +92,9 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
     private void generateConfigBeanDefinitionParserFor(DevKitTypeElement typeElement) {
         DefinedClass beanDefinitionparser = getConfigBeanDefinitionParserClass(typeElement);
-        DefinedClass pojo = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
+        DefinedClass pojo = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement));
 
-        context.note("Generating config element definition parser as " + beanDefinitionparser.fullName() + " for class " + typeElement.getSimpleName().toString());
+        ctx().note("Generating config element definition parser as " + beanDefinitionparser.fullName() + " for class " + typeElement.getSimpleName().toString());
 
         Method parse = beanDefinitionparser.method(Modifier.PUBLIC, ref(BeanDefinition.class), "parse");
         Variable element = parse.param(ref(org.w3c.dom.Element.class), "element");
@@ -160,8 +160,8 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class)) {
             generateParseHttpCallback(SchemaGenerator.OAUTH_CALLBACK_CONFIG_ELEMENT_NAME, parse, element, builder);
 
-            DefinedClass saveAccessTokenCallbackFactory = context.getClassForRole(DefaultSaveAccessTokenCallbackFactoryGenerator.ROLE);
-            DefinedClass restoreAccessTokenCallbackFactory = context.getClassForRole(DefaultRestoreAccessTokenCallbackFactoryGenerator.ROLE);
+            DefinedClass saveAccessTokenCallbackFactory = ctx().getClassForRole(DefaultSaveAccessTokenCallbackFactoryGenerator.ROLE);
+            DefinedClass restoreAccessTokenCallbackFactory = ctx().getClassForRole(DefaultRestoreAccessTokenCallbackFactoryGenerator.ROLE);
             generateParseNestedProcessor(parse.body(), element, parserContext, builder, "oauthSaveAccessToken", false, false, false, saveAccessTokenCallbackFactory);
             generateParseNestedProcessor(parse.body(), element, parserContext, builder, "oauthRestoreAccessToken", false, false, false, restoreAccessTokenCallbackFactory);
         }
@@ -234,7 +234,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         DefinedClass beanDefinitionparser = getBeanDefinitionParserClass(executableElement);
         DefinedClass messageSourceClass = getMessageSourceClass(executableElement, sourceAnnotation.threadingModel() == SourceThreadingModel.SINGLE_THREAD);
 
-        context.note("Generating bean definition parser as " + beanDefinitionparser.fullName() + " for message source " + messageSourceClass.fullName());
+        ctx().note("Generating bean definition parser as " + beanDefinitionparser.fullName() + " for message source " + messageSourceClass.fullName());
 
         generateSourceParseMethod(beanDefinitionparser, messageSourceClass, executableElement);
     }
@@ -249,7 +249,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             messageProcessorClass = getMessageProcessorClass(executableElement);
         }
 
-        context.note("Generating bean definition parser as " + beanDefinitionparser.fullName() + " for message processor " + messageProcessorClass.fullName());
+        ctx().note("Generating bean definition parser as " + beanDefinitionparser.fullName() + " for message processor " + messageProcessorClass.fullName());
 
         generateProcessorParseMethod(beanDefinitionparser, messageProcessorClass, executableElement);
     }
@@ -310,7 +310,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             } else if (variable.isEnum()) {
                 generateParseProperty(parse.body(), element, builder, fieldName);
             } else if (variable.asType().toString().startsWith(HttpCallback.class.getName())) {
-                Variable callbackFlowName = parse.body().decl(ref(String.class), fieldName + "CallbackFlowName", ExpressionFactory.invoke("getAttributeValue").arg(element).arg(context.getNameUtils().uncamel(fieldName) + "-flow-ref"));
+                Variable callbackFlowName = parse.body().decl(ref(String.class), fieldName + "CallbackFlowName", ExpressionFactory.invoke("getAttributeValue").arg(element).arg(ctx().getNameUtils().uncamel(fieldName) + "-flow-ref"));
                 Block block = parse.body()._if(Op.ne(callbackFlowName, ExpressionFactory._null()))._then();
                 block.invoke(builder, "addPropertyValue").arg(fieldName + "CallbackFlow").arg(ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(callbackFlowName));
             } else {
@@ -361,17 +361,17 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                 .arg(element)
                 .arg(builder)
                 .arg(fieldName)
-                .arg(context.getNameUtils().uncamel(fieldName))
-                .arg(context.getNameUtils().uncamel(context.getNameUtils().singularize(fieldName)));
+                .arg(ctx().getNameUtils().uncamel(fieldName))
+                .arg(ctx().getNameUtils().uncamel(ctx().getNameUtils().singularize(fieldName)));
 
         if (variable.hasTypeArguments()) {
             DevKitElement typeArgument = (DevKitElement) variable.getTypeArguments().get(0);
 
             if (typeArgument.isArrayOrList()) {
-                String innerChildElementName = "inner-" + context.getNameUtils().uncamel(context.getNameUtils().singularize(fieldName));
+                String innerChildElementName = "inner-" + ctx().getNameUtils().uncamel(ctx().getNameUtils().singularize(fieldName));
                 parseListAndSetProperty.arg(ExpressionFactory._new(generateParserDelegateForList(innerChildElementName)));
             } else if (typeArgument.isMap()) {
-                String innerChildElementName = "inner-" + context.getNameUtils().uncamel(context.getNameUtils().singularize(fieldName));
+                String innerChildElementName = "inner-" + ctx().getNameUtils().uncamel(ctx().getNameUtils().singularize(fieldName));
                 parseListAndSetProperty.arg(ExpressionFactory._new(generateParserDelegateForMap(innerChildElementName)));
             } else {
                 parseListAndSetProperty.arg(ExpressionFactory._new(generateParserDelegateForTextContent()));
@@ -386,17 +386,17 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                 .arg(element)
                 .arg(builder)
                 .arg(fieldName)
-                .arg(context.getNameUtils().uncamel(fieldName))
-                .arg(context.getNameUtils().uncamel(context.getNameUtils().singularize(fieldName)));
+                .arg(ctx().getNameUtils().uncamel(fieldName))
+                .arg(ctx().getNameUtils().uncamel(ctx().getNameUtils().singularize(fieldName)));
 
         if (variable.hasTypeArguments()) {
             DevKitElement typeArgument = (DevKitElement) variable.getTypeArguments().get(0);
 
             if (typeArgument.isArrayOrList()) {
-                String innerChildElementName = "inner-" + context.getNameUtils().uncamel(context.getNameUtils().singularize(fieldName));
+                String innerChildElementName = "inner-" + ctx().getNameUtils().uncamel(ctx().getNameUtils().singularize(fieldName));
                 parseMapAndSetProperty.arg(ExpressionFactory._new(generateParserDelegateForList(innerChildElementName)));
             } else if (typeArgument.isMap()) {
-                String innerChildElementName = "inner-" + context.getNameUtils().uncamel(context.getNameUtils().singularize(fieldName));
+                String innerChildElementName = "inner-" + ctx().getNameUtils().uncamel(ctx().getNameUtils().singularize(fieldName));
                 parseMapAndSetProperty.arg(ExpressionFactory._new(generateParserDelegateForMap(innerChildElementName)));
             } else {
                 parseMapAndSetProperty.arg(ExpressionFactory._new(generateParserDelegateForTextContent()));
@@ -417,7 +417,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         } else {
             block.invoke(isList ? "parseNestedProcessorAsListAndSetProperty" : "parseNestedProcessorAndSetProperty")
                     .arg(element)
-                    .arg(context.getNameUtils().uncamel(fieldName))
+                    .arg(ctx().getNameUtils().uncamel(fieldName))
                     .arg(parserContext)
                     .arg(factoryBean.dotclass())
                     .arg(builder)
@@ -432,7 +432,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
         block.assign(xmlElement, ref(DomUtils.class).staticInvoke("getChildElementByTagName")
                 .arg(element)
-                .arg(context.getNameUtils().uncamel(fieldName)));
+                .arg(ctx().getNameUtils().uncamel(fieldName)));
 
         Conditional xmlElementNotNull = block._if(Op.ne(xmlElement, ExpressionFactory._null()));
 
@@ -474,8 +474,8 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
     }
 
     private DefinedClass generateParserDelegateForTextContent() {
-        DefinedClass parserDelegateInterface = context.getClassForRole(AbstractBeanDefinitionParserGenerator.DELEGATE_ROLE);
-        DefinedClass anonymousClass = context.getCodeModel().anonymousClass(parserDelegateInterface.narrow(ref(String.class)));
+        DefinedClass parserDelegateInterface = ctx().getClassForRole(AbstractBeanDefinitionParserGenerator.DELEGATE_ROLE);
+        DefinedClass anonymousClass = ctx().getCodeModel().anonymousClass(parserDelegateInterface.narrow(ref(String.class)));
         Method parseMethod = anonymousClass.method(Modifier.PUBLIC, ref(String.class), "parse");
         Variable element = parseMethod.param(ref(Element.class), "element");
 
@@ -485,8 +485,8 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
     }
 
     private DefinedClass generateParserDelegateForList(String childElementName) {
-        DefinedClass parserDelegateInterface = context.getClassForRole(AbstractBeanDefinitionParserGenerator.DELEGATE_ROLE);
-        DefinedClass anonymousClass = context.getCodeModel().anonymousClass(parserDelegateInterface.narrow(ref(List.class)));
+        DefinedClass parserDelegateInterface = ctx().getClassForRole(AbstractBeanDefinitionParserGenerator.DELEGATE_ROLE);
+        DefinedClass anonymousClass = ctx().getCodeModel().anonymousClass(parserDelegateInterface.narrow(ref(List.class)));
         Method parseMethod = anonymousClass.method(Modifier.PUBLIC, ref(List.class), "parse");
         Variable element = parseMethod.param(ref(Element.class), "element");
 
@@ -498,8 +498,8 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
     }
 
     private DefinedClass generateParserDelegateForMap(String childElementName) {
-        DefinedClass parserDelegateInterface = context.getClassForRole(AbstractBeanDefinitionParserGenerator.DELEGATE_ROLE);
-        DefinedClass anonymousClass = context.getCodeModel().anonymousClass(parserDelegateInterface.narrow(ref(Map.class)));
+        DefinedClass parserDelegateInterface = ctx().getClassForRole(AbstractBeanDefinitionParserGenerator.DELEGATE_ROLE);
+        DefinedClass anonymousClass = ctx().getCodeModel().anonymousClass(parserDelegateInterface.narrow(ref(Map.class)));
         Method parseMethod = anonymousClass.method(Modifier.PUBLIC, ref(Map.class), "parse");
         Variable element = parseMethod.param(ref(Element.class), "element");
 

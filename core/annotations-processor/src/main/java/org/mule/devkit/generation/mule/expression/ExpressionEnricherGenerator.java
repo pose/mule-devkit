@@ -75,16 +75,16 @@ import java.util.Set;
 public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
         return typeElement.hasAnnotation(ExpressionLanguage.class) && typeElement.getMethodsAnnotatedWith(ExpressionEnricher.class).size() > 0;
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) {
+    public void generate(DevKitTypeElement typeElement) {
         String name = typeElement.getAnnotation(ExpressionLanguage.class).name();
 
         DevKitExecutableElement executableElement = typeElement.getMethodsAnnotatedWith(ExpressionEnricher.class).get(0);
-        TypeReference moduleObject = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
+        TypeReference moduleObject = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement));
         DefinedClass enricherClass = getEnricherClass(name, typeElement);
 
         // build trackmap
@@ -116,31 +116,31 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
         generateTrackMapValues(trackMap, v, trackedMap);
         generateTrackMapEntrySet(trackMap, k, v, trackedMap);
 
-        context.note("Generating message enricher " + enricherClass.fullName() + " for language at class " + typeElement.getSimpleName().toString());
+        ctx().note("Generating message enricher " + enricherClass.fullName() + " for language at class " + typeElement.getSimpleName().toString());
 
         FieldVariable module = generateModuleField(moduleObject, enricherClass);
 
-        Method setMuleContext = enricherClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setMuleContext");
+        Method setMuleContext = enricherClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setMuleContext");
         Variable muleContext = setMuleContext.param(ref(MuleContext.class), "muleContext");
         Conditional ifModuleIsContextAware = setMuleContext.body()._if(Op._instanceof(module, ref(MuleContextAware.class)));
         ifModuleIsContextAware._then().add(ExpressionFactory.cast(ref(MuleContextAware.class), module).invoke("setMuleContext").arg(muleContext));
 
-        Method start = enricherClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "start");
+        Method start = enricherClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "start");
         start._throws(ref(MuleException.class));
         Conditional ifModuleIsStartable = start.body()._if(Op._instanceof(module, ref(Startable.class)));
         ifModuleIsStartable._then().add(ExpressionFactory.cast(ref(Startable.class), module).invoke("start"));
 
-        Method stop = enricherClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "stop");
+        Method stop = enricherClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "stop");
         stop._throws(ref(MuleException.class));
         Conditional ifModuleIsStoppable = stop.body()._if(Op._instanceof(module, ref(Stoppable.class)));
         ifModuleIsStoppable._then().add(ExpressionFactory.cast(ref(Stoppable.class), module).invoke("stop"));
 
-        Method init = enricherClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "initialise");
+        Method init = enricherClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "initialise");
         init._throws(ref(InitialisationException.class));
         Conditional ifModuleIsInitialisable = init.body()._if(Op._instanceof(module, ref(Initialisable.class)));
         ifModuleIsInitialisable._then().add(ExpressionFactory.cast(ref(Initialisable.class), module).invoke("initialise"));
 
-        Method dispose = enricherClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "dispose");
+        Method dispose = enricherClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "dispose");
         Conditional ifModuleIsDisposable = dispose.body()._if(Op._instanceof(module, ref(Disposable.class)));
         ifModuleIsDisposable._then().add(ExpressionFactory.cast(ref(Disposable.class), module).invoke("dispose"));
 
@@ -158,7 +158,7 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
         generateIsAssignableFrom(enricherClass);
         generateTransformMethod(enricherClass);
 
-        Method enrich = enricherClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "enrich");
+        Method enrich = enricherClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "enrich");
         Variable expression = enrich.param(ref(String.class), "expression");
         Variable message = enrich.param(ref(MuleMessage.class), "message");
         Variable object = enrich.param(ref(Object.class), "object");
@@ -290,7 +290,7 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
             argCount++;
         }
 
-        if (ref(executableElement.getReturnType()) != context.getCodeModel().VOID) {
+        if (ref(executableElement.getReturnType()) != ctx().getCodeModel().VOID) {
             Variable newPayload = tryStatement.body().decl(ref(Object.class), "newPayload", evaluateInvoke);
             tryStatement.body().add(message.invoke("setPayload").arg(newPayload));
         } else {
@@ -320,7 +320,7 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
         catchAndRethrowAsRuntimeException(tryStatement, NoSuchMethodException.class);
         catchAndRethrowAsRuntimeException(tryStatement, TransformerException.class);
 
-        context.registerAtBoot(enricherClass);
+        ctx().registerAtBoot(enricherClass);
     }
 
     private void generateTrackMapEntrySet(DefinedClass trackMap, TypeVariable k, TypeVariable v, FieldVariable trackedMap) {
@@ -347,13 +347,13 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
     }
 
     private void generateTrackMapClear(DefinedClass trackMap, FieldVariable trackedMap) {
-        Method clear = trackMap.method(Modifier.PUBLIC, context.getCodeModel().VOID, "clear");
+        Method clear = trackMap.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "clear");
         clear.annotate(ref(Override.class));
         clear.body().add(trackedMap.invoke("clear"));
     }
 
     private void generateTrackMapPutAll(DefinedClass trackMap, TypeVariable k, TypeVariable v, FieldVariable trackedMap) {
-        Method putAll = trackMap.method(Modifier.PUBLIC, context.getCodeModel().VOID, "putAll");
+        Method putAll = trackMap.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "putAll");
         putAll.annotate(ref(Override.class));
         Variable map = putAll.param(ref(Map.class).narrow(k.wildcard()).narrow(v.wildcard()), "map");
         putAll.body().add(trackedMap.invoke("putAll").arg(map));
@@ -390,27 +390,27 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
     }
 
     private void generateTrackMapContainsValue(DefinedClass trackMap, FieldVariable trackedMap) {
-        Method containsValue = trackMap.method(Modifier.PUBLIC, context.getCodeModel().BOOLEAN, "containsValue");
+        Method containsValue = trackMap.method(Modifier.PUBLIC, ctx().getCodeModel().BOOLEAN, "containsValue");
         containsValue.annotate(ref(Override.class));
         Variable o2 = containsValue.param(ref(Object.class), "o");
         containsValue.body()._return(trackedMap.invoke("containsValue").arg(o2));
     }
 
     private void generateTrackMapContainsKey(DefinedClass trackMap, FieldVariable trackedMap) {
-        Method containsKey = trackMap.method(Modifier.PUBLIC, context.getCodeModel().BOOLEAN, "containsKey");
+        Method containsKey = trackMap.method(Modifier.PUBLIC, ctx().getCodeModel().BOOLEAN, "containsKey");
         containsKey.annotate(ref(Override.class));
         Variable o = containsKey.param(ref(Object.class), "o");
         containsKey.body()._return(trackedMap.invoke("containsKey").arg(o));
     }
 
     private void generateTrackMapIsEmpty(DefinedClass trackMap, FieldVariable trackedMap) {
-        Method isEmpty = trackMap.method(Modifier.PUBLIC, context.getCodeModel().BOOLEAN, "isEmpty");
+        Method isEmpty = trackMap.method(Modifier.PUBLIC, ctx().getCodeModel().BOOLEAN, "isEmpty");
         isEmpty.annotate(ref(Override.class));
         isEmpty.body()._return(trackedMap.invoke("isEmpty"));
     }
 
     private void generateTrackMapSize(DefinedClass trackMap, FieldVariable trackedMap) {
-        Method size = trackMap.method(Modifier.PUBLIC, context.getCodeModel().INT, "size");
+        Method size = trackMap.method(Modifier.PUBLIC, ctx().getCodeModel().INT, "size");
         size.annotate(ref(Override.class));
         size.body()._return(trackedMap.invoke("size"));
     }
@@ -436,15 +436,15 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
     }
 
     private void generateSetName(DefinedClass evaluatorClass) {
-        Method setName = evaluatorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setName");
+        Method setName = evaluatorClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setName");
         setName.param(ref(String.class), "name");
         setName.body()._throw(ExpressionFactory._new(ref(UnsupportedOperationException.class)));
     }
 
     private DefinedClass getEnricherClass(String name, DevKitTypeElement variableElement) {
-        String evaluatorClassName = context.getNameUtils().generateClassNameInPackage(variableElement, context.getNameUtils().camel(name) + NamingContants.EXPRESSION_ENRICHER_CLASS_NAME_SUFFIX);
-        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(evaluatorClassName) + NamingContants.EXPRESSIONS_NAMESPACE);
-        DefinedClass enricherClass = pkg._class(context.getNameUtils().getClassName(evaluatorClassName), new Class<?>[]{org.mule.api.expression.ExpressionEnricher.class});
+        String evaluatorClassName = ctx().getNameUtils().generateClassNameInPackage(variableElement, ctx().getNameUtils().camel(name) + NamingContants.EXPRESSION_ENRICHER_CLASS_NAME_SUFFIX);
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(evaluatorClassName) + NamingContants.EXPRESSIONS_NAMESPACE);
+        DefinedClass enricherClass = pkg._class(ctx().getNameUtils().getClassName(evaluatorClassName), new Class<?>[]{org.mule.api.expression.ExpressionEnricher.class});
         enricherClass._implements(ref(MuleContextAware.class));
         enricherClass._implements(ref(Startable.class));
         enricherClass._implements(ref(Stoppable.class));

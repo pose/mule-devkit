@@ -29,18 +29,18 @@ import java.io.OutputStreamWriter;
 public class RegistryBootstrapGenerator extends AbstractModuleGenerator {
 
     @Override
-    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(DevKitTypeElement typeElement) {
         return true;
     }
 
     @Override
-    protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
+    public void generate(DevKitTypeElement typeElement) throws GenerationException {
         OutputStreamWriter registryBootstrapStreamOut = null;
         try {
-            OutputStream registryBootstrapStream = context.getCodeModel().getRegistryBootstrapStream();
+            OutputStream registryBootstrapStream = ctx().getCodeModel().getRegistryBootstrapStream();
             registryBootstrapStreamOut = new OutputStreamWriter(registryBootstrapStream, "UTF-8");
-            for (DefinedClass clazz : context.getRegisterAtBoot()) {
-                context.note("Adding registry bootstrap entry for " + clazz.fullName() + " as " +  clazz.name());
+            for (DefinedClass clazz : ctx().getRegisterAtBoot()) {
+                ctx().note("Adding registry bootstrap entry for " + clazz.fullName() + " as " +  clazz.name());
                 registryBootstrapStreamOut.write(clazz.name() + "=" + clazz.fullName() + "\n");
             }
             registryBootstrapStreamOut.flush();
