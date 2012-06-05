@@ -16,26 +16,19 @@
  */
 package org.mule.devkit.generation.mule.oauth;
 
-import org.apache.commons.lang.StringUtils;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
-import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.generation.spring.AbstractBeanDefinitionParserGenerator;
 import org.mule.devkit.model.DevKitTypeElement;
-import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
-import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
-import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.Variable;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
-import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 
 public class AuthorizeBeanDefinitionParserGenerator extends AbstractMessageGenerator {

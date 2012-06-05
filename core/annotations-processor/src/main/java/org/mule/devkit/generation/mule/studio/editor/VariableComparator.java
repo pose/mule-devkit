@@ -20,7 +20,6 @@ package org.mule.devkit.generation.mule.studio.editor;
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.annotations.display.FriendlyName;
 import org.mule.api.annotations.display.Placement;
-import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.model.DevKitVariableElement;
 
 import javax.lang.model.element.VariableElement;
