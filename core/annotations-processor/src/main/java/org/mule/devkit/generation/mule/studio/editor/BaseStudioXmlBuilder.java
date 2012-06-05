@@ -283,7 +283,7 @@ public abstract class BaseStudioXmlBuilder {
         childElement.setAllowMultiple(false);
         childElement.setCaption(helper.getFormattedCaption(parameter));
         childElement.setInplace(true);
-        childElement.setJavaType(typeMirrorUtils.getJavaType(parameter));
+        childElement.setJavaType(parameter.asType().toString());
         return childElement;
     }
 

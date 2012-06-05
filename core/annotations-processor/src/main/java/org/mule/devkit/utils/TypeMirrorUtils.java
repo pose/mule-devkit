@@ -62,10 +62,6 @@ public class TypeMirrorUtils {
 
 
 
-    public String getJavaType(DevKitElement element) {
-        return element.asType().toString();
-    }
-
     public String getJavaType(ExecutableElement element) {
         return element.getReturnType().toString();
     }
