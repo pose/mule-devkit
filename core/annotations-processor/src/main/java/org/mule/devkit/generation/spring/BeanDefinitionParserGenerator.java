@@ -29,7 +29,6 @@ import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.api.callback.HttpCallback;
 import org.mule.api.callback.SourceCallback;
 import org.mule.config.PoolingProfile;
-import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.adapter.HttpCallbackAdapterGenerator;
@@ -408,7 +407,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
     }
 
     private void generateParseNestedProcessor(Block block, Variable element, Variable parserContext, Variable builder, String fieldName, boolean skipElement, boolean isList, boolean allowTextAttribute, TypeReference factoryBean) {
-        if( skipElement ) {
+        if (skipElement) {
             block.invoke(isList ? "parseNestedProcessorAsListAndSetProperty" : "parseNestedProcessorAndSetProperty")
                     .arg(element)
                     .arg(parserContext)
