@@ -78,12 +78,6 @@ import org.mule.devkit.model.code.builders.FieldBuilder;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.TemplateParser;
-import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.PropertyValue;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.ManagedList;
-import org.springframework.beans.factory.xml.BeanDefinitionParser;
-import org.springframework.beans.factory.xml.ParserContext;
 
 import javax.lang.model.type.TypeMirror;
 import java.lang.reflect.ParameterizedType;

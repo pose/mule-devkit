@@ -23,7 +23,6 @@ import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.spring.SchemaGenerator;
-import org.mule.devkit.model.DefaultDevKitElement;
 import org.mule.devkit.model.DevKitElement;
 import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitParameterElement;
@@ -37,7 +36,6 @@ import org.mule.devkit.model.studio.StringAttributeType;
 import org.mule.devkit.model.studio.TextType;
 
 import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeMirror;
 import javax.xml.bind.JAXBElement;
 import java.util.ArrayList;
 import java.util.List;

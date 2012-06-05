@@ -18,7 +18,6 @@
 package org.mule.devkit.utils;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.NestedProcessor;
 import org.mule.api.annotations.oauth.OAuthAccessToken;
 import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
 import org.mule.api.annotations.param.CorrelationGroupSize;
@@ -37,9 +36,6 @@ import org.mule.api.callback.SourceCallback;
 import org.mule.devkit.model.DevKitElement;
 
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeKind;
-import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 import java.lang.annotation.Annotation;
 import java.math.BigDecimal;
@@ -48,7 +44,6 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 public class TypeMirrorUtils {
     private static final List<Class<?>> PARAMETER_TYPES_TO_IGNORE = Arrays.asList(SourceCallback.class, MuleMessage.class);
