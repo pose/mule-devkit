@@ -28,16 +28,8 @@ public class NestedProcessorModuleTest extends AbstractModuleTest {
         runFlow("callback", "mulesoft");
     }
 
-    public void testCallbackWithString() throws Exception {
-        runFlow("callbackWithString", "mulesoft");
-    }
-
     public void testCallbackWithStringAndChildElements() throws Exception {
         runFlow("callbackWithStringAndChildElements", "MuleSoft, Inc.");
-    }
-
-    public void testCallbackListWithString() throws Exception {
-        runFlow("callbackListWithString", "mulesoft");
     }
 
     public void testProcessItems() throws Exception {

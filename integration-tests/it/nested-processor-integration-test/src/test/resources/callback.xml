@@ -32,24 +32,20 @@
         </callback:callback>
     </flow>
 
-    <flow name="callbackWithString">
-        <callback:callback text="mulesoft"/>
-    </flow>
-
     <flow name="callbackWithStringAndChildElements">
         <callback:process-items>
             <callback:items>
                 <callback:item>orange</callback:item>
                 <callback:item>apple</callback:item>
             </callback:items>
-            <callback:processors text="MuleSoft, Inc."/>
+            <callback:processors>
+                <expression-transformer>
+                    <return-argument expression="MuleSoft, Inc." evaluator="string"/>
+                </expression-transformer>
+            </callback:processors>
         </callback:process-items>
     </flow>
 
-
-    <flow name="callbackListWithString">
-        <callback:callback-list text="mulesoft"/>
-    </flow>
 
     <flow name="callbackWithPayload">
         <callback:callback-with-payload>

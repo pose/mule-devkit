@@ -21,7 +21,9 @@ import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Module;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
+import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
+import org.mule.config.spring.util.SpringXMLUtils;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.DevKitTypeElement;
@@ -86,6 +88,15 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
         generateParseConfigNameMethod(abstractBeanDefinitionParserClass);
         generateSetInitMethodIfNeededMethod(abstractBeanDefinitionParserClass);
         generateSetDestroyMethodIfNeededMethod(abstractBeanDefinitionParserClass);
+        generateParsePropertyMethod(abstractBeanDefinitionParserClass);
+        generateSetNoRecurseOnDefinitionMethod(abstractBeanDefinitionParserClass);
+        generateGenerateChildBeanNameMethod(abstractBeanDefinitionParserClass);
+        generateParseNestedProcessorMethod(abstractBeanDefinitionParserClass);
+        generateParseNestedProcessorAsListMethod(abstractBeanDefinitionParserClass);
+        generateParseNestedProcessorAsListAndSetPropertyMethod(abstractBeanDefinitionParserClass);
+        generateParseNestedProcessorAndSetPropertyMethod(abstractBeanDefinitionParserClass);
+        generateParseNestedProcessorAsListWithChildNameAndSetPropertyMethod(abstractBeanDefinitionParserClass);
+        generateParseNestedProcessorWithChildNameAndSetPropertyMethod(abstractBeanDefinitionParserClass);
     }
 
     private DefinedClass getAbstractBeanDefinitionParserClass(DevKitTypeElement typeElement) {
@@ -113,6 +124,137 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
             return e.getExistingClass();
         }
     }
+
+    private void generateParseNestedProcessorMethod(DefinedClass beanDefinitionParserClass) {
+        Method parseNestedProcessor = beanDefinitionParserClass.method(Modifier.PROTECTED, ref(BeanDefinition.class), "parseNestedProcessor");
+        Variable element = parseNestedProcessor.param(ref(Element.class), "element");
+        Variable parserContext = parseNestedProcessor.param(ref(ParserContext.class), "parserContext");
+        Variable factory = parseNestedProcessor.param(ref(Class.class), "factory");
+
+        Variable beanDefinitionBuilder = parseNestedProcessor.body().decl(ref(BeanDefinitionBuilder.class), "builder",
+                ref(BeanDefinitionBuilder.class).staticInvoke("rootBeanDefinition")
+                        .arg(factory));
+        Variable beanDefinition = parseNestedProcessor.body().decl(ref(BeanDefinition.class), "beanDefinition",
+                beanDefinitionBuilder.invoke("getBeanDefinition"));
+
+        parseNestedProcessor.body().add(parserContext.invoke("getRegistry").invoke("registerBeanDefinition")
+                .arg(ExpressionFactory.invoke("generateChildBeanName").arg(element))
+                .arg(beanDefinition));
+
+        parseNestedProcessor.body().add(element.invoke("setAttribute")
+                .arg("name").arg(ExpressionFactory.invoke("generateChildBeanName").arg(element)));
+
+        parseNestedProcessor.body().add(beanDefinitionBuilder.invoke("setSource").arg(parserContext.invoke("extractSource")
+                .arg(element)));
+
+        parseNestedProcessor.body().add(beanDefinitionBuilder.invoke("setScope")
+                .arg(ref(BeanDefinition.class).staticRef("SCOPE_SINGLETON")));
+
+        parseNestedProcessor.body().decl(ref(List.class), "list",
+                parserContext.invoke("getDelegate").invoke("parseListElement")
+                        .arg(element).arg(beanDefinitionBuilder.invoke("getBeanDefinition")));
+
+        parseNestedProcessor.body().add(parserContext.invoke("getRegistry").invoke("removeBeanDefinition")
+                .arg(ExpressionFactory.invoke("generateChildBeanName").arg(element)));
+
+        parseNestedProcessor.body()._return(beanDefinition);
+    }
+
+    private void generateParseNestedProcessorAsListAndSetPropertyMethod(DefinedClass beanDefinitionParserClass) {
+        Method parseNestedProcessor = beanDefinitionParserClass.method(Modifier.PROTECTED, context.getCodeModel().VOID, "parseNestedProcessorAsListAndSetProperty");
+        Variable element = parseNestedProcessor.param(ref(Element.class), "element");
+        Variable parserContext = parseNestedProcessor.param(ref(ParserContext.class), "parserContext");
+        Variable factory = parseNestedProcessor.param(ref(Class.class), "factory");
+        Variable builder = parseNestedProcessor.param(ref(BeanDefinitionBuilder.class), "builder");
+        Variable propertyName = parseNestedProcessor.param(ref(String.class), "propertyName");
+
+        Invocation parseList = ExpressionFactory.invoke("parseNestedProcessorAsList").arg(element).arg(parserContext).arg(factory);
+        parseNestedProcessor.body().add(builder.invoke("addPropertyValue").arg(propertyName).arg(parseList));
+    }
+
+    private void generateParseNestedProcessorAndSetPropertyMethod(DefinedClass beanDefinitionParserClass) {
+        Method parseNestedProcessor = beanDefinitionParserClass.method(Modifier.PROTECTED, context.getCodeModel().VOID, "parseNestedProcessorAndSetProperty");
+        Variable element = parseNestedProcessor.param(ref(Element.class), "element");
+        Variable parserContext = parseNestedProcessor.param(ref(ParserContext.class), "parserContext");
+        Variable factory = parseNestedProcessor.param(ref(Class.class), "factory");
+        Variable builder = parseNestedProcessor.param(ref(BeanDefinitionBuilder.class), "builder");
+        Variable propertyName = parseNestedProcessor.param(ref(String.class), "propertyName");
+
+        Invocation parseList = ExpressionFactory.invoke("parseNestedProcessor").arg(element).arg(parserContext).arg(factory);
+        parseNestedProcessor.body().add(builder.invoke("addPropertyValue").arg(propertyName).arg(parseList));
+    }
+
+    private void generateParseNestedProcessorAsListWithChildNameAndSetPropertyMethod(DefinedClass beanDefinitionParserClass) {
+        Method parseNestedProcessor = beanDefinitionParserClass.method(Modifier.PROTECTED, context.getCodeModel().VOID, "parseNestedProcessorAsListAndSetProperty");
+        Variable element = parseNestedProcessor.param(ref(Element.class), "element");
+        Variable childElementName = parseNestedProcessor.param(ref(String.class), "childElementName");
+        Variable parserContext = parseNestedProcessor.param(ref(ParserContext.class), "parserContext");
+        Variable factory = parseNestedProcessor.param(ref(Class.class), "factory");
+        Variable builder = parseNestedProcessor.param(ref(BeanDefinitionBuilder.class), "builder");
+        Variable propertyName = parseNestedProcessor.param(ref(String.class), "propertyName");
+
+        Variable childDomElement = parseNestedProcessor.body().decl(ref(Element.class), "childDomElement", ref(DomUtils.class).staticInvoke("getChildElementByTagName")
+                .arg(element).arg(childElementName));
+
+        Conditional ifNotNull = parseNestedProcessor.body()._if(Op.ne(childDomElement, ExpressionFactory._null()));
+
+        Invocation parseList = ExpressionFactory.invoke("parseNestedProcessorAsList").arg(childDomElement).arg(parserContext).arg(factory);
+        ifNotNull._then().add(builder.invoke("addPropertyValue").arg(propertyName).arg(parseList));
+    }
+
+    private void generateParseNestedProcessorWithChildNameAndSetPropertyMethod(DefinedClass beanDefinitionParserClass) {
+        Method parseNestedProcessor = beanDefinitionParserClass.method(Modifier.PROTECTED, context.getCodeModel().VOID, "parseNestedProcessorAndSetProperty");
+        Variable element = parseNestedProcessor.param(ref(Element.class), "element");
+        Variable childElementName = parseNestedProcessor.param(ref(String.class), "childElementName");
+        Variable parserContext = parseNestedProcessor.param(ref(ParserContext.class), "parserContext");
+        Variable factory = parseNestedProcessor.param(ref(Class.class), "factory");
+        Variable builder = parseNestedProcessor.param(ref(BeanDefinitionBuilder.class), "builder");
+        Variable propertyName = parseNestedProcessor.param(ref(String.class), "propertyName");
+
+        Variable childDomElement = parseNestedProcessor.body().decl(ref(Element.class), "childDomElement", ref(DomUtils.class).staticInvoke("getChildElementByTagName")
+                .arg(element).arg(childElementName));
+
+        Conditional ifNotNull = parseNestedProcessor.body()._if(Op.ne(childDomElement, ExpressionFactory._null()));
+
+        Invocation parseList = ExpressionFactory.invoke("parseNestedProcessor").arg(childDomElement).arg(parserContext).arg(factory);
+        ifNotNull._then().add(builder.invoke("addPropertyValue").arg(propertyName).arg(parseList));
+    }
+
+    private void generateParseNestedProcessorAsListMethod(DefinedClass beanDefinitionParserClass) {
+        Method parseNestedProcessor = beanDefinitionParserClass.method(Modifier.PROTECTED, ref(List.class), "parseNestedProcessorAsList");
+        Variable element = parseNestedProcessor.param(ref(Element.class), "element");
+        Variable parserContext = parseNestedProcessor.param(ref(ParserContext.class), "parserContext");
+        Variable factory = parseNestedProcessor.param(ref(Class.class), "factory");
+
+        Variable beanDefinitionBuilder = parseNestedProcessor.body().decl(ref(BeanDefinitionBuilder.class), "builder",
+                ref(BeanDefinitionBuilder.class).staticInvoke("rootBeanDefinition")
+                        .arg(factory));
+        Variable beanDefinition = parseNestedProcessor.body().decl(ref(BeanDefinition.class), "beanDefinition",
+                beanDefinitionBuilder.invoke("getBeanDefinition"));
+
+        parseNestedProcessor.body().add(parserContext.invoke("getRegistry").invoke("registerBeanDefinition")
+                .arg(ExpressionFactory.invoke("generateChildBeanName").arg(element))
+                .arg(beanDefinition));
+
+        parseNestedProcessor.body().add(element.invoke("setAttribute")
+                .arg("name").arg(ExpressionFactory.invoke("generateChildBeanName").arg(element)));
+
+        parseNestedProcessor.body().add(beanDefinitionBuilder.invoke("setSource").arg(parserContext.invoke("extractSource")
+                .arg(element)));
+
+        parseNestedProcessor.body().add(beanDefinitionBuilder.invoke("setScope")
+                .arg(ref(BeanDefinition.class).staticRef("SCOPE_SINGLETON")));
+
+        Variable list = parseNestedProcessor.body().decl(ref(List.class), "list",
+                parserContext.invoke("getDelegate").invoke("parseListElement")
+                        .arg(element).arg(beanDefinitionBuilder.invoke("getBeanDefinition")));
+
+        parseNestedProcessor.body().add(parserContext.invoke("getRegistry").invoke("removeBeanDefinition")
+                .arg(ExpressionFactory.invoke("generateChildBeanName").arg(element)));
+
+        parseNestedProcessor.body()._return(list);
+    }
+
 
     private void generateParseMapMethod(DefinedClass beanDefinitionParserClass, DefinedClass parserInterface) {
         Method parseMap = beanDefinitionParserClass.method(Modifier.PROTECTED, ref(ManagedMap.class), "parseMap");
@@ -345,6 +487,42 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
         Conditional isDisposable = setDestroyMethodIfNeeded.body()._if(ref(Disposable.class).dotclass()
                 .invoke("isAssignableFrom").arg(clazz));
         isDisposable._then().add(builder.invoke("setDestroyMethodName").arg(ref(Disposable.class).staticRef("PHASE_NAME")));
+    }
+
+    private void generateParsePropertyMethod(DefinedClass beanDefinitionParserClass) {
+        Method parseProperty = beanDefinitionParserClass.method(Modifier.PROTECTED, context.getCodeModel().VOID, "parseProperty");
+        Variable builder = parseProperty.param(ref(BeanDefinitionBuilder.class), "builder");
+        Variable element = parseProperty.param(ref(Element.class), "element");
+        Variable propertyName = parseProperty.param(ref(String.class), "propertyName");
+
+        Conditional ifNotNull = parseProperty.body()._if(ExpressionFactory.invoke("hasAttribute").arg(element).arg(propertyName));
+        ifNotNull._then().add(builder.invoke("addPropertyValue").arg(propertyName).arg(
+                element.invoke("getAttribute").arg(propertyName)
+        ));
+
+    }
+
+    private void generateSetNoRecurseOnDefinitionMethod(DefinedClass beanDefinitionParserClass) {
+        Method setNoRecurseOnDefinition = beanDefinitionParserClass.method(Modifier.PROTECTED, context.getCodeModel().VOID, "setNoRecurseOnDefinition");
+        Variable definition = setNoRecurseOnDefinition.param(ref(BeanDefinition.class), "definition");
+
+        setNoRecurseOnDefinition.body().add(definition.invoke("setAttribute").arg(
+                ref(MuleHierarchicalBeanDefinitionParserDelegate.class).staticRef("MULE_NO_RECURSE")).arg(ref(Boolean.class).staticRef("TRUE")));
+
+    }
+
+    private void generateGenerateChildBeanNameMethod(DefinedClass beanDefinitionParserClass) {
+        Method generateChildBeanName = beanDefinitionParserClass.method(Modifier.PROTECTED, ref(String.class), "generateChildBeanName");
+        Variable element = generateChildBeanName.param(ref(org.w3c.dom.Element.class), "element");
+
+        Variable id = generateChildBeanName.body().decl(ref(String.class), "id", ref(SpringXMLUtils.class).staticInvoke("getNameOrId").arg(element));
+        Conditional isBlank = generateChildBeanName.body()._if(ref(StringUtils.class).staticInvoke("isBlank").arg(id));
+        Invocation getParentName = ref(SpringXMLUtils.class).staticInvoke("getNameOrId").arg(ExpressionFactory.cast(
+                ref(org.w3c.dom.Element.class), element.invoke("getParentNode")
+        ));
+        Variable parentId = isBlank._then().decl(ref(String.class), "parentId", getParentName);
+        isBlank._then()._return(Op.plus(Op.plus(Op.plus(ExpressionFactory.lit("."), parentId), ExpressionFactory.lit(":")), element.invoke("getLocalName")));
+        isBlank._else()._return(id);
     }
 
 }
