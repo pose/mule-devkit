@@ -44,7 +44,7 @@ public class OAuthPatternTypeOperationsBuilder extends PatternTypeOperationsBuil
     	
     	ModeElementType mode = new ModeElementType();
         String methodName = "authorize";
-        mode.setModeId(MuleStudioEditorXmlGenerator.URI_PREFIX + type.name() + '/' + NameUtils.uncamel(methodName));
+        mode.setModeId(MuleStudioEditorXmlGenerator.URI_PREFIX + type.getModuleName() + '/' + NameUtils.uncamel(methodName));
         mode.setModeLabel(StringUtils.capitalize(methodName));
         modes.add(0, mode);
 

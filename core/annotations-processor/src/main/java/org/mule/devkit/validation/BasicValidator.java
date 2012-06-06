@@ -40,7 +40,7 @@ public class BasicValidator implements Validator {
             throw new ValidationException(type, "@Module/@Connector cannot be applied to an interface");
         }
 
-        if (type.isParametrized()) {
+        if (type.hasTypeArguments()) {
             throw new ValidationException(type, "@Module/@Connector type cannot have type parameters");
         }
 

@@ -56,7 +56,7 @@ public class GlobalTransformerTypeOperationsBuilder extends GlobalTypeBuilder {
     }
 
     protected String getExtendsBasedOnType() {
-        return MuleStudioEditorXmlGenerator.URI_PREFIX + type.name() + '/' + AbstractTransformerBuilder.ABSTRACT_TRANSFORMER_LOCAL_ID;
+        return MuleStudioEditorXmlGenerator.URI_PREFIX + type.getModuleName() + '/' + AbstractTransformerBuilder.ABSTRACT_TRANSFORMER_LOCAL_ID;
     }
 
     protected String getLocalIdBasedOnType() {

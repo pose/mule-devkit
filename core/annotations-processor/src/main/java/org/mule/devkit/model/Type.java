@@ -48,27 +48,25 @@ public interface Type extends Identifiable<TypeElement, Type> {
 
     boolean isInterface();
 
-    boolean isParametrized();
-
     boolean isModuleOrConnector();
 
     boolean isPoolable();
 
-    String minMuleVersion();
+    String getMinMuleVersion();
 
-    String namespace();
+    String getXmlNamespace();
 
-    String name();
+    String getModuleName();
 
-    String schemaLocation();
+    String getModuleSchemaLocation();
 
-    String schemaVersion();
+    String getModuleSchemaVersion();
 
     boolean usesConnectionManager();
 
-    String friendlyName();
+    String getFriendlyName();
 
-    String description();
+    String getDescription();
 
     boolean needsConfig();
 

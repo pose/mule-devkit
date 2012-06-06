@@ -54,7 +54,7 @@ public class PatternTypeBuilder extends BaseStudioXmlBuilder {
         patternType.setAbstract(true);
 
         if (executableElement.getAnnotation(Processor.class) != null) {
-            patternType.setExtends(helper.getUrl(type) + helper.getGlobalRefId(type.name()));
+            patternType.setExtends(helper.getUrl(type) + helper.getGlobalRefId(type.getModuleName()));
             patternType.setReturnType(executableElement.getReturnType().toString());
         } else if (executableElement.getAnnotation(Transformer.class) != null) {
             patternType.setExtends(helper.getUrl(type) + AbstractTransformerBuilder.ABSTRACT_TRANSFORMER_LOCAL_ID);

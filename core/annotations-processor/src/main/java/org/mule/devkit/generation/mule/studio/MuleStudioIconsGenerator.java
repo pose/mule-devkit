@@ -55,15 +55,15 @@ public class MuleStudioIconsGenerator extends AbstractMessageGenerator {
                 copyFile(icons.endpointLarge(), "icons/large", type);
             }
         } else {
-            copyFile(String.format(Icons.GENERIC_CLOUD_CONNECTOR_SMALL, type.name()), "icons/small", type);
-            copyFile(String.format(Icons.GENERIC_CLOUD_CONNECTOR_LARGE, type.name()), "icons/large", type);
+            copyFile(String.format(Icons.GENERIC_CLOUD_CONNECTOR_SMALL, type.getModuleName()), "icons/small", type);
+            copyFile(String.format(Icons.GENERIC_CLOUD_CONNECTOR_LARGE, type.getModuleName()), "icons/large", type);
             if(type.hasMethodsAnnotatedWith(Transformer.class)) {
-                copyFile(String.format(Icons.GENERIC_TRANSFORMER_SMALL, type.name()), "icons/small", type);
-                copyFile(String.format(Icons.GENERIC_TRANSFORMER_LARGE, type.name()), "icons/large", type);
+                copyFile(String.format(Icons.GENERIC_TRANSFORMER_SMALL, type.getModuleName()), "icons/small", type);
+                copyFile(String.format(Icons.GENERIC_TRANSFORMER_LARGE, type.getModuleName()), "icons/large", type);
             }
             if(type.hasMethodsAnnotatedWith(Source.class)) {
-                copyFile(String.format(Icons.GENERIC_ENDPOINT_SMALL, type.name()), "icons/small", type);
-                copyFile(String.format(Icons.GENERIC_ENDPOINT_LARGE, type.name()), "icons/large", type);
+                copyFile(String.format(Icons.GENERIC_ENDPOINT_SMALL, type.getModuleName()), "icons/small", type);
+                copyFile(String.format(Icons.GENERIC_ENDPOINT_LARGE, type.getModuleName()), "icons/large", type);
             }
         }
     }

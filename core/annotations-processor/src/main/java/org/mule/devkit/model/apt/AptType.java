@@ -193,11 +193,6 @@ public class AptType extends AptIdentifiable<TypeElement, Type> implements Type 
     }
 
     @Override
-    public boolean isParametrized() {
-        return !innerElement.getTypeParameters().isEmpty();
-    }
-
-    @Override
     public boolean isModuleOrConnector() {
         return hasAnnotation(Module.class) || hasAnnotation(Connector.class);
     }
@@ -213,7 +208,7 @@ public class AptType extends AptIdentifiable<TypeElement, Type> implements Type 
     }
 
     @Override
-    public String minMuleVersion() {
+    public String getMinMuleVersion() {
         if (hasAnnotation(Module.class)) {
             return getAnnotation(Module.class).minMuleVersion();
         }
@@ -228,7 +223,7 @@ public class AptType extends AptIdentifiable<TypeElement, Type> implements Type 
     }
 
     @Override
-    public String namespace() {
+    public String getXmlNamespace() {
         if (hasAnnotation(Module.class)) {
             return getAnnotation(Module.class).namespace();
         }
@@ -240,7 +235,7 @@ public class AptType extends AptIdentifiable<TypeElement, Type> implements Type 
     }
 
     @Override
-    public String name() {
+    public String getModuleName() {
         if (hasAnnotation(Module.class)) {
             return getAnnotation(Module.class).name();
         }
@@ -252,7 +247,7 @@ public class AptType extends AptIdentifiable<TypeElement, Type> implements Type 
     }
 
     @Override
-    public String schemaLocation() {
+    public String getModuleSchemaLocation() {
         if (hasAnnotation(Module.class)) {
             return getAnnotation(Module.class).schemaLocation();
         }
@@ -264,7 +259,7 @@ public class AptType extends AptIdentifiable<TypeElement, Type> implements Type 
     }
 
     @Override
-    public String schemaVersion() {
+    public String getModuleSchemaVersion() {
         if (hasAnnotation(Module.class)) {
             return getAnnotation(Module.class).schemaVersion();
         }
@@ -281,7 +276,7 @@ public class AptType extends AptIdentifiable<TypeElement, Type> implements Type 
     }
 
     @Override
-    public String friendlyName() {
+    public String getFriendlyName() {
         if (hasAnnotation(Module.class)) {
             return getAnnotation(Module.class).friendlyName();
         }
@@ -292,7 +287,7 @@ public class AptType extends AptIdentifiable<TypeElement, Type> implements Type 
     }
 
     @Override
-    public String description() {
+    public String getDescription() {
         if (hasAnnotation(Module.class)) {
             return getAnnotation(Module.class).description();
         }

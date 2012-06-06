@@ -54,8 +54,8 @@ public class MuleStudioSiteXmlGenerator extends AbstractMessageGenerator {
             document.appendChild(site);
 
             Element feature = document.createElement("feature");
-            feature.setAttribute("url", "features" + SEPARATOR + MuleStudioFeatureGenerator.STUDIO_PREFIX + type.name() + "_%VERSION%" +".jar");
-            feature.setAttribute("id", MuleStudioFeatureGenerator.STUDIO_PREFIX + type.name() );
+            feature.setAttribute("url", "features" + SEPARATOR + MuleStudioFeatureGenerator.STUDIO_PREFIX + type.getModuleName() + "_%VERSION%" +".jar");
+            feature.setAttribute("id", MuleStudioFeatureGenerator.STUDIO_PREFIX + type.getModuleName() );
             feature.setAttribute("version", "%VERSION%");
 
             Element category = document.createElement("category");

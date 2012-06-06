@@ -51,7 +51,7 @@ public class MuleStudioEditorXmlGenerator extends AbstractMessageGenerator {
 
     @Override
     public void generate(Type type) {
-        String moduleName = type.name();
+        String moduleName = type.getModuleName();
         boolean isOAuth = type.hasAnnotation(OAuth.class) || type.hasAnnotation(OAuth2.class);
 
         NamespaceType namespace = new NamespaceType();

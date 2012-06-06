@@ -53,7 +53,7 @@ public class MuleStudioPluginActivatorGenerator extends AbstractMessageGenerator
                 finalField().
                 type(String.class).
                 name("PLUGIN_ID").
-                initialValue("org.mule.tooling.ui.contribution." + type.name()).build();
+                initialValue("org.mule.tooling.ui.contribution." + type.getModuleName()).build();
         TypeReference activatorTypeRef = ctx().getCodeModel().directClass(ACTIVATOR_PACKAGE + "." + ACTIVATOR_CLASS_NAME);
         FieldVariable plugin = new FieldBuilder(activatorClass).staticField().type(activatorTypeRef).name("plugin").build();
 

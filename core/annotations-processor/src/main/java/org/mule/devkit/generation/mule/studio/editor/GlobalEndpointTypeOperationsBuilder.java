@@ -37,7 +37,7 @@ public class GlobalEndpointTypeOperationsBuilder extends GlobalTypeBuilder {
     @Override
     public GlobalType build() {
         GlobalType globalEndpointListingOps = super.build();
-        globalEndpointListingOps.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + type.name() + '/' + GlobalEndpointTypeWithNameBuilder.ABSTRACT_GLOBAL_ENDPOINT_LOCAL_ID);
+        globalEndpointListingOps.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + type.getModuleName() + '/' + GlobalEndpointTypeWithNameBuilder.ABSTRACT_GLOBAL_ENDPOINT_LOCAL_ID);
         return globalEndpointListingOps;
     }
 

@@ -152,12 +152,12 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         registerEnums(schema, type);
         registerComplexTypes(schema, type);
 
-        String fileName = "META-INF/mule-" + type.name() + XSD_EXTENSION;
+        String fileName = "META-INF/mule-" + type.getModuleName() + XSD_EXTENSION;
 
         String versionedLocation = getVersionedLocation(type);
         String currentLocation = null;
-        if (type.schemaLocation() == null || type.schemaLocation().length() == 0) {
-            currentLocation = schema.getTargetNamespace() + "/current/mule-" + type.name() + XSD_EXTENSION;
+        if (type.getModuleSchemaLocation() == null || type.getModuleSchemaLocation().length() == 0) {
+            currentLocation = schema.getTargetNamespace() + "/current/mule-" + type.getModuleName() + XSD_EXTENSION;
         }
 
         // TODO: replace with a class role
@@ -175,17 +175,17 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     }
 
     public static String getVersionedLocation(Type type) {
-        String versionedLocation = type.schemaLocation();
-        if (type.schemaLocation() == null || type.schemaLocation().length() == 0) {
-            versionedLocation = getNamespace(type) + "/" + type.schemaVersion() + "/mule-" + type.name() + XSD_EXTENSION;
+        String versionedLocation = type.getModuleSchemaLocation();
+        if (type.getModuleSchemaLocation() == null || type.getModuleSchemaLocation().length() == 0) {
+            versionedLocation = getNamespace(type) + "/" + type.getModuleSchemaVersion() + "/mule-" + type.getModuleName() + XSD_EXTENSION;
         }
         return versionedLocation;
     }
 
     public static String getNamespace(Type type) {
-        String targetNamespace = type.namespace();
+        String targetNamespace = type.getXmlNamespace();
         if (targetNamespace == null || targetNamespace.length() == 0) {
-            targetNamespace = SchemaConstants.BASE_NAMESPACE + type.name();
+            targetNamespace = SchemaConstants.BASE_NAMESPACE + type.getModuleName();
         }
         return targetNamespace;
     }

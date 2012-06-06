@@ -53,8 +53,8 @@ public class MuleStudioFeatureGenerator extends AbstractMessageGenerator {
             Document document = documentBuilder.newDocument();
 
             Element feature = document.createElement("feature");
-            feature.setAttribute("id", STUDIO_PREFIX + type.name());
-            feature.setAttribute("label", NameUtils.friendlyNameFromCamelCase(type.name()) + LABEL_SUFFIX);
+            feature.setAttribute("id", STUDIO_PREFIX + type.getModuleName());
+            feature.setAttribute("label", NameUtils.friendlyNameFromCamelCase(type.getModuleName()) + LABEL_SUFFIX);
             feature.setAttribute("version", "%VERSION%");
             feature.setAttribute("provider-name", "Mulesoft, Inc.");
             document.appendChild(feature);
@@ -65,7 +65,7 @@ public class MuleStudioFeatureGenerator extends AbstractMessageGenerator {
             feature.appendChild(license);
 
             Element plugin = document.createElement("plugin");
-            plugin.setAttribute("id", STUDIO_PREFIX + type.name());
+            plugin.setAttribute("id", STUDIO_PREFIX + type.getModuleName());
             plugin.setAttribute("download-size", "0");
             plugin.setAttribute("install-size", "0");
             plugin.setAttribute("version", "%VERSION%");

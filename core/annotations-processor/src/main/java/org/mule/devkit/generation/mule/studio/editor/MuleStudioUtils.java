@@ -76,7 +76,7 @@ public class MuleStudioUtils {
         if(icons != null) {
             image = icons.connectorLarge();
         } else {
-            image = String.format(Icons.GENERIC_CLOUD_CONNECTOR_LARGE, type.name());
+            image = String.format(Icons.GENERIC_CLOUD_CONNECTOR_LARGE, type.getModuleName());
         }
         if(image.contains("/")) {
             image = image.substring(image.lastIndexOf("/") +1);
@@ -90,7 +90,7 @@ public class MuleStudioUtils {
         if(icons != null) {
             icon = icons.connectorSmall();
         } else {
-            icon = String.format(Icons.GENERIC_CLOUD_CONNECTOR_SMALL, type.name());
+            icon = String.format(Icons.GENERIC_CLOUD_CONNECTOR_SMALL, type.getModuleName());
         }
         if(icon.contains("/")) {
             icon = icon.substring(icon.lastIndexOf("/") +1);
@@ -104,7 +104,7 @@ public class MuleStudioUtils {
         if(icons != null) {
             image = icons.endpointLarge();
         } else {
-            image = String.format(Icons.GENERIC_ENDPOINT_LARGE, type.name());
+            image = String.format(Icons.GENERIC_ENDPOINT_LARGE, type.getModuleName());
         }
         if(image.contains("/")) {
             image = image.substring(image.lastIndexOf("/") +1);
@@ -118,7 +118,7 @@ public class MuleStudioUtils {
         if(icons != null) {
             icon = icons.endpointSmall();
         } else {
-            icon = String.format(Icons.GENERIC_ENDPOINT_SMALL, type.name());
+            icon = String.format(Icons.GENERIC_ENDPOINT_SMALL, type.getModuleName());
         }
         if(icon.contains("/")) {
             icon = icon.substring(icon.lastIndexOf("/") +1);
@@ -132,7 +132,7 @@ public class MuleStudioUtils {
         if(icons != null) {
             image = icons.transformerLarge();
         } else {
-            image = String.format(Icons.GENERIC_TRANSFORMER_LARGE, type.name());
+            image = String.format(Icons.GENERIC_TRANSFORMER_LARGE, type.getModuleName());
         }
         if(image.contains("/")) {
             image = image.substring(image.lastIndexOf("/") +1);
@@ -146,7 +146,7 @@ public class MuleStudioUtils {
         if(icons != null) {
             icon = icons.transformerSmall();
         } else {
-            icon = String.format(Icons.GENERIC_TRANSFORMER_SMALL, type.name());
+            icon = String.format(Icons.GENERIC_TRANSFORMER_SMALL, type.getModuleName());
         }
         if(icon.contains("/")) {
             icon = icon.substring(icon.lastIndexOf("/") +1);
@@ -308,17 +308,17 @@ public class MuleStudioUtils {
     }
 
     public String getFormattedDescription(Type type) {
-        if(StringUtils.isNotBlank(type.description())) {
-            return type.description();
+        if(StringUtils.isNotBlank(type.getDescription())) {
+            return type.getDescription();
         }
         return formatDescription(type.getJavaDocSummary());
     }
 
     public String getFormattedCaption(Type type) {
-        if(StringUtils.isNotBlank(type.friendlyName())) {
-            return type.friendlyName();
+        if(StringUtils.isNotBlank(type.getFriendlyName())) {
+            return type.getFriendlyName();
         }
-        return formatCaption(type.name().replaceAll("-", " "));
+        return formatCaption(type.getModuleName().replaceAll("-", " "));
     }
 
     public String getFormattedCaption(Method element) {
@@ -370,6 +370,6 @@ public class MuleStudioUtils {
     }
 
     public String getUrl(Type type) {
-        return MuleStudioEditorXmlGenerator.URI_PREFIX + type.name() + '/';
+        return MuleStudioEditorXmlGenerator.URI_PREFIX + type.getModuleName() + '/';
     }
 }

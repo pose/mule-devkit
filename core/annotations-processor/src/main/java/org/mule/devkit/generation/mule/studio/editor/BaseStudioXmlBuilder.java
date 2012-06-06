@@ -73,7 +73,7 @@ public abstract class BaseStudioXmlBuilder {
     protected BaseStudioXmlBuilder(GeneratorContext context, Type type) {
         this(context);
         this.type = type;
-        moduleName = type.name();
+        moduleName = type.getModuleName();
     }
 
     protected Group createGroupWithModeSwitch(List<Method> methods) {
@@ -85,7 +85,7 @@ public abstract class BaseStudioXmlBuilder {
         modeSwitch.setDescription(helper.formatDescription("Operation"));
 
         Group group = new Group();
-        group.setId(type.name() + "ConnectorGeneric");
+        group.setId(type.getModuleName() + "ConnectorGeneric");
         group.getRegexpOrEncodingOrModeSwitch().add(objectFactory.createGroupModeSwitch(modeSwitch));
         group.setCaption(helper.formatCaption(MuleStudioEditorXmlGenerator.GROUP_DEFAULT_CAPTION));
         return group;
@@ -95,7 +95,7 @@ public abstract class BaseStudioXmlBuilder {
 		 List<ModeElementType> modes = new ArrayList<ModeElementType>();
 	     for (Method method : methods) {
 	         ModeElementType mode = new ModeElementType();
-	         mode.setModeId(MuleStudioEditorXmlGenerator.URI_PREFIX + type.name() + '/' + helper.getLocalId(method));
+	         mode.setModeId(MuleStudioEditorXmlGenerator.URI_PREFIX + type.getModuleName() + '/' + helper.getLocalId(method));
 	         mode.setModeLabel(StringUtils.capitalize(helper.getFriendlyName(method)));
 	         modes.add(mode);
 	     }
@@ -116,7 +116,7 @@ public abstract class BaseStudioXmlBuilder {
         List<AttributeCategory> attributeCategories = processVariableElements(getConfigurableFieldsSorted());
         for (AttributeCategory attributeCategory : attributeCategories) {
             if (attributeCategory.getCaption().equals(MuleStudioEditorXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION)) {
-                attributeCategory.setDescription(helper.formatDescription(type.name() + " configuration properties"));
+                attributeCategory.setDescription(helper.formatDescription(type.getModuleName() + " configuration properties"));
                 List<Group> groups = attributeCategory.getGroup();
                 if (groups.isEmpty()) {
                     groups.add(defaultGroup);
@@ -128,7 +128,7 @@ public abstract class BaseStudioXmlBuilder {
         if (attributeCategories.isEmpty()) {
             AttributeCategory attributeCategory = new AttributeCategory();
             attributeCategory.setCaption(helper.getFormattedCaption(type));
-            attributeCategory.setDescription(helper.formatDescription(type.name() + " configuration properties"));
+            attributeCategory.setDescription(helper.formatDescription(type.getModuleName() + " configuration properties"));
             attributeCategory.getGroup().add(defaultGroup);
             attributeCategories.add(attributeCategory);
         }

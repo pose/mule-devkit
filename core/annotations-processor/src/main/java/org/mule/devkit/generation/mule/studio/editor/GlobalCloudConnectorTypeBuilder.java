@@ -63,7 +63,7 @@ public class GlobalCloudConnectorTypeBuilder extends GlobalTypeBuilder {
     }
 
     protected String getExtendsBasedOnType() {
-        return MuleStudioEditorXmlGenerator.URI_PREFIX + type.name() + '/' + helper.getGlobalRefId(type.name());
+        return MuleStudioEditorXmlGenerator.URI_PREFIX + type.getModuleName() + '/' + helper.getGlobalRefId(type.getModuleName());
     }
 
     protected String getLocalIdBasedOnType() {

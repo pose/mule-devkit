@@ -40,7 +40,7 @@ public class SourceValidator implements Validator {
 
             if (method.getAnnotation(Source.class).primaryNodeOnly()) {
                 String[] expectedMinVersion = new String[]{"3", "3"};
-                String minMuleVersion = type.minMuleVersion();
+                String minMuleVersion = type.getMinMuleVersion();
                 if (minMuleVersion.contains("-")) {
                     minMuleVersion = minMuleVersion.split("-")[0];
                 }

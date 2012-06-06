@@ -50,7 +50,7 @@ public class AbstractTransformerBuilder extends BaseStudioXmlBuilder {
         abstractTransformer.setCaption(helper.formatCaption("Base transformer"));
         abstractTransformer.setDescription(helper.formatDescription("Base transformer"));
         abstractTransformer.setAbstract(true);
-        abstractTransformer.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + type.name() + "/" + type.name() + "-transformer");
+        abstractTransformer.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + type.getModuleName() + "/" + type.getModuleName() + "-transformer");
 
         AttributeCategory attributeCategory = new AttributeCategory();
         attributeCategory.setCaption(helper.formatCaption(ABSTRACT_TRANSFORMER_ATTRIBUTE_CATEGORY_CAPTION));

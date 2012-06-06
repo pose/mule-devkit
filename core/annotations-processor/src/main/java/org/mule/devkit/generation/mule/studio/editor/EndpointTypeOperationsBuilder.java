@@ -45,7 +45,7 @@ public class EndpointTypeOperationsBuilder extends EndpointTypeBuilder {
         attributeCategory.getGroup().add(createGroupWithModeSwitch(getSourceMethodsSorted()));
 
         endpoinTypeOperations.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().add(attributeCategory);
-        endpoinTypeOperations.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + type.name() + '/' + helper.getGlobalRefId(type.name()));
+        endpoinTypeOperations.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + type.getModuleName() + '/' + helper.getGlobalRefId(type.getModuleName()));
 
         return endpoinTypeOperations;
     }

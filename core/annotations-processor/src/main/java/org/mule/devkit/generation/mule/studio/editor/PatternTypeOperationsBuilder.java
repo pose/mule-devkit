@@ -55,13 +55,13 @@ public class PatternTypeOperationsBuilder extends BaseStudioXmlBuilder {
         patternType.setCaption(helper.getFormattedCaption(type));
 
         if (patternTypeToUse.equals(PatternTypes.CLOUD_CONNECTOR)) {
-            patternType.setLocalId(type.name() + "-connector");
-            patternType.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + type.name() + '/' + helper.getGlobalRefId(type.name()));
+            patternType.setLocalId(type.getModuleName() + "-connector");
+            patternType.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + type.getModuleName() + '/' + helper.getGlobalRefId(type.getModuleName()));
         } else {
-            patternType.setLocalId(type.name() + "-transformer");
+            patternType.setLocalId(type.getModuleName() + "-transformer");
         }
         patternType.setDescription(helper.getFormattedDescription(type));
-        patternType.setAliasId(ALIAS_ID_PREFIX + type.name());
+        patternType.setAliasId(ALIAS_ID_PREFIX + type.getModuleName());
         patternType.setIcon(getIcon());
         patternType.setImage(getImage());
 
