@@ -211,22 +211,6 @@ public class NameUtils {
         return false;
     }
 
-    public String generateClassNameInPackage(DevKitElement element, String className) {
-        String packageName;
-        if (element instanceof DevKitTypeElement) {
-            packageName = getPackageName(getBinaryName((DevKitTypeElement) element));
-        } else if (element instanceof DevKitParameterElement) {
-            packageName = getPackageName(getBinaryName((DevKitTypeElement) element.parent().parent()));
-        } else if (element.parent() instanceof DevKitTypeElement) {
-            packageName = getPackageName(getBinaryName((DevKitTypeElement) element.parent()));
-        } else {
-            // inner enum or parametrized type
-            DeclaredType declaredType = (DeclaredType) element.asType();
-            packageName = getPackageName(declaredType.toString());
-        }
-        return packageName + "." + className;
-    }
-
     public String generateClassNameInPackage(DevKitTypeElement typeElement, String extraPackage, String className) {
         String packageName = getPackageName(getBinaryName(typeElement));
 
