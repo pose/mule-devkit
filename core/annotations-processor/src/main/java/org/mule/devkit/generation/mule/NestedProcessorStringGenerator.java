@@ -97,9 +97,8 @@ public class NestedProcessorStringGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass getNestedProcessorStringClass(DevKitTypeElement type) {
-        String processorCallbackClassName = ctx().getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, NamingContants.NESTED_PROCESSOR_STRING_CLASS_NAME);
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(processorCallbackClassName));
-        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(processorCallbackClassName));
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingContants.CONFIG_NAMESPACE);
+        DefinedClass clazz = pkg._class(NamingContants.NESTED_PROCESSOR_STRING_CLASS_NAME);
 
         clazz.role(DefinedClassRoles.NESTED_PROCESSOR_STRING);
 

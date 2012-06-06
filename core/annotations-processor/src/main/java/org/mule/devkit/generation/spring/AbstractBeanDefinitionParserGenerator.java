@@ -98,9 +98,8 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
     }
 
     private DefinedClass getAbstractBeanDefinitionParserClass(DevKitTypeElement typeElement) {
-        String abstractBeanDefinitionParserClass = ctx().getNameUtils().generateClassNameInPackage(typeElement, NamingContants.CONFIG_NAMESPACE, NamingContants.ABSTRACT_DEFINITION_PARSER_CLASS_NAME_SUFFIX);
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(abstractBeanDefinitionParserClass));
-        DefinedClass clazz = pkg._class(Modifier.ABSTRACT, ctx().getNameUtils().getClassName(abstractBeanDefinitionParserClass), new Class[]{BeanDefinitionParser.class});
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingContants.CONFIG_NAMESPACE);
+        DefinedClass clazz = pkg._class(Modifier.ABSTRACT, NamingContants.ABSTRACT_DEFINITION_PARSER_CLASS_NAME_SUFFIX, new Class[]{BeanDefinitionParser.class});
 
         clazz.role(DefinedClassRoles.ABSTRACT_BEAN_DEFINITION_PARSER);
 

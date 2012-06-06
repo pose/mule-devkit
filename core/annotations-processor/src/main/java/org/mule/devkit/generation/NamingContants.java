@@ -55,4 +55,6 @@ public class NamingContants {
     public static final String REST_CLIENT_ADAPTER_CLASS_NAME_SUFFIX = "RestClientAdapter";
     public static final String CONNECTION_KEY_CLASS_NAME_SUFFIX = "ConnectionKey";
     public static final String CONNECTION_FACTORY_CLASS_NAME_SUFFIX = "ConnectionFactory";
+    public static final String DEFAULT_HTTP_CALLBACK_CLASS_NAME = "DefaultHttpCallback";
+
 }

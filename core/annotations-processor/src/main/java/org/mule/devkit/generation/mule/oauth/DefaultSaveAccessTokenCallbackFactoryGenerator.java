@@ -62,9 +62,8 @@ public class DefaultSaveAccessTokenCallbackFactoryGenerator extends AbstractMess
     }
 
     private DefinedClass getDefaultSaveAccessTokenCallbackFactoryClass(DevKitTypeElement type) {
-        String callbackClassName = ctx().getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, NamingContants.SAVE_ACCESS_TOKEN_CALLBACK_FACTORY_BEAN_CLASS_NAME);
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(callbackClassName));
-        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(callbackClassName));
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingContants.CONFIG_NAMESPACE);
+        DefinedClass clazz = pkg._class(NamingContants.SAVE_ACCESS_TOKEN_CALLBACK_FACTORY_BEAN_CLASS_NAME);
         clazz._extends(ref(MessageProcessorChainFactoryBean.class));
         clazz.role(DefinedClassRoles.DEFAULT_SAVE_ACCESS_TOKEN_FACTORY);
 

@@ -68,10 +68,9 @@ public class AuthorizeBeanDefinitionParserGenerator extends AbstractMessageGener
     }
 
     private DefinedClass getAuthorizeBeanDefinitionParserClass(DevKitTypeElement type) {
-        String authorizeBeanDefinitionParserClass = ctx().getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, NamingContants.AUTHORIZE_DEFINITION_PARSER_CLASS_NAME);
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(authorizeBeanDefinitionParserClass));
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingContants.CONFIG_NAMESPACE);
         DefinedClass abstractDefinitionParser = ctx().getCodeModel()._class(DefinedClassRoles.ABSTRACT_BEAN_DEFINITION_PARSER);
-        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(authorizeBeanDefinitionParserClass), abstractDefinitionParser);
+        DefinedClass clazz = pkg._class(NamingContants.AUTHORIZE_DEFINITION_PARSER_CLASS_NAME, abstractDefinitionParser);
         clazz.role(DefinedClassRoles.AUTHORIZE_BEAN_DEFINITION_PARSER);
 
         return clazz;

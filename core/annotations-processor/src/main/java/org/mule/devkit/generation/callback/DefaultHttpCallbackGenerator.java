@@ -17,6 +17,7 @@
 
 package org.mule.devkit.generation.callback;
 
+import com.sun.corba.se.impl.naming.namingutil.NamingConstants;
 import org.mule.MessageExchangePattern;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
@@ -66,7 +67,6 @@ public class DefaultHttpCallbackGenerator extends AbstractModuleGenerator {
     public static final String DOMAIN_FIELD_NAME = "domain";
     public static final String ASYNC_FIELD_NAME = "async";
     public static final String CONNECTOR_FIELD_NAME = "connector";
-    private static final String CLASS_NAME = "DefaultHttpCallback";
     private static final String INBOUND_ENDPOINT_EXCHANGE_PATTERN = "REQUEST_RESPONSE";
     private Method buildUrlMethod;
     private FieldVariable muleContextField;
@@ -398,9 +398,8 @@ public class DefaultHttpCallbackGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass getDefaultHttpCallbackClass(DevKitTypeElement type) {
-        String httpCallbackClassName = ctx().getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, CLASS_NAME);
-        Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(httpCallbackClassName));
-        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(httpCallbackClassName), new Class[]{HttpCallback.class});
+        Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingContants.CONFIG_NAMESPACE);
+        DefinedClass clazz = pkg._class(NamingContants.DEFAULT_HTTP_CALLBACK_CLASS_NAME, new Class[]{HttpCallback.class});
         clazz.role(DefinedClassRoles.DEFAULT_HTTP_CALLBACK);
 
         return clazz;

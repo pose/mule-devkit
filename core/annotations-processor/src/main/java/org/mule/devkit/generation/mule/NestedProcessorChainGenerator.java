@@ -174,9 +174,8 @@ public class NestedProcessorChainGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass getNestedProcessorChainClass(DevKitTypeElement typeElement) {
-        String processorCallbackClassName = ctx().getNameUtils().generateClassNameInPackage(typeElement, NamingContants.CONFIG_NAMESPACE, NamingContants.NESTED_PROCESSOR_CHAIN_CLASS_NAME);
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(processorCallbackClassName));
-        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(processorCallbackClassName), new Class[]{MuleContextAware.class});
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingContants.CONFIG_NAMESPACE);
+        DefinedClass clazz = pkg._class(NamingContants.NESTED_PROCESSOR_CHAIN_CLASS_NAME, new Class[]{MuleContextAware.class});
         clazz.role(DefinedClassRoles.NESTED_PROCESSOR_CHAIN);
 
         return clazz;

@@ -211,13 +211,6 @@ public class NameUtils {
         return false;
     }
 
-    public String generateClassNameInPackage(DevKitTypeElement typeElement, String extraPackage, String className) {
-        String packageName = getPackageName(getBinaryName(typeElement));
-
-        return packageName + extraPackage + "." + className;
-
-    }
-
     public String getBinaryName(DevKitTypeElement typeElement) {
         return elements.getBinaryName(typeElement.unwrap()).toString();
     }

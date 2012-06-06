@@ -165,9 +165,8 @@ public class AuthorizeMessageProcessorGenerator extends AbstractMessageGenerator
     }
 
     private DefinedClass getAuthorizeMessageProcessorClass(DevKitTypeElement type) {
-        String httpCallbackClassName = ctx().getNameUtils().generateClassNameInPackage(type, NamingContants.MESSAGE_PROCESSOR_NAMESPACE, NamingContants.AUTHORIZE_MESSAGE_PROCESSOR_CLASS_NAME);
-        Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(httpCallbackClassName));
-        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(httpCallbackClassName), new Class[]{
+        Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingContants.MESSAGE_PROCESSOR_NAMESPACE);
+        DefinedClass clazz = pkg._class(NamingContants.AUTHORIZE_MESSAGE_PROCESSOR_CLASS_NAME, new Class[]{
                 Initialisable.class,
                 Startable.class,
                 Disposable.class,

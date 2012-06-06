@@ -149,9 +149,8 @@ public class DefaultSaveAccessTokenCallbackGenerator extends AbstractMessageGene
     }
 
     private DefinedClass getDefaultSaveAccessTokenCallbackClass(DevKitTypeElement type) {
-        String callbackClassName = ctx().getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, NamingContants.DEFAULT_SAVE_ACCESS_TOKEN_CALLBACK_CLASS_NAME);
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(callbackClassName));
-        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(callbackClassName), new Class[]{
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingContants.CONFIG_NAMESPACE);
+        DefinedClass clazz = pkg._class(NamingContants.DEFAULT_SAVE_ACCESS_TOKEN_CALLBACK_CLASS_NAME, new Class[]{
                 SaveAccessTokenCallback.class});
         clazz.role(DefinedClassRoles.DEFAULT_SAVE_ACCESS_TOKEN_CALLBACK);
 

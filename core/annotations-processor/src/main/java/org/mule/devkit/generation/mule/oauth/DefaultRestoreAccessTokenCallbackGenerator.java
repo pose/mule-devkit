@@ -150,9 +150,8 @@ public class DefaultRestoreAccessTokenCallbackGenerator extends AbstractMessageG
     }
 
     private DefinedClass getDefaultRestoreAccessTokenCallbackClass(DevKitTypeElement type) {
-        String callbackClassName = ctx().getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, NamingContants.DEFAULT_RESTORE_ACCESS_TOKEN_CALLBACK_CLASS_NAME);
-        Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(callbackClassName));
-        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(callbackClassName), new Class[]{
+        Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingContants.CONFIG_NAMESPACE);
+        DefinedClass clazz = pkg._class(NamingContants.DEFAULT_RESTORE_ACCESS_TOKEN_CALLBACK_CLASS_NAME, new Class[]{
                 RestoreAccessTokenCallback.class});
 
         clazz.role(DefinedClassRoles.DEFAULT_RESTORE_ACCESS_TOKEN_CALLBACK);
