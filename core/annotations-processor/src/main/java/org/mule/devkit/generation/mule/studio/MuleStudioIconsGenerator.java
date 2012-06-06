@@ -69,7 +69,7 @@ public class MuleStudioIconsGenerator extends AbstractMessageGenerator {
     }
 
     private void copyFile(String fileName, String folder, DevKitTypeElement typeElement) throws GenerationException {
-        String sourcePath = ctx().getSourceUtils().getPath(typeElement.unwrap());
+        String sourcePath = typeElement.getPathToSourceFile();
         int packageCount = StringUtils.countMatches(typeElement.getQualifiedName().toString(), ".") + 1;
         while (packageCount > 0) {
             sourcePath = sourcePath.substring(0, sourcePath.lastIndexOf("/"));

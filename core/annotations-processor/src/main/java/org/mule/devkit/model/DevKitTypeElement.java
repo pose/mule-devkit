@@ -73,4 +73,6 @@ public interface DevKitTypeElement extends DevKitElement<TypeElement, DevKitType
     boolean needsConfig();
 
     Name getQualifiedName();
+
+    String getPathToSourceFile();
 }

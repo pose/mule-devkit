@@ -17,6 +17,7 @@
 
 package org.mule.devkit.model;
 
+import com.sun.source.util.TreePath;
 import com.sun.source.util.Trees;
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Connect;
@@ -38,6 +39,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
+import javax.tools.JavaFileObject;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
@@ -299,6 +301,13 @@ public class DefaultDevKitTypeElement extends DefaultDevKitElement<TypeElement, 
     @Override
     public Name getQualifiedName() {
         return innerElement.getQualifiedName();
+    }
+
+    @Override
+    public String getPathToSourceFile() {
+        TreePath path = trees.getPath(innerElement);
+        JavaFileObject source = path.getCompilationUnit().getSourceFile();
+        return source.toUri().getPath();
     }
 
 }

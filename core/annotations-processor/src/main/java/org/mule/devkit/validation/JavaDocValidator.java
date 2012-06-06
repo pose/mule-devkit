@@ -136,7 +136,7 @@ public class JavaDocValidator implements Validator {
         String pathToExamplesFile = split[0];
         String exampleName = split[1];
 
-        String sourcePath = context.getSourceUtils().getPath(method.parent().unwrap());
+        String sourcePath = method.parent().getPathToSourceFile();
         int packageCount = StringUtils.countMatches(method.parent().getQualifiedName().toString(), ".") + 1;
         while (packageCount > 0) {
             sourcePath = sourcePath.substring(0, sourcePath.lastIndexOf("/"));

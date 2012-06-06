@@ -24,7 +24,6 @@ import org.mule.devkit.model.code.writer.FilerCodeWriter;
 import org.mule.devkit.model.schema.SchemaModel;
 import org.mule.devkit.model.studio.StudioModel;
 import org.mule.devkit.utils.NameUtils;
-import org.mule.devkit.utils.SourceUtils;
 
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -53,7 +52,6 @@ public class GeneratorContext {
     private NameUtils nameUtils;
     private Map<String, String> options;
     private Set<TypeMirror> registeredEnums;
-    private SourceUtils sourceUtils;
     private Map<String, String> envOptions;
     private Set<TypeMirror> registeredJaxbElements;
 
@@ -67,7 +65,6 @@ public class GeneratorContext {
         nameUtils = new NameUtils(this.elements);
         studioModel = new StudioModel(new FilerCodeWriter(env.getFiler()));
         options = env.getOptions();
-        sourceUtils = new SourceUtils(env);
         registeredEnums = new HashSet<TypeMirror>();
         registeredJaxbElements = new HashSet<TypeMirror>();
         envOptions = Collections.unmodifiableMap(env.getOptions());
@@ -132,10 +129,6 @@ public class GeneratorContext {
 
     public void registerJaxbElement(TypeMirror jaxbElement) {
         registeredJaxbElements.add(jaxbElement);
-    }
-
-    public SourceUtils getSourceUtils() {
-        return sourceUtils;
     }
 
     public boolean isEnvOptionSet(String envOption) {

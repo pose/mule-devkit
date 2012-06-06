@@ -16,6 +16,7 @@
  */
 package org.mule.devkit.model;
 
+import com.sun.source.util.TreePath;
 import com.sun.source.util.Trees;
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.NestedProcessor;
@@ -33,6 +34,7 @@ import javax.lang.model.type.TypeVariable;
 import javax.lang.model.type.WildcardType;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
+import javax.tools.JavaFileObject;
 import javax.xml.bind.annotation.XmlType;
 import java.lang.annotation.Annotation;
 import java.math.BigDecimal;
