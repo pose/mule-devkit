@@ -144,7 +144,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
         // register destination data type
         registerDestinationType(constructor, moduleClass, executableElement);
 
-        constructor.body().invoke("setName").arg(ctx().getNameUtils().generateClassName(executableElement, "Transformer"));
+        constructor.body().invoke("setName").arg(executableElement.getCapitalizedName() + "Transformer");
     }
 
     private void registerDestinationType(Method constructor, DevKitTypeElement moduleClass, DevKitExecutableElement executableElement) {
@@ -184,9 +184,8 @@ public class TransformerGenerator extends AbstractMessageGenerator {
     }
 
     public DefinedClass getTransformerClass(DevKitExecutableElement executableElement) {
-        String transformerClassName = ctx().getNameUtils().generateClassName(executableElement, NamingContants.TRANSFORMER_CLASS_NAME_SUFFIX);
-        Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(transformerClassName) + NamingContants.TRANSFORMERS_NAMESPACE);
-        DefinedClass transformer = pkg._class(ctx().getNameUtils().getClassName(transformerClassName), AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class});
+        Package pkg = ctx().getCodeModel()._package(executableElement.parent().getPackageName() + NamingContants.TRANSFORMERS_NAMESPACE);
+        DefinedClass transformer = pkg._class(executableElement.getCapitalizedName() + NamingContants.TRANSFORMER_CLASS_NAME_SUFFIX, AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class});
 
         return transformer;
     }

@@ -211,13 +211,6 @@ public class NameUtils {
         return false;
     }
 
-    public String generateClassName(DevKitExecutableElement executableElement, String append) {
-        String packageName = getPackageName(getBinaryName(executableElement.parent()));
-        String className = StringUtils.capitalize(executableElement.getSimpleName().toString()) + append;
-
-        return packageName + "." + className;
-    }
-
     public String generateClassNameInPackage(DevKitElement element, String className) {
         String packageName;
         if (element instanceof DevKitTypeElement) {

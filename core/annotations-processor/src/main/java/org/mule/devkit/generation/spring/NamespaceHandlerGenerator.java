@@ -100,8 +100,7 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
         for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Transformer.class)) {
             Invocation registerMuleBeanDefinitionParser = init.body().invoke("registerBeanDefinitionParser");
             registerMuleBeanDefinitionParser.arg(ExpressionFactory.lit(ctx().getNameUtils().uncamel(executableElement.getSimpleName().toString())));
-            String transformerClassName = ctx().getNameUtils().generateClassName(executableElement, NamingContants.TRANSFORMER_CLASS_NAME_SUFFIX);
-            transformerClassName = ctx().getNameUtils().getPackageName(transformerClassName) + NamingContants.TRANSFORMERS_NAMESPACE + "." + ctx().getNameUtils().getClassName(transformerClassName);
+            String transformerClassName = typeElement.getPackageName() + NamingContants.TRANSFORMERS_NAMESPACE + "." + executableElement.getCapitalizedName() + NamingContants.TRANSFORMER_CLASS_NAME_SUFFIX;
             registerMuleBeanDefinitionParser.arg(ExpressionFactory._new(ref(MessageProcessorDefinitionParser.class)).arg(ref(transformerClassName).boxify().dotclass()));
         }
     }

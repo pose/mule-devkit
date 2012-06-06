@@ -416,10 +416,9 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected DefinedClass getBeanDefinitionParserClass(DevKitExecutableElement executableElement) {
-        String beanDefinitionParserName = ctx().getNameUtils().generateClassName(executableElement, NamingContants.DEFINITION_PARSER_CLASS_NAME_SUFFIX);
-        Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(beanDefinitionParserName) + NamingContants.CONFIG_NAMESPACE);
+        Package pkg = ctx().getCodeModel()._package(executableElement.parent().getPackageName() + NamingContants.CONFIG_NAMESPACE);
         DefinedClass abstractBeanDefinitionParser = ctx().getCodeModel()._class(DefinedClassRoles.ABSTRACT_BEAN_DEFINITION_PARSER);
-        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(beanDefinitionParserName), abstractBeanDefinitionParser);
+        DefinedClass clazz = pkg._class(executableElement.getCapitalizedName() + NamingContants.DEFINITION_PARSER_CLASS_NAME_SUFFIX, abstractBeanDefinitionParser);
 
         return clazz;
     }
@@ -435,9 +434,8 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected DefinedClass getMessageProcessorClass(DevKitExecutableElement executableElement) {
-        String className = ctx().getNameUtils().generateClassName(executableElement, NamingContants.MESSAGE_PROCESSOR_CLASS_NAME_SUFFIX);
-        return getMessageProcessorClass(className,
-                ctx().getNameUtils().getPackageName(className) + NamingContants.MESSAGE_PROCESSOR_NAMESPACE);
+        return getMessageProcessorClass(executableElement.getCapitalizedName() + NamingContants.MESSAGE_PROCESSOR_CLASS_NAME_SUFFIX,
+                executableElement.parent().getPackageName() + NamingContants.MESSAGE_PROCESSOR_NAMESPACE);
     }
 
     protected DefinedClass getMessageProcessorClass(String className, String packageName) {
@@ -455,9 +453,8 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected DefinedClass getInterceptingMessageProcessorClass(DevKitExecutableElement executableElement) {
-        String beanDefinitionParserName = ctx().getNameUtils().generateClassName(executableElement, NamingContants.MESSAGE_PROCESSOR_CLASS_NAME_SUFFIX);
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(beanDefinitionParserName) + NamingContants.MESSAGE_PROCESSOR_NAMESPACE);
-        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(beanDefinitionParserName), new Class[]{
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(executableElement.parent().getPackageName() + NamingContants.MESSAGE_PROCESSOR_NAMESPACE);
+        DefinedClass clazz = pkg._class(executableElement.getCapitalizedName() + NamingContants.MESSAGE_PROCESSOR_CLASS_NAME_SUFFIX, new Class[]{
                 Initialisable.class,
                 Startable.class,
                 Disposable.class,
@@ -472,8 +469,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
 
     protected DefinedClass getMessageSourceClass(DevKitExecutableElement executableElement, boolean runnable) {
-        String beanDefinitionParserName = ctx().getNameUtils().generateClassName(executableElement, NamingContants.MESSAGE_SOURCE_CLASS_NAME_SUFFIX);
-        Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(beanDefinitionParserName) + NamingContants.MESSAGE_SOURCE_NAMESPACE);
+        Package pkg = ctx().getCodeModel()._package(executableElement.parent().getPackageName() + NamingContants.MESSAGE_SOURCE_NAMESPACE);
         ArrayList<Class> inherits = new ArrayList<Class>();
         inherits.add(MuleContextAware.class);
         inherits.add(Startable.class);
@@ -492,7 +488,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             inherits.add(MessageSource.class);
         }
 
-        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(beanDefinitionParserName), inherits.toArray( new Class<?>[] {} ));
+        DefinedClass clazz = pkg._class(executableElement.getCapitalizedName() + NamingContants.MESSAGE_SOURCE_CLASS_NAME_SUFFIX, inherits.toArray( new Class<?>[] {} ));
 
         return clazz;
     }

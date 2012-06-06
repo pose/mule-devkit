@@ -31,4 +31,6 @@ public interface DevKitExecutableElement extends DevKitElement<ExecutableElement
     List<? extends TypeParameterElement> getTypeParameters();
 
     boolean hasOnlyOneChildElement();
+
+    String getCapitalizedName();
 }

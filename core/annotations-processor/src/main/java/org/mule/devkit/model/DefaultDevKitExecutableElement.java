@@ -17,6 +17,7 @@
 package org.mule.devkit.model;
 
 import com.sun.source.util.Trees;
+import org.apache.commons.lang.StringUtils;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeParameterElement;
@@ -74,5 +75,10 @@ public class DefaultDevKitExecutableElement extends DefaultDevKitElement<Executa
         }
 
         return requiredChildElements == 1;
+    }
+
+    @Override
+    public String getCapitalizedName() {
+        return StringUtils.capitalize(innerElement.getSimpleName().toString());
     }
 }
