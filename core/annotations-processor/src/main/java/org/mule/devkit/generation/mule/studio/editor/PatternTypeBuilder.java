@@ -58,7 +58,7 @@ public class PatternTypeBuilder extends BaseStudioXmlBuilder {
             patternType.setReturnType(executableElement.getReturnType().toString());
         } else if (executableElement.getAnnotation(Transformer.class) != null) {
             patternType.setExtends(helper.getUrl(typeElement) + AbstractTransformerBuilder.ABSTRACT_TRANSFORMER_LOCAL_ID);
-            patternType.setDescription(helper.formatDescription(javaDocUtils.getSummary(executableElement)));
+            patternType.setDescription(helper.formatDescription(executableElement.getJavaDocSummary()));
         }
 
         patternType.setIcon(getIcon());

@@ -343,7 +343,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             }
             String typeName = StringUtils.capitalize(name) + TYPE_SUFFIX;
 
-            registerProcessorElement(schema, processor.intercepting(), targetNamespace, name, typeName, ctx().getJavaDocUtils().getSummary(method));
+            registerProcessorElement(schema, processor.intercepting(), targetNamespace, name, typeName, method.getJavaDocSummary());
 
             registerProcessorType(schema, processor.intercepting(), targetNamespace, typeName, method);
         }
@@ -393,7 +393,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         // add doc
         Annotation annotation = new Annotation();
         Documentation doc = new Documentation();
-        doc.getContent().add(ctx().getJavaDocUtils().getSummary(executableElement));
+        doc.getContent().add(executableElement.getJavaDocSummary());
         annotation.getAppinfoOrDocumentation().add(doc);
 
         element.setAnnotation(annotation);
@@ -864,7 +864,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         Annotation annotation = new Annotation();
         Documentation doc = new Documentation();
-        doc.getContent().add(ctx().getJavaDocUtils().getSummary(typeElement));
+        doc.getContent().add(typeElement.getJavaDocSummary());
         annotation.getAppinfoOrDocumentation().add(doc);
         config.setAnnotation(annotation);
 
@@ -989,7 +989,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         // add doc
         Annotation annotation = new Annotation();
         Documentation doc = new Documentation();
-        doc.getContent().add(ctx().getJavaDocUtils().getSummary(variable));
+        doc.getContent().add(variable.getJavaDocSummary());
         annotation.getAppinfoOrDocumentation().add(doc);
 
         attribute.setAnnotation(annotation);
@@ -1028,7 +1028,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         // add doc
         Annotation annotation = new Annotation();
         Documentation doc = new Documentation();
-        doc.getContent().add(ctx().getJavaDocUtils().getSummary(variable));
+        doc.getContent().add(variable.getJavaDocSummary());
         annotation.getAppinfoOrDocumentation().add(doc);
 
         attribute.setAnnotation(annotation);

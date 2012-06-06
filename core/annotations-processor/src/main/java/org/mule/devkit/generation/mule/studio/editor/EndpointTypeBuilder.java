@@ -55,7 +55,7 @@ public class EndpointTypeBuilder extends BaseStudioXmlBuilder {
     }
 
     protected String getDescription() {
-        return helper.formatDescription(javaDocUtils.getSummary(executableElement));
+        return helper.formatDescription(executableElement.getJavaDocSummary());
     }
 
     protected String getCaption() {

@@ -274,7 +274,7 @@ public abstract class BaseStudioXmlBuilder {
             childElement.setDescription(helper.formatDescription(javaDocUtils.getParameterSummary(parameter.getSimpleName().toString(), executableElement)));
         } else {
             prefix = "configurable";
-            childElement.setDescription(helper.formatDescription(javaDocUtils.getSummary(parameter)));
+            childElement.setDescription(helper.formatDescription(parameter.getJavaDocSummary()));
         }
         childElement.setName(MuleStudioEditorXmlGenerator.URI_PREFIX + moduleName + '/' + prefix + '-' + nameUtils.uncamel(parameter.getSimpleName().toString()));
         childElement.setAllowMultiple(false);

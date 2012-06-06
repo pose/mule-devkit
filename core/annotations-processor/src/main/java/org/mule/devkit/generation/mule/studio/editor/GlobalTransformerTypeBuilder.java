@@ -57,7 +57,7 @@ public class GlobalTransformerTypeBuilder extends GlobalTypeBuilder {
     }
 
     protected String getDescriptionBasedOnType() {
-        return helper.formatDescription(javaDocUtils.getSummary(executableElement));
+        return helper.formatDescription(executableElement.getJavaDocSummary());
     }
 
     protected String getExtendsBasedOnType() {

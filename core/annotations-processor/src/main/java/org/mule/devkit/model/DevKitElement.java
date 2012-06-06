@@ -81,4 +81,8 @@ public interface DevKitElement<T extends Element, P extends DevKitElement> exten
     boolean isBigDecimal();
     
     boolean isBigInteger();
+
+    boolean hasJavaDocTag(String tagName);
+
+    String getJavaDocSummary();
 }

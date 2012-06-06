@@ -313,14 +313,14 @@ public class MuleStudioUtils {
         if (element instanceof DevKitParameterElement) {
             return formatDescription(javaDocUtils.getParameterSummary(element.getSimpleName().toString(), element.parent()));
         }
-        return formatDescription(javaDocUtils.getSummary(element));
+        return formatDescription(element.getJavaDocSummary());
     }
 
     public String getFormattedDescription(DevKitTypeElement typeElement) {
         if(StringUtils.isNotBlank(typeElement.description())) {
             return typeElement.description();
         }
-        return formatDescription(javaDocUtils.getSummary(typeElement));
+        return formatDescription(typeElement.getJavaDocSummary());
     }
 
     public String getFormattedCaption(DevKitTypeElement typeElement) {

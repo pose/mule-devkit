@@ -16,6 +16,7 @@
  */
 package org.mule.devkit.model;
 
+import org.apache.commons.lang.StringUtils;
 import org.mule.api.NestedProcessor;
 import org.mule.api.callback.HttpCallback;
 
@@ -40,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 public class DefaultDevKitElement<T extends Element, P extends DevKitElement> implements DevKitElement<T, P> {
     protected T innerElement;
@@ -311,5 +313,74 @@ public class DefaultDevKitElement<T extends Element, P extends DevKitElement> im
     @Override
     public boolean isBigInteger() {
         return innerElement.asType().toString().startsWith(BigInteger.class.getName());
-    }    
+    }
+
+    @Override
+    public String getJavaDocSummary() {
+        String comment = elements.getDocComment(innerElement);
+        if (comment == null || StringUtils.isBlank(comment)) {
+            return null;
+        }
+
+        comment = comment.trim();
+
+        String parsedComment = "";
+        boolean tagsBegan = false;
+        StringTokenizer st = new StringTokenizer(comment, "\n\r");
+        while (st.hasMoreTokens()) {
+            String nextToken = st.nextToken().trim();
+            if (nextToken.startsWith("@")) {
+                tagsBegan = true;
+            }
+            if (!tagsBegan) {
+                parsedComment = parsedComment + nextToken + "\n";
+            }
+        }
+
+        String strippedComments = "";
+        boolean insideTag = false;
+        for (int i = 0; i < parsedComment.length(); i++) {
+            if (parsedComment.charAt(i) == '{' &&
+                    parsedComment.charAt(i + 1) == '@') {
+                insideTag = true;
+            } else if (parsedComment.charAt(i) == '}') {
+                insideTag = false;
+            } else {
+                if (!insideTag) {
+                    strippedComments += parsedComment.charAt(i);
+                }
+            }
+        }
+
+        strippedComments = strippedComments.trim();
+        while (strippedComments.length() > 0 &&
+                strippedComments.charAt(strippedComments.length() - 1) == '\n') {
+            strippedComments = StringUtils.chomp(strippedComments);
+        }
+
+        return strippedComments;
+    }
+
+    @Override
+    public boolean hasJavaDocTag(String tagName) {
+        String comment = elements.getDocComment(innerElement);
+        if (StringUtils.isBlank(comment)) {
+            return false;
+        }
+
+        StringTokenizer st = new StringTokenizer(comment.trim(), "\n\r");
+        while (st.hasMoreTokens()) {
+            String nextToken = st.nextToken().trim();
+            if (nextToken.startsWith("@" + tagName)) {
+                String tagContent = StringUtils.difference("@" + tagName, nextToken);
+                return !StringUtils.isBlank(tagContent);
+            }
+            if (nextToken.startsWith("{@" + tagName)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }

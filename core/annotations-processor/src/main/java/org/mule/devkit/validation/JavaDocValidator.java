@@ -50,7 +50,7 @@ public class JavaDocValidator implements Validator {
             throw new ValidationException(typeElement, "Class " + typeElement.getQualifiedName().toString() + " is not properly documented. A summary is missing.");
         }
 
-        if (!context.getJavaDocUtils().hasTag("author", typeElement.unwrap())) {
+        if (!typeElement.hasJavaDocTag("author")) {
             throw new ValidationException(typeElement, "Class " + typeElement.getQualifiedName().toString() + " needs to have an @author tag.");
         }
 
@@ -96,7 +96,7 @@ public class JavaDocValidator implements Validator {
 
         if (!method.getReturnType().toString().equals("void") &&
                 !method.getReturnType().toString().contains("StopSourceCallback")) {
-            if (!context.getJavaDocUtils().hasTag("return", method.unwrap())) {
+            if (!method.hasJavaDocTag("return")) {
                 throw new ValidationException(typeElement, "The return type of a non-void method must be documented. Method " + method.getSimpleName().toString() + " is at fault. Missing @return.");
             }
         }
@@ -109,7 +109,7 @@ public class JavaDocValidator implements Validator {
     }
 
     private boolean hasComment(DevKitElement element, GeneratorContext context) {
-        String comment = context.getJavaDocUtils().getSummary(element);
+        String comment = element.getJavaDocSummary();
         return StringUtils.isNotBlank(comment);
 
     }
@@ -121,7 +121,7 @@ public class JavaDocValidator implements Validator {
 
     protected boolean exampleDoesNotExist(GeneratorContext context, DevKitExecutableElement method) throws ValidationException {
 
-        if (!context.getJavaDocUtils().hasTag("sample.xml", method.unwrap())) {
+        if (!method.hasJavaDocTag("sample.xml")) {
             throw new ValidationException(method, "Method " + method.getSimpleName().toString() + " does not contain an example using {@sample.xml} tag.");
         }
 
