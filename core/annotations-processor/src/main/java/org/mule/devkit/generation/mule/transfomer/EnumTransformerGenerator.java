@@ -17,6 +17,7 @@
 
 package org.mule.devkit.generation.mule.transfomer;
 
+import org.apache.commons.lang.StringUtils;
 import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
@@ -41,6 +42,8 @@ import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
+
+import javax.lang.model.type.DeclaredType;
 
 public class EnumTransformerGenerator extends AbstractMessageGenerator {
 
@@ -170,9 +173,18 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
 
     private DefinedClass getEnumTransformerClass(DevKitElement variableElement) {
         javax.lang.model.element.Element enumElement = ctx().getTypeUtils().asElement(variableElement.asType());
-        String transformerClassName = ctx().getNameUtils().generateClassNameInPackage(variableElement, enumElement.getSimpleName().toString() + NamingContants.ENUM_TRANSFORMER_CLASS_NAME_SUFFIX);
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(transformerClassName) + NamingContants.TRANSFORMERS_NAMESPACE);
-        DefinedClass transformer = pkg._class(ctx().getNameUtils().getClassName(transformerClassName), AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class, MuleContextAware.class});
+
+        String packageName = "";
+        if (variableElement instanceof DevKitTypeElement) {
+            packageName = ((DevKitTypeElement)variableElement).getPackageName();
+        } else if (variableElement instanceof DevKitParameterElement) {
+            packageName = ((DevKitTypeElement)((DevKitParameterElement) variableElement).parent().parent()).getPackageName();
+        } else if (variableElement.parent() instanceof DevKitTypeElement) {
+            packageName = ((DevKitTypeElement)variableElement.parent()).getPackageName();
+        }
+
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(packageName + NamingContants.TRANSFORMERS_NAMESPACE);
+        DefinedClass transformer = pkg._class(StringUtils.capitalise(enumElement.getSimpleName().toString()) + NamingContants.ENUM_TRANSFORMER_CLASS_NAME_SUFFIX, AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class, MuleContextAware.class});
 
         return transformer;
     }

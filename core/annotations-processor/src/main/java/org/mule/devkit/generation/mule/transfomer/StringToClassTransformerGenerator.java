@@ -113,8 +113,7 @@ public class StringToClassTransformerGenerator extends AbstractMessageGenerator 
     }
 
     private DefinedClass getTransformerClass(DevKitTypeElement typeElement) {
-        String transformerClassName = ctx().getNameUtils().generateClassNameInPackage(typeElement, NamingContants.STRING_TO_CLASS_TRANSFORMER_CLASS_NAME);
-        Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(transformerClassName) + NamingContants.TRANSFORMERS_NAMESPACE);
-        return pkg._class(ctx().getNameUtils().getClassName(transformerClassName), AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class, MuleContextAware.class});
+        Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingContants.TRANSFORMERS_NAMESPACE);
+        return pkg._class(NamingContants.STRING_TO_CLASS_TRANSFORMER_CLASS_NAME, AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class, MuleContextAware.class});
     }
 }

@@ -443,9 +443,8 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
     }
 
     private DefinedClass getEnricherClass(String name, DevKitTypeElement variableElement) {
-        String evaluatorClassName = ctx().getNameUtils().generateClassNameInPackage(variableElement, ctx().getNameUtils().camel(name) + NamingContants.EXPRESSION_ENRICHER_CLASS_NAME_SUFFIX);
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(evaluatorClassName) + NamingContants.EXPRESSIONS_NAMESPACE);
-        DefinedClass enricherClass = pkg._class(ctx().getNameUtils().getClassName(evaluatorClassName), new Class<?>[]{org.mule.api.expression.ExpressionEnricher.class});
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(variableElement.getPackageName() + NamingContants.EXPRESSIONS_NAMESPACE);
+        DefinedClass enricherClass = pkg._class(ctx().getNameUtils().camel(name) + NamingContants.EXPRESSION_ENRICHER_CLASS_NAME_SUFFIX, new Class<?>[]{org.mule.api.expression.ExpressionEnricher.class});
         enricherClass._implements(ref(MuleContextAware.class));
         enricherClass._implements(ref(Startable.class));
         enricherClass._implements(ref(Stoppable.class));

@@ -277,9 +277,8 @@ public class ExpressionEvaluatorGenerator extends AbstractMessageGenerator {
     }
 
     private DefinedClass getEvaluatorClass(String name, DevKitTypeElement variableElement) {
-        String evaluatorClassName = ctx().getNameUtils().generateClassNameInPackage(variableElement, ctx().getNameUtils().camel(name) + NamingContants.EXPRESSION_EVALUATOR_CLASS_NAME_SUFFIX);
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(evaluatorClassName) + NamingContants.EXPRESSIONS_NAMESPACE);
-        DefinedClass evaluator = pkg._class(ctx().getNameUtils().getClassName(evaluatorClassName), new Class<?>[]{org.mule.api.expression.ExpressionEvaluator.class});
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(variableElement + NamingContants.EXPRESSIONS_NAMESPACE);
+        DefinedClass evaluator = pkg._class(ctx().getNameUtils().camel(name) + NamingContants.EXPRESSION_EVALUATOR_CLASS_NAME_SUFFIX, new Class<?>[]{org.mule.api.expression.ExpressionEvaluator.class});
         evaluator._implements(ref(MuleContextAware.class));
         evaluator._implements(ref(Startable.class));
         evaluator._implements(ref(Stoppable.class));
