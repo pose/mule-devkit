@@ -23,7 +23,6 @@ import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.writer.FilerCodeWriter;
 import org.mule.devkit.model.schema.SchemaModel;
 import org.mule.devkit.model.studio.StudioModel;
-import org.mule.devkit.utils.JavaDocUtils;
 import org.mule.devkit.utils.NameUtils;
 import org.mule.devkit.utils.SourceUtils;
 
@@ -52,7 +51,6 @@ public class GeneratorContext {
     private Types types;
     private Elements elements;
     private NameUtils nameUtils;
-    private JavaDocUtils javaDocUtils;
     private Map<String, String> options;
     private Set<TypeMirror> registeredEnums;
     private SourceUtils sourceUtils;
@@ -67,7 +65,6 @@ public class GeneratorContext {
         elements = env.getElementUtils();
         types = env.getTypeUtils();
         nameUtils = new NameUtils(this.elements);
-        javaDocUtils = new JavaDocUtils(this.elements);
         studioModel = new StudioModel(new FilerCodeWriter(env.getFiler()));
         options = env.getOptions();
         sourceUtils = new SourceUtils(env);
@@ -111,10 +108,6 @@ public class GeneratorContext {
 
     public NameUtils getNameUtils() {
         return nameUtils;
-    }
-
-    public JavaDocUtils getJavaDocUtils() {
-        return javaDocUtils;
     }
 
     public StudioModel getStudioModel() {

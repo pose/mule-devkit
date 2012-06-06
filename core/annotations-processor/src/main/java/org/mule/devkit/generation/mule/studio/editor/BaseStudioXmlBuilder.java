@@ -35,7 +35,6 @@ import org.mule.devkit.model.studio.ModeElementType;
 import org.mule.devkit.model.studio.ModeType;
 import org.mule.devkit.model.studio.NestedElementReference;
 import org.mule.devkit.model.studio.ObjectFactory;
-import org.mule.devkit.utils.JavaDocUtils;
 import org.mule.devkit.utils.NameUtils;
 import org.mule.util.StringUtils;
 
@@ -60,7 +59,6 @@ public abstract class BaseStudioXmlBuilder {
     protected DevKitTypeElement typeElement;
     protected DevKitExecutableElement executableElement;
     protected NameUtils nameUtils;
-    protected JavaDocUtils javaDocUtils;
     protected Types typeUtils;
     protected String moduleName;
     protected GeneratorContext context;
@@ -69,7 +67,6 @@ public abstract class BaseStudioXmlBuilder {
     protected BaseStudioXmlBuilder(GeneratorContext context) {
         this.context = context;
         nameUtils = context.getNameUtils();
-        javaDocUtils = context.getJavaDocUtils();
         typeUtils = context.getTypeUtils();
         helper = new MuleStudioUtils(context);
         objectFactory = new ObjectFactory();

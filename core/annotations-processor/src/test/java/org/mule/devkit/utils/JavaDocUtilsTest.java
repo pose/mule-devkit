@@ -52,7 +52,6 @@ public class JavaDocUtilsTest {
                 "     \n" +
                 "     @param addressId  the customer address to update\n" +
                 "     @param attributes the address attributes to update");
-        JavaDocUtils javaDocUtils = new JavaDocUtils(elements);
         String sample = executableElement.getJavaDocTagContent("sample.xml");
         assertEquals("../../../doc/magento-connector.xml.sample magento:updateCustomerAddress", sample);
     }
@@ -66,7 +65,6 @@ public class JavaDocUtilsTest {
                 "     \n" +
                 "     @param addressId  the customer address to update\n" +
                 "     @param attributes the address attributes to update");
-        JavaDocUtils javaDocUtils = new JavaDocUtils(elements);
         String sample = executableElement.getJavaDocTagContent("sample.xml");
         assertEquals("../../../doc/magento-connector.xml.sample magento:updateCustomerAddress", sample);
     }
@@ -78,7 +76,6 @@ public class JavaDocUtilsTest {
                 "     \n" +
                 "     @param name the name\n" +
                 "     @param content the content");
-        JavaDocUtils javaDocUtils = new JavaDocUtils(elements);
         assertEquals("the content", executableElement.getJavaDocParameterSummary("content"));
     }
 
@@ -90,7 +87,6 @@ public class JavaDocUtilsTest {
                 "     @param name the name\n" +
                 "     @param content the \n" +
                 "content");
-        JavaDocUtils javaDocUtils = new JavaDocUtils(elements);
         assertEquals("the content", executableElement.getJavaDocParameterSummary("content"));
     }
 
@@ -101,7 +97,6 @@ public class JavaDocUtilsTest {
                 "     \n" +
                 "     @param name the name\n" +
                 "     @param content the content");
-        JavaDocUtils javaDocUtils = new JavaDocUtils(elements);
         assertTrue(StringUtils.isBlank(executableElement.getJavaDocParameterSummary("cont")));
     }
 
@@ -112,7 +107,6 @@ public class JavaDocUtilsTest {
                 "     \n" +
                 "     @param name the name\n" +
                 "     @param content the content");
-        JavaDocUtils javaDocUtils = new JavaDocUtils(elements);
         assertTrue(StringUtils.isBlank(executableElement.getJavaDocParameterSummary("value")));
     }
 
@@ -123,7 +117,6 @@ public class JavaDocUtilsTest {
                 "     \n" +
                 "     @param name the name\n" +
                 "     @param content");
-        JavaDocUtils javaDocUtils = new JavaDocUtils(elements);
         assertTrue(StringUtils.isBlank(executableElement.getJavaDocParameterSummary("content")));
     }
 
@@ -135,7 +128,6 @@ public class JavaDocUtilsTest {
                 "     {@sample.xml ../../../doc/mule-module-paypal.xml.sample paypal:authorize}\n" +
                 "     @param transactionId\n" +
                 "              The value of the order's transaction identification number");
-        JavaDocUtils javaDocUtils = new JavaDocUtils(elements);
         assertEquals("The value of the order's transaction identification number", executableElement.getJavaDocParameterSummary("transactionId"));
     }
 }

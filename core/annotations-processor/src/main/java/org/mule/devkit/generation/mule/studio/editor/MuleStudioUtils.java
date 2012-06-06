@@ -45,7 +45,6 @@ import org.mule.devkit.model.studio.PasswordType;
 import org.mule.devkit.model.studio.StringAttributeType;
 import org.mule.devkit.model.studio.TextType;
 import org.mule.devkit.model.studio.UrlType;
-import org.mule.devkit.utils.JavaDocUtils;
 import org.mule.devkit.utils.NameUtils;
 import org.mule.util.StringUtils;
 
@@ -58,11 +57,9 @@ public class MuleStudioUtils {
     private static final String IMAGE_PREFIX = "icons/large/";
     private static final String ICON_PREFIX = "icons/small/";
     private NameUtils nameUtils;
-    private JavaDocUtils javaDocUtils;
 
     public MuleStudioUtils(GeneratorContext context) {
         nameUtils = context.getNameUtils();
-        javaDocUtils = context.getJavaDocUtils();
     }
 
     public String formatCaption(String caption) {
