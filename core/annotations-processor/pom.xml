@@ -21,6 +21,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule.tools.devkit</groupId>
+            <artifactId>mule-devkit-annotations-model</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tools.devkit</groupId>
             <artifactId>mule-devkit-codemodel</artifactId>
             <version>${project.version}</version>
         </dependency>

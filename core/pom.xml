@@ -15,6 +15,7 @@
 
     <modules>
         <module>annotations</module>
+		<module>annotations-model</module>
         <module>annotations-processor</module>
     </modules>
 </project>
