@@ -25,7 +25,7 @@ import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.config.spring.util.SpringXMLUtils;
 import org.mule.devkit.generation.AbstractMessageGenerator;
-import org.mule.devkit.generation.NamingContants;
+import org.mule.devkit.generation.NamingConstants;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.ClassAlreadyExistsException;
@@ -98,8 +98,8 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
     }
 
     private DefinedClass getAbstractBeanDefinitionParserClass(DevKitTypeElement typeElement) {
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingContants.CONFIG_NAMESPACE);
-        DefinedClass clazz = pkg._class(Modifier.ABSTRACT, NamingContants.ABSTRACT_DEFINITION_PARSER_CLASS_NAME_SUFFIX, new Class[]{BeanDefinitionParser.class});
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingConstants.CONFIG_NAMESPACE);
+        DefinedClass clazz = pkg._class(Modifier.ABSTRACT, NamingConstants.ABSTRACT_DEFINITION_PARSER_CLASS_NAME_SUFFIX, new Class[]{BeanDefinitionParser.class});
 
         clazz.role(DefinedClassRoles.ABSTRACT_BEAN_DEFINITION_PARSER);
 

@@ -20,7 +20,7 @@ package org.mule.devkit.generation.mule;
 import org.mule.api.NestedProcessor;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.generation.NamingContants;
+import org.mule.devkit.generation.NamingConstants;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.DefinedClassRoles;
@@ -97,8 +97,8 @@ public class NestedProcessorStringGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass getNestedProcessorStringClass(DevKitTypeElement type) {
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingContants.CONFIG_NAMESPACE);
-        DefinedClass clazz = pkg._class(NamingContants.NESTED_PROCESSOR_STRING_CLASS_NAME);
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.CONFIG_NAMESPACE);
+        DefinedClass clazz = pkg._class(NamingConstants.NESTED_PROCESSOR_STRING_CLASS_NAME);
 
         clazz.role(DefinedClassRoles.NESTED_PROCESSOR_STRING);
 

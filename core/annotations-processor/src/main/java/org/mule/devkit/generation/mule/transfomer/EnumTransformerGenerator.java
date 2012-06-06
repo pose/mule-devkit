@@ -26,7 +26,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.devkit.generation.AbstractMessageGenerator;
-import org.mule.devkit.generation.NamingContants;
+import org.mule.devkit.generation.NamingConstants;
 import org.mule.devkit.model.DevKitElement;
 import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitFieldElement;
@@ -42,8 +42,6 @@ import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
-
-import javax.lang.model.type.DeclaredType;
 
 public class EnumTransformerGenerator extends AbstractMessageGenerator {
 
@@ -183,8 +181,8 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
             packageName = ((DevKitTypeElement)variableElement.parent()).getPackageName();
         }
 
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(packageName + NamingContants.TRANSFORMERS_NAMESPACE);
-        DefinedClass transformer = pkg._class(StringUtils.capitalise(enumElement.getSimpleName().toString()) + NamingContants.ENUM_TRANSFORMER_CLASS_NAME_SUFFIX, AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class, MuleContextAware.class});
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(packageName + NamingConstants.TRANSFORMERS_NAMESPACE);
+        DefinedClass transformer = pkg._class(StringUtils.capitalise(enumElement.getSimpleName().toString()) + NamingConstants.ENUM_TRANSFORMER_CLASS_NAME_SUFFIX, AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class, MuleContextAware.class});
 
         return transformer;
     }

@@ -21,7 +21,7 @@ import org.mule.api.Capabilities;
 import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Module;
 import org.mule.devkit.generation.AbstractModuleGenerator;
-import org.mule.devkit.generation.NamingContants;
+import org.mule.devkit.generation.NamingConstants;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.DefinedClassRoles;
@@ -47,7 +47,7 @@ public class CapabilitiesAdapterGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass getCapabilitiesAdapterClass(DevKitTypeElement typeElement) {
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingContants.ADAPTERS_NAMESPACE);
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingConstants.ADAPTERS_NAMESPACE);
 
         TypeReference previous = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
 
@@ -60,7 +60,7 @@ public class CapabilitiesAdapterGenerator extends AbstractModuleGenerator {
             modifiers |= Modifier.ABSTRACT;
         }
 
-        DefinedClass clazz = pkg._class(modifiers, typeElement.getClassName() + NamingContants.CAPABILITIES_ADAPTER_CLASS_NAME_SUFFIX, previous);
+        DefinedClass clazz = pkg._class(modifiers, typeElement.getClassName() + NamingConstants.CAPABILITIES_ADAPTER_CLASS_NAME_SUFFIX, previous);
         clazz._implements(Capabilities.class);
 
         clazz.role(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));

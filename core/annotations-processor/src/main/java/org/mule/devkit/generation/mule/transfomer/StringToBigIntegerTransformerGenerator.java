@@ -22,7 +22,7 @@ import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.devkit.generation.AbstractMessageGenerator;
-import org.mule.devkit.generation.NamingContants;
+import org.mule.devkit.generation.NamingConstants;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.DefinedClass;
@@ -115,7 +115,7 @@ public class StringToBigIntegerTransformerGenerator extends AbstractMessageGener
     }
 
     private DefinedClass getTransformerClass(DevKitTypeElement typeElement) {
-        Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingContants.TRANSFORMERS_NAMESPACE);
-        return pkg._class(NamingContants.STRING_TO_BIGINTEGER_TRANSFORMER_CLASS_NAME, AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class, MuleContextAware.class});
+        Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingConstants.TRANSFORMERS_NAMESPACE);
+        return pkg._class(NamingConstants.STRING_TO_BIGINTEGER_TRANSFORMER_CLASS_NAME, AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class, MuleContextAware.class});
     }
 }

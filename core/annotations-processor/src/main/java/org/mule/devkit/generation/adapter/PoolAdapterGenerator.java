@@ -28,7 +28,7 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.config.PoolingProfile;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.generation.NamingContants;
+import org.mule.devkit.generation.NamingConstants;
 import org.mule.devkit.model.DevKitFieldElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.Block;
@@ -112,9 +112,9 @@ public class PoolAdapterGenerator extends AbstractMessageGenerator {
     }
 
     private DefinedClass getPoolAdapterClass(DevKitTypeElement typeElement) {
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingContants.ADAPTERS_NAMESPACE);
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingConstants.ADAPTERS_NAMESPACE);
 
-        DefinedClass clazz = pkg._class(typeElement.getClassName() + NamingContants.POOL_ADAPTER_CLASS_NAME_SUFFIX);
+        DefinedClass clazz = pkg._class(typeElement.getClassName() + NamingConstants.POOL_ADAPTER_CLASS_NAME_SUFFIX);
         clazz._implements(Startable.class);
         clazz._implements(Stoppable.class);
         clazz._implements(MuleContextAware.class);

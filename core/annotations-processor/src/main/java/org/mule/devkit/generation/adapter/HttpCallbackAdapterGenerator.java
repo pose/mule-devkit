@@ -23,7 +23,7 @@ import org.mule.api.callback.HttpCallback;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.transport.Connector;
 import org.mule.devkit.generation.AbstractModuleGenerator;
-import org.mule.devkit.generation.NamingContants;
+import org.mule.devkit.generation.NamingConstants;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.Conditional;
@@ -104,11 +104,11 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass getHttpCallbackAdapterClass(DevKitTypeElement typeElement) {
-        Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingContants.ADAPTERS_NAMESPACE);
+        Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingConstants.ADAPTERS_NAMESPACE);
 
         DefinedClass classToExtend = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
 
-        DefinedClass oauthAdapter = pkg._class(typeElement.getClassName() + NamingContants.HTTP_CALLBACK_ADAPTER_CLASS_NAME_SUFFIX, classToExtend);
+        DefinedClass oauthAdapter = pkg._class(typeElement.getClassName() + NamingConstants.HTTP_CALLBACK_ADAPTER_CLASS_NAME_SUFFIX, classToExtend);
         oauthAdapter._implements(ref(Initialisable.class));
 
         oauthAdapter.role(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));

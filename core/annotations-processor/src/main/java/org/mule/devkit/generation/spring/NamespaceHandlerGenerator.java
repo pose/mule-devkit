@@ -26,8 +26,7 @@ import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.devkit.generation.AbstractMessageGenerator;
-import org.mule.devkit.generation.NamingContants;
-import org.mule.devkit.generation.mule.oauth.AuthorizeBeanDefinitionParserGenerator;
+import org.mule.devkit.generation.NamingConstants;
 import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.DefinedClass;
@@ -62,8 +61,8 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
     }
 
     private DefinedClass getNamespaceHandlerClass(DevKitTypeElement typeElement) {
-        Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingContants.CONFIG_NAMESPACE);
-        DefinedClass clazz = pkg._class(typeElement.getClassName() + NamingContants.NAMESPACE_HANDLER_CLASS_NAME_SUFFIX, NamespaceHandlerSupport.class);
+        Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingConstants.CONFIG_NAMESPACE);
+        DefinedClass clazz = pkg._class(typeElement.getClassName() + NamingConstants.NAMESPACE_HANDLER_CLASS_NAME_SUFFIX, NamespaceHandlerSupport.class);
 
         String targetNamespace = typeElement.namespace();
         if (targetNamespace == null || targetNamespace.length() == 0) {
@@ -101,7 +100,7 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
         for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Transformer.class)) {
             Invocation registerMuleBeanDefinitionParser = init.body().invoke("registerBeanDefinitionParser");
             registerMuleBeanDefinitionParser.arg(ExpressionFactory.lit(NameUtils.uncamel(executableElement.getSimpleName().toString())));
-            String transformerClassName = typeElement.getPackageName() + NamingContants.TRANSFORMERS_NAMESPACE + "." + executableElement.getCapitalizedName() + NamingContants.TRANSFORMER_CLASS_NAME_SUFFIX;
+            String transformerClassName = typeElement.getPackageName() + NamingConstants.TRANSFORMERS_NAMESPACE + "." + executableElement.getCapitalizedName() + NamingConstants.TRANSFORMER_CLASS_NAME_SUFFIX;
             registerMuleBeanDefinitionParser.arg(ExpressionFactory._new(ref(MessageProcessorDefinitionParser.class)).arg(ref(transformerClassName).boxify().dotclass()));
         }
     }

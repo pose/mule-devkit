@@ -52,7 +52,6 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.construct.Flow;
 import org.mule.devkit.generation.callback.DefaultHttpCallbackGenerator;
-import org.mule.devkit.generation.spring.AbstractBeanDefinitionParserGenerator;
 import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitParameterElement;
 import org.mule.devkit.model.DevKitTypeElement;
@@ -416,17 +415,17 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected DefinedClass getBeanDefinitionParserClass(DevKitExecutableElement executableElement) {
-        Package pkg = ctx().getCodeModel()._package(executableElement.parent().getPackageName() + NamingContants.CONFIG_NAMESPACE);
+        Package pkg = ctx().getCodeModel()._package(executableElement.parent().getPackageName() + NamingConstants.CONFIG_NAMESPACE);
         DefinedClass abstractBeanDefinitionParser = ctx().getCodeModel()._class(DefinedClassRoles.ABSTRACT_BEAN_DEFINITION_PARSER);
-        DefinedClass clazz = pkg._class(executableElement.getCapitalizedName() + NamingContants.DEFINITION_PARSER_CLASS_NAME_SUFFIX, abstractBeanDefinitionParser);
+        DefinedClass clazz = pkg._class(executableElement.getCapitalizedName() + NamingConstants.DEFINITION_PARSER_CLASS_NAME_SUFFIX, abstractBeanDefinitionParser);
 
         return clazz;
     }
 
     protected DefinedClass getConfigBeanDefinitionParserClass(DevKitTypeElement typeElement) {
         DefinedClass abstractBeanDefinitionParser = ctx().getCodeModel()._class(DefinedClassRoles.ABSTRACT_BEAN_DEFINITION_PARSER);
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingContants.CONFIG_NAMESPACE);
-        DefinedClass clazz = pkg._class(typeElement.getClassName() + NamingContants.CONFIG_DEFINITION_PARSER_CLASS_NAME_SUFFIX, abstractBeanDefinitionParser);
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingConstants.CONFIG_NAMESPACE);
+        DefinedClass clazz = pkg._class(typeElement.getClassName() + NamingConstants.CONFIG_DEFINITION_PARSER_CLASS_NAME_SUFFIX, abstractBeanDefinitionParser);
 
         clazz.role(DefinedClassRoles.CONFIG_BEAN_DEFINITION_PARSER, ref(typeElement));
 
@@ -434,8 +433,8 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected DefinedClass getMessageProcessorClass(DevKitExecutableElement executableElement) {
-        return getMessageProcessorClass(executableElement.getCapitalizedName() + NamingContants.MESSAGE_PROCESSOR_CLASS_NAME_SUFFIX,
-                executableElement.parent().getPackageName() + NamingContants.MESSAGE_PROCESSOR_NAMESPACE);
+        return getMessageProcessorClass(executableElement.getCapitalizedName() + NamingConstants.MESSAGE_PROCESSOR_CLASS_NAME_SUFFIX,
+                executableElement.parent().getPackageName() + NamingConstants.MESSAGE_PROCESSOR_NAMESPACE);
     }
 
     protected DefinedClass getMessageProcessorClass(String className, String packageName) {
@@ -453,8 +452,8 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected DefinedClass getInterceptingMessageProcessorClass(DevKitExecutableElement executableElement) {
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(executableElement.parent().getPackageName() + NamingContants.MESSAGE_PROCESSOR_NAMESPACE);
-        DefinedClass clazz = pkg._class(executableElement.getCapitalizedName() + NamingContants.MESSAGE_PROCESSOR_CLASS_NAME_SUFFIX, new Class[]{
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(executableElement.parent().getPackageName() + NamingConstants.MESSAGE_PROCESSOR_NAMESPACE);
+        DefinedClass clazz = pkg._class(executableElement.getCapitalizedName() + NamingConstants.MESSAGE_PROCESSOR_CLASS_NAME_SUFFIX, new Class[]{
                 Initialisable.class,
                 Startable.class,
                 Disposable.class,
@@ -469,7 +468,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
 
     protected DefinedClass getMessageSourceClass(DevKitExecutableElement executableElement, boolean runnable) {
-        Package pkg = ctx().getCodeModel()._package(executableElement.parent().getPackageName() + NamingContants.MESSAGE_SOURCE_NAMESPACE);
+        Package pkg = ctx().getCodeModel()._package(executableElement.parent().getPackageName() + NamingConstants.MESSAGE_SOURCE_NAMESPACE);
         ArrayList<Class> inherits = new ArrayList<Class>();
         inherits.add(MuleContextAware.class);
         inherits.add(Startable.class);
@@ -488,7 +487,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             inherits.add(MessageSource.class);
         }
 
-        DefinedClass clazz = pkg._class(executableElement.getCapitalizedName() + NamingContants.MESSAGE_SOURCE_CLASS_NAME_SUFFIX, inherits.toArray( new Class<?>[] {} ));
+        DefinedClass clazz = pkg._class(executableElement.getCapitalizedName() + NamingConstants.MESSAGE_SOURCE_CLASS_NAME_SUFFIX, inherits.toArray( new Class<?>[] {} ));
 
         return clazz;
     }

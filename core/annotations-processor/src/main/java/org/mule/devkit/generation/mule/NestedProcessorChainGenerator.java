@@ -26,7 +26,7 @@ import org.mule.api.NestedProcessor;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.devkit.generation.AbstractModuleGenerator;
-import org.mule.devkit.generation.NamingContants;
+import org.mule.devkit.generation.NamingConstants;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.DefinedClassRoles;
@@ -174,8 +174,8 @@ public class NestedProcessorChainGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass getNestedProcessorChainClass(DevKitTypeElement typeElement) {
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingContants.CONFIG_NAMESPACE);
-        DefinedClass clazz = pkg._class(NamingContants.NESTED_PROCESSOR_CHAIN_CLASS_NAME, new Class[]{MuleContextAware.class});
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingConstants.CONFIG_NAMESPACE);
+        DefinedClass clazz = pkg._class(NamingConstants.NESTED_PROCESSOR_CHAIN_CLASS_NAME, new Class[]{MuleContextAware.class});
         clazz.role(DefinedClassRoles.NESTED_PROCESSOR_CHAIN);
 
         return clazz;

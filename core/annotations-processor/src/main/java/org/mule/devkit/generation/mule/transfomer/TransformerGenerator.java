@@ -26,7 +26,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.generation.NamingContants;
+import org.mule.devkit.generation.NamingConstants;
 import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitParameterElement;
 import org.mule.devkit.model.DevKitTypeElement;
@@ -184,8 +184,8 @@ public class TransformerGenerator extends AbstractMessageGenerator {
     }
 
     public DefinedClass getTransformerClass(DevKitExecutableElement executableElement) {
-        Package pkg = ctx().getCodeModel()._package(executableElement.parent().getPackageName() + NamingContants.TRANSFORMERS_NAMESPACE);
-        DefinedClass transformer = pkg._class(executableElement.getCapitalizedName() + NamingContants.TRANSFORMER_CLASS_NAME_SUFFIX, AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class});
+        Package pkg = ctx().getCodeModel()._package(executableElement.parent().getPackageName() + NamingConstants.TRANSFORMERS_NAMESPACE);
+        DefinedClass transformer = pkg._class(executableElement.getCapitalizedName() + NamingConstants.TRANSFORMER_CLASS_NAME_SUFFIX, AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class});
 
         return transformer;
     }

@@ -27,7 +27,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.oauth.RestoreAccessTokenCallback;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.generation.NamingContants;
+import org.mule.devkit.generation.NamingConstants;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
@@ -150,8 +150,8 @@ public class DefaultRestoreAccessTokenCallbackGenerator extends AbstractMessageG
     }
 
     private DefinedClass getDefaultRestoreAccessTokenCallbackClass(DevKitTypeElement type) {
-        Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingContants.CONFIG_NAMESPACE);
-        DefinedClass clazz = pkg._class(NamingContants.DEFAULT_RESTORE_ACCESS_TOKEN_CALLBACK_CLASS_NAME, new Class[]{
+        Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.CONFIG_NAMESPACE);
+        DefinedClass clazz = pkg._class(NamingConstants.DEFAULT_RESTORE_ACCESS_TOKEN_CALLBACK_CLASS_NAME, new Class[]{
                 RestoreAccessTokenCallback.class});
 
         clazz.role(DefinedClassRoles.DEFAULT_RESTORE_ACCESS_TOKEN_CALLBACK);

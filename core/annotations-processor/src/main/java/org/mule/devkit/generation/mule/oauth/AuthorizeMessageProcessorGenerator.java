@@ -34,7 +34,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.generation.NamingContants;
+import org.mule.devkit.generation.NamingConstants;
 import org.mule.devkit.generation.adapter.OAuth1AdapterGenerator;
 import org.mule.devkit.generation.adapter.OAuth2AdapterGenerator;
 import org.mule.devkit.model.DevKitTypeElement;
@@ -165,8 +165,8 @@ public class AuthorizeMessageProcessorGenerator extends AbstractMessageGenerator
     }
 
     private DefinedClass getAuthorizeMessageProcessorClass(DevKitTypeElement type) {
-        Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingContants.MESSAGE_PROCESSOR_NAMESPACE);
-        DefinedClass clazz = pkg._class(NamingContants.AUTHORIZE_MESSAGE_PROCESSOR_CLASS_NAME, new Class[]{
+        Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.MESSAGE_PROCESSOR_NAMESPACE);
+        DefinedClass clazz = pkg._class(NamingConstants.AUTHORIZE_MESSAGE_PROCESSOR_CLASS_NAME, new Class[]{
                 Initialisable.class,
                 Startable.class,
                 Disposable.class,

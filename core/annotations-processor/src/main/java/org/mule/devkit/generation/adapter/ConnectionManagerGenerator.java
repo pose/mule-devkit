@@ -31,7 +31,7 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.config.PoolingProfile;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.generation.NamingContants;
+import org.mule.devkit.generation.NamingConstants;
 import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitFieldElement;
 import org.mule.devkit.model.DevKitParameterElement;
@@ -389,12 +389,12 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
     }
 
     private DefinedClass getConnectionManagerAdapterClass(DevKitTypeElement typeElement) {
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingContants.ADAPTERS_NAMESPACE);
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingConstants.ADAPTERS_NAMESPACE);
 
         DefinedClass classToExtend = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
         classToExtend.role(DefinedClassRoles.CONNECTOR_OBJECT, ref(typeElement));
 
-        DefinedClass connectionManagerClass = pkg._class(typeElement.getClassName() + NamingContants.CONNECTION_MANAGER_ADAPTER_CLASS_NAME_SUFFIX);
+        DefinedClass connectionManagerClass = pkg._class(typeElement.getClassName() + NamingConstants.CONNECTION_MANAGER_ADAPTER_CLASS_NAME_SUFFIX);
         connectionManagerClass._implements(ref(Initialisable.class));
         connectionManagerClass._implements(ref(Capabilities.class));
         connectionManagerClass._implements(ref(MuleContextAware.class));
@@ -411,7 +411,7 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
 
     private DefinedClass getConnectionParametersClass(DevKitTypeElement typeElement, DefinedClass connectionManagerClass) {
         try {
-            DefinedClass connectionKey = connectionManagerClass._class(Modifier.PUBLIC | Modifier.STATIC, NamingContants.CONNECTION_KEY_CLASS_NAME_SUFFIX);
+            DefinedClass connectionKey = connectionManagerClass._class(Modifier.PUBLIC | Modifier.STATIC, NamingConstants.CONNECTION_KEY_CLASS_NAME_SUFFIX);
             connectionKey.javadoc().add("A tuple of connection parameters");
             connectionKey.role(DefinedClassRoles.CONNECTION_PARAMETERS, ref(typeElement));
             return connectionKey;
@@ -422,7 +422,7 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
 
     private DefinedClass getConnectorFactoryClass(DefinedClass connectorManagerClass) {
         try {
-            DefinedClass objectFactory = connectorManagerClass._class(Modifier.PRIVATE | Modifier.STATIC, NamingContants.CONNECTION_FACTORY_CLASS_NAME_SUFFIX);
+            DefinedClass objectFactory = connectorManagerClass._class(Modifier.PRIVATE | Modifier.STATIC, NamingConstants.CONNECTION_FACTORY_CLASS_NAME_SUFFIX);
             objectFactory._implements(KeyedPoolableObjectFactory.class);
             return objectFactory;
         } catch (ClassAlreadyExistsException e) {

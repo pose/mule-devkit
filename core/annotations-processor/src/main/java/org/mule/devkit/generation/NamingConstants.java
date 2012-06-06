@@ -16,7 +16,7 @@
  */
 package org.mule.devkit.generation;
 
-public class NamingContants {
+public class NamingConstants {
     public static final String MESSAGE_PROCESSOR_NAMESPACE = ".processors";
     public static final String MESSAGE_SOURCE_NAMESPACE = ".sources";
     public static final String ADAPTERS_NAMESPACE = ".adapters";

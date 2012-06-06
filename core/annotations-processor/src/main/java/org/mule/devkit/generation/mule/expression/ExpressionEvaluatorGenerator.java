@@ -41,7 +41,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.transformer.TransformerException;
 import org.mule.devkit.generation.AbstractMessageGenerator;
-import org.mule.devkit.generation.NamingContants;
+import org.mule.devkit.generation.NamingConstants;
 import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitParameterElement;
 import org.mule.devkit.model.DevKitTypeElement;
@@ -278,8 +278,8 @@ public class ExpressionEvaluatorGenerator extends AbstractMessageGenerator {
     }
 
     private DefinedClass getEvaluatorClass(String name, DevKitTypeElement variableElement) {
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(variableElement.getPackageName() + NamingContants.EXPRESSIONS_NAMESPACE);
-        DefinedClass evaluator = pkg._class(NameUtils.camel(name) + NamingContants.EXPRESSION_EVALUATOR_CLASS_NAME_SUFFIX, new Class<?>[]{org.mule.api.expression.ExpressionEvaluator.class});
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(variableElement.getPackageName() + NamingConstants.EXPRESSIONS_NAMESPACE);
+        DefinedClass evaluator = pkg._class(NameUtils.camel(name) + NamingConstants.EXPRESSION_EVALUATOR_CLASS_NAME_SUFFIX, new Class<?>[]{org.mule.api.expression.ExpressionEvaluator.class});
         evaluator._implements(ref(MuleContextAware.class));
         evaluator._implements(ref(Startable.class));
         evaluator._implements(ref(Stoppable.class));

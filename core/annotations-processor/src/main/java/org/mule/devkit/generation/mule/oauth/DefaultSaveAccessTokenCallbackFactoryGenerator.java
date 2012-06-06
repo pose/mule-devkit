@@ -22,7 +22,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.generation.NamingContants;
+import org.mule.devkit.generation.NamingConstants;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.DefinedClassRoles;
@@ -62,8 +62,8 @@ public class DefaultSaveAccessTokenCallbackFactoryGenerator extends AbstractMess
     }
 
     private DefinedClass getDefaultSaveAccessTokenCallbackFactoryClass(DevKitTypeElement type) {
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingContants.CONFIG_NAMESPACE);
-        DefinedClass clazz = pkg._class(NamingContants.SAVE_ACCESS_TOKEN_CALLBACK_FACTORY_BEAN_CLASS_NAME);
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.CONFIG_NAMESPACE);
+        DefinedClass clazz = pkg._class(NamingConstants.SAVE_ACCESS_TOKEN_CALLBACK_FACTORY_BEAN_CLASS_NAME);
         clazz._extends(ref(MessageProcessorChainFactoryBean.class));
         clazz.role(DefinedClassRoles.DEFAULT_SAVE_ACCESS_TOKEN_FACTORY);
 

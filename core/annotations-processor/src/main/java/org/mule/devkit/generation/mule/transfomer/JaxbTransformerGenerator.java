@@ -25,7 +25,7 @@ import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.devkit.generation.AbstractModuleGenerator;
-import org.mule.devkit.generation.NamingContants;
+import org.mule.devkit.generation.NamingConstants;
 import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitParameterElement;
 import org.mule.devkit.model.DevKitTypeElement;
@@ -199,7 +199,7 @@ public class JaxbTransformerGenerator extends AbstractModuleGenerator {
     private DefinedClass getJaxbTransformerClass(DevKitExecutableElement executableElement, DevKitVariableElement variable) {
         DeclaredType declaredType = (DeclaredType) variable.asType();
         XmlType xmlType = declaredType.asElement().getAnnotation(XmlType.class);
-        Package pkg = ctx().getCodeModel()._package(executableElement.parent().getPackageName() + NamingContants.TRANSFORMERS_NAMESPACE);
+        Package pkg = ctx().getCodeModel()._package(executableElement.parent().getPackageName() + NamingConstants.TRANSFORMERS_NAMESPACE);
 
         return pkg._class(StringUtils.capitalize(xmlType.name()) + "JaxbTransformer", AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class});
     }

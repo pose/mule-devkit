@@ -20,8 +20,7 @@ import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.generation.NamingContants;
-import org.mule.devkit.generation.spring.AbstractBeanDefinitionParserGenerator;
+import org.mule.devkit.generation.NamingConstants;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.DefinedClassRoles;
@@ -68,9 +67,9 @@ public class AuthorizeBeanDefinitionParserGenerator extends AbstractMessageGener
     }
 
     private DefinedClass getAuthorizeBeanDefinitionParserClass(DevKitTypeElement type) {
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingContants.CONFIG_NAMESPACE);
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.CONFIG_NAMESPACE);
         DefinedClass abstractDefinitionParser = ctx().getCodeModel()._class(DefinedClassRoles.ABSTRACT_BEAN_DEFINITION_PARSER);
-        DefinedClass clazz = pkg._class(NamingContants.AUTHORIZE_DEFINITION_PARSER_CLASS_NAME, abstractDefinitionParser);
+        DefinedClass clazz = pkg._class(NamingConstants.AUTHORIZE_DEFINITION_PARSER_CLASS_NAME, abstractDefinitionParser);
         clazz.role(DefinedClassRoles.AUTHORIZE_BEAN_DEFINITION_PARSER);
 
         return clazz;
