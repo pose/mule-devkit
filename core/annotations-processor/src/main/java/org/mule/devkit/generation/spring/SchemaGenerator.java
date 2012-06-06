@@ -520,7 +520,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         // add doc
         Annotation annotation = new Annotation();
         Documentation doc = new Documentation();
-        doc.getContent().add(ctx().getJavaDocUtils().getParameterSummary(variable.getSimpleName().toString(), variable.parent()));
+        doc.getContent().add(variable.parent().getJavaDocParameterSummary(variable.getSimpleName().toString()));
         annotation.getAppinfoOrDocumentation().add(doc);
 
         collectionElement.setAnnotation(annotation);
@@ -566,7 +566,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         // add doc
         Annotation annotation = new Annotation();
         Documentation doc = new Documentation();
-        doc.getContent().add(ctx().getJavaDocUtils().getParameterSummary(variable.getSimpleName().toString(), variable.parent()));
+        doc.getContent().add(variable.parent().getJavaDocParameterSummary(variable.getSimpleName().toString()));
         annotation.getAppinfoOrDocumentation().add(doc);
 
         collectionElement.setAnnotation(annotation);
@@ -1083,7 +1083,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         // add doc
         Annotation annotation = new Annotation();
         Documentation doc = new Documentation();
-        doc.getContent().add(ctx().getJavaDocUtils().getParameterSummary(variable.getSimpleName().toString(), variable.parent()));
+        doc.getContent().add(variable.parent().getJavaDocParameterSummary(variable.getSimpleName().toString()));
         annotation.getAppinfoOrDocumentation().add(doc);
 
         attribute.setAnnotation(annotation);

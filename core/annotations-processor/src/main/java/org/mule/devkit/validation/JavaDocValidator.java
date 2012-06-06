@@ -115,7 +115,7 @@ public class JavaDocValidator implements Validator {
     }
 
     private boolean hasParameterComment(String paramName, DevKitElement element, GeneratorContext context) {
-        String comment = context.getJavaDocUtils().getParameterSummary(paramName, element);
+        String comment = element.getJavaDocParameterSummary(paramName);
         return StringUtils.isNotBlank(comment);
     }
 

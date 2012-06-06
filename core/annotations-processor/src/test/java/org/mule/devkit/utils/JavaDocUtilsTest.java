@@ -79,7 +79,7 @@ public class JavaDocUtilsTest {
                 "     @param name the name\n" +
                 "     @param content the content");
         JavaDocUtils javaDocUtils = new JavaDocUtils(elements);
-        assertEquals("the content", javaDocUtils.getParameterSummary("content", executableElement));
+        assertEquals("the content", executableElement.getJavaDocParameterSummary("content"));
     }
 
     @Test
@@ -91,7 +91,7 @@ public class JavaDocUtilsTest {
                 "     @param content the \n" +
                 "content");
         JavaDocUtils javaDocUtils = new JavaDocUtils(elements);
-        assertEquals("the content", javaDocUtils.getParameterSummary("content", executableElement));
+        assertEquals("the content", executableElement.getJavaDocParameterSummary("content"));
     }
 
     @Test
@@ -102,7 +102,7 @@ public class JavaDocUtilsTest {
                 "     @param name the name\n" +
                 "     @param content the content");
         JavaDocUtils javaDocUtils = new JavaDocUtils(elements);
-        assertTrue(StringUtils.isBlank(javaDocUtils.getParameterSummary("cont", executableElement)));
+        assertTrue(StringUtils.isBlank(executableElement.getJavaDocParameterSummary("cont")));
     }
 
     @Test
@@ -113,7 +113,7 @@ public class JavaDocUtilsTest {
                 "     @param name the name\n" +
                 "     @param content the content");
         JavaDocUtils javaDocUtils = new JavaDocUtils(elements);
-        assertTrue(StringUtils.isBlank(javaDocUtils.getParameterSummary("value", executableElement)));
+        assertTrue(StringUtils.isBlank(executableElement.getJavaDocParameterSummary("value")));
     }
 
     @Test
@@ -124,7 +124,7 @@ public class JavaDocUtilsTest {
                 "     @param name the name\n" +
                 "     @param content");
         JavaDocUtils javaDocUtils = new JavaDocUtils(elements);
-        assertTrue(StringUtils.isBlank(javaDocUtils.getParameterSummary("content", executableElement)));
+        assertTrue(StringUtils.isBlank(executableElement.getJavaDocParameterSummary("content")));
     }
 
     @Test
@@ -136,6 +136,6 @@ public class JavaDocUtilsTest {
                 "     @param transactionId\n" +
                 "              The value of the order's transaction identification number");
         JavaDocUtils javaDocUtils = new JavaDocUtils(elements);
-        assertEquals("The value of the order's transaction identification number", javaDocUtils.getParameterSummary("transactionId", executableElement));
+        assertEquals("The value of the order's transaction identification number", executableElement.getJavaDocParameterSummary("transactionId"));
     }
 }

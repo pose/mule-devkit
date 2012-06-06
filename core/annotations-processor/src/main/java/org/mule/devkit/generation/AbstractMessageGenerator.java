@@ -576,7 +576,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                     type(ref(variable.asType())).
                     name(fieldName).
                     build();
-            field.javadoc().add(ctx().getJavaDocUtils().getParameterSummary(variable.getSimpleName().toString(), variable));
+            field.javadoc().add(variable.getJavaDocParameterSummary(variable.getSimpleName().toString()));
             fields.put(variable.getSimpleName().toString(), new AbstractMessageGenerator.FieldVariableElement(field, fieldType, variable));
         }
         return fields;

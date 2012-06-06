@@ -87,4 +87,6 @@ public interface DevKitElement<T extends Element, P extends DevKitElement> exten
     String getJavaDocSummary();
 
     String getJavaDocTagContent(String tagName);
+
+    String getJavaDocParameterSummary(String paramName);
 }

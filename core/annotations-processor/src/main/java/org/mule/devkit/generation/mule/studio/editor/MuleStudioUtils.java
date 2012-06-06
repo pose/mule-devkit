@@ -311,7 +311,7 @@ public class MuleStudioUtils {
             return formatDescription(description.value());
         }
         if (element instanceof DevKitParameterElement) {
-            return formatDescription(javaDocUtils.getParameterSummary(element.getSimpleName().toString(), element.parent()));
+            return formatDescription(element.parent().getJavaDocParameterSummary(element.getSimpleName().toString()));
         }
         return formatDescription(element.getJavaDocSummary());
     }

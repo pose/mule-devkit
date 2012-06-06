@@ -417,4 +417,58 @@ public class DefaultDevKitElement<T extends Element, P extends DevKitElement> im
 
         return tagContent.toString();
     }
+
+    @Override
+    public String getJavaDocParameterSummary(String paramName) {
+        String comment = elements.getDocComment(innerElement);
+        if (StringUtils.isBlank(comment)) {
+            return null;
+        }
+
+        comment = comment.trim();
+
+        StringBuilder parameterCommentBuilder = new StringBuilder();
+        boolean insideParameter = false;
+        StringTokenizer st = new StringTokenizer(comment, "\n\r");
+        while (st.hasMoreTokens()) {
+            String nextToken = st.nextToken().trim();
+            if (nextToken.startsWith("@param " + paramName + " ") || nextToken.equals("@param " + paramName)) {
+                insideParameter = true;
+            } else if (nextToken.startsWith("@")) {
+                insideParameter = false;
+            }
+            if (insideParameter) {
+                parameterCommentBuilder.append(nextToken).append(" ");
+            }
+        }
+
+        int startIndex = 7 + paramName.length() + 1;
+        if (parameterCommentBuilder.length() < startIndex) {
+            return null;
+        }
+
+        String parameterComment = parameterCommentBuilder.substring(startIndex);
+
+        StringBuilder strippedCommentBuilder = new StringBuilder();
+        boolean insideTag = false;
+        for (int i = 0; i < parameterComment.length(); i++) {
+            if (parameterComment.charAt(i) == '{' &&
+                    parameterComment.charAt(i + 1) == '@') {
+                insideTag = true;
+            } else if (parameterComment.charAt(i) == '}') {
+                insideTag = false;
+            } else {
+                if (!insideTag) {
+                    strippedCommentBuilder.append(parameterComment.charAt(i));
+                }
+            }
+        }
+
+        String strippedComment = strippedCommentBuilder.toString().trim();
+        while (strippedComment.length() > 0 && strippedComment.charAt(strippedComment.length() - 1) == '\n') {
+            strippedComment = StringUtils.chomp(strippedComment);
+        }
+
+        return strippedComment;
+    }
 }
