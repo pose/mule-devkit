@@ -112,10 +112,9 @@ public class PoolAdapterGenerator extends AbstractMessageGenerator {
     }
 
     private DefinedClass getPoolAdapterClass(DevKitTypeElement typeElement) {
-        String poolAdapterName = ctx().getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.POOL_ADAPTER_CLASS_NAME_SUFFIX);
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(poolAdapterName));
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingContants.ADAPTERS_NAMESPACE);
 
-        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(poolAdapterName));
+        DefinedClass clazz = pkg._class(typeElement.getClassName() + NamingContants.POOL_ADAPTER_CLASS_NAME_SUFFIX);
         clazz._implements(Startable.class);
         clazz._implements(Stoppable.class);
         clazz._implements(MuleContextAware.class);

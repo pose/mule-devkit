@@ -75,4 +75,8 @@ public interface DevKitTypeElement extends DevKitElement<TypeElement, DevKitType
     Name getQualifiedName();
 
     String getPathToSourceFile();
+
+    String getPackageName();
+
+    String getClassName();
 }

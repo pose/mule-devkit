@@ -161,7 +161,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         }
 
         // TODO: replace with a class role
-        String namespaceHandlerName = ctx().getNameUtils().generateClassName(typeElement, NamingContants.CONFIG_NAMESPACE, NamingContants.NAMESPACE_HANDLER_CLASS_NAME_SUFFIX);
+        String namespaceHandlerName = ctx().getCodeModel()._class(DefinedClassRoles.NAMESPACE_HANDLER, ref(typeElement)).boxify().fullName();
         String className = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement)).boxify().fullName();
 
         SchemaLocation versionedSchemaLocation = new SchemaLocation(schema, schema.getTargetNamespace(), fileName, versionedLocation, namespaceHandlerName, className);

@@ -435,15 +435,14 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass getRestClientAdapterClass(DevKitTypeElement typeElement) {
-        String restClientAdapterClassName = ctx().getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.REST_CLIENT_ADAPTER_CLASS_NAME_SUFFIX);
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(restClientAdapterClassName));
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingContants.ADAPTERS_NAMESPACE);
         TypeReference previous = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
 
         if (previous == null) {
             previous = (TypeReference) ref(typeElement.asType());
         }
 
-        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(restClientAdapterClassName), previous);
+        DefinedClass clazz = pkg._class(typeElement.getClassName() + NamingContants.REST_CLIENT_ADAPTER_CLASS_NAME_SUFFIX, previous);
         clazz._implements(ref(Initialisable.class));
         clazz._implements(ref(Disposable.class));
         clazz._implements(ref(MuleContextAware.class));

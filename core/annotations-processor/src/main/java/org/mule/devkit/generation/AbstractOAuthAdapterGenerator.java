@@ -83,12 +83,9 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
     public static final String OAUTH_RESTORE_ACCESS_TOKEN_CALLBACK_FIELD_NAME = "oauthRestoreAccessToken";
 
     protected DefinedClass getOAuthAdapterClass(DevKitTypeElement typeElement, String classSuffix, Class<?> interf) {
-        String oauthAdapterName = ctx().getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, classSuffix);
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(oauthAdapterName));
-
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingContants.ADAPTERS_NAMESPACE);
         DefinedClass classToExtend = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
-
-        DefinedClass oauthAdapter = pkg._class(ctx().getNameUtils().getClassName(oauthAdapterName), classToExtend);
+        DefinedClass oauthAdapter = pkg._class(typeElement.getClassName() + classSuffix, classToExtend);
         oauthAdapter._implements(MuleContextAware.class);
         oauthAdapter._implements(Startable.class);
         oauthAdapter._implements(Initialisable.class);

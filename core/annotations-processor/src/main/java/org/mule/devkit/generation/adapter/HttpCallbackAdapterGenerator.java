@@ -104,12 +104,11 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass getHttpCallbackAdapterClass(DevKitTypeElement typeElement) {
-        String httpCallbackAdapterClassName = ctx().getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.HTTP_CALLBACK_ADAPTER_CLASS_NAME_SUFFIX);
-        Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(httpCallbackAdapterClassName));
+        Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingContants.ADAPTERS_NAMESPACE);
 
         DefinedClass classToExtend = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
 
-        DefinedClass oauthAdapter = pkg._class(ctx().getNameUtils().getClassName(httpCallbackAdapterClassName), classToExtend);
+        DefinedClass oauthAdapter = pkg._class(typeElement.getClassName() + NamingContants.HTTP_CALLBACK_ADAPTER_CLASS_NAME_SUFFIX, classToExtend);
         oauthAdapter._implements(ref(Initialisable.class));
 
         oauthAdapter.role(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));

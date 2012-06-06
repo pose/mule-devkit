@@ -61,15 +61,16 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
     }
 
     private DefinedClass getNamespaceHandlerClass(DevKitTypeElement typeElement) {
-        String namespaceHandlerName = ctx().getNameUtils().generateClassName(typeElement, NamingContants.CONFIG_NAMESPACE, NamingContants.NAMESPACE_HANDLER_CLASS_NAME_SUFFIX);
-        Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(namespaceHandlerName));
-        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(namespaceHandlerName), NamespaceHandlerSupport.class);
+        Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingContants.CONFIG_NAMESPACE);
+        DefinedClass clazz = pkg._class(typeElement.getClassName() + NamingContants.NAMESPACE_HANDLER_CLASS_NAME_SUFFIX, NamespaceHandlerSupport.class);
 
         String targetNamespace = typeElement.namespace();
         if (targetNamespace == null || targetNamespace.length() == 0) {
             targetNamespace = SchemaConstants.BASE_NAMESPACE + typeElement.name();
         }
         clazz.javadoc().add("Registers bean definitions parsers for handling elements in <code>" + targetNamespace + "</code>.");
+
+        clazz.role(DefinedClassRoles.NAMESPACE_HANDLER, ref(typeElement));
 
         return clazz;
     }

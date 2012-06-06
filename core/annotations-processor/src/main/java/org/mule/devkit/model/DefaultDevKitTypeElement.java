@@ -310,4 +310,18 @@ public class DefaultDevKitTypeElement extends DefaultDevKitElement<TypeElement, 
         return source.toUri().getPath();
     }
 
+    private String getBinaryName() {
+        return elements.getBinaryName(innerElement).toString();
+    }
+
+    public String getPackageName() {
+        int lastDot = getBinaryName().lastIndexOf('.');
+        return getBinaryName().substring(0, lastDot);
+    }
+
+    public String getClassName() {
+        int lastDot = getBinaryName().lastIndexOf('.');
+        return getBinaryName().substring(lastDot + 1);
+    }
+
 }

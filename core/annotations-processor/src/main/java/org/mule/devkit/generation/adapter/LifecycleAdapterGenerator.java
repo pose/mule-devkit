@@ -90,8 +90,7 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass getLifecycleAdapterClass(DevKitTypeElement typeElement) {
-        String lifecycleAdapterName = ctx().getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.LIFECYCLE_ADAPTER_CLASS_NAME_SUFFIX);
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(lifecycleAdapterName));
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingContants.ADAPTERS_NAMESPACE);
 
         TypeReference previous = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
         if (previous == null) {
@@ -103,7 +102,7 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
             modifiers |= Modifier.ABSTRACT;
         }
 
-        DefinedClass clazz = pkg._class(modifiers, ctx().getNameUtils().getClassName(lifecycleAdapterName), previous);
+        DefinedClass clazz = pkg._class(modifiers, typeElement.getClassName() + NamingContants.LIFECYCLE_ADAPTER_CLASS_NAME_SUFFIX, previous);
 
         clazz.role(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
 

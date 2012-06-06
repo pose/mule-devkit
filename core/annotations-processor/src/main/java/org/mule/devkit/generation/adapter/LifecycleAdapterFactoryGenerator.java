@@ -121,9 +121,8 @@ public class LifecycleAdapterFactoryGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass getLifecycleAdapterFactoryClass(DevKitTypeElement typeElement) {
-        String lifecycleAdapterName = ctx().getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.LIFECYCLE_ADAPTER_FACTORY_CLASS_NAME_SUFFIX);
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(lifecycleAdapterName));
-        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(lifecycleAdapterName));
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingContants.ADAPTERS_NAMESPACE);
+        DefinedClass clazz = pkg._class(typeElement.getClassName() + NamingContants.LIFECYCLE_ADAPTER_FACTORY_CLASS_NAME_SUFFIX);
         clazz._implements(ref(ObjectFactory.class));
 
         clazz.role(DefinedClassRoles.POJO_FACTORY, ref(typeElement));

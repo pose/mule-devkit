@@ -218,16 +218,7 @@ public class NameUtils {
         return packageName + "." + className;
     }
 
-    public String generateClassName(DevKitExecutableElement executableElement, String extraPackage, String append) {
-        String packageName = getPackageName(elements.getBinaryName(executableElement.parent().unwrap()).toString());
-        String className = StringUtils.capitalize(executableElement.getSimpleName().toString()) + append;
-
-        return packageName + extraPackage + "." + className;
-    }
-
     public String generateClassNameInPackage(DevKitElement element, String className) {
-        //Element enclosingElement = element.getEnclosingElement();
-        System.out.println("generateClassNameInPackage: " + element.getClass().getName());
         String packageName;
         if (element instanceof DevKitTypeElement) {
             packageName = getPackageName(getBinaryName((DevKitTypeElement) element));
@@ -252,14 +243,6 @@ public class NameUtils {
 
     public String getBinaryName(DevKitTypeElement typeElement) {
         return elements.getBinaryName(typeElement.unwrap()).toString();
-    }
-
-    public String generateClassName(DevKitTypeElement typeElement, String extraPackage, String classNameAppend) {
-        String typeFullName = getBinaryName(typeElement);
-        String pkg = getPackageName(typeFullName);
-        String className = getClassName(typeFullName);
-
-        return pkg + extraPackage + "." + className + classNameAppend;
     }
 
     private static class Inflection {

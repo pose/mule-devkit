@@ -389,13 +389,12 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
     }
 
     private DefinedClass getConnectionManagerAdapterClass(DevKitTypeElement typeElement) {
-        String connectionManagerName = ctx().getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.CONNECTION_MANAGER_ADAPTER_CLASS_NAME_SUFFIX);
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(connectionManagerName));
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingContants.ADAPTERS_NAMESPACE);
 
         DefinedClass classToExtend = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
         classToExtend.role(DefinedClassRoles.CONNECTOR_OBJECT, ref(typeElement));
 
-        DefinedClass connectionManagerClass = pkg._class(ctx().getNameUtils().getClassName(connectionManagerName));
+        DefinedClass connectionManagerClass = pkg._class(typeElement.getClassName() + NamingContants.CONNECTION_MANAGER_ADAPTER_CLASS_NAME_SUFFIX);
         connectionManagerClass._implements(ref(Initialisable.class));
         connectionManagerClass._implements(ref(Capabilities.class));
         connectionManagerClass._implements(ref(MuleContextAware.class));
