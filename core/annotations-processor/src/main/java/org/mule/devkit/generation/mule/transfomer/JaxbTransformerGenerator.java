@@ -199,8 +199,7 @@ public class JaxbTransformerGenerator extends AbstractModuleGenerator {
     private DefinedClass getJaxbTransformerClass(DevKitExecutableElement executableElement, DevKitVariableElement variable) {
         DeclaredType declaredType = (DeclaredType) variable.asType();
         XmlType xmlType = declaredType.asElement().getAnnotation(XmlType.class);
-        String packageName = ctx().getNameUtils().getPackageName(ctx().getNameUtils().getBinaryName(executableElement.parent())) + NamingContants.TRANSFORMERS_NAMESPACE;
-        Package pkg = ctx().getCodeModel()._package(packageName);
+        Package pkg = ctx().getCodeModel()._package(executableElement.parent().getPackageName() + NamingContants.TRANSFORMERS_NAMESPACE);
 
         return pkg._class(StringUtils.capitalize(xmlType.name()) + "JaxbTransformer", AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class});
     }

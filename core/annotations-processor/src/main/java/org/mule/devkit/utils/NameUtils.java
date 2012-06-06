@@ -211,10 +211,6 @@ public class NameUtils {
         return false;
     }
 
-    public String getBinaryName(DevKitTypeElement typeElement) {
-        return elements.getBinaryName(typeElement.unwrap()).toString();
-    }
-
     private static class Inflection {
         private String pattern;
         private String replacement;
