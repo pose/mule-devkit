@@ -62,6 +62,7 @@ import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.TypeVariable;
 import org.mule.devkit.model.code.Variable;
+import org.mule.devkit.utils.NameUtils;
 import org.mule.expression.ExpressionUtils;
 
 import javax.lang.model.type.TypeKind;
@@ -444,7 +445,7 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
 
     private DefinedClass getEnricherClass(String name, DevKitTypeElement variableElement) {
         org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(variableElement.getPackageName() + NamingContants.EXPRESSIONS_NAMESPACE);
-        DefinedClass enricherClass = pkg._class(ctx().getNameUtils().camel(name) + NamingContants.EXPRESSION_ENRICHER_CLASS_NAME_SUFFIX, new Class<?>[]{org.mule.api.expression.ExpressionEnricher.class});
+        DefinedClass enricherClass = pkg._class(NameUtils.camel(name) + NamingContants.EXPRESSION_ENRICHER_CLASS_NAME_SUFFIX, new Class<?>[]{org.mule.api.expression.ExpressionEnricher.class});
         enricherClass._implements(ref(MuleContextAware.class));
         enricherClass._implements(ref(Startable.class));
         enricherClass._implements(ref(Stoppable.class));

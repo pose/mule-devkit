@@ -20,6 +20,7 @@ package org.mule.devkit.generation.mule.studio;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.utils.NameUtils;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
@@ -55,7 +56,7 @@ public class MuleStudioManifestGenerator extends AbstractMessageGenerator {
         StringBuilder manfiestContentBuilder = new StringBuilder(100);
         manfiestContentBuilder.append("Manifest-Version: 1.0\n");
         manfiestContentBuilder.append("Bundle-ManifestVersion: 2\n");
-        manfiestContentBuilder.append("Bundle-Name: ").append(ctx().getNameUtils().friendlyNameFromCamelCase(typeElement.name())).append("\n");
+        manfiestContentBuilder.append("Bundle-Name: ").append(NameUtils.friendlyNameFromCamelCase(typeElement.name())).append("\n");
         manfiestContentBuilder.append("Bundle-SymbolicName: " + MuleStudioFeatureGenerator.STUDIO_PREFIX).append(typeElement.name()).append(";singleton:=true\n");
         manfiestContentBuilder.append("Bundle-Version: %VERSION%\n");
         manfiestContentBuilder.append("Bundle-Activator: org.mule.tooling.ui.contribution.Activator\n");

@@ -56,11 +56,6 @@ public class MuleStudioUtils {
 
     private static final String IMAGE_PREFIX = "icons/large/";
     private static final String ICON_PREFIX = "icons/small/";
-    private NameUtils nameUtils;
-
-    public MuleStudioUtils(GeneratorContext context) {
-        nameUtils = context.getNameUtils();
-    }
 
     public String formatCaption(String caption) {
         return WordUtils.capitalizeFully(caption);
@@ -259,7 +254,7 @@ public class MuleStudioUtils {
         if (attributeType instanceof StringAttributeType && !SchemaTypeConversion.isSupported(variableElement.asType().toString())) {
             attributeType.setName(parameterName + SchemaGenerator.REF_SUFFIX);
         } else if (attributeType instanceof FlowRefType) {
-            attributeType.setName(nameUtils.uncamel(parameterName) + SchemaGenerator.FLOW_REF_SUFFIX);
+            attributeType.setName(NameUtils.uncamel(parameterName) + SchemaGenerator.FLOW_REF_SUFFIX);
         } else {
             attributeType.setName(parameterName);
         }
@@ -285,9 +280,9 @@ public class MuleStudioUtils {
 
     public String getLocalId(DevKitExecutableElement executableElement, DevKitVariableElement variableElement) {
         if (executableElement != null) {
-            return nameUtils.uncamel(executableElement.getSimpleName().toString()) + '-' + nameUtils.uncamel(variableElement.getSimpleName().toString());
+            return NameUtils.uncamel(executableElement.getSimpleName().toString()) + '-' + NameUtils.uncamel(variableElement.getSimpleName().toString());
         } else {
-            return "configurable-" + nameUtils.uncamel(variableElement.getSimpleName().toString());
+            return "configurable-" + NameUtils.uncamel(variableElement.getSimpleName().toString());
         }
     }
 
@@ -299,7 +294,7 @@ public class MuleStudioUtils {
         } else {
             localId = executableElement.getSimpleName().toString();
         }
-        return nameUtils.uncamel(localId);
+        return NameUtils.uncamel(localId);
     }
 
     public String getFormattedDescription(DevKitVariableElement element) {
@@ -336,7 +331,7 @@ public class MuleStudioUtils {
         if (caption != null && StringUtils.isNotBlank(caption.value())) {
             return caption.value();
         }
-        String friendlyName = nameUtils.friendlyNameFromCamelCase(element.getSimpleName().toString());
+        String friendlyName = NameUtils.friendlyNameFromCamelCase(element.getSimpleName().toString());
         if (element.isHttpCallback()) {
             return formatCaption(friendlyName + " Flow");
         }
@@ -355,7 +350,7 @@ public class MuleStudioUtils {
         if(source != null && StringUtils.isNotBlank(source.friendlyName())) {
             return source.friendlyName();
         }
-        return nameUtils.friendlyNameFromCamelCase(element.getSimpleName().toString());
+        return NameUtils.friendlyNameFromCamelCase(element.getSimpleName().toString());
     }
 
     public boolean isKnownType(DevKitVariableElement variable) {

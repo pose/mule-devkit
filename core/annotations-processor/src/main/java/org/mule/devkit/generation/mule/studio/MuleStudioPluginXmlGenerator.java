@@ -22,6 +22,7 @@ import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.mule.studio.editor.MuleStudioEditorXmlGenerator;
 import org.mule.devkit.generation.spring.SchemaGenerator;
 import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.utils.NameUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -69,7 +70,7 @@ public class MuleStudioPluginXmlGenerator extends AbstractMessageGenerator {
             externalContributionElement.setAttribute("contributionType", "cloud-connector");
             externalContributionElement.setAttribute("path", MuleStudioEditorXmlGenerator.EDITOR_XML_FILE_NAME);
             externalContributionElement.setAttribute("version", "%PROJECT_VERSION%");
-            externalContributionElement.setAttribute("name", ctx().getNameUtils().friendlyNameFromCamelCase(typeElement.name()));
+            externalContributionElement.setAttribute("name", NameUtils.friendlyNameFromCamelCase(typeElement.name()));
 
             extensionElement.appendChild(externalContributionElement);
 

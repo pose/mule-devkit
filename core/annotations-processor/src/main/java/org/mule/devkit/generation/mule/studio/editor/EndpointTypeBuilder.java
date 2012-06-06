@@ -22,6 +22,7 @@ import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.EndpointType;
+import org.mule.devkit.utils.NameUtils;
 
 import java.util.Collection;
 
@@ -63,6 +64,6 @@ public class EndpointTypeBuilder extends BaseStudioXmlBuilder {
     }
 
     protected String getLocalId() {
-        return nameUtils.uncamel(executableElement.getSimpleName().toString());
+        return NameUtils.uncamel(executableElement.getSimpleName().toString());
     }
 }

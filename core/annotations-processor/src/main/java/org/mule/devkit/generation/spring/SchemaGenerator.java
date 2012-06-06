@@ -67,6 +67,7 @@ import org.mule.devkit.model.schema.TopLevelComplexType;
 import org.mule.devkit.model.schema.TopLevelElement;
 import org.mule.devkit.model.schema.TopLevelSimpleType;
 import org.mule.devkit.model.schema.Union;
+import org.mule.devkit.utils.NameUtils;
 import org.mule.util.StringUtils;
 
 import javax.inject.Inject;
@@ -324,7 +325,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
     private void registerTransformers(Schema schema, DevKitTypeElement typeElement) {
         for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Transformer.class)) {
-            Element transformerElement = registerTransformer(ctx().getNameUtils().uncamel(method.getSimpleName().toString()));
+            Element transformerElement = registerTransformer(NameUtils.uncamel(method.getSimpleName().toString()));
             schema.getSimpleTypeOrComplexTypeOrGroup().add(transformerElement);
         }
     }
@@ -366,7 +367,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
     private void registerProcessorElement(Schema schema, boolean intercepting, String targetNamespace, String name, String typeName, String docText) {
         Element element = new TopLevelElement();
-        element.setName(ctx().getNameUtils().uncamel(name));
+        element.setName(NameUtils.uncamel(name));
         if (intercepting) {
             element.setSubstitutionGroup(SchemaConstants.MULE_ABSTRACT_INTERCEPTING_MESSAGE_PROCESSOR);
         } else {
@@ -387,7 +388,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
     private void registerSourceElement(Schema schema, String targetNamespace, String name, String typeName, DevKitExecutableElement executableElement) {
         Element element = new TopLevelElement();
-        element.setName(ctx().getNameUtils().uncamel(name));
+        element.setName(NameUtils.uncamel(name));
         element.setSubstitutionGroup(SchemaConstants.MULE_ABSTRACT_INBOUND_ENDPOINT);
         element.setType(new QName(targetNamespace, typeName));
 
@@ -503,7 +504,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         TopLevelElement collectionElement = new TopLevelElement();
         all.getParticle().add(objectFactory.createElement(collectionElement));
-        collectionElement.setName(ctx().getNameUtils().uncamel(variable.getSimpleName().toString()));
+        collectionElement.setName(NameUtils.uncamel(variable.getSimpleName().toString()));
 
         if (optional != null) {
             collectionElement.setMinOccurs(BigInteger.valueOf(0L));
@@ -551,7 +552,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         TopLevelElement collectionElement = new TopLevelElement();
         all.getParticle().add(objectFactory.createElement(collectionElement));
-        collectionElement.setName(ctx().getNameUtils().uncamel(variable.getSimpleName().toString()));
+        collectionElement.setName(NameUtils.uncamel(variable.getSimpleName().toString()));
 
         if (!forceOptional) {
             if (optional != null) {
@@ -572,7 +573,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         collectionElement.setAnnotation(annotation);
 
-        String collectionName = ctx().getNameUtils().uncamel(ctx().getNameUtils().singularize(collectionElement.getName()));
+        String collectionName = NameUtils.uncamel(NameUtils.singularize(collectionElement.getName()));
         LocalComplexType collectionComplexType = generateCollectionComplexType(schema, targetNamespace, collectionName, variable);
         collectionElement.setComplexType(collectionComplexType);
     }
@@ -1073,7 +1074,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             javax.lang.model.element.Element enumElement = ctx().getTypeUtils().asElement(variable.asType());
             attribute.setType(new QName(schema.getTargetNamespace(), enumElement.getSimpleName() + ENUM_TYPE_SUFFIX));
         } else if (variable.isHttpCallback()) {
-            attribute.setName(ctx().getNameUtils().uncamel(name) + FLOW_REF_SUFFIX);
+            attribute.setName(NameUtils.uncamel(name) + FLOW_REF_SUFFIX);
             attribute.setType(SchemaConstants.STRING);
         } else {
             // non-supported types will get "-ref" so beans can be injected

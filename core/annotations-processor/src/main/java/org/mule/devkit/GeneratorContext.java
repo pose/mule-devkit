@@ -48,7 +48,6 @@ public class GeneratorContext {
     private List<DefinedClass> registerAtBoot;
     private Types types;
     private Elements elements;
-    private NameUtils nameUtils;
     private Map<String, String> options;
     private Set<TypeMirror> registeredEnums;
     private Map<String, String> envOptions;
@@ -60,7 +59,6 @@ public class GeneratorContext {
         schemaModel = new SchemaModel(new FilerCodeWriter(env.getFiler()));
         elements = env.getElementUtils();
         types = env.getTypeUtils();
-        nameUtils = new NameUtils(this.elements);
         studioModel = new StudioModel(new FilerCodeWriter(env.getFiler()));
         options = env.getOptions();
         registeredEnums = new HashSet<TypeMirror>();
@@ -87,10 +85,6 @@ public class GeneratorContext {
 
     public Types getTypeUtils() {
         return types;
-    }
-
-    public NameUtils getNameUtils() {
-        return nameUtils;
     }
 
     public StudioModel getStudioModel() {

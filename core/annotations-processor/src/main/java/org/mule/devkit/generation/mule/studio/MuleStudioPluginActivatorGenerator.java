@@ -36,7 +36,8 @@ import org.osgi.framework.BundleContext;
 public class MuleStudioPluginActivatorGenerator extends AbstractMessageGenerator {
 
     public static final String ACTIVATOR_PATH = "org/mule/tooling/ui/contribution/Activator.class";
-    private static final String ACTIVATOR_FQN = "org.mule.tooling.ui.contribution.Activator";
+    private static final String ACTIVATOR_PACKAGE = "org.mule.tooling.ui.contribution";
+    private static final String ACTIVATOR_CLASS_NAME = "Activator";
 
     @Override
     public boolean shouldGenerate(DevKitTypeElement typeElement) {
@@ -54,7 +55,7 @@ public class MuleStudioPluginActivatorGenerator extends AbstractMessageGenerator
                 type(String.class).
                 name("PLUGIN_ID").
                 initialValue("org.mule.tooling.ui.contribution." + typeElement.name()).build();
-        TypeReference activatorTypeRef = ctx().getCodeModel().directClass(ACTIVATOR_FQN);
+        TypeReference activatorTypeRef = ctx().getCodeModel().directClass(ACTIVATOR_PACKAGE + "." + ACTIVATOR_CLASS_NAME);
         FieldVariable plugin = new FieldBuilder(activatorClass).staticField().type(activatorTypeRef).name("plugin").build();
 
         generateStartMethod(activatorClass, plugin);
@@ -66,11 +67,9 @@ public class MuleStudioPluginActivatorGenerator extends AbstractMessageGenerator
     }
 
     private DefinedClass getActivatorClass() {
-        NameUtils nameUtils = ctx().getNameUtils();
-        String activatorFQN = ACTIVATOR_FQN;
-        Package pkg = ctx().getCodeModel()._package(nameUtils.getPackageName(activatorFQN));
+        Package pkg = ctx().getCodeModel()._package(ACTIVATOR_PACKAGE);
         DefinedClass clazz;
-        clazz = pkg._class(ctx().getNameUtils().getClassName(activatorFQN));
+        clazz = pkg._class(ACTIVATOR_CLASS_NAME);
         clazz._extends(AbstractUIPlugin.class);
         return clazz;
     }

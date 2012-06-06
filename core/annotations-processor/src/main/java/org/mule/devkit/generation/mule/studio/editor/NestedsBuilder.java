@@ -34,6 +34,7 @@ import org.mule.devkit.model.studio.NestedElementReference;
 import org.mule.devkit.model.studio.NestedElementType;
 import org.mule.devkit.model.studio.StringAttributeType;
 import org.mule.devkit.model.studio.TextType;
+import org.mule.devkit.utils.NameUtils;
 
 import javax.lang.model.type.DeclaredType;
 import javax.xml.bind.JAXBElement;
@@ -71,17 +72,17 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
                     secondLevelNestedElement = createSecondLevelNestedElement(variableElement, childElement);
                     handleSimpleMap(variableElement, secondLevelNestedElement);
                     if (isListOfMaps(variableElement)) {
-                        childElement.setName(nameUtils.singularize(childElement.getName()));
+                        childElement.setName(NameUtils.singularize(childElement.getName()));
                         thirdLevelNestedElement = new NestedElementType();
-                        thirdLevelNestedElement.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(variableElement.getSimpleName().toString())));
-                        thirdLevelNestedElement.setLocalId(nameUtils.singularize(localId));
-                        thirdLevelNestedElement.setXmlname(nameUtils.uncamel(nameUtils.singularize(variableElement.getSimpleName().toString())));
-                        thirdLevelNestedElement.setDescription(helper.formatDescription(nameUtils.friendlyNameFromCamelCase(variableElement.getSimpleName().toString())));
+                        thirdLevelNestedElement.setCaption(helper.formatCaption(NameUtils.friendlyNameFromCamelCase(variableElement.getSimpleName().toString())));
+                        thirdLevelNestedElement.setLocalId(NameUtils.singularize(localId));
+                        thirdLevelNestedElement.setXmlname(NameUtils.uncamel(NameUtils.singularize(variableElement.getSimpleName().toString())));
+                        thirdLevelNestedElement.setDescription(helper.formatDescription(NameUtils.friendlyNameFromCamelCase(variableElement.getSimpleName().toString())));
                         thirdLevelNestedElement.setIcon(getIcon());
                         thirdLevelNestedElement.setImage(getImage());
-                        NestedElementReference childElement1 = createChildElement(variableElement, SchemaGenerator.INNER_PREFIX + nameUtils.singularize(localId));
-                        childElement1.setCaption(nameUtils.singularize(childElement1.getCaption()));
-                        childElement1.setDescription(nameUtils.singularize(childElement1.getDescription()));
+                        NestedElementReference childElement1 = createChildElement(variableElement, SchemaGenerator.INNER_PREFIX + NameUtils.singularize(localId));
+                        childElement1.setCaption(NameUtils.singularize(childElement1.getCaption()));
+                        childElement1.setDescription(NameUtils.singularize(childElement1.getDescription()));
                         thirdLevelNestedElement.getRegexpOrEncodingOrString().add(helper.createJAXBElement(childElement1));
                     }
                 }
@@ -173,8 +174,8 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
         textType.setIsToElement(true);
         attributeTypeForListValues = textType;
 
-        attributeTypeForListValues.setName(nameUtils.singularize(localId));
-        attributeTypeForListValues.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
+        attributeTypeForListValues.setName(NameUtils.singularize(localId));
+        attributeTypeForListValues.setCaption(helper.formatCaption(NameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
         if (executableElement != null) {
             attributeTypeForListValues.setDescription(helper.formatDescription(executableElement.getJavaDocParameterSummary(parameter.getSimpleName().toString())));
         } else {
@@ -185,16 +186,16 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
 
     private NestedElementType createSecondLevelNestedElement(DevKitVariableElement parameter, NestedElementReference childElement) {
         NestedElementType nestedElement = new NestedElementType();
-        nestedElement.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
+        nestedElement.setCaption(helper.formatCaption(NameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
         String localIdSuffix = childElement.getName().substring(childElement.getName().lastIndexOf('/') + 1);
         if (isListOfMaps(parameter)) {
-            nestedElement.setLocalId(SchemaGenerator.INNER_PREFIX + nameUtils.singularize(localIdSuffix));
-            nestedElement.setXmlname(SchemaGenerator.INNER_PREFIX + nameUtils.uncamel(nameUtils.singularize(parameter.getSimpleName().toString())));
+            nestedElement.setLocalId(SchemaGenerator.INNER_PREFIX + NameUtils.singularize(localIdSuffix));
+            nestedElement.setXmlname(SchemaGenerator.INNER_PREFIX + NameUtils.uncamel(NameUtils.singularize(parameter.getSimpleName().toString())));
         } else {
             nestedElement.setLocalId(localIdSuffix);
-            nestedElement.setXmlname(nameUtils.uncamel(nameUtils.singularize(parameter.getSimpleName().toString())));
+            nestedElement.setXmlname(NameUtils.uncamel(NameUtils.singularize(parameter.getSimpleName().toString())));
         }
-        nestedElement.setDescription(helper.formatDescription(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
+        nestedElement.setDescription(helper.formatDescription(NameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
         nestedElement.setIcon(getIcon());
         nestedElement.setImage(getImage());
         return nestedElement;
@@ -203,9 +204,9 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
     private NestedElementType createFirstLevelNestedElement(DevKitVariableElement parameter, String localId) {
         NestedElementType nestedElement = new NestedElementType();
         nestedElement.setLocalId(localId);
-        nestedElement.setXmlname(nameUtils.uncamel(parameter.getSimpleName().toString()));
-        nestedElement.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
-        nestedElement.setDescription(helper.formatDescription(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
+        nestedElement.setXmlname(NameUtils.uncamel(parameter.getSimpleName().toString()));
+        nestedElement.setCaption(helper.formatCaption(NameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
+        nestedElement.setDescription(helper.formatDescription(NameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
         nestedElement.setIcon(getIcon());
         nestedElement.setImage(getImage());
 
@@ -248,13 +249,13 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
 
     private NestedElementReference createChildElement(DevKitVariableElement parameter, String localId) {
         NestedElementReference childElement = new NestedElementReference();
-        String parameterFriendlyName = nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString());
+        String parameterFriendlyName = NameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString());
         if (isListOfMaps(parameter)) {
             childElement.setName(MuleStudioEditorXmlGenerator.URI_PREFIX + moduleName + '/' + localId);
-            childElement.setDescription(helper.formatDescription(nameUtils.singularize(parameterFriendlyName)));
-            childElement.setCaption(helper.formatCaption(nameUtils.singularize(parameterFriendlyName)));
+            childElement.setDescription(helper.formatDescription(NameUtils.singularize(parameterFriendlyName)));
+            childElement.setCaption(helper.formatCaption(NameUtils.singularize(parameterFriendlyName)));
         } else {
-            String singularizedLocalId = nameUtils.singularize(localId);
+            String singularizedLocalId = NameUtils.singularize(localId);
             if (localId.equals(singularizedLocalId)) {
                 singularizedLocalId += "-each";
             }

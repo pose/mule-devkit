@@ -20,6 +20,7 @@ package org.mule.devkit.generation.mule.studio;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.utils.NameUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -53,7 +54,7 @@ public class MuleStudioFeatureGenerator extends AbstractMessageGenerator {
 
             Element feature = document.createElement("feature");
             feature.setAttribute("id", STUDIO_PREFIX + typeElement.name());
-            feature.setAttribute("label", ctx().getNameUtils().friendlyNameFromCamelCase(typeElement.name()) + LABEL_SUFFIX);
+            feature.setAttribute("label", NameUtils.friendlyNameFromCamelCase(typeElement.name()) + LABEL_SUFFIX);
             feature.setAttribute("version", "%VERSION%");
             feature.setAttribute("provider-name", "Mulesoft, Inc.");
             document.appendChild(feature);

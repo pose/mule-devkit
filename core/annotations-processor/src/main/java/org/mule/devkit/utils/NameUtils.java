@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class NameUtils {
-    private Elements elements;
 
     private static final List<Inflection> plural = new ArrayList<Inflection>();
     private static final List<Inflection> singular = new ArrayList<Inflection>();
@@ -100,10 +99,6 @@ public class NameUtils {
         uncountable("sheep");
     }
 
-    public NameUtils(Elements elements) {
-        this.elements = elements;
-    }
-
     private static void plural(String pattern, String replacement) {
         plural.add(0, new Inflection(pattern, replacement));
     }
@@ -121,7 +116,7 @@ public class NameUtils {
         uncountable.add(word);
     }
 
-    public String camel(String uncamelCaseName) {
+    public static String camel(String uncamelCaseName) {
         String result = "";
         String[] parts = uncamelCaseName.split("-");
 
@@ -133,7 +128,7 @@ public class NameUtils {
     }
 
 
-    public String uncamel(String camelCaseName) {
+    public static String uncamel(String camelCaseName) {
         String result = "";
         String[] parts = camelCaseName.split("(?<!^)(?=[A-Z])");
 
@@ -144,18 +139,8 @@ public class NameUtils {
         return result;
     }
 
-    public String friendlyNameFromCamelCase(String camelCaseName) {
+    public static String friendlyNameFromCamelCase(String camelCaseName) {
         return StringUtils.capitalize(uncamel(camelCaseName)).replaceAll("-", " ");
-    }
-
-    public String getClassName(String fullyQualifiedClassName) {
-        int lastDot = fullyQualifiedClassName.lastIndexOf('.');
-        return fullyQualifiedClassName.substring(lastDot + 1);
-    }
-
-    public String getPackageName(String fullyQualifiedClassName) {
-        int lastDot = fullyQualifiedClassName.lastIndexOf('.');
-        return fullyQualifiedClassName.substring(0, lastDot);
     }
 
     /**
@@ -164,7 +149,7 @@ public class NameUtils {
      * @param word The word
      * @return The pluralized word
      */
-    public String pluralize(String word) {
+    public static String pluralize(String word) {
         if (isUncountable(word)) {
             return word;
         } else {
@@ -183,7 +168,7 @@ public class NameUtils {
      * @param word The word
      * @return The singularized word
      */
-    public String singularize(String word) {
+    public static String singularize(String word) {
         if (isUncountable(word)) {
             return word;
         } else {
@@ -202,7 +187,7 @@ public class NameUtils {
      * @param word The word
      * @return True if it is uncountable
      */
-    public boolean isUncountable(String word) {
+    public static boolean isUncountable(String word) {
         for (String w : uncountable) {
             if (w.equalsIgnoreCase(word)) {
                 return true;

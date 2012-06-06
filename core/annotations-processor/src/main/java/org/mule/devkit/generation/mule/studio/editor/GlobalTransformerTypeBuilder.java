@@ -23,6 +23,7 @@ import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.GlobalType;
 import org.mule.devkit.model.studio.Group;
+import org.mule.devkit.utils.NameUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +66,7 @@ public class GlobalTransformerTypeBuilder extends GlobalTypeBuilder {
     }
 
     protected String getLocalIdBasedOnType() {
-        return nameUtils.uncamel(executableElement.getSimpleName().toString());
+        return NameUtils.uncamel(executableElement.getSimpleName().toString());
     }
 
     protected String getCaptionBasedOnType() {

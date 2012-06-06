@@ -52,6 +52,7 @@ import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
+import org.mule.devkit.utils.NameUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -311,7 +312,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             } else if (variable.isEnum()) {
                 generateParseProperty(parse.body(), element, builder, fieldName);
             } else if (variable.asType().toString().startsWith(HttpCallback.class.getName())) {
-                Variable callbackFlowName = parse.body().decl(ref(String.class), fieldName + "CallbackFlowName", ExpressionFactory.invoke("getAttributeValue").arg(element).arg(ctx().getNameUtils().uncamel(fieldName) + "-flow-ref"));
+                Variable callbackFlowName = parse.body().decl(ref(String.class), fieldName + "CallbackFlowName", ExpressionFactory.invoke("getAttributeValue").arg(element).arg(NameUtils.uncamel(fieldName) + "-flow-ref"));
                 Block block = parse.body()._if(Op.ne(callbackFlowName, ExpressionFactory._null()))._then();
                 block.invoke(builder, "addPropertyValue").arg(fieldName + "CallbackFlow").arg(ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(callbackFlowName));
             } else {
@@ -362,17 +363,17 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                 .arg(element)
                 .arg(builder)
                 .arg(fieldName)
-                .arg(ctx().getNameUtils().uncamel(fieldName))
-                .arg(ctx().getNameUtils().uncamel(ctx().getNameUtils().singularize(fieldName)));
+                .arg(NameUtils.uncamel(fieldName))
+                .arg(NameUtils.uncamel(NameUtils.singularize(fieldName)));
 
         if (variable.hasTypeArguments()) {
             DevKitElement typeArgument = (DevKitElement) variable.getTypeArguments().get(0);
 
             if (typeArgument.isArrayOrList()) {
-                String innerChildElementName = "inner-" + ctx().getNameUtils().uncamel(ctx().getNameUtils().singularize(fieldName));
+                String innerChildElementName = "inner-" + NameUtils.uncamel(NameUtils.singularize(fieldName));
                 parseListAndSetProperty.arg(ExpressionFactory._new(generateParserDelegateForList(innerChildElementName)));
             } else if (typeArgument.isMap()) {
-                String innerChildElementName = "inner-" + ctx().getNameUtils().uncamel(ctx().getNameUtils().singularize(fieldName));
+                String innerChildElementName = "inner-" + NameUtils.uncamel(NameUtils.singularize(fieldName));
                 parseListAndSetProperty.arg(ExpressionFactory._new(generateParserDelegateForMap(innerChildElementName)));
             } else {
                 parseListAndSetProperty.arg(ExpressionFactory._new(generateParserDelegateForTextContent()));
@@ -387,17 +388,17 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                 .arg(element)
                 .arg(builder)
                 .arg(fieldName)
-                .arg(ctx().getNameUtils().uncamel(fieldName))
-                .arg(ctx().getNameUtils().uncamel(ctx().getNameUtils().singularize(fieldName)));
+                .arg(NameUtils.uncamel(fieldName))
+                .arg(NameUtils.uncamel(NameUtils.singularize(fieldName)));
 
         if (variable.hasTypeArguments()) {
             DevKitElement typeArgument = (DevKitElement) variable.getTypeArguments().get(0);
 
             if (typeArgument.isArrayOrList()) {
-                String innerChildElementName = "inner-" + ctx().getNameUtils().uncamel(ctx().getNameUtils().singularize(fieldName));
+                String innerChildElementName = "inner-" + NameUtils.uncamel(NameUtils.singularize(fieldName));
                 parseMapAndSetProperty.arg(ExpressionFactory._new(generateParserDelegateForList(innerChildElementName)));
             } else if (typeArgument.isMap()) {
-                String innerChildElementName = "inner-" + ctx().getNameUtils().uncamel(ctx().getNameUtils().singularize(fieldName));
+                String innerChildElementName = "inner-" + NameUtils.uncamel(NameUtils.singularize(fieldName));
                 parseMapAndSetProperty.arg(ExpressionFactory._new(generateParserDelegateForMap(innerChildElementName)));
             } else {
                 parseMapAndSetProperty.arg(ExpressionFactory._new(generateParserDelegateForTextContent()));
@@ -418,7 +419,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         } else {
             block.invoke(isList ? "parseNestedProcessorAsListAndSetProperty" : "parseNestedProcessorAndSetProperty")
                     .arg(element)
-                    .arg(ctx().getNameUtils().uncamel(fieldName))
+                    .arg(NameUtils.uncamel(fieldName))
                     .arg(parserContext)
                     .arg(factoryBean.dotclass())
                     .arg(builder)
@@ -433,7 +434,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
         block.assign(xmlElement, ref(DomUtils.class).staticInvoke("getChildElementByTagName")
                 .arg(element)
-                .arg(ctx().getNameUtils().uncamel(fieldName)));
+                .arg(NameUtils.uncamel(fieldName)));
 
         Conditional xmlElementNotNull = block._if(Op.ne(xmlElement, ExpressionFactory._null()));
 

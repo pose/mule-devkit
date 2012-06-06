@@ -38,6 +38,7 @@ import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Package;
 import org.mule.devkit.model.schema.SchemaConstants;
+import org.mule.devkit.utils.NameUtils;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
@@ -99,7 +100,7 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
     private void registerBeanDefinitionParserForEachTransformer(DevKitTypeElement typeElement, Method init) {
         for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Transformer.class)) {
             Invocation registerMuleBeanDefinitionParser = init.body().invoke("registerBeanDefinitionParser");
-            registerMuleBeanDefinitionParser.arg(ExpressionFactory.lit(ctx().getNameUtils().uncamel(executableElement.getSimpleName().toString())));
+            registerMuleBeanDefinitionParser.arg(ExpressionFactory.lit(NameUtils.uncamel(executableElement.getSimpleName().toString())));
             String transformerClassName = typeElement.getPackageName() + NamingContants.TRANSFORMERS_NAMESPACE + "." + executableElement.getCapitalizedName() + NamingContants.TRANSFORMER_CLASS_NAME_SUFFIX;
             registerMuleBeanDefinitionParser.arg(ExpressionFactory._new(ref(MessageProcessorDefinitionParser.class)).arg(ref(transformerClassName).boxify().dotclass()));
         }
@@ -114,7 +115,7 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
             elementName = processor.name();
         }
 
-        init.body().invoke("registerBeanDefinitionParser").arg(ExpressionFactory.lit(ctx().getNameUtils().uncamel(elementName))).arg(ExpressionFactory._new(beanDefinitionParser));
+        init.body().invoke("registerBeanDefinitionParser").arg(ExpressionFactory.lit(NameUtils.uncamel(elementName))).arg(ExpressionFactory._new(beanDefinitionParser));
     }
 
     private void registerBeanDefinitionParserForSource(Method init, DevKitExecutableElement executableElement) {
@@ -126,6 +127,6 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
             elementName = source.name();
         }
 
-        init.body().invoke("registerBeanDefinitionParser").arg(ExpressionFactory.lit(ctx().getNameUtils().uncamel(elementName))).arg(ExpressionFactory._new(beanDefinitionParser));
+        init.body().invoke("registerBeanDefinitionParser").arg(ExpressionFactory.lit(NameUtils.uncamel(elementName))).arg(ExpressionFactory._new(beanDefinitionParser));
     }
 }

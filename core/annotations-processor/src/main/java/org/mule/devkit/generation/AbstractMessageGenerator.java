@@ -440,7 +440,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
     protected DefinedClass getMessageProcessorClass(String className, String packageName) {
         org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(packageName);
-        DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(className), new Class[]{
+        DefinedClass clazz = pkg._class(className, new Class[]{
                 Initialisable.class,
                 Startable.class,
                 Disposable.class,

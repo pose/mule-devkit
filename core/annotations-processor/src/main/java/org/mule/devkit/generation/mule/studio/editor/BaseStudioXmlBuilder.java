@@ -58,7 +58,6 @@ public abstract class BaseStudioXmlBuilder {
     protected MuleStudioUtils helper;
     protected DevKitTypeElement typeElement;
     protected DevKitExecutableElement executableElement;
-    protected NameUtils nameUtils;
     protected Types typeUtils;
     protected String moduleName;
     protected GeneratorContext context;
@@ -66,9 +65,8 @@ public abstract class BaseStudioXmlBuilder {
 
     protected BaseStudioXmlBuilder(GeneratorContext context) {
         this.context = context;
-        nameUtils = context.getNameUtils();
         typeUtils = context.getTypeUtils();
-        helper = new MuleStudioUtils(context);
+        helper = new MuleStudioUtils();
         objectFactory = new ObjectFactory();
     }
 
@@ -267,13 +265,13 @@ public abstract class BaseStudioXmlBuilder {
         NestedElementReference childElement = new NestedElementReference();
         String prefix;
         if (executableElement != null) {
-            prefix = nameUtils.uncamel(executableElement.getSimpleName().toString());
+            prefix = NameUtils.uncamel(executableElement.getSimpleName().toString());
             childElement.setDescription(helper.formatDescription(executableElement.getJavaDocParameterSummary(parameter.getSimpleName().toString())));
         } else {
             prefix = "configurable";
             childElement.setDescription(helper.formatDescription(parameter.getJavaDocSummary()));
         }
-        childElement.setName(MuleStudioEditorXmlGenerator.URI_PREFIX + moduleName + '/' + prefix + '-' + nameUtils.uncamel(parameter.getSimpleName().toString()));
+        childElement.setName(MuleStudioEditorXmlGenerator.URI_PREFIX + moduleName + '/' + prefix + '-' + NameUtils.uncamel(parameter.getSimpleName().toString()));
         childElement.setAllowMultiple(false);
         childElement.setCaption(helper.getFormattedCaption(parameter));
         childElement.setInplace(true);
