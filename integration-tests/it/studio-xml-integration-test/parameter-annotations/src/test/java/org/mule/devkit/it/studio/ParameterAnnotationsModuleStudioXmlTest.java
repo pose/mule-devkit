@@ -16,9 +16,6 @@
  */
 package org.mule.devkit.it.studio;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;

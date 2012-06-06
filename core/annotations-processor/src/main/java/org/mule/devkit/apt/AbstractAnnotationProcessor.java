@@ -18,13 +18,13 @@
 package org.mule.devkit.apt;
 
 import com.sun.source.util.Trees;
-import org.mule.devkit.Context;
-import org.mule.devkit.GenerationException;
-import org.mule.devkit.Generator;
+import org.mule.devkit.apt.model.AnnotationProcessorType;
+import org.mule.devkit.generation.api.Context;
+import org.mule.devkit.generation.api.GenerationException;
+import org.mule.devkit.generation.api.Generator;
+import org.mule.devkit.generation.api.ValidationException;
+import org.mule.devkit.generation.api.Validator;
 import org.mule.devkit.model.Type;
-import org.mule.devkit.apt.model.AptType;
-import org.mule.devkit.ValidationException;
-import org.mule.devkit.Validator;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
@@ -62,7 +62,7 @@ public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
             Set<? extends Element> elements = env.getElementsAnnotatedWith(annotation);
             Set<TypeElement> typeElements = ElementFilter.typesIn(elements);
             for (TypeElement e : typeElements) {
-                Type type = new AptType(e, processingEnv.getTypeUtils(), processingEnv.getElementUtils(), Trees.instance(processingEnv));
+                Type type = new AnnotationProcessorType(e, processingEnv.getTypeUtils(), processingEnv.getElementUtils(), Trees.instance(processingEnv));
                 context.note("Validating " + type.getSimpleName().toString() + " class");
                 for (Validator validator : getValidators()) {
                     try {
@@ -76,12 +76,12 @@ public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
                 }
             }
             for (TypeElement e : typeElements) {
-                Type type = new AptType(e, processingEnv.getTypeUtils(), processingEnv.getElementUtils(), Trees.instance(processingEnv));
+                Type type = new AnnotationProcessorType(e, processingEnv.getTypeUtils(), processingEnv.getElementUtils(), Trees.instance(processingEnv));
                 context.note("Generating code for " + type.getSimpleName().toString() + " class");
                 for (Generator generator : getGenerators()) {
                     try {
                         generator.setCtx(context);
-                        if( generator.shouldGenerate(type) ) {
+                        if (generator.shouldGenerate(type)) {
                             generator.generate(type);
                         }
                     } catch (GenerationException ge) {
@@ -118,7 +118,7 @@ public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
     }
 
     private void createContext() {
-        context = new AptContext(processingEnv);
+        context = new AnnotationProcessorContext(processingEnv);
     }
 
     protected Context getContext() {

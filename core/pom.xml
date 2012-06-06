@@ -17,5 +17,7 @@
         <module>annotations</module>
 		<module>annotations-model</module>
         <module>annotations-processor</module>
+		<module>generation-api</module>
+		<module>generation-core</module>
     </modules>
 </project>

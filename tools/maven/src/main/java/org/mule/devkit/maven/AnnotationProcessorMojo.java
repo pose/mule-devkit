@@ -33,7 +33,7 @@ import java.util.Set;
 @MojoPhase("generate-sources")
 public class AnnotationProcessorMojo extends AbstractAnnotationProcessorMojo {
 
-    private static String[] processors = {"org.mule.devkit.apt.DevKitAnnotationProcessor"};
+    private static String[] processors = {"org.mule.devkit.apt.AnnotationProcessor"};
 
     /**
      * project classpath
