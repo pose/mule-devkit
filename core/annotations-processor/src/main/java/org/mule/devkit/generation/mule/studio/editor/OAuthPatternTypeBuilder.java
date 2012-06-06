@@ -17,7 +17,7 @@
 package org.mule.devkit.generation.mule.studio.editor;
 
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.studio.PatternType;
 
 /**
@@ -28,8 +28,8 @@ import org.mule.devkit.model.studio.PatternType;
  */
 public class OAuthPatternTypeBuilder extends PatternTypeBuilder {
 
-	public OAuthPatternTypeBuilder(GeneratorContext context, DevKitTypeElement typeElement) {
-        super(context, null, typeElement);
+	public OAuthPatternTypeBuilder(GeneratorContext context, Type type) {
+        super(context, null, type);
 	}
 	
 	@Override
@@ -43,7 +43,7 @@ public class OAuthPatternTypeBuilder extends PatternTypeBuilder {
         patternType.setLocalId("authorize");
         patternType.setCaption("Authorize");
         patternType.setAbstract(true);
-        patternType.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name()));
+        patternType.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + type.name() + '/' + helper.getGlobalRefId(type.name()));
         patternType.setIcon(getIcon());
         patternType.setImage(getImage());
         return patternType;
@@ -51,12 +51,12 @@ public class OAuthPatternTypeBuilder extends PatternTypeBuilder {
 	
 	@Override
     protected String getImage() {
-        return helper.getConnectorImage(typeElement);
+        return helper.getConnectorImage(type);
     }
 
     @Override
 	protected String getIcon() {
-        return helper.getConnectorIcon(typeElement);
+        return helper.getConnectorIcon(type);
     }
 	
 }

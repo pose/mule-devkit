@@ -21,7 +21,7 @@ import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.NamingConstants;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.Method;
@@ -35,8 +35,8 @@ public class AuthorizeBeanDefinitionParserGenerator extends AbstractMessageGener
     public static final String AUTHORIZE_DEFINITION_PARSER_ROLE = "AuthorizeDefinitionParser";
 
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
-        if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class)) {
+    public boolean shouldGenerate(Type type) {
+        if (type.hasAnnotation(OAuth.class) || type.hasAnnotation(OAuth2.class)) {
             return true;
         }
 
@@ -44,8 +44,8 @@ public class AuthorizeBeanDefinitionParserGenerator extends AbstractMessageGener
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) throws GenerationException {
-        DefinedClass beanDefinitionParser = getAuthorizeBeanDefinitionParserClass(typeElement);
+    public void generate(Type type) throws GenerationException {
+        DefinedClass beanDefinitionParser = getAuthorizeBeanDefinitionParserClass(type);
         DefinedClass messageProcessorClass = ctx().getCodeModel()._class(DefinedClassRoles.AUTHORIZE_MESSAGE_PROCESSOR);
 
         Method parse = beanDefinitionParser.method(Modifier.PUBLIC, ref(BeanDefinition.class), "parse");
@@ -66,7 +66,7 @@ public class AuthorizeBeanDefinitionParserGenerator extends AbstractMessageGener
         parse.body()._return(definition);
     }
 
-    private DefinedClass getAuthorizeBeanDefinitionParserClass(DevKitTypeElement type) {
+    private DefinedClass getAuthorizeBeanDefinitionParserClass(Type type) {
         org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.CONFIG_NAMESPACE);
         DefinedClass abstractDefinitionParser = ctx().getCodeModel()._class(DefinedClassRoles.ABSTRACT_BEAN_DEFINITION_PARSER);
         DefinedClass clazz = pkg._class(NamingConstants.AUTHORIZE_DEFINITION_PARSER_CLASS_NAME, abstractDefinitionParser);

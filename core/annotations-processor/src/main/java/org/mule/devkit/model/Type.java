@@ -22,7 +22,7 @@ import javax.lang.model.element.TypeElement;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
-public interface DevKitTypeElement extends DevKitElement<TypeElement, DevKitTypeElement> {
+public interface Type extends Identifiable<TypeElement, Type> {
 
     boolean hasProcessorMethodWithParameter(Class<?> parameterType);
 
@@ -32,17 +32,17 @@ public interface DevKitTypeElement extends DevKitElement<TypeElement, DevKitType
 
     boolean hasAnnotation(Class<? extends Annotation> annotation);
 
-    List<DevKitExecutableElement> getMethodsAnnotatedWith(Class<? extends Annotation> annotation);
+    List<Method> getMethodsAnnotatedWith(Class<? extends Annotation> annotation);
 
-    List<DevKitExecutableElement> getMethodsWhoseParametersAreAnnotatedWith(Class<? extends Annotation> annotation);
+    List<Method> getMethodsWhoseParametersAreAnnotatedWith(Class<? extends Annotation> annotation);
 
-    List<DevKitFieldElement> getFieldsAnnotatedWith(Class<? extends Annotation> annotation);
+    List<Field> getFieldsAnnotatedWith(Class<? extends Annotation> annotation);
 
     boolean hasMethodsAnnotatedWith(Class<? extends Annotation> annotation);
 
-    List<DevKitFieldElement> getFields();
+    List<Field> getFields();
 
-    List<DevKitExecutableElement> getMethods();
+    List<Method> getMethods();
 
     boolean hasFieldAnnotatedWith(Class<? extends Annotation> annotation);
 

@@ -18,8 +18,8 @@
 package org.mule.devkit.generation.mule.studio.editor;
 
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.GlobalType;
 import org.mule.devkit.model.studio.Group;
@@ -30,8 +30,8 @@ import java.util.List;
 
 public class GlobalEndpointTypeBuilder extends GlobalTypeBuilder {
 
-    public GlobalEndpointTypeBuilder(GeneratorContext context, DevKitExecutableElement executableElement, DevKitTypeElement typeElement) {
-        super(context, executableElement, typeElement);
+    public GlobalEndpointTypeBuilder(GeneratorContext context, Method executableElement, Type type) {
+        super(context, executableElement, type);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class GlobalEndpointTypeBuilder extends GlobalTypeBuilder {
     }
 
     protected String getExtendsBasedOnType() {
-        return MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + getLocalIdBasedOnType();
+        return MuleStudioEditorXmlGenerator.URI_PREFIX + type.name() + '/' + getLocalIdBasedOnType();
     }
 
     protected String getLocalIdBasedOnType() {
@@ -86,12 +86,12 @@ public class GlobalEndpointTypeBuilder extends GlobalTypeBuilder {
 
     @Override
     protected String getImage() {
-        return helper.getEndpointImage(typeElement);
+        return helper.getEndpointImage(type);
     }
 
     @Override
     protected String getIcon() {
-        return helper.getEndpointIcon(typeElement);
+        return helper.getEndpointIcon(type);
     }
 
     private String getIdBasedOnType() {

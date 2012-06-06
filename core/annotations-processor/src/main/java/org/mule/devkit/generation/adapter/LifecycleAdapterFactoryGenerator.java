@@ -27,8 +27,8 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.object.ObjectFactory;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.NamingConstants;
-import org.mule.devkit.model.DevKitFieldElement;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Field;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -40,25 +40,25 @@ import org.mule.devkit.model.code.Variable;
 public class LifecycleAdapterFactoryGenerator extends AbstractModuleGenerator {
 
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return (typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class)) && typeElement.isPoolable();
+    public boolean shouldGenerate(Type type) {
+        return (type.hasAnnotation(Module.class) || type.hasAnnotation(Connector.class)) && type.isPoolable();
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) {
-        DefinedClass lifecycleAdapterFactory = getLifecycleAdapterFactoryClass(typeElement);
+    public void generate(Type type) {
+        DefinedClass lifecycleAdapterFactory = getLifecycleAdapterFactoryClass(type);
         lifecycleAdapterFactory.javadoc().add("A <code>" + lifecycleAdapterFactory.name() + "</code> is an implementation  ");
         lifecycleAdapterFactory.javadoc().add(" of {@link ObjectFactory} interface for ");
-        lifecycleAdapterFactory.javadoc().add(ref(typeElement.asType()));
+        lifecycleAdapterFactory.javadoc().add(ref(type.asType()));
 
-        DefinedClass poolObjectClass = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
-        poolObjectClass.role(DefinedClassRoles.POOL_OBJECT, ref(typeElement));
+        DefinedClass poolObjectClass = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(type));
+        poolObjectClass.role(DefinedClassRoles.POOL_OBJECT, ref(type));
 
-        generateFields(typeElement, lifecycleAdapterFactory);
+        generateFields(type, lifecycleAdapterFactory);
 
         generateInitialiseMethod(lifecycleAdapterFactory);
         generateDisposeMethod(lifecycleAdapterFactory);
-        generateGetInstanceMethod(typeElement, lifecycleAdapterFactory, poolObjectClass);
+        generateGetInstanceMethod(type, lifecycleAdapterFactory, poolObjectClass);
         generateGetObjectClassMethod(lifecycleAdapterFactory, poolObjectClass);
         generateAddObjectInitialisationCallback(lifecycleAdapterFactory);
         generateIsSingleton(lifecycleAdapterFactory);
@@ -92,12 +92,12 @@ public class LifecycleAdapterFactoryGenerator extends AbstractModuleGenerator {
         getObjectClass.body()._return(poolObjectClass.dotclass());
     }
 
-    private void generateGetInstanceMethod(DevKitTypeElement typeElement, DefinedClass lifecycleAdapterFactory, DefinedClass poolObjectClass) {
+    private void generateGetInstanceMethod(Type type, DefinedClass lifecycleAdapterFactory, DefinedClass poolObjectClass) {
         Method getInstance = lifecycleAdapterFactory.method(Modifier.PUBLIC, ref(Object.class), "getInstance");
         getInstance.param(ref(MuleContext.class), "muleContext");
 
         Variable object = getInstance.body().decl(poolObjectClass, "object", ExpressionFactory._new(poolObjectClass));
-        for (DevKitFieldElement variable : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
+        for (Field variable : type.getFieldsAnnotatedWith(Configurable.class)) {
             getInstance.body().add(object.invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(ExpressionFactory._this().ref(variable.getSimpleName().toString())));
         }
 
@@ -113,19 +113,19 @@ public class LifecycleAdapterFactoryGenerator extends AbstractModuleGenerator {
         initialise._throws(ref(InitialisationException.class));
     }
 
-    private void generateFields(DevKitTypeElement typeElement, DefinedClass lifecycleAdapterFactory) {
-        for (DevKitFieldElement variable : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
+    private void generateFields(Type type, DefinedClass lifecycleAdapterFactory) {
+        for (Field variable : type.getFieldsAnnotatedWith(Configurable.class)) {
             FieldVariable configField = lifecycleAdapterFactory.field(Modifier.PRIVATE, ref(variable.asType()), variable.getSimpleName().toString());
             generateSetter(lifecycleAdapterFactory, configField);
         }
     }
 
-    private DefinedClass getLifecycleAdapterFactoryClass(DevKitTypeElement typeElement) {
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingConstants.ADAPTERS_NAMESPACE);
-        DefinedClass clazz = pkg._class(typeElement.getClassName() + NamingConstants.LIFECYCLE_ADAPTER_FACTORY_CLASS_NAME_SUFFIX);
+    private DefinedClass getLifecycleAdapterFactoryClass(Type type) {
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.ADAPTERS_NAMESPACE);
+        DefinedClass clazz = pkg._class(type.getClassName() + NamingConstants.LIFECYCLE_ADAPTER_FACTORY_CLASS_NAME_SUFFIX);
         clazz._implements(ref(ObjectFactory.class));
 
-        clazz.role(DefinedClassRoles.POJO_FACTORY, ref(typeElement));
+        clazz.role(DefinedClassRoles.POJO_FACTORY, ref(type));
 
         return clazz;
     }

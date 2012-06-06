@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.model;
+package org.mule.devkit.model.apt;
 
 import com.sun.source.util.TreePath;
 import com.sun.source.util.Trees;
@@ -28,6 +28,10 @@ import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
+import org.mule.devkit.model.Field;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Parameter;
+import org.mule.devkit.model.Type;
 
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
@@ -44,9 +48,9 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DefaultDevKitTypeElement extends DefaultDevKitElement<TypeElement, DevKitTypeElement> implements DevKitTypeElement {
+public class AptType extends AptIdentifiable<TypeElement, Type> implements Type {
 
-    public DefaultDevKitTypeElement(TypeElement innerElement, Types types, Elements elements, Trees trees) {
+    public AptType(TypeElement innerElement, Types types, Elements elements, Trees trees) {
         super(innerElement, null, types, elements, trees);
     }
 
@@ -54,7 +58,7 @@ public class DefaultDevKitTypeElement extends DefaultDevKitElement<TypeElement, 
     public boolean needsConfig() {
         boolean needsConfig = false;
 
-        for (DevKitFieldElement variable : getFieldsAnnotatedWith(Configurable.class)) {
+        for (Field variable : getFieldsAnnotatedWith(Configurable.class)) {
             needsConfig = true;
         }
 
@@ -68,8 +72,8 @@ public class DefaultDevKitTypeElement extends DefaultDevKitElement<TypeElement, 
 
     @Override
     public boolean hasProcessorMethodWithParameter(Class<?> parameterType) {
-        for (DevKitExecutableElement method : getMethodsAnnotatedWith(Processor.class)) {
-            for (DevKitParameterElement parameter : method.getParameters()) {
+        for (Method method : getMethodsAnnotatedWith(Processor.class)) {
+            for (Parameter parameter : method.getParameters()) {
                 if (parameter.asType().toString().startsWith(parameterType.getName())) {
                     return true;
                 }
@@ -80,7 +84,7 @@ public class DefaultDevKitTypeElement extends DefaultDevKitElement<TypeElement, 
 
     @Override
     public boolean hasConfigurableWithType(Class<?> parameterType) {
-        for (DevKitFieldElement field : getFieldsAnnotatedWith(Configurable.class)) {
+        for (Field field : getFieldsAnnotatedWith(Configurable.class)) {
             if (field.asType().toString().startsWith(parameterType.getName())) {
                 return true;
             }
@@ -90,8 +94,8 @@ public class DefaultDevKitTypeElement extends DefaultDevKitElement<TypeElement, 
 
     @Override
     public boolean hasProcessorMethodWithParameterListOf(Class<?> listGenericType) {
-        for (DevKitExecutableElement method : getMethodsAnnotatedWith(Processor.class)) {
-            for (DevKitParameterElement parameter : method.getParameters()) {
+        for (Method method : getMethodsAnnotatedWith(Processor.class)) {
+            for (Parameter parameter : method.getParameters()) {
                 if (parameter.asType().toString().startsWith(List.class.getName())) {
                     List<? extends TypeMirror> typeArguments = ((DeclaredType) parameter.asType()).getTypeArguments();
                     if (!typeArguments.isEmpty() && typeArguments.get(0).toString().equals(listGenericType.getName())) {
@@ -109,9 +113,9 @@ public class DefaultDevKitTypeElement extends DefaultDevKitElement<TypeElement, 
     }
 
     @Override
-    public List<DevKitExecutableElement> getMethodsAnnotatedWith(Class<? extends Annotation> annotation) {
-        List<DevKitExecutableElement> result = new ArrayList<DevKitExecutableElement>();
-        for (DevKitExecutableElement method : getMethods()) {
+    public List<Method> getMethodsAnnotatedWith(Class<? extends Annotation> annotation) {
+        List<Method> result = new ArrayList<Method>();
+        for (Method method : getMethods()) {
             if (method.getAnnotation(annotation) != null) {
                 result.add(method);
             }
@@ -120,10 +124,10 @@ public class DefaultDevKitTypeElement extends DefaultDevKitElement<TypeElement, 
     }
 
     @Override
-    public List<DevKitExecutableElement> getMethodsWhoseParametersAreAnnotatedWith(Class<? extends Annotation> annotation) {
-        List<DevKitExecutableElement> result = new ArrayList<DevKitExecutableElement>();
-        for (DevKitExecutableElement method : getMethods()) {
-            for (DevKitParameterElement parameter : method.getParameters()) {
+    public List<Method> getMethodsWhoseParametersAreAnnotatedWith(Class<? extends Annotation> annotation) {
+        List<Method> result = new ArrayList<Method>();
+        for (Method method : getMethods()) {
+            for (Parameter parameter : method.getParameters()) {
                 if (parameter.getAnnotation(annotation) != null) {
                     result.add(method);
                 }
@@ -133,9 +137,9 @@ public class DefaultDevKitTypeElement extends DefaultDevKitElement<TypeElement, 
     }
 
     @Override
-    public List<DevKitFieldElement> getFieldsAnnotatedWith(Class<? extends Annotation> annotation) {
-        List<DevKitFieldElement> result = new ArrayList<DevKitFieldElement>();
-        for (DevKitFieldElement field : getFields()) {
+    public List<Field> getFieldsAnnotatedWith(Class<? extends Annotation> annotation) {
+        List<Field> result = new ArrayList<Field>();
+        for (Field field : getFields()) {
             if (field.getAnnotation(annotation) != null) {
                 result.add(field);
             }
@@ -145,7 +149,7 @@ public class DefaultDevKitTypeElement extends DefaultDevKitElement<TypeElement, 
 
     @Override
     public boolean hasMethodsAnnotatedWith(Class<? extends Annotation> annotation) {
-        for (DevKitExecutableElement method : getMethods()) {
+        for (Method method : getMethods()) {
             if (method.getAnnotation(annotation) != null) {
                 return true;
             }
@@ -155,7 +159,7 @@ public class DefaultDevKitTypeElement extends DefaultDevKitElement<TypeElement, 
 
     @Override
     public boolean hasFieldAnnotatedWith(Class<? extends Annotation> annotation) {
-        for (DevKitFieldElement field : getFields()) {
+        for (Field field : getFields()) {
             if (field.getAnnotation(annotation) != null) {
                 return true;
             }
@@ -164,20 +168,20 @@ public class DefaultDevKitTypeElement extends DefaultDevKitElement<TypeElement, 
     }
 
     @Override
-    public List<DevKitFieldElement> getFields() {
-        List<DevKitFieldElement> fields = new ArrayList<DevKitFieldElement>();
+    public List<Field> getFields() {
+        List<Field> fields = new ArrayList<Field>();
         for(VariableElement variableElement : ElementFilter.fieldsIn(innerElement.getEnclosedElements()) ) {
-            fields.add(new DefaultDevKitFieldElement(variableElement, this, types, elements, trees));
+            fields.add(new AptField(variableElement, this, types, elements, trees));
         }
 
         return fields;
     }
 
     @Override
-    public List<DevKitExecutableElement> getMethods() {
-        List<DevKitExecutableElement> methods = new ArrayList<DevKitExecutableElement>();
+    public List<Method> getMethods() {
+        List<Method> methods = new ArrayList<Method>();
         for(ExecutableElement executableElement : ElementFilter.methodsIn(innerElement.getEnclosedElements()) ) {
-            methods.add(new DefaultDevKitExecutableElement(executableElement, this, types, elements, trees));
+            methods.add(new AptMethod(executableElement, this, types, elements, trees));
         }
 
         return methods;

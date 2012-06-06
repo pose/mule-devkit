@@ -31,9 +31,9 @@ import org.mule.api.annotations.param.Payload;
 import org.mule.api.annotations.param.SessionHeaders;
 import org.mule.api.callback.SourceCallback;
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitParameterElement;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Parameter;
+import org.mule.devkit.model.Type;
 
 import javax.lang.model.type.TypeKind;
 import java.util.List;
@@ -41,14 +41,14 @@ import java.util.List;
 public class ProcessorValidator implements Validator {
 
     @Override
-    public boolean shouldValidate(DevKitTypeElement typeElement, GeneratorContext context) {
-        return typeElement.isModuleOrConnector();
+    public boolean shouldValidate(Type type, GeneratorContext context) {
+        return type.isModuleOrConnector();
     }
 
     @Override
-    public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
+    public void validate(Type type, GeneratorContext context) throws ValidationException {
 
-        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Processor.class)) {
+        for (Method method : type.getMethodsAnnotatedWith(Processor.class)) {
 
             if (method.isStatic()) {
                 throw new ValidationException(method, "@Processor cannot be applied to a static method");
@@ -64,7 +64,7 @@ public class ProcessorValidator implements Validator {
 
             validateIntercepting(method);
 
-            for (DevKitParameterElement parameter : method.getParameters()) {
+            for (Parameter parameter : method.getParameters()) {
                 int count = 0;
                 if (parameter.getAnnotation(InboundHeaders.class) != null) {
                     count++;
@@ -111,11 +111,11 @@ public class ProcessorValidator implements Validator {
         }
     }
 
-    private void validateIntercepting(DevKitExecutableElement method) throws ValidationException {
+    private void validateIntercepting(Method method) throws ValidationException {
         if (method.getAnnotation(Processor.class).intercepting()) {
             boolean containsSourceCallback = false;
-            List<DevKitParameterElement> parameters = method.getParameters();
-            for (DevKitParameterElement parameter : parameters) {
+            List<Parameter> parameters = method.getParameters();
+            for (Parameter parameter : parameters) {
                 if (parameter.asType().toString().startsWith(SourceCallback.class.getName())) {
                     containsSourceCallback = true;
                 }

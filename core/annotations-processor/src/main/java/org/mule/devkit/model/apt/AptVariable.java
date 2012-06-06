@@ -14,19 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.mule.devkit.model.apt;
 
-package org.mule.devkit.generation;
+import com.sun.source.util.Trees;
+import org.mule.devkit.model.Identifiable;
+import org.mule.devkit.model.Variable;
 
-import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.Type;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 
-public interface Generator {
-
-    boolean shouldGenerate(Type type);
-
-    void generate(Type type) throws GenerationException;
-
-    void setCtx(GeneratorContext generationContext);
-
-    GeneratorContext ctx();
+public class AptVariable<P extends Identifiable> extends AptIdentifiable<VariableElement, P> implements Variable<P> {
+    public AptVariable(VariableElement variableElement, P parent, Types types, Elements elements, Trees trees) {
+        super(variableElement, parent, types, elements, trees);
+    }
 }

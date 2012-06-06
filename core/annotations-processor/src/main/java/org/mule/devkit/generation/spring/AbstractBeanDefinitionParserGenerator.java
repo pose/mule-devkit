@@ -26,7 +26,7 @@ import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.config.spring.util.SpringXMLUtils;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.NamingConstants;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.ClassAlreadyExistsException;
 import org.mule.devkit.model.code.Conditional;
@@ -58,13 +58,13 @@ import java.util.List;
 
 public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenerator {
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class);
+    public boolean shouldGenerate(Type type) {
+        return type.hasAnnotation(Module.class) || type.hasAnnotation(Connector.class);
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) {
-        DefinedClass abstractBeanDefinitionParserClass = getAbstractBeanDefinitionParserClass(typeElement);
+    public void generate(Type type) {
+        DefinedClass abstractBeanDefinitionParserClass = getAbstractBeanDefinitionParserClass(type);
 
         FieldVariable patternInfo = generateFieldForPatternInfo(abstractBeanDefinitionParserClass);
 
@@ -97,8 +97,8 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
         generateParseNestedProcessorWithChildNameAndSetPropertyMethod(abstractBeanDefinitionParserClass);
     }
 
-    private DefinedClass getAbstractBeanDefinitionParserClass(DevKitTypeElement typeElement) {
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingConstants.CONFIG_NAMESPACE);
+    private DefinedClass getAbstractBeanDefinitionParserClass(Type type) {
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.CONFIG_NAMESPACE);
         DefinedClass clazz = pkg._class(Modifier.ABSTRACT, NamingConstants.ABSTRACT_DEFINITION_PARSER_CLASS_NAME_SUFFIX, new Class[]{BeanDefinitionParser.class});
 
         clazz.role(DefinedClassRoles.ABSTRACT_BEAN_DEFINITION_PARSER);

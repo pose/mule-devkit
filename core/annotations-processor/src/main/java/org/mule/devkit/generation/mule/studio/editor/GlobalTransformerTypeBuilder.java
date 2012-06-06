@@ -18,8 +18,8 @@
 package org.mule.devkit.generation.mule.studio.editor;
 
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.GlobalType;
 import org.mule.devkit.model.studio.Group;
@@ -30,8 +30,8 @@ import java.util.List;
 
 public class GlobalTransformerTypeBuilder extends GlobalTypeBuilder {
 
-    public GlobalTransformerTypeBuilder(GeneratorContext context, DevKitExecutableElement executableElement, DevKitTypeElement typeElement) {
-        super(context, executableElement, typeElement);
+    public GlobalTransformerTypeBuilder(GeneratorContext context, Method executableElement, Type type) {
+        super(context, executableElement, type);
     }
 
     @Override
@@ -62,7 +62,7 @@ public class GlobalTransformerTypeBuilder extends GlobalTypeBuilder {
     }
 
     protected String getExtendsBasedOnType() {
-        return MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + getLocalIdBasedOnType();
+        return MuleStudioEditorXmlGenerator.URI_PREFIX + type.name() + '/' + getLocalIdBasedOnType();
     }
 
     protected String getLocalIdBasedOnType() {
@@ -79,11 +79,11 @@ public class GlobalTransformerTypeBuilder extends GlobalTypeBuilder {
 
     @Override
     protected String getImage() {
-        return helper.getTransformerImage(typeElement);
+        return helper.getTransformerImage(type);
     }
 
     @Override
     protected String getIcon() {
-        return helper.getTransformerIcon(typeElement);
+        return helper.getTransformerIcon(type);
     }
 }

@@ -32,13 +32,11 @@ import org.mule.config.PoolingProfile;
 import org.mule.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.adapter.HttpCallbackAdapterGenerator;
-import org.mule.devkit.generation.mule.oauth.DefaultRestoreAccessTokenCallbackFactoryGenerator;
-import org.mule.devkit.generation.mule.oauth.DefaultSaveAccessTokenCallbackFactoryGenerator;
-import org.mule.devkit.model.DevKitElement;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitFieldElement;
-import org.mule.devkit.model.DevKitParameterElement;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Field;
+import org.mule.devkit.model.Identifiable;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Parameter;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
@@ -46,7 +44,6 @@ import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.Invocation;
-import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.TryStatement;
@@ -75,30 +72,30 @@ import java.util.Map;
 public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class);
+    public boolean shouldGenerate(Type type) {
+        return type.hasAnnotation(Module.class) || type.hasAnnotation(Connector.class);
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) {
-        generateConfigBeanDefinitionParserFor(typeElement);
+    public void generate(Type type) {
+        generateConfigBeanDefinitionParserFor(type);
 
-        for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Processor.class)) {
+        for (Method executableElement : type.getMethodsAnnotatedWith(Processor.class)) {
             generateBeanDefinitionParserForProcessor(executableElement);
         }
 
-        for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Source.class)) {
+        for (Method executableElement : type.getMethodsAnnotatedWith(Source.class)) {
             generateBeanDefinitionParserForSource(executableElement);
         }
     }
 
-    private void generateConfigBeanDefinitionParserFor(DevKitTypeElement typeElement) {
-        DefinedClass beanDefinitionparser = getConfigBeanDefinitionParserClass(typeElement);
-        DefinedClass pojo = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
+    private void generateConfigBeanDefinitionParserFor(Type type) {
+        DefinedClass beanDefinitionparser = getConfigBeanDefinitionParserClass(type);
+        DefinedClass pojo = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(type));
 
-        ctx().note("Generating config element definition parser as " + beanDefinitionparser.fullName() + " for class " + typeElement.getSimpleName().toString());
+        ctx().note("Generating config element definition parser as " + beanDefinitionparser.fullName() + " for class " + type.getSimpleName().toString());
 
-        Method parse = beanDefinitionparser.method(Modifier.PUBLIC, ref(BeanDefinition.class), "parse");
+        org.mule.devkit.model.code.Method parse = beanDefinitionparser.method(Modifier.PUBLIC, ref(BeanDefinition.class), "parse");
         Variable element = parse.param(ref(org.w3c.dom.Element.class), "element");
         Variable parserContext = parse.param(ref(ParserContext.class), "parserContext");
 
@@ -110,7 +107,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         parse.body().invoke("setInitMethodIfNeeded").arg(builder).arg(pojo.dotclass());
         parse.body().invoke("setDestroyMethodIfNeeded").arg(builder).arg(pojo.dotclass());
 
-        for (DevKitFieldElement variable : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
+        for (Field variable : type.getFieldsAnnotatedWith(Configurable.class)) {
 
             String fieldName = variable.getSimpleName().toString();
 
@@ -133,7 +130,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             }
         }
 
-        for (DevKitFieldElement variable : typeElement.getFieldsAnnotatedWith(Inject.class)) {
+        for (Field variable : type.getFieldsAnnotatedWith(Inject.class)) {
             if (variable.asType().toString().equals("org.mule.api.store.ObjectStore")) {
                 Conditional ifNotNull = parse.body()._if(ExpressionFactory.invoke("hasAttribute").arg(element).arg("objectStore-ref"));
                 ifNotNull._then().add(builder.invoke("addPropertyValue").arg(variable.getSimpleName().toString()).arg(
@@ -142,9 +139,9 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             }
         }
 
-        DevKitExecutableElement connect = connectMethodForClass(typeElement);
+        Method connect = connectMethodForClass(type);
         if (connect != null) {
-            for (DevKitParameterElement variable : connect.getParameters()) {
+            for (Parameter variable : connect.getParameters()) {
                 String fieldName = variable.getSimpleName().toString();
 
                 if (SchemaTypeConversion.isSupported(variable.asType().toString())) {
@@ -159,7 +156,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             }
         }
 
-        if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class)) {
+        if (type.hasAnnotation(OAuth.class) || type.hasAnnotation(OAuth2.class)) {
             generateParseHttpCallback(SchemaGenerator.OAUTH_CALLBACK_CONFIG_ELEMENT_NAME, parse, element, builder);
 
             DefinedClass saveAccessTokenCallbackFactory = ctx().getCodeModel()._class(DefinedClassRoles.DEFAULT_SAVE_ACCESS_TOKEN_CALLBACK);
@@ -167,7 +164,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             generateParseNestedProcessor(parse.body(), element, parserContext, builder, "oauthSaveAccessToken", false, false, false, saveAccessTokenCallbackFactory);
             generateParseNestedProcessor(parse.body(), element, parserContext, builder, "oauthRestoreAccessToken", false, false, false, restoreAccessTokenCallbackFactory);
         }
-        if (typeElement.hasProcessorMethodWithParameter(HttpCallback.class)) {
+        if (type.hasProcessorMethodWithParameter(HttpCallback.class)) {
             generateParseHttpCallback(SchemaGenerator.HTTP_CALLBACK_CONFIG_ELEMENT_NAME, parse, element, builder);
         }
 
@@ -175,7 +172,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             generateParsePoolingProfile("connection-pooling-profile", "connectionPoolingProfile", parse, element, builder);
         }
 
-        if (typeElement.isPoolable()) {
+        if (type.isPoolable()) {
             generateParsePoolingProfile("pooling-profile", "poolingProfile", parse, element, builder);
         }
 
@@ -187,7 +184,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
     }
 
-    private void generateParseHttpCallback(String elementName, Method parse, Variable element, Variable builder) {
+    private void generateParseHttpCallback(String elementName, org.mule.devkit.model.code.Method parse, Variable element, Variable builder) {
         Variable httpCallbackConfigElement = parse.body().decl(ref(org.w3c.dom.Element.class), "httpCallbackConfigElement", ref(DomUtils.class).staticInvoke("getChildElementByTagName").
                 arg(element).arg(elementName));
         Block ifHttpCallbackConfigPresent = parse.body()._if(Op.ne(httpCallbackConfigElement, ExpressionFactory._null()))._then();
@@ -202,7 +199,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         ));
     }
 
-    private void generateParsePoolingProfile(String elementName, String propertyName, Method parse, Variable element, Variable builder) {
+    private void generateParsePoolingProfile(String elementName, String propertyName, org.mule.devkit.model.code.Method parse, Variable element, Variable builder) {
         Variable poolingProfileBuilder = parse.body().decl(ref(BeanDefinitionBuilder.class), propertyName + "Builder",
                 ref(BeanDefinitionBuilder.class).staticInvoke("rootBeanDefinition").arg(ref(PoolingProfile.class).dotclass().invoke("getName")));
 
@@ -230,7 +227,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         ));
     }
 
-    private void generateBeanDefinitionParserForSource(DevKitExecutableElement executableElement) {
+    private void generateBeanDefinitionParserForSource(Method executableElement) {
         // get class
         Source sourceAnnotation = executableElement.getAnnotation(Source.class);
         DefinedClass beanDefinitionparser = getBeanDefinitionParserClass(executableElement);
@@ -241,7 +238,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         generateSourceParseMethod(beanDefinitionparser, messageSourceClass, executableElement);
     }
 
-    private void generateBeanDefinitionParserForProcessor(DevKitExecutableElement executableElement) {
+    private void generateBeanDefinitionParserForProcessor(Method executableElement) {
         DefinedClass beanDefinitionparser = getBeanDefinitionParserClass(executableElement);
         DefinedClass messageProcessorClass;
 
@@ -256,8 +253,8 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         generateProcessorParseMethod(beanDefinitionparser, messageProcessorClass, executableElement);
     }
 
-    private void generateProcessorParseMethod(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, DevKitExecutableElement executableElement) {
-        Method parse = beanDefinitionparser.method(Modifier.PUBLIC, ref(BeanDefinition.class), "parse");
+    private void generateProcessorParseMethod(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, Method executableElement) {
+        org.mule.devkit.model.code.Method parse = beanDefinitionparser.method(Modifier.PUBLIC, ref(BeanDefinition.class), "parse");
         Variable element = parse.param(ref(org.w3c.dom.Element.class), "element");
         Variable parserContext = parse.param(ref(ParserContext.class), "parserContext");
 
@@ -268,8 +265,8 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         parse.body()._return(definition);
     }
 
-    private void generateSourceParseMethod(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, DevKitExecutableElement executableElement) {
-        Method parse = beanDefinitionparser.method(Modifier.PUBLIC, ref(BeanDefinition.class), "parse");
+    private void generateSourceParseMethod(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, Method executableElement) {
+        org.mule.devkit.model.code.Method parse = beanDefinitionparser.method(Modifier.PUBLIC, ref(BeanDefinition.class), "parse");
         Variable element = parse.param(ref(org.w3c.dom.Element.class), "element");
         Variable parserContext = parse.param(ref(ParserContext.class), "parserContext");
 
@@ -280,14 +277,14 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         parse.body()._return(definition);
     }
 
-    private Variable generateParseCommon(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, DevKitExecutableElement executableElement, Method parse, Variable element, Variable parserContext) {
+    private Variable generateParseCommon(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, Method executableElement, org.mule.devkit.model.code.Method parse, Variable element, Variable parserContext) {
         Variable builder = parse.body().decl(ref(BeanDefinitionBuilder.class), "builder",
                 ref(BeanDefinitionBuilder.class).staticInvoke("rootBeanDefinition").arg(messageProcessorClass.dotclass().invoke("getName")));
 
         parse.body().invoke("parseConfigRef").arg(element).arg(builder);
 
 
-        for (DevKitParameterElement variable : executableElement.getParameters()) {
+        for (Parameter variable : executableElement.getParameters()) {
             if (variable.asType().toString().startsWith(SourceCallback.class.getName())) {
                 continue;
             }
@@ -332,11 +329,11 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             }
         }
 
-        DevKitExecutableElement connectMethod = connectForMethod(executableElement);
+        Method connectMethod = connectForMethod(executableElement);
         if (connectMethod != null) {
             generateParseProperty(parse.body(), element, builder, "retryMax");
 
-            for (DevKitParameterElement variable : connectMethod.getParameters()) {
+            for (Parameter variable : connectMethod.getParameters()) {
                 String fieldName = variable.getSimpleName().toString();
 
                 if (SchemaTypeConversion.isSupported(variable.asType().toString())) {
@@ -358,7 +355,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         return definition;
     }
 
-    private void generateParseList(Method parse, Variable element, Variable builder, DevKitElement variable, String fieldName) {
+    private void generateParseList(org.mule.devkit.model.code.Method parse, Variable element, Variable builder, Identifiable variable, String fieldName) {
         Invocation parseListAndSetProperty = parse.body().invoke("parseListAndSetProperty")
                 .arg(element)
                 .arg(builder)
@@ -367,7 +364,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                 .arg(NameUtils.uncamel(NameUtils.singularize(fieldName)));
 
         if (variable.hasTypeArguments()) {
-            DevKitElement typeArgument = (DevKitElement) variable.getTypeArguments().get(0);
+            Identifiable typeArgument = (Identifiable) variable.getTypeArguments().get(0);
 
             if (typeArgument.isArrayOrList()) {
                 String innerChildElementName = "inner-" + NameUtils.uncamel(NameUtils.singularize(fieldName));
@@ -383,7 +380,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         }
     }
 
-    private void generateParseMap(Method parse, Variable element, Variable builder, DevKitElement variable, String fieldName) {
+    private void generateParseMap(org.mule.devkit.model.code.Method parse, Variable element, Variable builder, Identifiable variable, String fieldName) {
         Invocation parseMapAndSetProperty = parse.body().invoke("parseMapAndSetProperty")
                 .arg(element)
                 .arg(builder)
@@ -392,7 +389,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                 .arg(NameUtils.uncamel(NameUtils.singularize(fieldName)));
 
         if (variable.hasTypeArguments()) {
-            DevKitElement typeArgument = (DevKitElement) variable.getTypeArguments().get(0);
+            Identifiable typeArgument = (Identifiable) variable.getTypeArguments().get(0);
 
             if (typeArgument.isArrayOrList()) {
                 String innerChildElementName = "inner-" + NameUtils.uncamel(NameUtils.singularize(fieldName));
@@ -478,7 +475,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
     private DefinedClass generateParserDelegateForTextContent() {
         DefinedClass parserDelegateInterface = ctx().getCodeModel()._class(DefinedClassRoles.PARSER_DELEGATE);
         DefinedClass anonymousClass = ctx().getCodeModel().anonymousClass(parserDelegateInterface.narrow(ref(String.class)));
-        Method parseMethod = anonymousClass.method(Modifier.PUBLIC, ref(String.class), "parse");
+        org.mule.devkit.model.code.Method parseMethod = anonymousClass.method(Modifier.PUBLIC, ref(String.class), "parse");
         Variable element = parseMethod.param(ref(Element.class), "element");
 
         parseMethod.body()._return(element.invoke("getTextContent"));
@@ -489,7 +486,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
     private DefinedClass generateParserDelegateForList(String childElementName) {
         DefinedClass parserDelegateInterface = ctx().getCodeModel()._class(DefinedClassRoles.PARSER_DELEGATE);
         DefinedClass anonymousClass = ctx().getCodeModel().anonymousClass(parserDelegateInterface.narrow(ref(List.class)));
-        Method parseMethod = anonymousClass.method(Modifier.PUBLIC, ref(List.class), "parse");
+        org.mule.devkit.model.code.Method parseMethod = anonymousClass.method(Modifier.PUBLIC, ref(List.class), "parse");
         Variable element = parseMethod.param(ref(Element.class), "element");
 
         parseMethod.body()._return(ExpressionFactory.invoke("parseList")
@@ -502,7 +499,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
     private DefinedClass generateParserDelegateForMap(String childElementName) {
         DefinedClass parserDelegateInterface = ctx().getCodeModel()._class(DefinedClassRoles.PARSER_DELEGATE);
         DefinedClass anonymousClass = ctx().getCodeModel().anonymousClass(parserDelegateInterface.narrow(ref(Map.class)));
-        Method parseMethod = anonymousClass.method(Modifier.PUBLIC, ref(Map.class), "parse");
+        org.mule.devkit.model.code.Method parseMethod = anonymousClass.method(Modifier.PUBLIC, ref(Map.class), "parse");
         Variable element = parseMethod.param(ref(Element.class), "element");
 
         parseMethod.body()._return(ExpressionFactory.invoke("parseMap")

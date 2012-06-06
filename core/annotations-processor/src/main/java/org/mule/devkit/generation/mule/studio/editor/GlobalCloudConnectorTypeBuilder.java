@@ -18,7 +18,7 @@
 package org.mule.devkit.generation.mule.studio.editor;
 
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.AttributeType;
 import org.mule.devkit.model.studio.Group;
@@ -29,8 +29,8 @@ import java.util.Map;
 
 public class GlobalCloudConnectorTypeBuilder extends GlobalTypeBuilder {
 
-    public GlobalCloudConnectorTypeBuilder(GeneratorContext context, DevKitTypeElement typeElement) {
-        super(context, typeElement);
+    public GlobalCloudConnectorTypeBuilder(GeneratorContext context, Type type) {
+        super(context, type);
     }
 
     protected List<AttributeCategory> getAttributeCategories() {
@@ -43,14 +43,14 @@ public class GlobalCloudConnectorTypeBuilder extends GlobalTypeBuilder {
 
     @Override
     protected void processConnectionAttributes(Map<String, Group> groupsByName, Map<String, AttributeCategory> attributeCategoriesByName) {
-        if (typeElement.usesConnectionManager()) {
+        if (type.usesConnectionManager()) {
             Group connectionAttributesGroup = new Group();
             connectionAttributesGroup.setCaption(helper.formatCaption(CONNECTION_GROUP_NAME));
             connectionAttributesGroup.setId(StringUtils.uncapitalize(CONNECTION_GROUP_NAME));
 
             groupsByName.put(CONNECTION_GROUP_NAME, connectionAttributesGroup);
 
-            List<AttributeType> connectionAttributes = getConnectionAttributes(typeElement);
+            List<AttributeType> connectionAttributes = getConnectionAttributes(type);
             connectionAttributesGroup.getRegexpOrEncodingOrModeSwitch().addAll(helper.createJAXBElements(connectionAttributes));
 
             AttributeCategory defaultAttributeCategory = attributeCategoriesByName.get(MuleStudioEditorXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION);
@@ -59,11 +59,11 @@ public class GlobalCloudConnectorTypeBuilder extends GlobalTypeBuilder {
     }
 
     protected String getDescriptionBasedOnType() {
-        return helper.formatDescription("Global " + helper.getFormattedCaption(typeElement) + " configuration information");
+        return helper.formatDescription("Global " + helper.getFormattedCaption(type) + " configuration information");
     }
 
     protected String getExtendsBasedOnType() {
-        return MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name());
+        return MuleStudioEditorXmlGenerator.URI_PREFIX + type.name() + '/' + helper.getGlobalRefId(type.name());
     }
 
     protected String getLocalIdBasedOnType() {
@@ -71,7 +71,7 @@ public class GlobalCloudConnectorTypeBuilder extends GlobalTypeBuilder {
     }
 
     protected String getCaptionBasedOnType() {
-        return helper.getFormattedCaption(typeElement);
+        return helper.getFormattedCaption(type);
     }
 
     protected String getNameDescriptionBasedOnType() {
@@ -80,11 +80,11 @@ public class GlobalCloudConnectorTypeBuilder extends GlobalTypeBuilder {
 
     @Override
     protected String getImage() {
-        return helper.getConnectorImage(typeElement);
+        return helper.getConnectorImage(type);
     }
 
     @Override
     protected String getIcon() {
-        return helper.getConnectorIcon(typeElement);
+        return helper.getConnectorIcon(type);
     }
 }

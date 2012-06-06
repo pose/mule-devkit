@@ -17,8 +17,8 @@
 package org.mule.devkit.generation.mule.studio.editor;
 
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.studio.ModeElementType;
 import org.mule.devkit.utils.NameUtils;
 import org.mule.util.StringUtils;
@@ -34,17 +34,17 @@ import java.util.List;
  */
 public class OAuthPatternTypeOperationsBuilder extends PatternTypeOperationsBuilder {
 
-	public OAuthPatternTypeOperationsBuilder(GeneratorContext context, DevKitTypeElement typeElement, PatternTypes patternTypeToUse) {
-		super(context, typeElement, patternTypeToUse);
+	public OAuthPatternTypeOperationsBuilder(GeneratorContext context, Type type, PatternTypes patternTypeToUse) {
+		super(context, type, patternTypeToUse);
 	}
 	
 	@Override
-    protected List<ModeElementType> getModes(List<DevKitExecutableElement> methods) {
+    protected List<ModeElementType> getModes(List<Method> methods) {
     	List<ModeElementType> modes = super.getModes(methods);
     	
     	ModeElementType mode = new ModeElementType();
         String methodName = "authorize";
-        mode.setModeId(MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + NameUtils.uncamel(methodName));
+        mode.setModeId(MuleStudioEditorXmlGenerator.URI_PREFIX + type.name() + '/' + NameUtils.uncamel(methodName));
         mode.setModeLabel(StringUtils.capitalize(methodName));
         modes.add(0, mode);
 

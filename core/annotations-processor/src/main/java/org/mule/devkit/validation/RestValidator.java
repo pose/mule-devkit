@@ -26,22 +26,22 @@ import org.mule.api.annotations.rest.RestHttpClient;
 import org.mule.api.annotations.rest.RestQueryParam;
 import org.mule.api.annotations.rest.RestUriParam;
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitFieldElement;
-import org.mule.devkit.model.DevKitParameterElement;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Field;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Parameter;
+import org.mule.devkit.model.Type;
 
 public class RestValidator implements Validator {
 
     @Override
-    public boolean shouldValidate(DevKitTypeElement typeElement, GeneratorContext context) {
-        return typeElement.isModuleOrConnector() && typeElement.hasMethodsAnnotatedWith(RestCall.class);
+    public boolean shouldValidate(Type type, GeneratorContext context) {
+        return type.isModuleOrConnector() && type.hasMethodsAnnotatedWith(RestCall.class);
     }
 
     @Override
-    public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
+    public void validate(Type type, GeneratorContext context) throws ValidationException {
 
-        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(RestCall.class)) {
+        for (Method method : type.getMethodsAnnotatedWith(RestCall.class)) {
 
             if (!method.isAbstract()) {
                 throw new ValidationException(method, "@RestCall can only be applied to abstract methods");
@@ -64,7 +64,7 @@ public class RestValidator implements Validator {
             }
 
             int nonAnnotatedParameterCount = 0;
-            for (DevKitParameterElement parameter : method.getParameters()) {
+            for (Parameter parameter : method.getParameters()) {
                 if (parameter.getAnnotation(RestUriParam.class) == null &&
                         parameter.getAnnotation(RestHeaderParam.class) == null &&
                         parameter.getAnnotation(RestQueryParam.class) == null) {
@@ -77,9 +77,9 @@ public class RestValidator implements Validator {
             }
         }
 
-        for (DevKitFieldElement field : typeElement.getFieldsAnnotatedWith(RestUriParam.class)) {
+        for (Field field : type.getFieldsAnnotatedWith(RestUriParam.class)) {
             boolean getterFound = false;
-            for (DevKitExecutableElement method : typeElement.getMethods()) {
+            for (Method method : type.getMethods()) {
                 if (method.getSimpleName().toString().equals("get" + StringUtils.capitalize(field.getSimpleName().toString()))) {
                     getterFound = true;
                     break;
@@ -90,19 +90,19 @@ public class RestValidator implements Validator {
             }
         }
 
-        if (typeElement.getFieldsAnnotatedWith(RestHttpClient.class).size() > 1) {
-            throw new ValidationException(typeElement, "There can only be one field annotated with @RestHttpClient.");
+        if (type.getFieldsAnnotatedWith(RestHttpClient.class).size() > 1) {
+            throw new ValidationException(type, "There can only be one field annotated with @RestHttpClient.");
         }
 
-        if( typeElement.getFieldsAnnotatedWith(RestHttpClient.class).size() > 0 ) {
-            if (!typeElement.getFieldsAnnotatedWith(RestHttpClient.class).get(0).asType().toString().equals(HttpClient.class.getName())) {
-                throw new ValidationException(typeElement.getFieldsAnnotatedWith(RestHttpClient.class).get(0), "A field annotated with @RestHttpClient must be of type " + HttpClient.class.getName());
+        if( type.getFieldsAnnotatedWith(RestHttpClient.class).size() > 0 ) {
+            if (!type.getFieldsAnnotatedWith(RestHttpClient.class).get(0).asType().toString().equals(HttpClient.class.getName())) {
+                throw new ValidationException(type.getFieldsAnnotatedWith(RestHttpClient.class).get(0), "A field annotated with @RestHttpClient must be of type " + HttpClient.class.getName());
             }
         }
 
-        for (DevKitFieldElement field : typeElement.getFieldsAnnotatedWith(RestHttpClient.class)) {
+        for (Field field : type.getFieldsAnnotatedWith(RestHttpClient.class)) {
             boolean getterFound = false;
-            for (DevKitExecutableElement method : typeElement.getMethods()) {
+            for (Method method : type.getMethods()) {
                 if (method.getSimpleName().toString().equals("get" + StringUtils.capitalize(field.getSimpleName().toString()))) {
                     getterFound = true;
                     break;

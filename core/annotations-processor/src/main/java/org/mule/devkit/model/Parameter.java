@@ -16,5 +16,6 @@
  */
 package org.mule.devkit.model;
 
-public interface DevKitFieldElement extends DevKitVariableElement<DevKitTypeElement> {
+public interface Parameter extends Variable<Method> {
+    boolean shouldBeIgnored();
 }

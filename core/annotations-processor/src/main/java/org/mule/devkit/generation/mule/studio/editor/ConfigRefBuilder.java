@@ -19,7 +19,7 @@ package org.mule.devkit.generation.mule.studio.editor;
 
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.spring.SchemaGenerator;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.Group;
 import org.mule.devkit.model.studio.NewType;
@@ -33,8 +33,8 @@ public class ConfigRefBuilder extends BaseStudioXmlBuilder {
     public static final String GLOBAL_REF_NAME = SchemaGenerator.ATTRIBUTE_NAME_CONFIG_REF;
     private static final boolean CONFIG_REF_REQUIRED = true;
 
-    public ConfigRefBuilder(GeneratorContext context, DevKitTypeElement typeElement) {
-        super(context, typeElement);
+    public ConfigRefBuilder(GeneratorContext context, Type type) {
+        super(context, type);
     }
 
     public JAXBElement<PatternType> build() {
@@ -61,8 +61,8 @@ public class ConfigRefBuilder extends BaseStudioXmlBuilder {
         cloudConnector.setLocalId(helper.getGlobalRefId(moduleName));
         cloudConnector.setDescription(helper.formatDescription("Interact with " + StringUtils.capitalize(moduleName)));
         cloudConnector.setAbstract(true);
-        cloudConnector.setIcon(helper.getConnectorIcon(typeElement));
-        cloudConnector.setImage(helper.getConnectorImage(typeElement));
+        cloudConnector.setIcon(helper.getConnectorIcon(type));
+        cloudConnector.setImage(helper.getConnectorImage(type));
 
         return objectFactory.createNamespaceTypeCloudConnector(cloudConnector);
     }

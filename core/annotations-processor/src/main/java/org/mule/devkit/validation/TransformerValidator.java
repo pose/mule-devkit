@@ -19,8 +19,8 @@ package org.mule.devkit.validation;
 
 import org.mule.api.annotations.Transformer;
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Type;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
@@ -31,13 +31,13 @@ import java.util.Map;
 public class TransformerValidator implements Validator {
 
     @Override
-    public boolean shouldValidate(DevKitTypeElement typeElement, GeneratorContext context) {
-        return typeElement.isModuleOrConnector() && typeElement.hasMethodsAnnotatedWith(Transformer.class);
+    public boolean shouldValidate(Type type, GeneratorContext context) {
+        return type.isModuleOrConnector() && type.hasMethodsAnnotatedWith(Transformer.class);
     }
 
     @Override
-    public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
-        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Transformer.class)) {
+    public void validate(Type type, GeneratorContext context) throws ValidationException {
+        for (Method method : type.getMethodsAnnotatedWith(Transformer.class)) {
 
             if (!method.isStatic()) {
                 throw new ValidationException(method, "@Transformer must be a static method");
@@ -66,7 +66,7 @@ public class TransformerValidator implements Validator {
         }
     }
 
-    private List<? extends AnnotationValue> getSourceTypes(DevKitExecutableElement method) {
+    private List<? extends AnnotationValue> getSourceTypes(Method method) {
         String transformerAnnotationName = Transformer.class.getName();
         List<? extends AnnotationMirror> annotationMirrors = method.getAnnotationMirrors();
         for (AnnotationMirror annotationMirror : annotationMirrors) {

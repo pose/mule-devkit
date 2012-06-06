@@ -30,9 +30,9 @@ import org.mule.api.security.SecurityManager;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitFieldElement;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Field;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Type;
 import org.mule.util.queue.QueueManager;
 
 import javax.inject.Inject;
@@ -40,13 +40,13 @@ import javax.transaction.TransactionManager;
 
 public class InjectValidator implements Validator {
     @Override
-    public boolean shouldValidate(DevKitTypeElement typeElement, GeneratorContext context) {
-        return typeElement.getFieldsAnnotatedWith(Inject.class).size() > 0;
+    public boolean shouldValidate(Type type, GeneratorContext context) {
+        return type.getFieldsAnnotatedWith(Inject.class).size() > 0;
     }
 
     @Override
-    public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
-        for (DevKitFieldElement variable : typeElement.getFieldsAnnotatedWith(Inject.class)) {
+    public void validate(Type type, GeneratorContext context) throws ValidationException {
+        for (Field variable : type.getFieldsAnnotatedWith(Inject.class)) {
             if (!variable.asType().toString().equals(MuleContext.class.getName()) &&
                     !variable.asType().toString().equals(ObjectStoreManager.class.getName()) &&
                     !variable.asType().toString().equals(TransactionManager.class.getName()) &&
@@ -67,7 +67,7 @@ public class InjectValidator implements Validator {
                         + "ExpressionManager, EndpointFactory, MuleClient, SystemExceptionHandler, SecurityManager, WorkManager, Registry");
             } else {
                 boolean found = false;
-                for (DevKitExecutableElement method : typeElement.getMethods()) {
+                for (Method method : type.getMethods()) {
                     if( method.getSimpleName().toString().equals("set" + StringUtils.capitalize(variable.getSimpleName().toString()))) {
                         found = true;
                         break;
@@ -79,7 +79,7 @@ public class InjectValidator implements Validator {
 
                 if( variable.asType().toString().equals(ObjectStore.class.getName()) ) {
                     boolean getterFound = false;
-                    for (DevKitExecutableElement method : typeElement.getMethods()) {
+                    for (Method method : type.getMethods()) {
                         if( method.getSimpleName().toString().equals("get" + StringUtils.capitalize(variable.getSimpleName().toString()))) {
                             getterFound = true;
                             break;

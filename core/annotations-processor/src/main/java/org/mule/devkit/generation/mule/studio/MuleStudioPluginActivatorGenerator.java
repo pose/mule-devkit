@@ -20,7 +20,7 @@ package org.mule.devkit.generation.mule.studio;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
@@ -30,7 +30,6 @@ import org.mule.devkit.model.code.Package;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 import org.mule.devkit.model.code.builders.FieldBuilder;
-import org.mule.devkit.utils.NameUtils;
 import org.osgi.framework.BundleContext;
 
 public class MuleStudioPluginActivatorGenerator extends AbstractMessageGenerator {
@@ -40,12 +39,12 @@ public class MuleStudioPluginActivatorGenerator extends AbstractMessageGenerator
     private static final String ACTIVATOR_CLASS_NAME = "Activator";
 
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(Type type) {
         return !ctx().hasOption("skipStudioPluginPackage");
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) throws GenerationException {
+    public void generate(Type type) throws GenerationException {
         DefinedClass activatorClass = getActivatorClass();
         activatorClass.javadoc().add("The activator class controls the plug-in life cycle");
         new FieldBuilder(activatorClass).
@@ -54,7 +53,7 @@ public class MuleStudioPluginActivatorGenerator extends AbstractMessageGenerator
                 finalField().
                 type(String.class).
                 name("PLUGIN_ID").
-                initialValue("org.mule.tooling.ui.contribution." + typeElement.name()).build();
+                initialValue("org.mule.tooling.ui.contribution." + type.name()).build();
         TypeReference activatorTypeRef = ctx().getCodeModel().directClass(ACTIVATOR_PACKAGE + "." + ACTIVATOR_CLASS_NAME);
         FieldVariable plugin = new FieldBuilder(activatorClass).staticField().type(activatorTypeRef).name("plugin").build();
 

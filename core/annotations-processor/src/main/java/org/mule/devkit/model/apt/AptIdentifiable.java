@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.mule.devkit.model;
+package org.mule.devkit.model.apt;
 
-import com.sun.source.util.TreePath;
 import com.sun.source.util.Trees;
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.NestedProcessor;
 import org.mule.api.callback.HttpCallback;
+import org.mule.devkit.model.Identifiable;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
@@ -34,7 +34,6 @@ import javax.lang.model.type.TypeVariable;
 import javax.lang.model.type.WildcardType;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-import javax.tools.JavaFileObject;
 import javax.xml.bind.annotation.XmlType;
 import java.lang.annotation.Annotation;
 import java.math.BigDecimal;
@@ -46,14 +45,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-public class DefaultDevKitElement<T extends Element, P extends DevKitElement> implements DevKitElement<T, P> {
+public class AptIdentifiable<T extends Element, P extends Identifiable> implements Identifiable<T, P> {
     protected T innerElement;
     protected P parent;
     protected Types types;
     protected Elements elements;
     protected Trees trees;
 
-    public DefaultDevKitElement(T element, P parent, Types types, Elements elements, Trees trees) {
+    public AptIdentifiable(T element, P parent, Types types, Elements elements, Trees trees) {
         this.innerElement = element;
         this.parent = parent;
         this.types = types;
@@ -230,8 +229,8 @@ public class DefaultDevKitElement<T extends Element, P extends DevKitElement> im
     }
 
     @Override
-    public List<DevKitElement> getTypeArguments() {
-        List<DevKitElement> typeArguments = new ArrayList<DevKitElement>();
+    public List<Identifiable> getTypeArguments() {
+        List<Identifiable> typeArguments = new ArrayList<Identifiable>();
         DeclaredType declaredType = (DeclaredType)asType();
         for( TypeMirror typeMirror : declaredType.getTypeArguments() ) {
             if( typeMirror instanceof WildcardType || typeMirror instanceof TypeVariable ) {
@@ -239,9 +238,9 @@ public class DefaultDevKitElement<T extends Element, P extends DevKitElement> im
             }
             Element element = types.asElement(typeMirror);
             if( element instanceof TypeElement ) {
-                typeArguments.add(new DefaultDevKitTypeElement((TypeElement)element, types, elements, trees));
+                typeArguments.add(new AptType((TypeElement)element, types, elements, trees));
             } else {
-                typeArguments.add(new DefaultDevKitElement(element, this, types, elements, trees));
+                typeArguments.add(new AptIdentifiable(element, this, types, elements, trees));
             }
         }
 

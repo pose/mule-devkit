@@ -16,27 +16,8 @@
  */
 package org.mule.devkit.model;
 
-import javax.lang.model.element.Element;
-import javax.lang.model.element.Name;
-import javax.lang.model.type.TypeMirror;
-import java.util.List;
-
-public interface DevKitElement<T extends Element, P extends DevKitElement> extends DevKitAnnotatedElement {
-    T unwrap();
-
-    P parent();
-
-    TypeMirror asType();
-
-    Name getSimpleName();
-
+public interface Typeable {
     boolean isXmlType();
-
-    boolean isPublic();
-
-    boolean isPrivate();
-
-    boolean isProtected();
 
     boolean isAbstract();
 
@@ -54,39 +35,28 @@ public interface DevKitElement<T extends Element, P extends DevKitElement> exten
 
     boolean isCollection();
 
-    List<DevKitElement> getTypeArguments();
-
-    boolean hasTypeArguments();
 
     boolean isString();
-    
+
     boolean isBoolean();
-    
+
     boolean isInteger();
-    
+
     boolean isLong();
-    
+
     boolean isFloat();
-    
+
     boolean isDouble();
-    
+
     boolean isChar();
-    
+
     boolean isHttpCallback();
-    
+
     boolean isURL();
-    
+
     boolean isDate();
-    
+
     boolean isBigDecimal();
-    
+
     boolean isBigInteger();
-
-    boolean hasJavaDocTag(String tagName);
-
-    String getJavaDocSummary();
-
-    String getJavaDocTagContent(String tagName);
-
-    String getJavaDocParameterSummary(String paramName);
 }

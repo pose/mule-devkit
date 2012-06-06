@@ -25,14 +25,13 @@ import org.mule.api.annotations.display.Password;
 import org.mule.api.annotations.display.Summary;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
-import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.spring.SchemaGenerator;
 import org.mule.devkit.generation.spring.SchemaTypeConversion;
-import org.mule.devkit.model.DevKitElement;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitParameterElement;
-import org.mule.devkit.model.DevKitTypeElement;
-import org.mule.devkit.model.DevKitVariableElement;
+import org.mule.devkit.model.Identifiable;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Parameter;
+import org.mule.devkit.model.Type;
+import org.mule.devkit.model.Variable;
 import org.mule.devkit.model.studio.AttributeType;
 import org.mule.devkit.model.studio.Booleantype;
 import org.mule.devkit.model.studio.EncodingType;
@@ -71,13 +70,13 @@ public class MuleStudioUtils {
         return description.replaceAll("\\<.*?\\>", "");
     }
 
-    public String getConnectorImage(DevKitTypeElement typeElement) {
-        Icons icons = typeElement.getAnnotation(Icons.class);
+    public String getConnectorImage(Type type) {
+        Icons icons = type.getAnnotation(Icons.class);
         String image;
         if(icons != null) {
             image = icons.connectorLarge();
         } else {
-            image = String.format(Icons.GENERIC_CLOUD_CONNECTOR_LARGE, typeElement.name());
+            image = String.format(Icons.GENERIC_CLOUD_CONNECTOR_LARGE, type.name());
         }
         if(image.contains("/")) {
             image = image.substring(image.lastIndexOf("/") +1);
@@ -85,13 +84,13 @@ public class MuleStudioUtils {
         return IMAGE_PREFIX + image;
     }
 
-    public String getConnectorIcon(DevKitTypeElement typeElement) {
-        Icons icons = typeElement.getAnnotation(Icons.class);
+    public String getConnectorIcon(Type type) {
+        Icons icons = type.getAnnotation(Icons.class);
         String icon;
         if(icons != null) {
             icon = icons.connectorSmall();
         } else {
-            icon = String.format(Icons.GENERIC_CLOUD_CONNECTOR_SMALL, typeElement.name());
+            icon = String.format(Icons.GENERIC_CLOUD_CONNECTOR_SMALL, type.name());
         }
         if(icon.contains("/")) {
             icon = icon.substring(icon.lastIndexOf("/") +1);
@@ -99,13 +98,13 @@ public class MuleStudioUtils {
         return ICON_PREFIX + icon;
     }
 
-    public String getEndpointImage(DevKitTypeElement typeElement) {
-        Icons icons = typeElement.getAnnotation(Icons.class);
+    public String getEndpointImage(Type type) {
+        Icons icons = type.getAnnotation(Icons.class);
         String image;
         if(icons != null) {
             image = icons.endpointLarge();
         } else {
-            image = String.format(Icons.GENERIC_ENDPOINT_LARGE, typeElement.name());
+            image = String.format(Icons.GENERIC_ENDPOINT_LARGE, type.name());
         }
         if(image.contains("/")) {
             image = image.substring(image.lastIndexOf("/") +1);
@@ -113,13 +112,13 @@ public class MuleStudioUtils {
         return IMAGE_PREFIX + image;
     }
 
-    public String getEndpointIcon(DevKitTypeElement typeElement) {
-        Icons icons = typeElement.getAnnotation(Icons.class);
+    public String getEndpointIcon(Type type) {
+        Icons icons = type.getAnnotation(Icons.class);
         String icon;
         if(icons != null) {
             icon = icons.endpointSmall();
         } else {
-            icon = String.format(Icons.GENERIC_ENDPOINT_SMALL, typeElement.name());
+            icon = String.format(Icons.GENERIC_ENDPOINT_SMALL, type.name());
         }
         if(icon.contains("/")) {
             icon = icon.substring(icon.lastIndexOf("/") +1);
@@ -127,13 +126,13 @@ public class MuleStudioUtils {
         return ICON_PREFIX + icon;
     }
 
-    public String getTransformerImage(DevKitTypeElement typeElement) {
-        Icons icons = typeElement.getAnnotation(Icons.class);
+    public String getTransformerImage(Type type) {
+        Icons icons = type.getAnnotation(Icons.class);
         String image;
         if(icons != null) {
             image = icons.transformerLarge();
         } else {
-            image = String.format(Icons.GENERIC_TRANSFORMER_LARGE, typeElement.name());
+            image = String.format(Icons.GENERIC_TRANSFORMER_LARGE, type.name());
         }
         if(image.contains("/")) {
             image = image.substring(image.lastIndexOf("/") +1);
@@ -141,13 +140,13 @@ public class MuleStudioUtils {
         return IMAGE_PREFIX + image;
     }
 
-    public String getTransformerIcon(DevKitTypeElement typeElement) {
-        Icons icons = typeElement.getAnnotation(Icons.class);
+    public String getTransformerIcon(Type type) {
+        Icons icons = type.getAnnotation(Icons.class);
         String icon;
         if(icons != null) {
             icon = icons.transformerSmall();
         } else {
-            icon = String.format(Icons.GENERIC_TRANSFORMER_SMALL, typeElement.name());
+            icon = String.format(Icons.GENERIC_TRANSFORMER_SMALL, type.name());
         }
         if(icon.contains("/")) {
             icon = icon.substring(icon.lastIndexOf("/") +1);
@@ -205,7 +204,7 @@ public class MuleStudioUtils {
         return null;
     }
 
-    public AttributeType createAttributeTypeIgnoreEnumsAndCollections(DevKitElement element) {
+    public AttributeType createAttributeTypeIgnoreEnumsAndCollections(Identifiable element) {
         if (skipAttributeTypeGeneration(element)) {
             return null;
         } else if (SchemaTypeConversion.isSupported(element.asType().toString())) {
@@ -220,11 +219,11 @@ public class MuleStudioUtils {
         }
     }
 
-    private boolean skipAttributeTypeGeneration(DevKitElement element) {
-        return element.isCollection() || element.isEnum() || ((element instanceof DevKitParameterElement) && ((DevKitParameterElement) element).shouldBeIgnored());
+    private boolean skipAttributeTypeGeneration(Identifiable element) {
+        return element.isCollection() || element.isEnum() || ((element instanceof Parameter) && ((Parameter) element).shouldBeIgnored());
     }
 
-    private AttributeType createAttributeTypeOfSupportedType(DevKitElement element) {
+    private AttributeType createAttributeTypeOfSupportedType(Identifiable element) {
         if (element.getAnnotation(Password.class) != null) {
             return new PasswordType();
         }
@@ -247,24 +246,24 @@ public class MuleStudioUtils {
         }
     }
 
-    public void setAttributeTypeInfo(DevKitVariableElement variableElement, AttributeType attributeType) {
-        String parameterName = variableElement.getSimpleName().toString();
-        attributeType.setCaption(getFormattedCaption(variableElement));
-        attributeType.setDescription(getFormattedDescription(variableElement));
-        if (attributeType instanceof StringAttributeType && !SchemaTypeConversion.isSupported(variableElement.asType().toString())) {
+    public void setAttributeTypeInfo(Variable variable, AttributeType attributeType) {
+        String parameterName = variable.getSimpleName().toString();
+        attributeType.setCaption(getFormattedCaption(variable));
+        attributeType.setDescription(getFormattedDescription(variable));
+        if (attributeType instanceof StringAttributeType && !SchemaTypeConversion.isSupported(variable.asType().toString())) {
             attributeType.setName(parameterName + SchemaGenerator.REF_SUFFIX);
         } else if (attributeType instanceof FlowRefType) {
             attributeType.setName(NameUtils.uncamel(parameterName) + SchemaGenerator.FLOW_REF_SUFFIX);
         } else {
             attributeType.setName(parameterName);
         }
-        attributeType.setRequired(variableElement.getAnnotation(Optional.class) == null);
-        attributeType.setJavaType(variableElement.asType().toString());
-        setDefaultValueIfAvailable(variableElement, attributeType);
+        attributeType.setRequired(variable.getAnnotation(Optional.class) == null);
+        attributeType.setJavaType(variable.asType().toString());
+        setDefaultValueIfAvailable(variable, attributeType);
     }
 
-    public void setDefaultValueIfAvailable(DevKitVariableElement variableElement, AttributeType parameter) {
-        Default annotation = variableElement.getAnnotation(Default.class);
+    public void setDefaultValueIfAvailable(Variable variable, AttributeType parameter) {
+        Default annotation = variable.getAnnotation(Default.class);
         if (annotation != null) {
             if (parameter instanceof Booleantype) {
                 ((Booleantype) parameter).setDefaultValue(Boolean.valueOf(annotation.value()));
@@ -278,15 +277,15 @@ public class MuleStudioUtils {
         }
     }
 
-    public String getLocalId(DevKitExecutableElement executableElement, DevKitVariableElement variableElement) {
+    public String getLocalId(Method executableElement, Variable variable) {
         if (executableElement != null) {
-            return NameUtils.uncamel(executableElement.getSimpleName().toString()) + '-' + NameUtils.uncamel(variableElement.getSimpleName().toString());
+            return NameUtils.uncamel(executableElement.getSimpleName().toString()) + '-' + NameUtils.uncamel(variable.getSimpleName().toString());
         } else {
-            return "configurable-" + NameUtils.uncamel(variableElement.getSimpleName().toString());
+            return "configurable-" + NameUtils.uncamel(variable.getSimpleName().toString());
         }
     }
 
-    public String getLocalId(DevKitExecutableElement executableElement) {
+    public String getLocalId(Method executableElement) {
         String localId;
         Processor processor = executableElement.getAnnotation(Processor.class);
         if (processor != null && StringUtils.isNotBlank(processor.name())) {
@@ -297,36 +296,36 @@ public class MuleStudioUtils {
         return NameUtils.uncamel(localId);
     }
 
-    public String getFormattedDescription(DevKitVariableElement element) {
+    public String getFormattedDescription(Variable element) {
         Summary description = element.getAnnotation(Summary.class);
         if (description != null && StringUtils.isNotBlank(description.value())) {
             return formatDescription(description.value());
         }
-        if (element instanceof DevKitParameterElement) {
+        if (element instanceof Parameter) {
             return formatDescription(element.parent().getJavaDocParameterSummary(element.getSimpleName().toString()));
         }
         return formatDescription(element.getJavaDocSummary());
     }
 
-    public String getFormattedDescription(DevKitTypeElement typeElement) {
-        if(StringUtils.isNotBlank(typeElement.description())) {
-            return typeElement.description();
+    public String getFormattedDescription(Type type) {
+        if(StringUtils.isNotBlank(type.description())) {
+            return type.description();
         }
-        return formatDescription(typeElement.getJavaDocSummary());
+        return formatDescription(type.getJavaDocSummary());
     }
 
-    public String getFormattedCaption(DevKitTypeElement typeElement) {
-        if(StringUtils.isNotBlank(typeElement.friendlyName())) {
-            return typeElement.friendlyName();
+    public String getFormattedCaption(Type type) {
+        if(StringUtils.isNotBlank(type.friendlyName())) {
+            return type.friendlyName();
         }
-        return formatCaption(typeElement.name().replaceAll("-", " "));
+        return formatCaption(type.name().replaceAll("-", " "));
     }
 
-    public String getFormattedCaption(DevKitExecutableElement element) {
+    public String getFormattedCaption(Method element) {
         return formatCaption(getFriendlyName(element));
     }
 
-    public String getFormattedCaption(DevKitVariableElement element) {
+    public String getFormattedCaption(Variable element) {
         FriendlyName caption = element.getAnnotation(FriendlyName.class);
         if (caption != null && StringUtils.isNotBlank(caption.value())) {
             return caption.value();
@@ -341,7 +340,7 @@ public class MuleStudioUtils {
         return formatCaption(friendlyName);
     }
 
-    public String getFriendlyName(DevKitExecutableElement element) {
+    public String getFriendlyName(Method element) {
         Processor processor = element.getAnnotation(Processor.class);
         if(processor != null && StringUtils.isNotBlank(processor.friendlyName())) {
             return processor.friendlyName();
@@ -353,7 +352,7 @@ public class MuleStudioUtils {
         return NameUtils.friendlyNameFromCamelCase(element.getSimpleName().toString());
     }
 
-    public boolean isKnownType(DevKitVariableElement variable) {
+    public boolean isKnownType(Variable variable) {
         return variable.isString() ||
                 variable.isChar() ||
                 variable.isDate() ||
@@ -370,7 +369,7 @@ public class MuleStudioUtils {
                 variable.isURL();
     }
 
-    public String getUrl(DevKitTypeElement typeElement) {
-        return MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/';
+    public String getUrl(Type type) {
+        return MuleStudioEditorXmlGenerator.URI_PREFIX + type.name() + '/';
     }
 }

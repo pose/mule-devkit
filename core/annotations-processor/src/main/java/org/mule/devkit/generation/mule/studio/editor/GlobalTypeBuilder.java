@@ -18,8 +18,8 @@
 package org.mule.devkit.generation.mule.studio.editor;
 
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.AttributeType;
 import org.mule.devkit.model.studio.GlobalType;
@@ -28,12 +28,12 @@ import java.util.List;
 
 public abstract class GlobalTypeBuilder extends BaseStudioXmlBuilder {
 
-    public GlobalTypeBuilder(GeneratorContext context, DevKitExecutableElement executableElement, DevKitTypeElement typeElement) {
-        super(context, executableElement, typeElement);
+    public GlobalTypeBuilder(GeneratorContext context, Method executableElement, Type type) {
+        super(context, executableElement, type);
     }
 
-    public GlobalTypeBuilder(GeneratorContext context, DevKitTypeElement typeElement) {
-        super(context, typeElement);
+    public GlobalTypeBuilder(GeneratorContext context, Type type) {
+        super(context, type);
     }
 
     protected abstract List<AttributeCategory> getAttributeCategories();

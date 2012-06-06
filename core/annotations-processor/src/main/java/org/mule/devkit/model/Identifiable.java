@@ -16,7 +16,16 @@
  */
 package org.mule.devkit.model;
 
-import javax.lang.model.element.VariableElement;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.Name;
+import javax.lang.model.type.TypeMirror;
 
-public interface DevKitVariableElement<P extends DevKitElement> extends DevKitElement<VariableElement, P> {
+public interface Identifiable<T extends Element, P extends Identifiable> extends Annotable, Documentable, Accessible, Generifiable, Typeable {
+    T unwrap();
+
+    P parent();
+
+    TypeMirror asType();
+
+    Name getSimpleName();
 }

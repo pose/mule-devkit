@@ -14,19 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.mule.devkit.model;
 
-package org.mule.devkit.generation;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeParameterElement;
+import javax.lang.model.type.TypeMirror;
+import java.util.List;
 
-import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.Type;
+public interface Method extends Identifiable<ExecutableElement, Type> {
+    List<Parameter> getParameters();
 
-public interface Generator {
+    List<? extends TypeMirror> getThrownTypes();
 
-    boolean shouldGenerate(Type type);
+    TypeMirror getReturnType();
 
-    void generate(Type type) throws GenerationException;
+    List<? extends TypeParameterElement> getTypeParameters();
 
-    void setCtx(GeneratorContext generationContext);
+    boolean hasOnlyOneChildElement();
 
-    GeneratorContext ctx();
+    String getCapitalizedName();
 }

@@ -23,7 +23,7 @@ import org.mule.api.annotations.Transformer;
 import org.mule.api.annotations.display.Icons;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Type;
 import org.mule.util.IOUtils;
 
 import java.io.File;
@@ -36,41 +36,41 @@ public class MuleStudioIconsGenerator extends AbstractMessageGenerator {
     public static final String ICONS_FOLDER = "icons/";
 
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(Type type) {
         return !ctx().hasOption("skipStudioPluginPackage");
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) throws GenerationException {
-        Icons icons = typeElement.getAnnotation(Icons.class);
+    public void generate(Type type) throws GenerationException {
+        Icons icons = type.getAnnotation(Icons.class);
         if (icons != null) {
-            copyFile(icons.connectorSmall(), "icons/small", typeElement);
-            copyFile(icons.connectorLarge(), "icons/large", typeElement);
-            if(typeElement.hasMethodsAnnotatedWith(Transformer.class)) {
-                copyFile(icons.transformerSmall(), "icons/small", typeElement);
-                copyFile(icons.transformerLarge(), "icons/large", typeElement);
+            copyFile(icons.connectorSmall(), "icons/small", type);
+            copyFile(icons.connectorLarge(), "icons/large", type);
+            if(type.hasMethodsAnnotatedWith(Transformer.class)) {
+                copyFile(icons.transformerSmall(), "icons/small", type);
+                copyFile(icons.transformerLarge(), "icons/large", type);
             }
-            if(typeElement.hasMethodsAnnotatedWith(Source.class)) {
-                copyFile(icons.endpointSmall(), "icons/small", typeElement);
-                copyFile(icons.endpointLarge(), "icons/large", typeElement);
+            if(type.hasMethodsAnnotatedWith(Source.class)) {
+                copyFile(icons.endpointSmall(), "icons/small", type);
+                copyFile(icons.endpointLarge(), "icons/large", type);
             }
         } else {
-            copyFile(String.format(Icons.GENERIC_CLOUD_CONNECTOR_SMALL, typeElement.name()), "icons/small", typeElement);
-            copyFile(String.format(Icons.GENERIC_CLOUD_CONNECTOR_LARGE, typeElement.name()), "icons/large", typeElement);
-            if(typeElement.hasMethodsAnnotatedWith(Transformer.class)) {
-                copyFile(String.format(Icons.GENERIC_TRANSFORMER_SMALL, typeElement.name()), "icons/small", typeElement);
-                copyFile(String.format(Icons.GENERIC_TRANSFORMER_LARGE, typeElement.name()), "icons/large", typeElement);
+            copyFile(String.format(Icons.GENERIC_CLOUD_CONNECTOR_SMALL, type.name()), "icons/small", type);
+            copyFile(String.format(Icons.GENERIC_CLOUD_CONNECTOR_LARGE, type.name()), "icons/large", type);
+            if(type.hasMethodsAnnotatedWith(Transformer.class)) {
+                copyFile(String.format(Icons.GENERIC_TRANSFORMER_SMALL, type.name()), "icons/small", type);
+                copyFile(String.format(Icons.GENERIC_TRANSFORMER_LARGE, type.name()), "icons/large", type);
             }
-            if(typeElement.hasMethodsAnnotatedWith(Source.class)) {
-                copyFile(String.format(Icons.GENERIC_ENDPOINT_SMALL, typeElement.name()), "icons/small", typeElement);
-                copyFile(String.format(Icons.GENERIC_ENDPOINT_LARGE, typeElement.name()), "icons/large", typeElement);
+            if(type.hasMethodsAnnotatedWith(Source.class)) {
+                copyFile(String.format(Icons.GENERIC_ENDPOINT_SMALL, type.name()), "icons/small", type);
+                copyFile(String.format(Icons.GENERIC_ENDPOINT_LARGE, type.name()), "icons/large", type);
             }
         }
     }
 
-    private void copyFile(String fileName, String folder, DevKitTypeElement typeElement) throws GenerationException {
-        String sourcePath = typeElement.getPathToSourceFile();
-        int packageCount = StringUtils.countMatches(typeElement.getQualifiedName().toString(), ".") + 1;
+    private void copyFile(String fileName, String folder, Type type) throws GenerationException {
+        String sourcePath = type.getPathToSourceFile();
+        int packageCount = StringUtils.countMatches(type.getQualifiedName().toString(), ".") + 1;
         while (packageCount > 0) {
             sourcePath = sourcePath.substring(0, sourcePath.lastIndexOf("/"));
             packageCount--;

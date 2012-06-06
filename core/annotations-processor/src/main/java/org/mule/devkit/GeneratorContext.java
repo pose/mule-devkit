@@ -17,13 +17,12 @@
 
 package org.mule.devkit;
 
-import org.mule.devkit.model.DevKitElement;
+import org.mule.devkit.model.Identifiable;
 import org.mule.devkit.model.code.CodeModel;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.writer.FilerCodeWriter;
 import org.mule.devkit.model.schema.SchemaModel;
 import org.mule.devkit.model.studio.StudioModel;
-import org.mule.devkit.utils.NameUtils;
 
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -33,7 +32,6 @@ import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -127,7 +125,7 @@ public class GeneratorContext {
         messager.printMessage(Diagnostic.Kind.ERROR, msg);
     }
 
-    public void error(String msg, DevKitElement element) {
+    public void error(String msg, Identifiable element) {
         messager.printMessage(Diagnostic.Kind.ERROR, msg, element.unwrap());
     }
 }

@@ -21,8 +21,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mule.devkit.model.DefaultDevKitExecutableElement;
-import org.mule.devkit.model.DevKitExecutableElement;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.apt.AptMethod;
 import org.mule.util.StringUtils;
 
 import javax.lang.model.util.Elements;
@@ -41,13 +41,13 @@ public class JavaDocUtilsTest {
     @Mock
     private Trees trees;
 
-    private DevKitExecutableElement executableElement;
+    private Method executableElement;
 
     @Before
     public void setUpTests() {
         MockitoAnnotations.initMocks(this);
 
-        executableElement = new DefaultDevKitExecutableElement(null, null, types, elements, trees);
+        executableElement = new AptMethod(null, null, types, elements, trees);
     }
 
     @Test

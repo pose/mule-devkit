@@ -35,7 +35,7 @@ import org.mule.config.spring.factories.AsyncMessageProcessorsFactoryBean;
 import org.mule.construct.Flow;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.NamingConstants;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
@@ -86,15 +86,15 @@ public class DefaultHttpCallbackGenerator extends AbstractModuleGenerator {
     private FieldVariable connectorField;
 
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return typeElement.hasAnnotation(OAuth.class) ||
-                typeElement.hasAnnotation(OAuth2.class) ||
-                typeElement.hasProcessorMethodWithParameter(HttpCallback.class);
+    public boolean shouldGenerate(Type type) {
+        return type.hasAnnotation(OAuth.class) ||
+                type.hasAnnotation(OAuth2.class) ||
+                type.hasProcessorMethodWithParameter(HttpCallback.class);
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) {
-        DefinedClass callbackClass = getDefaultHttpCallbackClass(typeElement);
+    public void generate(Type type) {
+        DefinedClass callbackClass = getDefaultHttpCallbackClass(type);
 
         ctx().note("Generating HTTP callback implementation as " + callbackClass.fullName());
 
@@ -396,7 +396,7 @@ public class DefaultHttpCallbackGenerator extends AbstractModuleGenerator {
         processMethod.body()._return(ExpressionFactory.invoke(callbackFlowField, "process").arg(processMethod.params().get(0)));
     }
 
-    private DefinedClass getDefaultHttpCallbackClass(DevKitTypeElement type) {
+    private DefinedClass getDefaultHttpCallbackClass(Type type) {
         Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.CONFIG_NAMESPACE);
         DefinedClass clazz = pkg._class(NamingConstants.DEFAULT_HTTP_CALLBACK_CLASS_NAME, new Class[]{HttpCallback.class});
         clazz.role(DefinedClassRoles.DEFAULT_HTTP_CALLBACK);

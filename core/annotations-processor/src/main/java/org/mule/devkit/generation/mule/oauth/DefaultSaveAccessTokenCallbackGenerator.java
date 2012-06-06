@@ -28,7 +28,7 @@ import org.mule.api.oauth.SaveAccessTokenCallback;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.NamingConstants;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
@@ -46,8 +46,8 @@ public class DefaultSaveAccessTokenCallbackGenerator extends AbstractMessageGene
     public static final String ROLE = "DefaultSaveAccessTokenCallback";
 
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
-        if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class)) {
+    public boolean shouldGenerate(Type type) {
+        if (type.hasAnnotation(OAuth.class) || type.hasAnnotation(OAuth2.class)) {
             return true;
         }
 
@@ -55,8 +55,8 @@ public class DefaultSaveAccessTokenCallbackGenerator extends AbstractMessageGene
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) throws GenerationException {
-        DefinedClass callbackClass = getDefaultSaveAccessTokenCallbackClass(typeElement);
+    public void generate(Type type) throws GenerationException {
+        DefinedClass callbackClass = getDefaultSaveAccessTokenCallbackClass(type);
 
         FieldVariable messageProcessor = generateFieldForMessageProcessor(callbackClass, "messageProcessor");
         FieldVariable logger = generateLoggerField(callbackClass);
@@ -148,7 +148,7 @@ public class DefaultSaveAccessTokenCallbackGenerator extends AbstractMessageGene
         );
     }
 
-    private DefinedClass getDefaultSaveAccessTokenCallbackClass(DevKitTypeElement type) {
+    private DefinedClass getDefaultSaveAccessTokenCallbackClass(Type type) {
         org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.CONFIG_NAMESPACE);
         DefinedClass clazz = pkg._class(NamingConstants.DEFAULT_SAVE_ACCESS_TOKEN_CALLBACK_CLASS_NAME, new Class[]{
                 SaveAccessTokenCallback.class});

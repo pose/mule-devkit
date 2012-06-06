@@ -43,9 +43,9 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.NamingConstants;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitParameterElement;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Parameter;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.ClassAlreadyExistsException;
 import org.mule.devkit.model.code.Conditional;
@@ -55,7 +55,6 @@ import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.ForEach;
 import org.mule.devkit.model.code.Invocation;
-import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.TryStatement;
@@ -66,7 +65,6 @@ import org.mule.devkit.utils.NameUtils;
 import org.mule.expression.ExpressionUtils;
 
 import javax.lang.model.type.TypeKind;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -77,17 +75,17 @@ import java.util.Set;
 public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
 
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return typeElement.hasAnnotation(ExpressionLanguage.class) && typeElement.getMethodsAnnotatedWith(ExpressionEnricher.class).size() > 0;
+    public boolean shouldGenerate(Type type) {
+        return type.hasAnnotation(ExpressionLanguage.class) && type.getMethodsAnnotatedWith(ExpressionEnricher.class).size() > 0;
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) {
-        String name = typeElement.getAnnotation(ExpressionLanguage.class).name();
+    public void generate(Type type) {
+        String name = type.getAnnotation(ExpressionLanguage.class).name();
 
-        DevKitExecutableElement executableElement = typeElement.getMethodsAnnotatedWith(ExpressionEnricher.class).get(0);
-        TypeReference moduleObject = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
-        DefinedClass enricherClass = getEnricherClass(name, typeElement);
+        Method executableElement = type.getMethodsAnnotatedWith(ExpressionEnricher.class).get(0);
+        TypeReference moduleObject = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(type));
+        DefinedClass enricherClass = getEnricherClass(name, type);
 
         // build trackmap
         DefinedClass trackMap = null;
@@ -118,31 +116,31 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
         generateTrackMapValues(trackMap, v, trackedMap);
         generateTrackMapEntrySet(trackMap, k, v, trackedMap);
 
-        ctx().note("Generating message enricher " + enricherClass.fullName() + " for language at class " + typeElement.getSimpleName().toString());
+        ctx().note("Generating message enricher " + enricherClass.fullName() + " for language at class " + type.getSimpleName().toString());
 
         FieldVariable module = generateModuleField(moduleObject, enricherClass);
 
-        Method setMuleContext = enricherClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setMuleContext");
+        org.mule.devkit.model.code.Method setMuleContext = enricherClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setMuleContext");
         Variable muleContext = setMuleContext.param(ref(MuleContext.class), "muleContext");
         Conditional ifModuleIsContextAware = setMuleContext.body()._if(Op._instanceof(module, ref(MuleContextAware.class)));
         ifModuleIsContextAware._then().add(ExpressionFactory.cast(ref(MuleContextAware.class), module).invoke("setMuleContext").arg(muleContext));
 
-        Method start = enricherClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "start");
+        org.mule.devkit.model.code.Method start = enricherClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "start");
         start._throws(ref(MuleException.class));
         Conditional ifModuleIsStartable = start.body()._if(Op._instanceof(module, ref(Startable.class)));
         ifModuleIsStartable._then().add(ExpressionFactory.cast(ref(Startable.class), module).invoke("start"));
 
-        Method stop = enricherClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "stop");
+        org.mule.devkit.model.code.Method stop = enricherClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "stop");
         stop._throws(ref(MuleException.class));
         Conditional ifModuleIsStoppable = stop.body()._if(Op._instanceof(module, ref(Stoppable.class)));
         ifModuleIsStoppable._then().add(ExpressionFactory.cast(ref(Stoppable.class), module).invoke("stop"));
 
-        Method init = enricherClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "initialise");
+        org.mule.devkit.model.code.Method init = enricherClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "initialise");
         init._throws(ref(InitialisationException.class));
         Conditional ifModuleIsInitialisable = init.body()._if(Op._instanceof(module, ref(Initialisable.class)));
         ifModuleIsInitialisable._then().add(ExpressionFactory.cast(ref(Initialisable.class), module).invoke("initialise"));
 
-        Method dispose = enricherClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "dispose");
+        org.mule.devkit.model.code.Method dispose = enricherClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "dispose");
         Conditional ifModuleIsDisposable = dispose.body()._if(Op._instanceof(module, ref(Disposable.class)));
         ifModuleIsDisposable._then().add(ExpressionFactory.cast(ref(Disposable.class), module).invoke("dispose"));
 
@@ -160,7 +158,7 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
         generateIsAssignableFrom(enricherClass);
         generateTransformMethod(enricherClass);
 
-        Method enrich = enricherClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "enrich");
+        org.mule.devkit.model.code.Method enrich = enricherClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "enrich");
         Variable expression = enrich.param(ref(String.class), "expression");
         Variable message = enrich.param(ref(MuleMessage.class), "message");
         Variable object = enrich.param(ref(Object.class), "object");
@@ -168,7 +166,7 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
         TryStatement tryStatement = enrich.body()._try();
 
         Invocation newArray = ExpressionFactory._new(ref(Class.class).array());
-        for (DevKitParameterElement parameter : executableElement.getParameters()) {
+        for (Parameter parameter : executableElement.getParameters()) {
             if (parameter.asType().getKind() == TypeKind.BOOLEAN ||
                     parameter.asType().getKind() == TypeKind.BYTE ||
                     parameter.asType().getKind() == TypeKind.SHORT ||
@@ -187,8 +185,8 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
         Invocation getMethod = module.invoke("getClass").invoke("getMethod").arg(executableElement.getSimpleName().toString()).arg(parameterClasses);
         Variable moduleEvaluate = tryStatement.body().decl(ref(java.lang.reflect.Method.class), "evaluateMethod", getMethod);
         List<Variable> types = new ArrayList<Variable>();
-        for (DevKitParameterElement parameter : executableElement.getParameters()) {
-            Variable var = tryStatement.body().decl(ref(Type.class), parameter.getSimpleName().toString() + "Type", moduleEvaluate.invoke("getGenericParameterTypes").component(ExpressionFactory.lit(types.size())));
+        for (Parameter parameter : executableElement.getParameters()) {
+            Variable var = tryStatement.body().decl(ref(java.lang.reflect.Type.class), parameter.getSimpleName().toString() + "Type", moduleEvaluate.invoke("getGenericParameterTypes").component(ExpressionFactory.lit(types.size())));
             types.add(var);
         }
 
@@ -198,7 +196,7 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
         Variable outboundHeadersVar = null;
         Variable sessionHeadersVar = null;
         Invocation evaluateInvoke = module.invoke(executableElement.getSimpleName().toString());
-        for (DevKitParameterElement parameter : executableElement.getParameters()) {
+        for (Parameter parameter : executableElement.getParameters()) {
             if (parameter.getAnnotation(Payload.class) != null) {
                 evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()).boxify(), ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(message.invoke("getPayload"))));
             } else if (parameter.getAnnotation(ExceptionPayload.class) != null) {
@@ -326,50 +324,50 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
     }
 
     private void generateTrackMapEntrySet(DefinedClass trackMap, TypeVariable k, TypeVariable v, FieldVariable trackedMap) {
-        Method entrySet = trackMap.method(Modifier.PUBLIC, ref(Set.class).narrow(ref(Map.Entry.class).narrow(k).narrow(v)), "entrySet");
+        org.mule.devkit.model.code.Method entrySet = trackMap.method(Modifier.PUBLIC, ref(Set.class).narrow(ref(Map.Entry.class).narrow(k).narrow(v)), "entrySet");
         entrySet.annotate(ref(Override.class));
         entrySet.body()._return(trackedMap.invoke("entrySet"));
     }
 
     private void generateTrackMapValues(DefinedClass trackMap, TypeVariable v, FieldVariable trackedMap) {
-        Method values = trackMap.method(Modifier.PUBLIC, ref(Collection.class).narrow(v), "values");
+        org.mule.devkit.model.code.Method values = trackMap.method(Modifier.PUBLIC, ref(Collection.class).narrow(v), "values");
         values.annotate(ref(Override.class));
         values.body()._return(trackedMap.invoke("values"));
     }
 
     private void generateTrackMapChangedKeySet(DefinedClass trackMap, TypeVariable k, FieldVariable changedKeys) {
-        Method changedkeySet = trackMap.method(Modifier.PUBLIC, ref(Set.class).narrow(k), "changedKeySet");
+        org.mule.devkit.model.code.Method changedkeySet = trackMap.method(Modifier.PUBLIC, ref(Set.class).narrow(k), "changedKeySet");
         changedkeySet.body()._return(ExpressionFactory._this().ref(changedKeys));
     }
 
     private void generateTrackMapKeySet(DefinedClass trackMap, TypeVariable k, FieldVariable trackedMap) {
-        Method keySet = trackMap.method(Modifier.PUBLIC, ref(Set.class).narrow(k), "keySet");
+        org.mule.devkit.model.code.Method keySet = trackMap.method(Modifier.PUBLIC, ref(Set.class).narrow(k), "keySet");
         keySet.annotate(ref(Override.class));
         keySet.body()._return(trackedMap.invoke("keySet"));
     }
 
     private void generateTrackMapClear(DefinedClass trackMap, FieldVariable trackedMap) {
-        Method clear = trackMap.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "clear");
+        org.mule.devkit.model.code.Method clear = trackMap.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "clear");
         clear.annotate(ref(Override.class));
         clear.body().add(trackedMap.invoke("clear"));
     }
 
     private void generateTrackMapPutAll(DefinedClass trackMap, TypeVariable k, TypeVariable v, FieldVariable trackedMap) {
-        Method putAll = trackMap.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "putAll");
+        org.mule.devkit.model.code.Method putAll = trackMap.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "putAll");
         putAll.annotate(ref(Override.class));
         Variable map = putAll.param(ref(Map.class).narrow(k.wildcard()).narrow(v.wildcard()), "map");
         putAll.body().add(trackedMap.invoke("putAll").arg(map));
     }
 
     private void generateTrackMapRemove(DefinedClass trackMap, TypeVariable v, FieldVariable trackedMap) {
-        Method remove = trackMap.method(Modifier.PUBLIC, v, "remove");
+        org.mule.devkit.model.code.Method remove = trackMap.method(Modifier.PUBLIC, v, "remove");
         remove.annotate(ref(Override.class));
         Variable o4 = remove.param(ref(Object.class), "o");
         remove.body()._return(trackedMap.invoke("remove").arg(o4));
     }
 
     private void generateTrackMapPut(DefinedClass trackMap, TypeVariable k, TypeVariable v, FieldVariable trackedMap, FieldVariable changedKeys) {
-        Method put = trackMap.method(Modifier.PUBLIC, v, "put");
+        org.mule.devkit.model.code.Method put = trackMap.method(Modifier.PUBLIC, v, "put");
         put.annotate(ref(Override.class));
         Variable k2 = put.param(k, "k");
         Variable v2 = put.param(v, "v");
@@ -378,41 +376,41 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
     }
 
     private void generateTrackMapGet(DefinedClass trackMap, TypeVariable v, FieldVariable trackedMap) {
-        Method get = trackMap.method(Modifier.PUBLIC, v, "get");
+        org.mule.devkit.model.code.Method get = trackMap.method(Modifier.PUBLIC, v, "get");
         get.annotate(ref(Override.class));
         Variable o3 = get.param(ref(Object.class), "o");
         get.body()._return(trackedMap.invoke("get").arg(o3));
     }
 
     private void generateTrackMapConstructor(DefinedClass trackMap, TypeVariable k, TypeVariable v, FieldVariable trackedMap, FieldVariable changedKeys) {
-        Method constructor = trackMap.constructor(Modifier.PUBLIC);
+        org.mule.devkit.model.code.Method constructor = trackMap.constructor(Modifier.PUBLIC);
         Variable innerTrackedMap = constructor.param(ref(Map.class).narrow(k).narrow(v), "trackedMap");
         constructor.body().assign(ExpressionFactory._this().ref(trackedMap), innerTrackedMap);
         constructor.body().assign(ExpressionFactory._this().ref(changedKeys), ExpressionFactory._new(ref(HashSet.class).narrow(k)));
     }
 
     private void generateTrackMapContainsValue(DefinedClass trackMap, FieldVariable trackedMap) {
-        Method containsValue = trackMap.method(Modifier.PUBLIC, ctx().getCodeModel().BOOLEAN, "containsValue");
+        org.mule.devkit.model.code.Method containsValue = trackMap.method(Modifier.PUBLIC, ctx().getCodeModel().BOOLEAN, "containsValue");
         containsValue.annotate(ref(Override.class));
         Variable o2 = containsValue.param(ref(Object.class), "o");
         containsValue.body()._return(trackedMap.invoke("containsValue").arg(o2));
     }
 
     private void generateTrackMapContainsKey(DefinedClass trackMap, FieldVariable trackedMap) {
-        Method containsKey = trackMap.method(Modifier.PUBLIC, ctx().getCodeModel().BOOLEAN, "containsKey");
+        org.mule.devkit.model.code.Method containsKey = trackMap.method(Modifier.PUBLIC, ctx().getCodeModel().BOOLEAN, "containsKey");
         containsKey.annotate(ref(Override.class));
         Variable o = containsKey.param(ref(Object.class), "o");
         containsKey.body()._return(trackedMap.invoke("containsKey").arg(o));
     }
 
     private void generateTrackMapIsEmpty(DefinedClass trackMap, FieldVariable trackedMap) {
-        Method isEmpty = trackMap.method(Modifier.PUBLIC, ctx().getCodeModel().BOOLEAN, "isEmpty");
+        org.mule.devkit.model.code.Method isEmpty = trackMap.method(Modifier.PUBLIC, ctx().getCodeModel().BOOLEAN, "isEmpty");
         isEmpty.annotate(ref(Override.class));
         isEmpty.body()._return(trackedMap.invoke("isEmpty"));
     }
 
     private void generateTrackMapSize(DefinedClass trackMap, FieldVariable trackedMap) {
-        Method size = trackMap.method(Modifier.PUBLIC, ctx().getCodeModel().INT, "size");
+        org.mule.devkit.model.code.Method size = trackMap.method(Modifier.PUBLIC, ctx().getCodeModel().INT, "size");
         size.annotate(ref(Override.class));
         size.body()._return(trackedMap.invoke("size"));
     }
@@ -428,23 +426,23 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
     }
 
     private void generateConstructor(TypeReference typeRef, DefinedClass evaluatorClass, FieldVariable module) {
-        Method constructor = evaluatorClass.constructor(Modifier.PUBLIC);
+        org.mule.devkit.model.code.Method constructor = evaluatorClass.constructor(Modifier.PUBLIC);
         constructor.body().assign(module, ExpressionFactory._new(typeRef));
     }
 
     private void generateGetName(String name, DefinedClass evaluatorClass) {
-        Method getName = evaluatorClass.method(Modifier.PUBLIC, ref(String.class), "getName");
+        org.mule.devkit.model.code.Method getName = evaluatorClass.method(Modifier.PUBLIC, ref(String.class), "getName");
         getName.body()._return(ExpressionFactory.lit(name));
     }
 
     private void generateSetName(DefinedClass evaluatorClass) {
-        Method setName = evaluatorClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setName");
+        org.mule.devkit.model.code.Method setName = evaluatorClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setName");
         setName.param(ref(String.class), "name");
         setName.body()._throw(ExpressionFactory._new(ref(UnsupportedOperationException.class)));
     }
 
-    private DefinedClass getEnricherClass(String name, DevKitTypeElement variableElement) {
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(variableElement.getPackageName() + NamingConstants.EXPRESSIONS_NAMESPACE);
+    private DefinedClass getEnricherClass(String name, Type type) {
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.EXPRESSIONS_NAMESPACE);
         DefinedClass enricherClass = pkg._class(NameUtils.camel(name) + NamingConstants.EXPRESSION_ENRICHER_CLASS_NAME_SUFFIX, new Class<?>[]{org.mule.api.expression.ExpressionEnricher.class});
         enricherClass._implements(ref(MuleContextAware.class));
         enricherClass._implements(ref(Startable.class));

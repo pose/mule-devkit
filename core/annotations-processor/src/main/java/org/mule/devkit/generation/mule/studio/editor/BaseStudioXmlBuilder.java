@@ -21,11 +21,11 @@ import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Connect;
 import org.mule.api.annotations.display.Placement;
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitFieldElement;
-import org.mule.devkit.model.DevKitParameterElement;
-import org.mule.devkit.model.DevKitTypeElement;
-import org.mule.devkit.model.DevKitVariableElement;
+import org.mule.devkit.model.Field;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Parameter;
+import org.mule.devkit.model.Type;
+import org.mule.devkit.model.Variable;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.AttributeType;
 import org.mule.devkit.model.studio.EnumElement;
@@ -56,8 +56,8 @@ public abstract class BaseStudioXmlBuilder {
     public static final String CONNECTION_GROUP_LABEL = "Use these fields to override the credentials defined in the %s connector.";
     protected ObjectFactory objectFactory;
     protected MuleStudioUtils helper;
-    protected DevKitTypeElement typeElement;
-    protected DevKitExecutableElement executableElement;
+    protected Type type;
+    protected Method executableElement;
     protected Types typeUtils;
     protected String moduleName;
     protected GeneratorContext context;
@@ -70,13 +70,13 @@ public abstract class BaseStudioXmlBuilder {
         objectFactory = new ObjectFactory();
     }
 
-    protected BaseStudioXmlBuilder(GeneratorContext context, DevKitTypeElement typeElement) {
+    protected BaseStudioXmlBuilder(GeneratorContext context, Type type) {
         this(context);
-        this.typeElement = typeElement;
-        moduleName = typeElement.name();
+        this.type = type;
+        moduleName = type.name();
     }
 
-    protected Group createGroupWithModeSwitch(List<DevKitExecutableElement> methods) {
+    protected Group createGroupWithModeSwitch(List<Method> methods) {
        
         ModeType modeSwitch = new ModeType();
         modeSwitch.getMode().addAll(this.getModes(methods));
@@ -85,17 +85,17 @@ public abstract class BaseStudioXmlBuilder {
         modeSwitch.setDescription(helper.formatDescription("Operation"));
 
         Group group = new Group();
-        group.setId(typeElement.name() + "ConnectorGeneric");
+        group.setId(type.name() + "ConnectorGeneric");
         group.getRegexpOrEncodingOrModeSwitch().add(objectFactory.createGroupModeSwitch(modeSwitch));
         group.setCaption(helper.formatCaption(MuleStudioEditorXmlGenerator.GROUP_DEFAULT_CAPTION));
         return group;
     }
     
-    protected List<ModeElementType> getModes(List<DevKitExecutableElement> methods) {
+    protected List<ModeElementType> getModes(List<Method> methods) {
 		 List<ModeElementType> modes = new ArrayList<ModeElementType>();
-	     for (DevKitExecutableElement method : methods) {
+	     for (Method method : methods) {
 	         ModeElementType mode = new ModeElementType();
-	         mode.setModeId(MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + helper.getLocalId(method));
+	         mode.setModeId(MuleStudioEditorXmlGenerator.URI_PREFIX + type.name() + '/' + helper.getLocalId(method));
 	         mode.setModeLabel(StringUtils.capitalize(helper.getFriendlyName(method)));
 	         modes.add(mode);
 	     }
@@ -103,8 +103,8 @@ public abstract class BaseStudioXmlBuilder {
 	     return modes;
     }
 
-    protected BaseStudioXmlBuilder(GeneratorContext context, DevKitExecutableElement executableElement, DevKitTypeElement typeElement) {
-        this(context, typeElement);
+    protected BaseStudioXmlBuilder(GeneratorContext context, Method executableElement, Type type) {
+        this(context, type);
         this.executableElement = executableElement;
     }
 
@@ -116,7 +116,7 @@ public abstract class BaseStudioXmlBuilder {
         List<AttributeCategory> attributeCategories = processVariableElements(getConfigurableFieldsSorted());
         for (AttributeCategory attributeCategory : attributeCategories) {
             if (attributeCategory.getCaption().equals(MuleStudioEditorXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION)) {
-                attributeCategory.setDescription(helper.formatDescription(typeElement.name() + " configuration properties"));
+                attributeCategory.setDescription(helper.formatDescription(type.name() + " configuration properties"));
                 List<Group> groups = attributeCategory.getGroup();
                 if (groups.isEmpty()) {
                     groups.add(defaultGroup);
@@ -127,15 +127,15 @@ public abstract class BaseStudioXmlBuilder {
         }
         if (attributeCategories.isEmpty()) {
             AttributeCategory attributeCategory = new AttributeCategory();
-            attributeCategory.setCaption(helper.getFormattedCaption(typeElement));
-            attributeCategory.setDescription(helper.formatDescription(typeElement.name() + " configuration properties"));
+            attributeCategory.setCaption(helper.getFormattedCaption(type));
+            attributeCategory.setDescription(helper.formatDescription(type.name() + " configuration properties"));
             attributeCategory.getGroup().add(defaultGroup);
             attributeCategories.add(attributeCategory);
         }
         return attributeCategories;
     }
 
-    private List<AttributeCategory> processVariableElements(List<? extends DevKitVariableElement> variableElements) {
+    private List<AttributeCategory> processVariableElements(List<? extends Variable> variableElements) {
 
         Map<String, Group> groupsByName = new LinkedHashMap<String, Group>();
         Map<String, AttributeCategory> attributeCategoriesByName = new LinkedHashMap<String, AttributeCategory>();
@@ -143,7 +143,7 @@ public abstract class BaseStudioXmlBuilder {
 
         processConnectionAttributes(groupsByName, attributeCategoriesByName);
 
-        for (DevKitVariableElement parameter : variableElements) {
+        for (Variable parameter : variableElements) {
             JAXBElement<? extends AttributeType> jaxbElement = createJaxbElement(parameter);
             AttributeCategory attributeCategory = getOrCreateAttributeCategory(attributeCategoriesByName, parameter.getAnnotation(Placement.class));
             Group group = getOrCreateGroup(groupsByName, parameter);
@@ -192,7 +192,7 @@ public abstract class BaseStudioXmlBuilder {
         }
     }
 
-    private Group getOrCreateGroup(Map<String, Group> groupsByName, DevKitVariableElement parameter) {
+    private Group getOrCreateGroup(Map<String, Group> groupsByName, Variable parameter) {
         Placement placement = parameter.getAnnotation(Placement.class);
         if (placement == null || StringUtils.isBlank(placement.group())) {
             if (!groupsByName.containsKey(GENERAL_GROUP_NAME)) {
@@ -214,7 +214,7 @@ public abstract class BaseStudioXmlBuilder {
         }
     }
 
-    private JAXBElement<? extends AttributeType> createJaxbElement(DevKitVariableElement parameter) {
+    private JAXBElement<? extends AttributeType> createJaxbElement(Variable parameter) {
         JAXBElement<? extends AttributeType> jaxbElement;
         if (parameter.isEnum()) {
             EnumType enumType = createEnumType(parameter);
@@ -229,9 +229,9 @@ public abstract class BaseStudioXmlBuilder {
         return jaxbElement;
     }
 
-    private List<DevKitParameterElement> getParametersSorted() {
-        List<DevKitParameterElement> parameters = new ArrayList<DevKitParameterElement>(executableElement.getParameters());
-        Iterator<DevKitParameterElement> iterator = parameters.iterator();
+    private List<Parameter> getParametersSorted() {
+        List<Parameter> parameters = new ArrayList<Parameter>(executableElement.getParameters());
+        Iterator<Parameter> iterator = parameters.iterator();
         while (iterator.hasNext()) {
             if (iterator.next().shouldBeIgnored()) {
                 iterator.remove();
@@ -241,7 +241,7 @@ public abstract class BaseStudioXmlBuilder {
         return parameters;
     }
 
-    private AttributeType createAttributeType(DevKitVariableElement parameter) {
+    private AttributeType createAttributeType(Variable parameter) {
         AttributeType attributeType = helper.createAttributeTypeIgnoreEnumsAndCollections(parameter);
         if (attributeType != null) {
             helper.setAttributeTypeInfo(parameter, attributeType);
@@ -249,10 +249,10 @@ public abstract class BaseStudioXmlBuilder {
         return attributeType;
     }
 
-    protected List<AttributeType> getConnectionAttributes(DevKitTypeElement typeElement) {
+    protected List<AttributeType> getConnectionAttributes(Type type) {
         List<AttributeType> parameters = new ArrayList<AttributeType>();
-        DevKitExecutableElement connectMethod = typeElement.getMethodsAnnotatedWith(Connect.class).get(0);
-        for (DevKitParameterElement connectAttributeType : connectMethod.getParameters()) {
+        Method connectMethod = type.getMethodsAnnotatedWith(Connect.class).get(0);
+        for (Parameter connectAttributeType : connectMethod.getParameters()) {
             AttributeType parameter = helper.createAttributeTypeIgnoreEnumsAndCollections(connectAttributeType);
             helper.setAttributeTypeInfo(connectAttributeType, parameter);
             parameter.setRequired(false);
@@ -261,7 +261,7 @@ public abstract class BaseStudioXmlBuilder {
         return parameters;
     }
 
-    private NestedElementReference createNestedElementReference(DevKitExecutableElement executableElement, DevKitVariableElement parameter) {
+    private NestedElementReference createNestedElementReference(Method executableElement, Variable parameter) {
         NestedElementReference childElement = new NestedElementReference();
         String prefix;
         if (executableElement != null) {
@@ -279,7 +279,7 @@ public abstract class BaseStudioXmlBuilder {
         return childElement;
     }
 
-    private EnumType createEnumType(DevKitVariableElement parameter) {
+    private EnumType createEnumType(Variable parameter) {
         EnumType enumType = new EnumType();
         enumType.setSupportsExpressions(true);
         enumType.setAllowsCustom(true);
@@ -296,8 +296,8 @@ public abstract class BaseStudioXmlBuilder {
         return enumType;
     }
 
-    private List<DevKitFieldElement> getConfigurableFieldsSorted() {
-        List<DevKitFieldElement> configurableFields = typeElement.getFieldsAnnotatedWith(Configurable.class);
+    private List<Field> getConfigurableFieldsSorted() {
+        List<Field> configurableFields = type.getFieldsAnnotatedWith(Configurable.class);
         Collections.sort(configurableFields, new VariableComparator());
         return configurableFields;
     }

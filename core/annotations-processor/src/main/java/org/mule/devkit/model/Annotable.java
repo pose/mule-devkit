@@ -16,6 +16,12 @@
  */
 package org.mule.devkit.model;
 
-public interface DevKitParameterElement extends DevKitVariableElement<DevKitExecutableElement> {
-    boolean shouldBeIgnored();
+import javax.lang.model.element.AnnotationMirror;
+import java.lang.annotation.Annotation;
+import java.util.List;
+
+public interface Annotable {
+    List<? extends AnnotationMirror> getAnnotationMirrors();
+
+    <A extends Annotation> A getAnnotation(Class<A> aClass);
 }

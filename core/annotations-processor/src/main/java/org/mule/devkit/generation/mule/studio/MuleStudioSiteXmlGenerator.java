@@ -19,7 +19,7 @@ package org.mule.devkit.generation.mule.studio;
 
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Type;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -38,12 +38,12 @@ public class MuleStudioSiteXmlGenerator extends AbstractMessageGenerator {
     public static final String SITE_XML = "site.xml";
 
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(Type type) {
         return !ctx().hasOption("skipStudioPluginPackage");
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) throws GenerationException {
+    public void generate(Type type) throws GenerationException {
         try {
 
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -54,8 +54,8 @@ public class MuleStudioSiteXmlGenerator extends AbstractMessageGenerator {
             document.appendChild(site);
 
             Element feature = document.createElement("feature");
-            feature.setAttribute("url", "features" + SEPARATOR + MuleStudioFeatureGenerator.STUDIO_PREFIX + typeElement.name() + "_%VERSION%" +".jar");
-            feature.setAttribute("id", MuleStudioFeatureGenerator.STUDIO_PREFIX + typeElement.name() );
+            feature.setAttribute("url", "features" + SEPARATOR + MuleStudioFeatureGenerator.STUDIO_PREFIX + type.name() + "_%VERSION%" +".jar");
+            feature.setAttribute("id", MuleStudioFeatureGenerator.STUDIO_PREFIX + type.name() );
             feature.setAttribute("version", "%VERSION%");
 
             Element category = document.createElement("category");

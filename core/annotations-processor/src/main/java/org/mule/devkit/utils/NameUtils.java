@@ -18,13 +18,7 @@
 package org.mule.devkit.utils;
 
 import org.apache.commons.lang.StringUtils;
-import org.mule.devkit.model.DevKitElement;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitParameterElement;
-import org.mule.devkit.model.DevKitTypeElement;
 
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.util.Elements;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;

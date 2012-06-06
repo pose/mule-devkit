@@ -14,19 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.mule.devkit.model;
 
-package org.mule.devkit.generation;
-
-import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.Type;
-
-public interface Generator {
-
-    boolean shouldGenerate(Type type);
-
-    void generate(Type type) throws GenerationException;
-
-    void setCtx(GeneratorContext generationContext);
-
-    GeneratorContext ctx();
+public interface Field extends Variable<Type> {
 }

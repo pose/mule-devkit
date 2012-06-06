@@ -24,7 +24,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.transport.Connector;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.NamingConstants;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
@@ -50,15 +50,15 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
     private static final int DEFAULT_REMOTE_PORT = 80;
 
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return typeElement.hasAnnotation(OAuth.class) ||
-                typeElement.hasAnnotation(OAuth2.class) ||
-                typeElement.hasProcessorMethodWithParameter(HttpCallback.class);
+    public boolean shouldGenerate(Type type) {
+        return type.hasAnnotation(OAuth.class) ||
+                type.hasAnnotation(OAuth2.class) ||
+                type.hasProcessorMethodWithParameter(HttpCallback.class);
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) {
-        DefinedClass httpCallbackAdapter = getHttpCallbackAdapterClass(typeElement);
+    public void generate(Type type) {
+        DefinedClass httpCallbackAdapter = getHttpCallbackAdapterClass(type);
         FieldVariable localPort = localPortFieldWithGetterAndSetter(httpCallbackAdapter);
         FieldVariable remotePort = remotePortFieldWithGetterAndSetter(httpCallbackAdapter);
         FieldVariable domain = domainFieldWithGetterAndSetter(httpCallbackAdapter);
@@ -103,15 +103,15 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
         thenBlock.assign(domain, ExpressionFactory.lit("localhost"));
     }
 
-    private DefinedClass getHttpCallbackAdapterClass(DevKitTypeElement typeElement) {
-        Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingConstants.ADAPTERS_NAMESPACE);
+    private DefinedClass getHttpCallbackAdapterClass(Type type) {
+        Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.ADAPTERS_NAMESPACE);
 
-        DefinedClass classToExtend = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
+        DefinedClass classToExtend = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(type));
 
-        DefinedClass oauthAdapter = pkg._class(typeElement.getClassName() + NamingConstants.HTTP_CALLBACK_ADAPTER_CLASS_NAME_SUFFIX, classToExtend);
+        DefinedClass oauthAdapter = pkg._class(type.getClassName() + NamingConstants.HTTP_CALLBACK_ADAPTER_CLASS_NAME_SUFFIX, classToExtend);
         oauthAdapter._implements(ref(Initialisable.class));
 
-        oauthAdapter.role(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
+        oauthAdapter.role(DefinedClassRoles.MODULE_OBJECT, ref(type));
 
         return oauthAdapter;
     }

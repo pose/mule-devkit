@@ -27,15 +27,14 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.NamingConstants;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitParameterElement;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Parameter;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.Invocation;
-import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.Package;
@@ -55,13 +54,13 @@ import java.util.Map;
 public class TransformerGenerator extends AbstractMessageGenerator {
 
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class);
+    public boolean shouldGenerate(Type type) {
+        return type.hasAnnotation(Module.class) || type.hasAnnotation(Connector.class);
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) throws GenerationException {
-        for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Transformer.class)) {
+    public void generate(Type type) throws GenerationException {
+        for (Method executableElement : type.getMethodsAnnotatedWith(Transformer.class)) {
 
             // get class
             DefinedClass transformerClass = getTransformerClass(executableElement);
@@ -71,7 +70,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
             FieldVariable weighting = transformerClass.field(Modifier.PRIVATE, ctx().getCodeModel().INT, "weighting", Op.plus(ref(DiscoverableTransformer.class).staticRef("DEFAULT_PRIORITY_WEIGHTING"), ExpressionFactory.lit(transformer.priorityWeighting())));
 
             //generate constructor
-            generateConstructor(transformerClass, typeElement, executableElement);
+            generateConstructor(transformerClass, type, executableElement);
 
             // doTransform
             generateDoTransform(transformerClass, executableElement);
@@ -86,18 +85,18 @@ public class TransformerGenerator extends AbstractMessageGenerator {
     }
 
     private void generateSetPriorityWeighting(DefinedClass jaxbTransformerClass, FieldVariable weighting) {
-        Method setPriorityWeighting = jaxbTransformerClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setPriorityWeighting");
+        org.mule.devkit.model.code.Method setPriorityWeighting = jaxbTransformerClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setPriorityWeighting");
         Variable localWeighting = setPriorityWeighting.param(ctx().getCodeModel().INT, "weighting");
         setPriorityWeighting.body().assign(ExpressionFactory._this().ref(weighting), localWeighting);
     }
 
     private void generateGetPriorityWeighting(DefinedClass jaxbTransformerClass, FieldVariable weighting) {
-        Method getPriorityWeighting = jaxbTransformerClass.method(Modifier.PUBLIC, ctx().getCodeModel().INT, "getPriorityWeighting");
+        org.mule.devkit.model.code.Method getPriorityWeighting = jaxbTransformerClass.method(Modifier.PUBLIC, ctx().getCodeModel().INT, "getPriorityWeighting");
         getPriorityWeighting.body()._return(weighting);
     }
 
-    private void generateDoTransform(DefinedClass transformerClass, DevKitExecutableElement executableElement) {
-        Method doTransform = transformerClass.method(Modifier.PROTECTED, ref(Object.class), "doTransform");
+    private void generateDoTransform(DefinedClass transformerClass, Method executableElement) {
+        org.mule.devkit.model.code.Method doTransform = transformerClass.method(Modifier.PROTECTED, ref(Object.class), "doTransform");
         doTransform._throws(TransformerException.class);
         Variable src = doTransform.param(ref(Object.class), "src");
         doTransform.param(ref(String.class), "encoding");
@@ -134,9 +133,9 @@ public class TransformerGenerator extends AbstractMessageGenerator {
         catchBlock.body()._throw(transformerException);
     }
 
-    private void generateConstructor(DefinedClass transformerClass, DevKitTypeElement moduleClass, DevKitExecutableElement executableElement) {
+    private void generateConstructor(DefinedClass transformerClass, Type moduleClass, Method executableElement) {
         // generate constructor
-        Method constructor = transformerClass.constructor(Modifier.PUBLIC);
+        org.mule.devkit.model.code.Method constructor = transformerClass.constructor(Modifier.PUBLIC);
 
         // register source data type
         registerSourceTypes(constructor, executableElement);
@@ -147,10 +146,10 @@ public class TransformerGenerator extends AbstractMessageGenerator {
         constructor.body().invoke("setName").arg(executableElement.getCapitalizedName() + "Transformer");
     }
 
-    private void registerDestinationType(Method constructor, DevKitTypeElement moduleClass, DevKitExecutableElement executableElement) {
+    private void registerDestinationType(org.mule.devkit.model.code.Method constructor, Type moduleClass, Method executableElement) {
         TryStatement tryToFindMethod = constructor.body()._try();
         Invocation getMethod = ref(moduleClass.asType()).boxify().dotclass().invoke("getMethod").arg(executableElement.getSimpleName().toString());
-        for(DevKitParameterElement parameter : executableElement.getParameters() ) {
+        for(Parameter parameter : executableElement.getParameters() ) {
             getMethod.arg(ref(parameter.asType()).boxify().dotclass());
         }
         Variable method = tryToFindMethod.body().decl(ref(java.lang.reflect.Method.class), "method", getMethod);
@@ -160,7 +159,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
         catchNoSuchMethodException.body()._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg("Unable to find method " + executableElement.getSimpleName().toString()));
     }
 
-    private void registerSourceTypes(Method constructor, DevKitExecutableElement executableElement) {
+    private void registerSourceTypes(org.mule.devkit.model.code.Method constructor, Method executableElement) {
         final String transformerAnnotationName = Transformer.class.getName();
         List<? extends AnnotationValue> sourceTypes = null;
         List<? extends AnnotationMirror> annotationMirrors = executableElement.getAnnotationMirrors();
@@ -183,7 +182,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
         }
     }
 
-    public DefinedClass getTransformerClass(DevKitExecutableElement executableElement) {
+    public DefinedClass getTransformerClass(Method executableElement) {
         Package pkg = ctx().getCodeModel()._package(executableElement.parent().getPackageName() + NamingConstants.TRANSFORMERS_NAMESPACE);
         DefinedClass transformer = pkg._class(executableElement.getCapitalizedName() + NamingConstants.TRANSFORMER_CLASS_NAME_SUFFIX, AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class});
 

@@ -23,7 +23,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.NamingConstants;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -49,13 +49,13 @@ public class StringToDateTransformerGenerator extends AbstractMessageGenerator {
     private static final String SIMPLE_DATE_FORMAT_FIELD_NAME = "SIMPLE_DATE_FORMAT";
 
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return typeElement.hasProcessorMethodWithParameter(Date.class);
+    public boolean shouldGenerate(Type type) {
+        return type.hasProcessorMethodWithParameter(Date.class);
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) {
-        DefinedClass transformerClass = getTransformerClass(typeElement);
+    public void generate(Type type) {
+        DefinedClass transformerClass = getTransformerClass(type);
 
         ctx().note("Generating String to Date transformer as " + transformerClass.fullName());
 
@@ -125,8 +125,8 @@ public class StringToDateTransformerGenerator extends AbstractMessageGenerator {
         registerSourceType.arg(ref(DataTypeFactory.class).staticInvoke("create").arg(ref(String.class).boxify().dotclass()));
     }
 
-    private DefinedClass getTransformerClass(DevKitTypeElement typeElement) {
-        Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingConstants.TRANSFORMERS_NAMESPACE);
+    private DefinedClass getTransformerClass(Type type) {
+        Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.TRANSFORMERS_NAMESPACE);
         return pkg._class(NamingConstants.STRING_TO_DATE_TRANSFORMER_CLASS_NAME, AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class, MuleContextAware.class});
     }
 }

@@ -27,29 +27,29 @@ import org.mule.api.annotations.param.OutboundHeaders;
 import org.mule.api.annotations.param.Payload;
 import org.mule.api.annotations.param.SessionHeaders;
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitParameterElement;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Parameter;
+import org.mule.devkit.model.Type;
 
 public class ExpressionLanguageValidator implements Validator {
     @Override
-    public boolean shouldValidate(DevKitTypeElement typeElement, GeneratorContext context) {
+    public boolean shouldValidate(Type type, GeneratorContext context) {
         return true;
     }
 
     @Override
-    public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
-        if (typeElement.getMethodsAnnotatedWith(ExpressionEvaluator.class).size() > 1) {
-            throw new ValidationException(typeElement, "An @ExpressionLanguage can only contain one @ExpressionEvaluator.");
+    public void validate(Type type, GeneratorContext context) throws ValidationException {
+        if (type.getMethodsAnnotatedWith(ExpressionEvaluator.class).size() > 1) {
+            throw new ValidationException(type, "An @ExpressionLanguage can only contain one @ExpressionEvaluator.");
         }
-        if (typeElement.getMethodsAnnotatedWith(ExpressionEnricher.class).size() > 1) {
-            throw new ValidationException(typeElement, "An @ExpressionLanguage can only contain one @ExpressionEnricher.");
+        if (type.getMethodsAnnotatedWith(ExpressionEnricher.class).size() > 1) {
+            throw new ValidationException(type, "An @ExpressionLanguage can only contain one @ExpressionEnricher.");
         }
-        if (typeElement.getMethodsAnnotatedWith(ExpressionEvaluator.class).size() == 0 &&
-                typeElement.getMethodsAnnotatedWith(ExpressionEnricher.class).size() == 0) {
-            throw new ValidationException(typeElement, "An @ExpressionLanguage must contain one @ExpressionEnricher or one @ExpressionEvaluator or both.");
+        if (type.getMethodsAnnotatedWith(ExpressionEvaluator.class).size() == 0 &&
+                type.getMethodsAnnotatedWith(ExpressionEnricher.class).size() == 0) {
+            throw new ValidationException(type, "An @ExpressionLanguage must contain one @ExpressionEnricher or one @ExpressionEvaluator or both.");
         }
-        for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(ExpressionEvaluator.class)) {
+        for (Method executableElement : type.getMethodsAnnotatedWith(ExpressionEvaluator.class)) {
             if (executableElement.getParameters().size() == 0) {
                 throw new ValidationException(executableElement, "An @ExpressionEvaluator must receive at least a String that represents the expression to evaluate.");
             }
@@ -59,7 +59,7 @@ public class ExpressionLanguageValidator implements Validator {
             }
 
             boolean expressionStringFound = false;
-            for (DevKitParameterElement parameter : executableElement.getParameters()) {
+            for (Parameter parameter : executableElement.getParameters()) {
                 if (parameter.getAnnotation(Payload.class) == null &&
                         parameter.getAnnotation(OutboundHeaders.class) == null &&
                         parameter.getAnnotation(InboundHeaders.class) == null &&
@@ -80,7 +80,7 @@ public class ExpressionLanguageValidator implements Validator {
             }
         }
 
-        for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(ExpressionEnricher.class)) {
+        for (Method executableElement : type.getMethodsAnnotatedWith(ExpressionEnricher.class)) {
             if (executableElement.getParameters().size() == 0) {
                 throw new ValidationException(executableElement, "An @ExpressionEnricher must receive at least a String that represents the expression and Object that represents the object to be used for enrichment.");
             }
@@ -91,7 +91,7 @@ public class ExpressionLanguageValidator implements Validator {
 
             boolean expressionStringFound = false;
             boolean enrichObjectFound = false;
-            for (DevKitParameterElement parameter : executableElement.getParameters()) {
+            for (Parameter parameter : executableElement.getParameters()) {
                 if (parameter.getAnnotation(Payload.class) == null &&
                         parameter.getAnnotation(OutboundHeaders.class) == null &&
                         parameter.getAnnotation(InboundHeaders.class) == null &&

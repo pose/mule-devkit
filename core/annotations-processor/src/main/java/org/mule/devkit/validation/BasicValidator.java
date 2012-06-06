@@ -21,34 +21,34 @@ import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.DevKitFieldElement;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Field;
+import org.mule.devkit.model.Type;
 
 import javax.lang.model.type.TypeKind;
 
 public class BasicValidator implements Validator {
 
     @Override
-    public boolean shouldValidate(DevKitTypeElement typeElement, GeneratorContext context) {
-        return typeElement.isModuleOrConnector();
+    public boolean shouldValidate(Type type, GeneratorContext context) {
+        return type.isModuleOrConnector();
     }
 
     @Override
-    public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
+    public void validate(Type type, GeneratorContext context) throws ValidationException {
 
-        if (typeElement.isInterface()) {
-            throw new ValidationException(typeElement, "@Module/@Connector cannot be applied to an interface");
+        if (type.isInterface()) {
+            throw new ValidationException(type, "@Module/@Connector cannot be applied to an interface");
         }
 
-        if (typeElement.isParametrized()) {
-            throw new ValidationException(typeElement, "@Module/@Connector type cannot have type parameters");
+        if (type.isParametrized()) {
+            throw new ValidationException(type, "@Module/@Connector type cannot have type parameters");
         }
 
-        if (!typeElement.isPublic()) {
-            throw new ValidationException(typeElement, "@Module/@Connector must be public");
+        if (!type.isPublic()) {
+            throw new ValidationException(type, "@Module/@Connector must be public");
         }
 
-        for (DevKitFieldElement variable : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
+        for (Field variable : type.getFieldsAnnotatedWith(Configurable.class)) {
 
             if (variable.isFinal()) {
                 throw new ValidationException(variable, "@Configurable cannot be applied to field with final modifier");

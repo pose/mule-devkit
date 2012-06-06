@@ -17,14 +17,14 @@
 
 package org.mule.devkit.generation.mule.studio.editor;
 
-import org.mule.devkit.model.DevKitExecutableElement;
+import org.mule.devkit.model.Method;
 
 import java.util.Comparator;
 
-public class MethodComparator implements Comparator<DevKitExecutableElement> {
+public class MethodComparator implements Comparator<Method> {
 
     @Override
-    public int compare(DevKitExecutableElement method1, DevKitExecutableElement method2) {
+    public int compare(Method method1, Method method2) {
         String method1Name = method1.getSimpleName().toString();
         String method2Name = method2.getSimpleName().toString();
         return method1Name.compareTo(method2Name);

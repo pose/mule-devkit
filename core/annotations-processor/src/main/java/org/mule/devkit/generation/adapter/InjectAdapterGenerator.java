@@ -33,8 +33,8 @@ import org.mule.api.store.ObjectStoreManager;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.NamingConstants;
-import org.mule.devkit.model.DevKitFieldElement;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Field;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.code.Cast;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
@@ -54,22 +54,22 @@ import javax.transaction.TransactionManager;
 public class InjectAdapterGenerator extends AbstractModuleGenerator {
 
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return typeElement.getFieldsAnnotatedWith(Inject.class).size() > 0;
+    public boolean shouldGenerate(Type type) {
+        return type.getFieldsAnnotatedWith(Inject.class).size() > 0;
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) throws GenerationException {
-        DefinedClass adapter = getMuleContextAwareAdapter(typeElement);
+    public void generate(Type type) throws GenerationException {
+        DefinedClass adapter = getMuleContextAwareAdapter(type);
         adapter.javadoc().add("A <code>" + adapter.name() + "</code> is a wrapper around ");
-        adapter.javadoc().add(ref(typeElement.asType()));
+        adapter.javadoc().add(ref(type.asType()));
         adapter.javadoc().add(" that allows the injection of several Mule facilities when a MuleContext is set.");
 
         Method setMuleContext = adapter.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setMuleContext");
         setMuleContext.annotate(Override.class);
         Variable context = setMuleContext.param(ref(MuleContext.class), "context");
 
-        for (DevKitFieldElement variable : typeElement.getFieldsAnnotatedWith(Inject.class)) {
+        for (Field variable : type.getFieldsAnnotatedWith(Inject.class)) {
             if (variable.asType().toString().startsWith(MuleContext.class.getName())) {
                 setMuleContext.body().add(ExpressionFactory._super().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(context));
             } else if (variable.asType().toString().startsWith(ObjectStoreManager.class.getName())) {
@@ -121,24 +121,24 @@ public class InjectAdapterGenerator extends AbstractModuleGenerator {
         }
     }
 
-    private DefinedClass getMuleContextAwareAdapter(DevKitTypeElement typeElement) {
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingConstants.ADAPTERS_NAMESPACE);
+    private DefinedClass getMuleContextAwareAdapter(Type type) {
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.ADAPTERS_NAMESPACE);
 
-        TypeReference previous = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
+        TypeReference previous = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(type));
 
         if (previous == null) {
-            previous = (TypeReference) ref(typeElement.asType());
+            previous = (TypeReference) ref(type.asType());
         }
 
         int modifiers = Modifier.PUBLIC;
-        if( typeElement.isAbstract() ) {
+        if( type.isAbstract() ) {
             modifiers |= Modifier.ABSTRACT;
         }
 
-        DefinedClass clazz = pkg._class(modifiers, typeElement.getClassName() + NamingConstants.INJECTION_ADAPTER_CLASS_NAME_SUFFIX, previous);
+        DefinedClass clazz = pkg._class(modifiers, type.getClassName() + NamingConstants.INJECTION_ADAPTER_CLASS_NAME_SUFFIX, previous);
         clazz._implements(ref(MuleContextAware.class));
 
-        clazz.role(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
+        clazz.role(DefinedClassRoles.MODULE_OBJECT, ref(type));
 
         return clazz;
     }

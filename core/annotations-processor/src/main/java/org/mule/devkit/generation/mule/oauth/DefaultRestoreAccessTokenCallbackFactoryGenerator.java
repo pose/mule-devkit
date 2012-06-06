@@ -23,7 +23,7 @@ import org.mule.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.NamingConstants;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -34,8 +34,8 @@ import org.mule.devkit.model.code.Variable;
 public class DefaultRestoreAccessTokenCallbackFactoryGenerator extends AbstractMessageGenerator {
 
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
-        if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class)) {
+    public boolean shouldGenerate(Type type) {
+        if (type.hasAnnotation(OAuth.class) || type.hasAnnotation(OAuth2.class)) {
             return true;
         }
 
@@ -43,8 +43,8 @@ public class DefaultRestoreAccessTokenCallbackFactoryGenerator extends AbstractM
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) throws GenerationException {
-        DefinedClass factory = getDefaultRestoreAccessTokenCallbackFactoryClass(typeElement);
+    public void generate(Type type) throws GenerationException {
+        DefinedClass factory = getDefaultRestoreAccessTokenCallbackFactoryClass(type);
 
         DefinedClass callback = ctx().getCodeModel()._class(DefinedClassRoles.DEFAULT_RESTORE_ACCESS_TOKEN_CALLBACK);
         Method getObjectType = factory.method(Modifier.PUBLIC, ref(Class.class), "getObjectType");
@@ -61,7 +61,7 @@ public class DefaultRestoreAccessTokenCallbackFactoryGenerator extends AbstractM
         getObject.body()._return(callbackVariable);
     }
 
-    private DefinedClass getDefaultRestoreAccessTokenCallbackFactoryClass(DevKitTypeElement type) {
+    private DefinedClass getDefaultRestoreAccessTokenCallbackFactoryClass(Type type) {
         org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.CONFIG_NAMESPACE);
         DefinedClass clazz = pkg._class(NamingConstants.RESTORE_ACCESS_TOKEN_CALLBACK_FACTORY_BEAN_CLASS_NAME);
         clazz._extends(ref(MessageProcessorChainFactoryBean.class));

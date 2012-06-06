@@ -19,8 +19,8 @@ package org.mule.devkit.generation.mule.studio.editor;
 
 import org.mule.api.annotations.Source;
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.GlobalType;
 
@@ -30,14 +30,14 @@ import java.util.List;
 
 public class GlobalEndpointTypeOperationsBuilder extends GlobalTypeBuilder {
 
-    public GlobalEndpointTypeOperationsBuilder(GeneratorContext context, DevKitTypeElement typeElement) {
-        super(context, typeElement);
+    public GlobalEndpointTypeOperationsBuilder(GeneratorContext context, Type type) {
+        super(context, type);
     }
 
     @Override
     public GlobalType build() {
         GlobalType globalEndpointListingOps = super.build();
-        globalEndpointListingOps.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + GlobalEndpointTypeWithNameBuilder.ABSTRACT_GLOBAL_ENDPOINT_LOCAL_ID);
+        globalEndpointListingOps.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + type.name() + '/' + GlobalEndpointTypeWithNameBuilder.ABSTRACT_GLOBAL_ENDPOINT_LOCAL_ID);
         return globalEndpointListingOps;
     }
 
@@ -53,8 +53,8 @@ public class GlobalEndpointTypeOperationsBuilder extends GlobalTypeBuilder {
         return attributeCategories;
     }
 
-    private List<DevKitExecutableElement> getTransformerMethodsSorted() {
-        List<DevKitExecutableElement> transformer = typeElement.getMethodsAnnotatedWith(Source.class);
+    private List<Method> getTransformerMethodsSorted() {
+        List<Method> transformer = type.getMethodsAnnotatedWith(Source.class);
         Collections.sort(transformer, new MethodComparator());
         return transformer;
     }
@@ -72,7 +72,7 @@ public class GlobalEndpointTypeOperationsBuilder extends GlobalTypeBuilder {
     }
 
     protected String getCaptionBasedOnType() {
-        return helper.getFormattedCaption(typeElement);
+        return helper.getFormattedCaption(type);
     }
 
     protected String getNameDescriptionBasedOnType() {
@@ -81,11 +81,11 @@ public class GlobalEndpointTypeOperationsBuilder extends GlobalTypeBuilder {
 
     @Override
     protected String getImage() {
-        return helper.getEndpointImage(typeElement);
+        return helper.getEndpointImage(type);
     }
 
     @Override
     protected String getIcon() {
-        return helper.getEndpointIcon(typeElement);
+        return helper.getEndpointIcon(type);
     }
 }

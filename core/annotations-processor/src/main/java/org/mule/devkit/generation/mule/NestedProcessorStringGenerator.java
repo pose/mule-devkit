@@ -21,7 +21,7 @@ import org.mule.api.NestedProcessor;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.NamingConstants;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -35,14 +35,14 @@ import java.util.Map;
 public class NestedProcessorStringGenerator extends AbstractModuleGenerator {
 
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return typeElement.hasProcessorMethodWithParameter(NestedProcessor.class) ||
-               typeElement.hasProcessorMethodWithParameterListOf(NestedProcessor.class);
+    public boolean shouldGenerate(Type type) {
+        return type.hasProcessorMethodWithParameter(NestedProcessor.class) ||
+               type.hasProcessorMethodWithParameterListOf(NestedProcessor.class);
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) throws GenerationException {
-        DefinedClass callbackClass = getNestedProcessorStringClass(typeElement);
+    public void generate(Type type) throws GenerationException {
+        DefinedClass callbackClass = getNestedProcessorStringClass(type);
         callbackClass._implements(ref(NestedProcessor.class));
 
         FieldVariable output = callbackClass.field(Modifier.PRIVATE, ref(String.class), "output");
@@ -96,7 +96,7 @@ public class NestedProcessorStringGenerator extends AbstractModuleGenerator {
         constructor.body().assign(ExpressionFactory._this().ref(output), output2);
     }
 
-    private DefinedClass getNestedProcessorStringClass(DevKitTypeElement type) {
+    private DefinedClass getNestedProcessorStringClass(Type type) {
         org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.CONFIG_NAMESPACE);
         DefinedClass clazz = pkg._class(NamingConstants.NESTED_PROCESSOR_STRING_CLASS_NAME);
 

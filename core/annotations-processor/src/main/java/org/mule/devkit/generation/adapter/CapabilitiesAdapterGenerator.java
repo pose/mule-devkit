@@ -22,7 +22,7 @@ import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Module;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.NamingConstants;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.Modifier;
@@ -31,39 +31,39 @@ import org.mule.devkit.model.code.TypeReference;
 public class CapabilitiesAdapterGenerator extends AbstractModuleGenerator {
 
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class);
+    public boolean shouldGenerate(Type type) {
+        return type.hasAnnotation(Module.class) || type.hasAnnotation(Connector.class);
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) {
-        DefinedClass capabilitiesAdapter = getCapabilitiesAdapterClass(typeElement);
+    public void generate(Type type) {
+        DefinedClass capabilitiesAdapter = getCapabilitiesAdapterClass(type);
         capabilitiesAdapter.javadoc().add("A <code>" + capabilitiesAdapter.name() + "</code> is a wrapper around ");
-        capabilitiesAdapter.javadoc().add(ref(typeElement.asType()));
+        capabilitiesAdapter.javadoc().add(ref(type.asType()));
         capabilitiesAdapter.javadoc().add(" that implements {@link org.mule.api.Capabilities} interface.");
 
-        generateIsCapableOf(typeElement, capabilitiesAdapter);
+        generateIsCapableOf(type, capabilitiesAdapter);
 
     }
 
-    private DefinedClass getCapabilitiesAdapterClass(DevKitTypeElement typeElement) {
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingConstants.ADAPTERS_NAMESPACE);
+    private DefinedClass getCapabilitiesAdapterClass(Type type) {
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.ADAPTERS_NAMESPACE);
 
-        TypeReference previous = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
+        TypeReference previous = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(type));
 
         if( previous == null ) {
-            previous = (TypeReference) ref(typeElement.asType());
+            previous = (TypeReference) ref(type.asType());
         }
         
         int modifiers = Modifier.PUBLIC;
-        if( typeElement.isAbstract() ) {
+        if( type.isAbstract() ) {
             modifiers |= Modifier.ABSTRACT;
         }
 
-        DefinedClass clazz = pkg._class(modifiers, typeElement.getClassName() + NamingConstants.CAPABILITIES_ADAPTER_CLASS_NAME_SUFFIX, previous);
+        DefinedClass clazz = pkg._class(modifiers, type.getClassName() + NamingConstants.CAPABILITIES_ADAPTER_CLASS_NAME_SUFFIX, previous);
         clazz._implements(Capabilities.class);
 
-        clazz.role(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
+        clazz.role(DefinedClassRoles.MODULE_OBJECT, ref(type));
 
         return clazz;
     }

@@ -21,7 +21,7 @@ import org.mule.devkit.generation.AbstractGenerator;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.mule.studio.editor.MuleStudioEditorXmlGenerator;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Type;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,12 +38,12 @@ public class MuleStudioPluginGenerator extends AbstractMessageGenerator {
             MuleStudioPluginXmlGenerator.PLUGIN_XML_FILE_NAME};
 
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(Type type) {
         return !ctx().hasOption("skipStudioPluginPackage");
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) throws GenerationException {
+    public void generate(Type type) throws GenerationException {
         List<? extends AbstractGenerator> muleStudioGenerators = Arrays.asList(
                 new MuleStudioManifestGenerator(),
                 new MuleStudioEditorXmlGenerator(),
@@ -52,7 +52,7 @@ public class MuleStudioPluginGenerator extends AbstractMessageGenerator {
                 new MuleStudioIconsGenerator());
         for (AbstractGenerator muleStudioGenerator : muleStudioGenerators) {
             muleStudioGenerator.setCtx(ctx());
-            muleStudioGenerator.generate(typeElement);
+            muleStudioGenerator.generate(type);
         }
     }
 }

@@ -37,7 +37,7 @@ import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.NamingConstants;
 import org.mule.devkit.generation.adapter.OAuth1AdapterGenerator;
 import org.mule.devkit.generation.adapter.OAuth2AdapterGenerator;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.DefinedClass;
@@ -49,7 +49,6 @@ import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Package;
 import org.mule.devkit.model.code.TryStatement;
-import org.mule.devkit.model.code.Type;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 
@@ -60,8 +59,8 @@ public class AuthorizeMessageProcessorGenerator extends AbstractMessageGenerator
     private static final String LOCATION_PROPERTY = "Location";
 
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
-        if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class)) {
+    public boolean shouldGenerate(Type type) {
+        if (type.hasAnnotation(OAuth.class) || type.hasAnnotation(OAuth2.class)) {
             return true;
         }
 
@@ -69,19 +68,19 @@ public class AuthorizeMessageProcessorGenerator extends AbstractMessageGenerator
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) throws GenerationException {
+    public void generate(Type type) throws GenerationException {
         // get class
         DefinedClass messageProcessorClass;
 
-        messageProcessorClass = getAuthorizeMessageProcessorClass(typeElement);
+        messageProcessorClass = getAuthorizeMessageProcessorClass(type);
 
         // add standard fields
-        FieldVariable object = generateFieldForModuleObject(messageProcessorClass, typeElement);
+        FieldVariable object = generateFieldForModuleObject(messageProcessorClass, type);
         FieldVariable muleContext = generateFieldForMuleContext(messageProcessorClass);
         FieldVariable flowConstruct = generateFieldForFlowConstruct(messageProcessorClass);
 
         // add initialise
-        generateInitialiseMethod(messageProcessorClass, null, typeElement, muleContext, null, null, object, null, true);
+        generateInitialiseMethod(messageProcessorClass, null, type, muleContext, null, null, object, null, true);
 
         // add start
         generateStartMethod(messageProcessorClass, null);
@@ -102,7 +101,7 @@ public class AuthorizeMessageProcessorGenerator extends AbstractMessageGenerator
         generateSetModuleObjectMethod(messageProcessorClass, object);
 
         // add process method
-        Type muleEvent = ref(MuleEvent.class);
+        org.mule.devkit.model.code.Type muleEvent = ref(MuleEvent.class);
 
         Method process = messageProcessorClass.method(Modifier.PUBLIC, muleEvent, "process");
         process.javadoc().add("Starts the OAuth authorization process");
@@ -112,11 +111,11 @@ public class AuthorizeMessageProcessorGenerator extends AbstractMessageGenerator
         process._throws(MuleException.class);
         Variable event = process.param(muleEvent, "event");
 
-        DefinedClass moduleObjectClass = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
+        DefinedClass moduleObjectClass = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(type));
         Variable moduleObject = process.body().decl(moduleObjectClass, "castedModuleObject", ExpressionFactory._null());
         findConfig(process.body(), muleContext, object, "authorize", event, moduleObjectClass, moduleObject);
 
-        OAuth2 oauth2 = typeElement.getAnnotation(OAuth2.class);
+        OAuth2 oauth2 = type.getAnnotation(OAuth2.class);
         if (oauth2 != null && !StringUtils.isEmpty(oauth2.expirationRegex())) {
             Block ifTokenExpired = process.body()._if(moduleObject.invoke(OAuth2AdapterGenerator.HAS_TOKEN_EXPIRED_METHOD_NAME))._then();
             ifTokenExpired.invoke(moduleObject, OAuth2AdapterGenerator.RESET_METHOD_NAME);
@@ -138,7 +137,7 @@ public class AuthorizeMessageProcessorGenerator extends AbstractMessageGenerator
         tryToAuthorize.body()._return(event);
 
         // OAuth 2 does not have a request token
-        if (typeElement.hasAnnotation(OAuth.class)) {
+        if (type.hasAnnotation(OAuth.class)) {
             CatchBlock unableToAcquireRequestTokenException = tryToAuthorize._catch(ref(UnableToAcquireRequestTokenException.class));
             Variable exception = unableToAcquireRequestTokenException.param("e");
             TypeReference coreMessages = ref(CoreMessages.class);
@@ -164,7 +163,7 @@ public class AuthorizeMessageProcessorGenerator extends AbstractMessageGenerator
 
     }
 
-    private DefinedClass getAuthorizeMessageProcessorClass(DevKitTypeElement type) {
+    private DefinedClass getAuthorizeMessageProcessorClass(Type type) {
         Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.MESSAGE_PROCESSOR_NAMESPACE);
         DefinedClass clazz = pkg._class(NamingConstants.AUTHORIZE_MESSAGE_PROCESSOR_CLASS_NAME, new Class[]{
                 Initialisable.class,

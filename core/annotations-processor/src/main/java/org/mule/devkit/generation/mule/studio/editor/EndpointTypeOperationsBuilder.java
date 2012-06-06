@@ -19,8 +19,8 @@ package org.mule.devkit.generation.mule.studio.editor;
 
 import org.mule.api.annotations.Source;
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.EndpointType;
 
@@ -29,8 +29,8 @@ import java.util.List;
 
 public class EndpointTypeOperationsBuilder extends EndpointTypeBuilder {
 
-    public EndpointTypeOperationsBuilder(GeneratorContext context, DevKitTypeElement typeElement) {
-        super(context, null, typeElement);
+    public EndpointTypeOperationsBuilder(GeneratorContext context, Type type) {
+        super(context, null, type);
     }
 
     public EndpointType build() {
@@ -45,7 +45,7 @@ public class EndpointTypeOperationsBuilder extends EndpointTypeBuilder {
         attributeCategory.getGroup().add(createGroupWithModeSwitch(getSourceMethodsSorted()));
 
         endpoinTypeOperations.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().add(attributeCategory);
-        endpoinTypeOperations.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name()));
+        endpoinTypeOperations.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + type.name() + '/' + helper.getGlobalRefId(type.name()));
 
         return endpoinTypeOperations;
     }
@@ -57,12 +57,12 @@ public class EndpointTypeOperationsBuilder extends EndpointTypeBuilder {
 
     @Override
     protected String getDescription() {
-        return helper.getFormattedDescription(typeElement);
+        return helper.getFormattedDescription(type);
     }
 
     @Override
     protected String getCaption() {
-        return helper.getFormattedCaption(typeElement) + " (Streaming)";
+        return helper.getFormattedCaption(type) + " (Streaming)";
     }
 
     @Override
@@ -70,8 +70,8 @@ public class EndpointTypeOperationsBuilder extends EndpointTypeBuilder {
         return "endpoint";
     }
 
-    private List<DevKitExecutableElement> getSourceMethodsSorted() {
-        List<DevKitExecutableElement> methods = typeElement.getMethodsAnnotatedWith(Source.class);
+    private List<Method> getSourceMethodsSorted() {
+        List<Method> methods = type.getMethodsAnnotatedWith(Source.class);
         Collections.sort(methods, new MethodComparator());
         return methods;
     }

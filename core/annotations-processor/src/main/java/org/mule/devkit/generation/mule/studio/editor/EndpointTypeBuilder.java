@@ -18,8 +18,8 @@
 package org.mule.devkit.generation.mule.studio.editor;
 
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.EndpointType;
 import org.mule.devkit.utils.NameUtils;
@@ -28,22 +28,22 @@ import java.util.Collection;
 
 public class EndpointTypeBuilder extends BaseStudioXmlBuilder {
 
-    public EndpointTypeBuilder(GeneratorContext context, DevKitExecutableElement executableElement, DevKitTypeElement typeElement) {
-        super(context, executableElement, typeElement);
+    public EndpointTypeBuilder(GeneratorContext context, Method executableElement, Type type) {
+        super(context, executableElement, type);
     }
 
     public EndpointType build() {
         EndpointType endpointType = new EndpointType();
         endpointType.setLocalId(getLocalId());
         endpointType.setCaption(getCaption());
-        endpointType.setIcon(helper.getEndpointIcon(typeElement));
-        endpointType.setImage(helper.getEndpointImage(typeElement));
+        endpointType.setIcon(helper.getEndpointIcon(type));
+        endpointType.setImage(helper.getEndpointImage(type));
         endpointType.setDescription(getDescription());
         endpointType.setSupportsInbound(true);
         endpointType.setSupportsOutbound(false);
         endpointType.setInboundLocalName(getLocalId());
         endpointType.setAbstract(true);
-        endpointType.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name()));
+        endpointType.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + type.name() + '/' + helper.getGlobalRefId(type.name()));
 
         processMethodParameters(endpointType);
 

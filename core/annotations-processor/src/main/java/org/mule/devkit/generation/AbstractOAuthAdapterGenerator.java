@@ -34,9 +34,9 @@ import org.mule.api.oauth.SaveAccessTokenCallback;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.devkit.generation.callback.DefaultHttpCallbackGenerator;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitParameterElement;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Parameter;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.ClassAlreadyExistsException;
@@ -46,7 +46,6 @@ import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.Invocation;
-import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.TryStatement;
@@ -82,20 +81,20 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
     public static final String OAUTH_SAVE_ACCESS_TOKEN_CALLBACK_FIELD_NAME = "oauthSaveAccessToken";
     public static final String OAUTH_RESTORE_ACCESS_TOKEN_CALLBACK_FIELD_NAME = "oauthRestoreAccessToken";
 
-    protected DefinedClass getOAuthAdapterClass(DevKitTypeElement typeElement, String classSuffix, Class<?> interf) {
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingConstants.ADAPTERS_NAMESPACE);
-        DefinedClass classToExtend = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
-        DefinedClass oauthAdapter = pkg._class(typeElement.getClassName() + classSuffix, classToExtend);
+    protected DefinedClass getOAuthAdapterClass(Type type, String classSuffix, Class<?> interf) {
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.ADAPTERS_NAMESPACE);
+        DefinedClass classToExtend = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(type));
+        DefinedClass oauthAdapter = pkg._class(type.getClassName() + classSuffix, classToExtend);
         oauthAdapter._implements(MuleContextAware.class);
         oauthAdapter._implements(Startable.class);
         oauthAdapter._implements(Initialisable.class);
         oauthAdapter._implements(Stoppable.class);
         oauthAdapter._implements(interf);
 
-        oauthAdapter.role(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
+        oauthAdapter.role(DefinedClassRoles.MODULE_OBJECT, ref(type));
 
         oauthAdapter.javadoc().add("A {@code " + oauthAdapter.name() + "} is a wrapper around ");
-        oauthAdapter.javadoc().add(ref(typeElement.asType()));
+        oauthAdapter.javadoc().add(ref(type.asType()));
         oauthAdapter.javadoc().add(" that adds OAuth capabilites to the pojo.");
 
         return oauthAdapter;
@@ -131,7 +130,7 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
     }
 
     protected void generateStartMethod(DefinedClass oauthAdapter) {
-        Method start = oauthAdapter.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, Startable.PHASE_NAME);
+        org.mule.devkit.model.code.Method start = oauthAdapter.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, Startable.PHASE_NAME);
         start._throws(MuleException.class);
         start.body().invoke(ExpressionFactory._super(), Startable.PHASE_NAME);
         start.body().invoke(oauthAdapter.fields().get(CALLBACK_FIELD_NAME), Startable.PHASE_NAME);
@@ -139,14 +138,14 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
     }
 
     protected void generateStopMethod(DefinedClass oauthAdapter) {
-        Method start = oauthAdapter.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, Stoppable.PHASE_NAME);
+        org.mule.devkit.model.code.Method start = oauthAdapter.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, Stoppable.PHASE_NAME);
         start._throws(MuleException.class);
         start.body().invoke(ExpressionFactory._super(), (Stoppable.PHASE_NAME));
         start.body().invoke(oauthAdapter.fields().get(CALLBACK_FIELD_NAME), Stoppable.PHASE_NAME);
     }
 
-    protected Method generateInitialiseMethod(DefinedClass oauthAdapter, DefinedClass messageProcessor, String callbackPath) {
-        Method initialise = oauthAdapter.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, Initialisable.PHASE_NAME);
+    protected org.mule.devkit.model.code.Method generateInitialiseMethod(DefinedClass oauthAdapter, DefinedClass messageProcessor, String callbackPath) {
+        org.mule.devkit.model.code.Method initialise = oauthAdapter.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, Initialisable.PHASE_NAME);
         if (ref(Initialisable.class).isAssignableFrom(oauthAdapter._extends())) {
             initialise.body().invoke(ExpressionFactory._super(), Initialisable.PHASE_NAME);
         }
@@ -175,7 +174,7 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
             throw new GenerationException(e); // This wont happen
         }
 
-        Method processMethod = messageProcessor.method(Modifier.PUBLIC, ref(MuleEvent.class), "process")._throws(ref(MuleException.class));
+        org.mule.devkit.model.code.Method processMethod = messageProcessor.method(Modifier.PUBLIC, ref(MuleEvent.class), "process")._throws(ref(MuleException.class));
         Variable event = processMethod.param(ref(MuleEvent.class), "event");
 
         TryStatement tryToExtractVerifier = processMethod.body()._try();
@@ -190,7 +189,7 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
 
         processMethod.body()._return(event);
 
-        Method extractMethod = messageProcessor.method(Modifier.PRIVATE, ref(String.class), "extractAuthorizationCode")._throws(ref(Exception.class));
+        org.mule.devkit.model.code.Method extractMethod = messageProcessor.method(Modifier.PRIVATE, ref(String.class), "extractAuthorizationCode")._throws(ref(Exception.class));
         Variable response = extractMethod.param(String.class, "response");
         Variable matcher = extractMethod.body().decl(ref(Matcher.class), "matcher", oauthAdapter.fields().get(AUTH_CODE_PATTERN_FIELD_NAME).invoke("matcher").arg(response));
         Conditional ifVerifierFound = extractMethod.body()._if(Op.cand(matcher.invoke("find"), Op.gte(matcher.invoke("groupCount"), ExpressionFactory.lit(1))));
@@ -206,10 +205,10 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
     }
 
 
-    protected void generateOverrides(DevKitTypeElement typeElement, DefinedClass oauthAdapter, FieldVariable oauthAccessToken, FieldVariable oauthAccessTokenSecret) {
+    protected void generateOverrides(Type type, DefinedClass oauthAdapter, FieldVariable oauthAccessToken, FieldVariable oauthAccessTokenSecret) {
         Map<String, Variable> variables = new HashMap<String, Variable>();
-        for (DevKitExecutableElement executableElement : typeElement.getMethodsWhoseParametersAreAnnotatedWith(OAuthAccessToken.class)) {
-            Method override = oauthAdapter.method(Modifier.PUBLIC, ref(executableElement.getReturnType()), executableElement.getSimpleName().toString());
+        for (Method executableElement : type.getMethodsWhoseParametersAreAnnotatedWith(OAuthAccessToken.class)) {
+            org.mule.devkit.model.code.Method override = oauthAdapter.method(Modifier.PUBLIC, ref(executableElement.getReturnType()), executableElement.getSimpleName().toString());
             //override.annotate(Override.class);
             override._throws(ref(NotAuthorizedException.class));
             for(TypeMirror thrownType : executableElement.getThrownTypes()) {
@@ -218,7 +217,7 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
 
             override.body().invoke("hasBeenAuthorized");
 
-            for (DevKitParameterElement parameter : executableElement.getParameters()) {
+            for (Parameter parameter : executableElement.getParameters()) {
                 if (parameter.getAnnotation(OAuthAccessToken.class) != null ||
                         parameter.getAnnotation(OAuthAccessTokenSecret.class) != null) {
                     continue;
@@ -231,7 +230,7 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
             }
 
             Invocation callSuper = ExpressionFactory._super().invoke(executableElement.getSimpleName().toString());
-            for (DevKitParameterElement parameter : executableElement.getParameters()) {
+            for (Parameter parameter : executableElement.getParameters()) {
                 if (parameter.getAnnotation(OAuthAccessToken.class) != null) {
                     callSuper.arg(oauthAccessToken);
                 } else if (parameter.getAnnotation(OAuthAccessTokenSecret.class) != null) {
@@ -250,7 +249,7 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
     }
 
     protected void generateHasBeenAuthorizedMethod(DefinedClass oauthAdapter, FieldVariable oauthAccessToken) {
-        Method hasBeenAuthorized = oauthAdapter.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "hasBeenAuthorized");
+        org.mule.devkit.model.code.Method hasBeenAuthorized = oauthAdapter.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "hasBeenAuthorized");
         hasBeenAuthorized._throws(ref(NotAuthorizedException.class));
         Block ifAccessTokenIsNull = hasBeenAuthorized.body()._if(isNull(oauthAccessToken))._then();
 

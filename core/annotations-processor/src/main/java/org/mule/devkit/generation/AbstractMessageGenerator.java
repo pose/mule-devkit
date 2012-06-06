@@ -52,10 +52,10 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.construct.Flow;
 import org.mule.devkit.generation.callback.DefaultHttpCallbackGenerator;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitParameterElement;
-import org.mule.devkit.model.DevKitTypeElement;
-import org.mule.devkit.model.DevKitVariableElement;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Parameter;
+import org.mule.devkit.model.Type;
+import org.mule.devkit.model.Variable;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
@@ -67,13 +67,11 @@ import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.ForEach;
 import org.mule.devkit.model.code.ForLoop;
 import org.mule.devkit.model.code.Invocation;
-import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.Package;
 import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.TypeReference;
-import org.mule.devkit.model.code.Variable;
 import org.mule.devkit.model.code.builders.FieldBuilder;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transformer.types.DataTypeFactory;
@@ -92,8 +90,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
     protected void generateIsListMethod(DefinedClass messageProcessorClass) {
-        Method isList = messageProcessorClass.method(Modifier.PRIVATE, ctx().getCodeModel().BOOLEAN, "isList");
-        Variable type = isList.param(ref(java.lang.reflect.Type.class), "type");
+        org.mule.devkit.model.code.Method isList = messageProcessorClass.method(Modifier.PRIVATE, ctx().getCodeModel().BOOLEAN, "isList");
+        org.mule.devkit.model.code.Variable type = isList.param(ref(java.lang.reflect.Type.class), "type");
 
         Conditional isClass = isList.body()._if(Op.cand(Op._instanceof(type, ref(Class.class)),
                 ExpressionFactory.invoke("isListClass").arg(ExpressionFactory.cast(ref(Class.class), type))));
@@ -107,7 +105,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         );
 
         Conditional isWildcardType = isList.body()._if(Op._instanceof(type, ref(WildcardType.class)));
-        Variable upperBounds = isWildcardType._then().decl(ref(java.lang.reflect.Type.class).array(), "upperBounds",
+        org.mule.devkit.model.code.Variable upperBounds = isWildcardType._then().decl(ref(java.lang.reflect.Type.class).array(), "upperBounds",
                 ExpressionFactory.cast(ref(WildcardType.class), type).invoke("getUpperBounds"));
         isWildcardType._then()._return(Op.cand(
                 Op.ne(upperBounds.ref("length"), ExpressionFactory.lit(0)),
@@ -118,8 +116,8 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected void generateIsMapMethod(DefinedClass messageProcessorClass) {
-        Method isMap = messageProcessorClass.method(Modifier.PRIVATE, ctx().getCodeModel().BOOLEAN, "isMap");
-        Variable type = isMap.param(ref(java.lang.reflect.Type.class), "type");
+        org.mule.devkit.model.code.Method isMap = messageProcessorClass.method(Modifier.PRIVATE, ctx().getCodeModel().BOOLEAN, "isMap");
+        org.mule.devkit.model.code.Variable type = isMap.param(ref(java.lang.reflect.Type.class), "type");
 
         Conditional isClass = isMap.body()._if(Op.cand(Op._instanceof(type, ref(Class.class)),
                 ExpressionFactory.invoke("isMapClass").arg(ExpressionFactory.cast(ref(Class.class), type))));
@@ -133,7 +131,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         );
 
         Conditional isWildcardType = isMap.body()._if(Op._instanceof(type, ref(WildcardType.class)));
-        Variable upperBounds = isWildcardType._then().decl(ref(java.lang.reflect.Type.class).array(), "upperBounds",
+        org.mule.devkit.model.code.Variable upperBounds = isWildcardType._then().decl(ref(java.lang.reflect.Type.class).array(), "upperBounds",
                 ExpressionFactory.cast(ref(WildcardType.class), type).invoke("getUpperBounds"));
         isWildcardType._then()._return(Op.cand(
                 Op.ne(upperBounds.ref("length"), ExpressionFactory.lit(0)),
@@ -144,23 +142,23 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected void generateIsListClassMethod(DefinedClass messageProcessorClass) {
-        Method isListClass = messageProcessorClass.method(Modifier.PRIVATE, ctx().getCodeModel().BOOLEAN, "isListClass");
+        org.mule.devkit.model.code.Method isListClass = messageProcessorClass.method(Modifier.PRIVATE, ctx().getCodeModel().BOOLEAN, "isListClass");
         isListClass.javadoc().add("Checks whether the specified class parameter is an instance of ");
         isListClass.javadoc().add(ref(List.class));
         isListClass.javadoc().addParam("clazz <code>Class</code> to check.");
         isListClass.javadoc().addReturn("<code>true</code> is <code>clazz</code> is instance of a collection class, <code>false</code> otherwise.");
 
-        Variable clazz = isListClass.param(ref(Class.class), "clazz");
-        Variable classes = isListClass.body().decl(ref(List.class).narrow(ref(Class.class)), "classes", ExpressionFactory._new(ref(ArrayList.class).narrow(ref(Class.class))));
+        org.mule.devkit.model.code.Variable clazz = isListClass.param(ref(Class.class), "clazz");
+        org.mule.devkit.model.code.Variable classes = isListClass.body().decl(ref(List.class).narrow(ref(Class.class)), "classes", ExpressionFactory._new(ref(ArrayList.class).narrow(ref(Class.class))));
         isListClass.body().invoke("computeClassHierarchy").arg(clazz).arg(classes);
 
         isListClass.body()._return(classes.invoke("contains").arg(ref(List.class).dotclass()));
     }
 
     protected void generateIsAssignableFrom(DefinedClass messageProcessorClass) {
-        Method isAssignableFrom = messageProcessorClass.method(Modifier.PRIVATE, ctx().getCodeModel().BOOLEAN, "isAssignableFrom");
-        Variable expectedType = isAssignableFrom.param(ref(java.lang.reflect.Type.class), "expectedType");
-        Variable clazz = isAssignableFrom.param(ref(Class.class), "clazz");
+        org.mule.devkit.model.code.Method isAssignableFrom = messageProcessorClass.method(Modifier.PRIVATE, ctx().getCodeModel().BOOLEAN, "isAssignableFrom");
+        org.mule.devkit.model.code.Variable expectedType = isAssignableFrom.param(ref(java.lang.reflect.Type.class), "expectedType");
+        org.mule.devkit.model.code.Variable clazz = isAssignableFrom.param(ref(Class.class), "clazz");
 
         Block isClass = isAssignableFrom.body()._if(Op._instanceof(expectedType, ref(Class.class)))._then();
         Conditional isPrimitive = isClass._if(ExpressionFactory.cast(ref(Class.class), expectedType).invoke("isPrimitive"));
@@ -222,7 +220,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
         Block isWildcardType = isAssignableFrom.body()._if(
                 Op._instanceof(expectedType, ref(WildcardType.class)))._then();
-        Variable upperBounds = isWildcardType.decl(ref(java.lang.reflect.Type.class).array(), "upperBounds",
+        org.mule.devkit.model.code.Variable upperBounds = isWildcardType.decl(ref(java.lang.reflect.Type.class).array(), "upperBounds",
                 ExpressionFactory.cast(ref(WildcardType.class), expectedType).invoke("getUpperBounds"));
         Block ifHasUpperBounds = isWildcardType._if(Op.ne(upperBounds.ref("length"), ExpressionFactory.lit(0)))._then();
         ifHasUpperBounds._return(
@@ -233,29 +231,29 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected void generateTransformMethod(DefinedClass messageProcessorClass) {
-        Method transform = messageProcessorClass.method(Modifier.PRIVATE, ref(Object.class), "transform");
+        org.mule.devkit.model.code.Method transform = messageProcessorClass.method(Modifier.PRIVATE, ref(Object.class), "transform");
         transform._throws(ref(TransformerException.class));
-        Variable muleMessage = transform.param(ref(MuleMessage.class), "muleMessage");
-        Variable expectedType = transform.param(ref(java.lang.reflect.Type.class), "expectedType");
-        Variable source = transform.param(ref(Object.class), "source");
+        org.mule.devkit.model.code.Variable muleMessage = transform.param(ref(MuleMessage.class), "muleMessage");
+        org.mule.devkit.model.code.Variable expectedType = transform.param(ref(java.lang.reflect.Type.class), "expectedType");
+        org.mule.devkit.model.code.Variable source = transform.param(ref(Object.class), "source");
 
         transform.body()._if(Op.eq(source, ExpressionFactory._null()))._then()._return(source);
 
-        Variable target = transform.body().decl(ref(Object.class), "target", ExpressionFactory._null());
+        org.mule.devkit.model.code.Variable target = transform.body().decl(ref(Object.class), "target", ExpressionFactory._null());
         Conditional isList = transform.body()._if(
                 ExpressionFactory.invoke("isList").arg(source.invoke("getClass")));
         Conditional isExpectedList = isList._then()._if(
                 ExpressionFactory.invoke("isList").arg(expectedType));
-        Variable newList = isExpectedList._then().decl(ref(List.class), "newList", ExpressionFactory._new(ref(ArrayList.class)));
-        Variable listParameterizedType = isExpectedList._then().decl(ref(java.lang.reflect.Type.class), "valueType",
+        org.mule.devkit.model.code.Variable newList = isExpectedList._then().decl(ref(List.class), "newList", ExpressionFactory._new(ref(ArrayList.class)));
+        org.mule.devkit.model.code.Variable listParameterizedType = isExpectedList._then().decl(ref(java.lang.reflect.Type.class), "valueType",
                 ExpressionFactory.cast(ref(ParameterizedType.class), expectedType).
                         invoke("getActualTypeArguments").component(ExpressionFactory.lit(0)));
-        Variable listIterator = isExpectedList._then().decl(ref(ListIterator.class), "iterator",
+        org.mule.devkit.model.code.Variable listIterator = isExpectedList._then().decl(ref(ListIterator.class), "iterator",
                 ExpressionFactory.cast(ref(List.class), source).
                         invoke("listIterator"));
 
         Block whileHasNext = isExpectedList._then()._while(listIterator.invoke("hasNext")).body();
-        Variable subTarget = whileHasNext.decl(ref(Object.class), "subTarget", listIterator.invoke("next"));
+        org.mule.devkit.model.code.Variable subTarget = whileHasNext.decl(ref(Object.class), "subTarget", listIterator.invoke("next"));
         whileHasNext.add(newList.invoke("add").arg(
                 ExpressionFactory.invoke("transform").arg(muleMessage).arg(listParameterizedType).
                         arg(subTarget)
@@ -269,9 +267,9 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                 ExpressionFactory.invoke("isMap").arg(expectedType));
 
         Block isExpectedMapBlock = isExpectedMap._then();
-        Variable keyType = isExpectedMapBlock.decl(ref(java.lang.reflect.Type.class), "keyType",
+        org.mule.devkit.model.code.Variable keyType = isExpectedMapBlock.decl(ref(java.lang.reflect.Type.class), "keyType",
                 ref(Object.class).dotclass());
-        Variable valueType = isExpectedMapBlock.decl(ref(java.lang.reflect.Type.class), "valueType",
+        org.mule.devkit.model.code.Variable valueType = isExpectedMapBlock.decl(ref(java.lang.reflect.Type.class), "valueType",
                 ref(Object.class).dotclass());
 
         Block isGenericMap = isExpectedMapBlock._if(Op._instanceof(expectedType, ref(ParameterizedType.class)))._then();
@@ -281,19 +279,19 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         isGenericMap.assign(valueType, ExpressionFactory.cast(ref(ParameterizedType.class), expectedType).
                 invoke("getActualTypeArguments").component(ExpressionFactory.lit(1)));
 
-        Variable map = isExpectedMapBlock.decl(ref(Map.class), "map", ExpressionFactory.cast(ref(Map.class), source));
+        org.mule.devkit.model.code.Variable map = isExpectedMapBlock.decl(ref(Map.class), "map", ExpressionFactory.cast(ref(Map.class), source));
 
         //Conditional ifKeysNotOfSameType = isExpectedMapBlock._if(Op.cand(
         //        Op.not(map.invoke("isEmpty")),
         //        Op.not(ExpressionFactory.invoke(keyType.invoke("toString"), "equals").arg(ExpressionFactory.invoke(ExpressionFactory.invoke((ExpressionFactory.invoke(ExpressionFactory.invoke(map.invoke("keySet"), "iterator"), "next"), "getClass", "toString"))))));
         //Block ifKeysNotOfSameTypeThen = ifKeysNotOfSameType._then().block();
 
-        Variable newMap = isExpectedMapBlock.decl(ref(Map.class), "newMap", ExpressionFactory._new(ref(HashMap.class)));
+        org.mule.devkit.model.code.Variable newMap = isExpectedMapBlock.decl(ref(Map.class), "newMap", ExpressionFactory._new(ref(HashMap.class)));
         ForEach forEach = isExpectedMapBlock.forEach(ref(Object.class), "entryObj", map.invoke("entrySet"));
         Block forEachBlock = forEach.body().block();
-        Variable entry = forEachBlock.decl(ref(Map.Entry.class), "entry", ExpressionFactory.cast(ref(Map.Entry.class), forEach.var()));
-        Variable newKey = forEachBlock.decl(ref(Object.class), "newKey", ExpressionFactory.invoke("transform").arg(muleMessage).arg(keyType).arg(entry.invoke("getKey")));
-        Variable newValue = forEachBlock.decl(ref(Object.class), "newValue", ExpressionFactory.invoke("transform").arg(muleMessage).arg(valueType).arg(entry.invoke("getValue")));
+        org.mule.devkit.model.code.Variable entry = forEachBlock.decl(ref(Map.Entry.class), "entry", ExpressionFactory.cast(ref(Map.Entry.class), forEach.var()));
+        org.mule.devkit.model.code.Variable newKey = forEachBlock.decl(ref(Object.class), "newKey", ExpressionFactory.invoke("transform").arg(muleMessage).arg(keyType).arg(entry.invoke("getKey")));
+        org.mule.devkit.model.code.Variable newValue = forEachBlock.decl(ref(Object.class), "newValue", ExpressionFactory.invoke("transform").arg(muleMessage).arg(valueType).arg(entry.invoke("getValue")));
         forEachBlock.invoke(newMap, "put").arg(newKey).arg(newValue);
 
         isExpectedMapBlock.assign(target, newMap);
@@ -318,17 +316,17 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                 Op.not(ExpressionFactory.invoke("isAssignableFrom").arg(expectedType).arg(target.invoke("getClass")))
         ));
 
-        Variable sourceDataType = shouldTransform._then().decl(ref(DataType.class), "sourceDataType",
+        org.mule.devkit.model.code.Variable sourceDataType = shouldTransform._then().decl(ref(DataType.class), "sourceDataType",
                 ref(DataTypeFactory.class).staticInvoke("create").arg(target.invoke("getClass")));
 
         Conditional ifParameterizedType = shouldTransform._then()._if(Op._instanceof(expectedType, ref(ParameterizedType.class)));
         ifParameterizedType._then().assign(expectedType, ExpressionFactory.cast(ref(ParameterizedType.class), expectedType).invoke("getRawType"));
 
-        Variable targetDataType = shouldTransform._then().decl(ref(DataType.class), "targetDataType",
+        org.mule.devkit.model.code.Variable targetDataType = shouldTransform._then().decl(ref(DataType.class), "targetDataType",
                 ref(DataTypeFactory.class).staticInvoke("create").arg(
                         ExpressionFactory.cast(ref(Class.class), expectedType)));
 
-        Variable transformer = shouldTransform._then().decl(ref(Transformer.class), "t",
+        org.mule.devkit.model.code.Variable transformer = shouldTransform._then().decl(ref(Transformer.class), "t",
                 muleMessage.invoke("getMuleContext").invoke("getRegistry").invoke("lookupTransformer").arg(sourceDataType).arg(targetDataType));
 
         shouldTransform._then()._return(transformer.invoke("transform").arg(target));
@@ -338,29 +336,29 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
 
     protected void generateIsMapClassMethod(DefinedClass messageProcessorClass) {
-        Method isMapClass = messageProcessorClass.method(Modifier.PRIVATE, ctx().getCodeModel().BOOLEAN, "isMapClass");
+        org.mule.devkit.model.code.Method isMapClass = messageProcessorClass.method(Modifier.PRIVATE, ctx().getCodeModel().BOOLEAN, "isMapClass");
         isMapClass.javadoc().add("Checks whether the specified class parameter is an instance of ");
         isMapClass.javadoc().add(ref(Map.class));
         isMapClass.javadoc().addParam("clazz <code>Class</code> to check.");
         isMapClass.javadoc().addReturn("<code>true</code> is <code>clazz</code> is instance of a collection class, <code>false</code> otherwise.");
 
-        Variable clazz = isMapClass.param(ref(Class.class), "clazz");
-        Variable classes = isMapClass.body().decl(ref(List.class).narrow(ref(Class.class)), "classes", ExpressionFactory._new(ref(ArrayList.class).narrow(ref(Class.class))));
+        org.mule.devkit.model.code.Variable clazz = isMapClass.param(ref(Class.class), "clazz");
+        org.mule.devkit.model.code.Variable classes = isMapClass.body().decl(ref(List.class).narrow(ref(Class.class)), "classes", ExpressionFactory._new(ref(ArrayList.class).narrow(ref(Class.class))));
         isMapClass.body().invoke("computeClassHierarchy").arg(clazz).arg(classes);
 
         isMapClass.body()._return(classes.invoke("contains").arg(ref(Map.class).dotclass()));
     }
 
     protected void generateComputeClassHierarchyMethod(DefinedClass messageProcessorClass) {
-        Method computeClassHierarchy = messageProcessorClass.method(Modifier.PRIVATE, ctx().getCodeModel().VOID, "computeClassHierarchy");
+        org.mule.devkit.model.code.Method computeClassHierarchy = messageProcessorClass.method(Modifier.PRIVATE, ctx().getCodeModel().VOID, "computeClassHierarchy");
         computeClassHierarchy.javadoc().add("Get all superclasses and interfaces recursively.");
         computeClassHierarchy.javadoc().addParam("clazz   The class to start the search with.");
         computeClassHierarchy.javadoc().addParam("classes List of classes to which to add all found super classes and interfaces.");
-        Variable clazz = computeClassHierarchy.param(Class.class, "clazz");
-        Variable classes = computeClassHierarchy.param(List.class, "classes");
+        org.mule.devkit.model.code.Variable clazz = computeClassHierarchy.param(Class.class, "clazz");
+        org.mule.devkit.model.code.Variable classes = computeClassHierarchy.param(List.class, "classes");
 
         ForLoop iterateClasses = computeClassHierarchy.body()._for();
-        Variable current = iterateClasses.init(ref(Class.class), "current", clazz);
+        org.mule.devkit.model.code.Variable current = iterateClasses.init(ref(Class.class), "current", clazz);
         iterateClasses.test(Op.ne(current, ExpressionFactory._null()));
         iterateClasses.update(current.assign(current.invoke("getSuperclass")));
 
@@ -401,7 +399,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         return expressionManager;
     }
 
-    protected FieldVariable generateFieldForModuleObject(DefinedClass messageProcessorClass, DevKitTypeElement typeElement) {
+    protected FieldVariable generateFieldForModuleObject(DefinedClass messageProcessorClass, Type type) {
         FieldVariable field = messageProcessorClass.field(Modifier.PRIVATE, ref(Object.class), "moduleObject");
         field.javadoc().add("Module object");
 
@@ -414,7 +412,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         return messageProcessor;
     }
 
-    protected DefinedClass getBeanDefinitionParserClass(DevKitExecutableElement executableElement) {
+    protected DefinedClass getBeanDefinitionParserClass(Method executableElement) {
         Package pkg = ctx().getCodeModel()._package(executableElement.parent().getPackageName() + NamingConstants.CONFIG_NAMESPACE);
         DefinedClass abstractBeanDefinitionParser = ctx().getCodeModel()._class(DefinedClassRoles.ABSTRACT_BEAN_DEFINITION_PARSER);
         DefinedClass clazz = pkg._class(executableElement.getCapitalizedName() + NamingConstants.DEFINITION_PARSER_CLASS_NAME_SUFFIX, abstractBeanDefinitionParser);
@@ -422,17 +420,17 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         return clazz;
     }
 
-    protected DefinedClass getConfigBeanDefinitionParserClass(DevKitTypeElement typeElement) {
+    protected DefinedClass getConfigBeanDefinitionParserClass(Type type) {
         DefinedClass abstractBeanDefinitionParser = ctx().getCodeModel()._class(DefinedClassRoles.ABSTRACT_BEAN_DEFINITION_PARSER);
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingConstants.CONFIG_NAMESPACE);
-        DefinedClass clazz = pkg._class(typeElement.getClassName() + NamingConstants.CONFIG_DEFINITION_PARSER_CLASS_NAME_SUFFIX, abstractBeanDefinitionParser);
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.CONFIG_NAMESPACE);
+        DefinedClass clazz = pkg._class(type.getClassName() + NamingConstants.CONFIG_DEFINITION_PARSER_CLASS_NAME_SUFFIX, abstractBeanDefinitionParser);
 
-        clazz.role(DefinedClassRoles.CONFIG_BEAN_DEFINITION_PARSER, ref(typeElement));
+        clazz.role(DefinedClassRoles.CONFIG_BEAN_DEFINITION_PARSER, ref(type));
 
         return clazz;
     }
 
-    protected DefinedClass getMessageProcessorClass(DevKitExecutableElement executableElement) {
+    protected DefinedClass getMessageProcessorClass(Method executableElement) {
         return getMessageProcessorClass(executableElement.getCapitalizedName() + NamingConstants.MESSAGE_PROCESSOR_CLASS_NAME_SUFFIX,
                 executableElement.parent().getPackageName() + NamingConstants.MESSAGE_PROCESSOR_NAMESPACE);
     }
@@ -451,7 +449,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         return clazz;
     }
 
-    protected DefinedClass getInterceptingMessageProcessorClass(DevKitExecutableElement executableElement) {
+    protected DefinedClass getInterceptingMessageProcessorClass(Method executableElement) {
         org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(executableElement.parent().getPackageName() + NamingConstants.MESSAGE_PROCESSOR_NAMESPACE);
         DefinedClass clazz = pkg._class(executableElement.getCapitalizedName() + NamingConstants.MESSAGE_PROCESSOR_CLASS_NAME_SUFFIX, new Class[]{
                 Initialisable.class,
@@ -467,7 +465,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
 
-    protected DefinedClass getMessageSourceClass(DevKitExecutableElement executableElement, boolean runnable) {
+    protected DefinedClass getMessageSourceClass(Method executableElement, boolean runnable) {
         Package pkg = ctx().getCodeModel()._package(executableElement.parent().getPackageName() + NamingConstants.MESSAGE_SOURCE_NAMESPACE);
         ArrayList<Class> inherits = new ArrayList<Class>();
         inherits.add(MuleContextAware.class);
@@ -492,13 +490,13 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         return clazz;
     }
 
-    protected Map<String, FieldVariableElement> generateProcessorFieldForEachParameter(DefinedClass messageProcessorClass, DevKitExecutableElement processorMethod) {
+    protected Map<String, FieldVariableElement> generateProcessorFieldForEachParameter(DefinedClass messageProcessorClass, Method processorMethod) {
         return generateProcessorFieldForEachParameter(messageProcessorClass, processorMethod, null);
     }
 
-    protected Map<String, FieldVariableElement> generateProcessorFieldForEachParameter(DefinedClass messageProcessorClass, DevKitExecutableElement processorMethod, Class annotatedWith) {
+    protected Map<String, FieldVariableElement> generateProcessorFieldForEachParameter(DefinedClass messageProcessorClass, Method processorMethod, Class annotatedWith) {
         Map<String, AbstractMessageGenerator.FieldVariableElement> fields = new HashMap<String, FieldVariableElement>();
-        for (DevKitParameterElement variable : processorMethod.getParameters()) {
+        for (Parameter variable : processorMethod.getParameters()) {
             if (variable.asType().toString().startsWith(SourceCallback.class.getName())) {
                 continue;
             }
@@ -550,13 +548,13 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         return fields;
     }
 
-    protected Map<String, FieldVariableElement> generateStandardFieldForEachParameter(DefinedClass messageProcessorClass, DevKitExecutableElement processorMethod) {
+    protected Map<String, FieldVariableElement> generateStandardFieldForEachParameter(DefinedClass messageProcessorClass, Method processorMethod) {
         return generateStandardFieldForEachParameter(messageProcessorClass, processorMethod, null);
     }
 
-    protected Map<String, FieldVariableElement> generateStandardFieldForEachParameter(DefinedClass messageProcessorClass, DevKitExecutableElement processorMethod, Class annotatedWith) {
+    protected Map<String, FieldVariableElement> generateStandardFieldForEachParameter(DefinedClass messageProcessorClass, Method processorMethod, Class annotatedWith) {
         Map<String, AbstractMessageGenerator.FieldVariableElement> fields = new HashMap<String, FieldVariableElement>();
-        for (DevKitParameterElement variable : processorMethod.getParameters()) {
+        for (Parameter variable : processorMethod.getParameters()) {
             if (annotatedWith != null && variable.getAnnotation(annotatedWith) == null) {
                 continue;
             }
@@ -576,10 +574,10 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         return fields;
     }
 
-    protected Method generateInitialiseMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, DevKitTypeElement typeElement, FieldVariable muleContext, FieldVariable expressionManager, FieldVariable patternInfo, FieldVariable object, FieldVariable retryCount, boolean shouldAutoCreate) {
-        DefinedClass pojoClass = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
+    protected org.mule.devkit.model.code.Method generateInitialiseMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, Type type, FieldVariable muleContext, FieldVariable expressionManager, FieldVariable patternInfo, FieldVariable object, FieldVariable retryCount, boolean shouldAutoCreate) {
+        DefinedClass pojoClass = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(type));
 
-        Method initialise = messageProcessorClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "initialise");
+        org.mule.devkit.model.code.Method initialise = messageProcessorClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "initialise");
         initialise.javadoc().add("Obtains the expression manager from the Mule context and initialises the connector. If a target object ");
         initialise.javadoc().add(" has not been set already it will search the Mule registry for a default one.");
         initialise.javadoc().addThrows(ref(InitialisationException.class));
@@ -610,7 +608,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                                 arg("Cannot find object")).arg(ExpressionFactory._this()));
             }
             CatchBlock catchBlock = tryLookUp._catch(ref(RegistrationException.class));
-            Variable exception = catchBlock.param("e");
+            org.mule.devkit.model.code.Variable exception = catchBlock.param("e");
             TypeReference coreMessages = ref(CoreMessages.class);
             Invocation failedToInvoke = coreMessages.staticInvoke("initialisationFailure");
             failedToInvoke.arg(pojoClass.fullName());
@@ -632,8 +630,8 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             for (String fieldName : fields.keySet()) {
                 FieldVariableElement variableElement = fields.get(fieldName);
 
-                if (variableElement.getVariableElement().isNestedProcessor()) {
-                    boolean isList = variableElement.getVariableElement().isArrayOrList();
+                if (variableElement.getVariable().isNestedProcessor()) {
+                    boolean isList = variableElement.getVariable().isArrayOrList();
 
                     if (!isList) {
                         Conditional ifInitialisable = initialise.body()._if(Op._instanceof(variableElement.getField(), ref(Initialisable.class)));
@@ -648,10 +646,10 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                                 ExpressionFactory.cast(ref(Initialisable.class), forEachProcessor.var()).invoke("initialise")
                         );
                     }
-                } else if (variableElement.getVariableElement().asType().toString().startsWith(HttpCallback.class.getName())) {
+                } else if (variableElement.getVariable().asType().toString().startsWith(HttpCallback.class.getName())) {
                     FieldVariable callbackFlowName = fields.get(fieldName).getField();
                     Block ifCallbackFlowNameIsNull = initialise.body()._if(Op.ne(callbackFlowName, ExpressionFactory._null()))._then();
-                    Variable castedModuleObject = ifCallbackFlowNameIsNull.decl(pojoClass, "castedModuleObject", ExpressionFactory.cast(pojoClass, object));
+                    org.mule.devkit.model.code.Variable castedModuleObject = ifCallbackFlowNameIsNull.decl(pojoClass, "castedModuleObject", ExpressionFactory.cast(pojoClass, object));
                     Invocation domain = castedModuleObject.invoke("get" + StringUtils.capitalize(DefaultHttpCallbackGenerator.DOMAIN_FIELD_NAME));
                     Invocation localPort = castedModuleObject.invoke("get" + StringUtils.capitalize(DefaultHttpCallbackGenerator.LOCAL_PORT_FIELD_NAME));
                     Invocation remotePort = castedModuleObject.invoke("get" + StringUtils.capitalize(DefaultHttpCallbackGenerator.REMOTE_PORT_FIELD_NAME));
@@ -665,23 +663,23 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         return initialise;
     }
 
-    protected Method generateSetMuleContextMethod(DefinedClass clazz, FieldVariable muleContext) {
+    protected org.mule.devkit.model.code.Method generateSetMuleContextMethod(DefinedClass clazz, FieldVariable muleContext) {
         return generateSetMuleContextMethod(clazz, muleContext, null);
     }
 
-    protected Method generateSetMuleContextMethod(DefinedClass clazz, FieldVariable muleContext, Map<String, FieldVariableElement> fields) {
-        Method setMuleContext = clazz.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setMuleContext");
+    protected org.mule.devkit.model.code.Method generateSetMuleContextMethod(DefinedClass clazz, FieldVariable muleContext, Map<String, FieldVariableElement> fields) {
+        org.mule.devkit.model.code.Method setMuleContext = clazz.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setMuleContext");
         setMuleContext.javadoc().add("Set the Mule context");
         setMuleContext.javadoc().addParam("context Mule context to set");
-        Variable muleContextParam = setMuleContext.param(ref(MuleContext.class), "context");
+        org.mule.devkit.model.code.Variable muleContextParam = setMuleContext.param(ref(MuleContext.class), "context");
         setMuleContext.body().assign(ExpressionFactory._this().ref(muleContext), muleContextParam);
 
         if (fields != null) {
             for (String fieldName : fields.keySet()) {
                 FieldVariableElement variableElement = fields.get(fieldName);
 
-                if (variableElement.getVariableElement().isNestedProcessor()) {
-                    boolean isList = variableElement.getVariableElement().isArrayOrList();
+                if (variableElement.getVariable().isNestedProcessor()) {
+                    boolean isList = variableElement.getVariable().isArrayOrList();
 
                     if (!isList) {
                         Conditional ifMuleContextAware = setMuleContext.body()._if(Op._instanceof(variableElement.getField(), ref(MuleContextAware.class)));
@@ -703,23 +701,23 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         return setMuleContext;
     }
 
-    protected Method generateSetFlowConstructMethod(DefinedClass messageSourceClass, FieldVariable flowConstruct) {
+    protected org.mule.devkit.model.code.Method generateSetFlowConstructMethod(DefinedClass messageSourceClass, FieldVariable flowConstruct) {
         return generateSetFlowConstructMethod(messageSourceClass, flowConstruct, null);
     }
 
-    protected Method generateSetFlowConstructMethod(DefinedClass messageSourceClass, FieldVariable flowConstruct, Map<String, FieldVariableElement> fields) {
-        Method setFlowConstruct = messageSourceClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setFlowConstruct");
+    protected org.mule.devkit.model.code.Method generateSetFlowConstructMethod(DefinedClass messageSourceClass, FieldVariable flowConstruct, Map<String, FieldVariableElement> fields) {
+        org.mule.devkit.model.code.Method setFlowConstruct = messageSourceClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setFlowConstruct");
         setFlowConstruct.javadoc().add("Sets flow construct");
         setFlowConstruct.javadoc().addParam("flowConstruct Flow construct to set");
-        Variable newFlowConstruct = setFlowConstruct.param(ref(FlowConstruct.class), "flowConstruct");
+        org.mule.devkit.model.code.Variable newFlowConstruct = setFlowConstruct.param(ref(FlowConstruct.class), "flowConstruct");
         setFlowConstruct.body().assign(ExpressionFactory._this().ref(flowConstruct), newFlowConstruct);
 
         if (fields != null) {
             for (String fieldName : fields.keySet()) {
                 FieldVariableElement variableElement = fields.get(fieldName);
 
-                if (variableElement.getVariableElement().isNestedProcessor()) {
-                    boolean isList = variableElement.getVariableElement().isArrayOrList();
+                if (variableElement.getVariable().isNestedProcessor()) {
+                    boolean isList = variableElement.getVariable().isArrayOrList();
 
                     if (!isList) {
                         Conditional ifMuleContextAware = setFlowConstruct.body()._if(Op._instanceof(variableElement.getField(), ref(FlowConstructAware.class)));
@@ -743,7 +741,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
 
-    protected void findConfig(Block block, FieldVariable muleContext, FieldVariable object, String methodName, Variable event, DefinedClass moduleObjectClass, Variable moduleObject) {
+    protected void findConfig(Block block, FieldVariable muleContext, FieldVariable object, String methodName, org.mule.devkit.model.code.Variable event, DefinedClass moduleObjectClass, org.mule.devkit.model.code.Variable moduleObject) {
         Conditional ifObjectIsString = block._if(Op._instanceof(object, ref(String.class)));
         ifObjectIsString._else().assign(moduleObject, ExpressionFactory.cast(moduleObjectClass, object));
         ifObjectIsString._then().assign(moduleObject, ExpressionFactory.cast(moduleObjectClass, muleContext.invoke("getRegistry").invoke("lookupObject").arg(ExpressionFactory.cast(ref(String.class), object))));
@@ -784,27 +782,27 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
 
-    protected Method generateSetModuleObjectMethod(DefinedClass messageProcessorClass, FieldVariable object) {
-        Method setObject = messageProcessorClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setModuleObject");
+    protected org.mule.devkit.model.code.Method generateSetModuleObjectMethod(DefinedClass messageProcessorClass, FieldVariable object) {
+        org.mule.devkit.model.code.Method setObject = messageProcessorClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setModuleObject");
         setObject.javadoc().add("Sets the instance of the object under which the processor will execute");
         setObject.javadoc().addParam("moduleObject Instace of the module");
-        Variable objectParam = setObject.param(object.type(), "moduleObject");
+        org.mule.devkit.model.code.Variable objectParam = setObject.param(object.type(), "moduleObject");
         setObject.body().assign(ExpressionFactory._this().ref(object), objectParam);
 
         return setObject;
     }
 
-    protected void generateTransform(Block block, Variable transformedField, Variable evaluatedField, TypeMirror expectedType, FieldVariable muleContext) {
+    protected void generateTransform(Block block, org.mule.devkit.model.code.Variable transformedField, org.mule.devkit.model.code.Variable evaluatedField, TypeMirror expectedType, FieldVariable muleContext) {
         Invocation isAssignableFrom = ExpressionFactory.dotclass(ref(expectedType).boxify()).invoke("isAssignableFrom").arg(evaluatedField.invoke("getClass"));
         Conditional ifNotIsAssignableFrom = block._if(Op.not(isAssignableFrom));
         Block isNotAssignable = ifNotIsAssignableFrom._then();
-        Variable dataTypeSource = isNotAssignable.decl(ref(DataType.class), "source");
-        Variable dataTypeTarget = isNotAssignable.decl(ref(DataType.class), "target");
+        org.mule.devkit.model.code.Variable dataTypeSource = isNotAssignable.decl(ref(DataType.class), "source");
+        org.mule.devkit.model.code.Variable dataTypeTarget = isNotAssignable.decl(ref(DataType.class), "target");
 
         isNotAssignable.assign(dataTypeSource, ref(DataTypeFactory.class).staticInvoke("create").arg(evaluatedField.invoke("getClass")));
         isNotAssignable.assign(dataTypeTarget, ref(DataTypeFactory.class).staticInvoke("create").arg(ExpressionFactory.dotclass(ref(expectedType).boxify())));
 
-        Variable transformer = isNotAssignable.decl(ref(Transformer.class), "t");
+        org.mule.devkit.model.code.Variable transformer = isNotAssignable.decl(ref(Transformer.class), "t");
         Invocation lookupTransformer = muleContext.invoke("getRegistry").invoke("lookupTransformer");
         lookupTransformer.arg(dataTypeSource);
         lookupTransformer.arg(dataTypeTarget);
@@ -816,18 +814,18 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
 
-    protected Method generateSetListenerMethod(DefinedClass messageSourceClass, FieldVariable messageProcessor) {
-        Method setListener = messageSourceClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setListener");
+    protected org.mule.devkit.model.code.Method generateSetListenerMethod(DefinedClass messageSourceClass, FieldVariable messageProcessor) {
+        org.mule.devkit.model.code.Method setListener = messageSourceClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setListener");
         setListener.javadoc().add("Sets the message processor that will \"listen\" the events generated by this message source");
         setListener.javadoc().addParam("listener Message processor");
-        Variable listener = setListener.param(ref(MessageProcessor.class), "listener");
+        org.mule.devkit.model.code.Variable listener = setListener.param(ref(MessageProcessor.class), "listener");
         setListener.body().assign(ExpressionFactory._this().ref(messageProcessor), listener);
 
         return setListener;
     }
 
     protected void generateThrow(String bundle, Class<?> clazz, CatchBlock callProcessorCatch, Expression event, String methodName) {
-        Variable exception = callProcessorCatch.param("e");
+        org.mule.devkit.model.code.Variable exception = callProcessorCatch.param("e");
         TypeReference coreMessages = ref(CoreMessages.class);
         Invocation failedToInvoke = coreMessages.staticInvoke(bundle);
         if (methodName != null) {
@@ -845,12 +843,12 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     protected class FieldVariableElement {
         private final FieldVariable field;
         private final FieldVariable fieldType;
-        private final DevKitVariableElement variableElement;
+        private final Variable variable;
 
-        public FieldVariableElement(FieldVariable field, FieldVariable fieldType, DevKitVariableElement variableElement) {
+        public FieldVariableElement(FieldVariable field, FieldVariable fieldType, Variable variable) {
             this.field = field;
             this.fieldType = fieldType;
-            this.variableElement = variableElement;
+            this.variable = variable;
         }
 
         @Override
@@ -859,7 +857,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             int result = 1;
             result = prime * result + ((field == null) ? 0 : field.hashCode());
             result = prime * result + ((fieldType == null) ? 0 : fieldType.hashCode());
-            result = prime * result + ((variableElement == null) ? 0 : variableElement.hashCode());
+            result = prime * result + ((variable == null) ? 0 : variable.hashCode());
             return result;
         }
 
@@ -889,11 +887,11 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             } else if (!fieldType.equals(other.fieldType)) {
                 return false;
             }
-            if (variableElement == null) {
-                if (other.variableElement != null) {
+            if (variable == null) {
+                if (other.variable != null) {
                     return false;
                 }
-            } else if (!variableElement.equals(other.variableElement)) {
+            } else if (!variable.equals(other.variable)) {
                 return false;
             }
             return true;
@@ -907,31 +905,31 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             return fieldType;
         }
 
-        public DevKitVariableElement getVariableElement() {
-            return variableElement;
+        public Variable getVariable() {
+            return variable;
         }
     }
 
     protected void generateSourceCallbackProcessMethod(DefinedClass messageSourceClass, FieldVariable messageProcessor, FieldVariable muleContext, FieldVariable flowConstruct) {
-        Method process = messageSourceClass.method(Modifier.PUBLIC, ref(Object.class), "process");
+        org.mule.devkit.model.code.Method process = messageSourceClass.method(Modifier.PUBLIC, ref(Object.class), "process");
         process.javadoc().add("Implements {@link SourceCallback#process(org.mule.api.MuleEvent)}. This message source will be passed on to ");
         process.javadoc().add("the actual pojo's method as a callback mechanism.");
         process._throws(ref(Exception.class));
-        Variable message = process.param(ref(Object.class), "message");
+        org.mule.devkit.model.code.Variable message = process.param(ref(Object.class), "message");
 
-        Variable muleMessage = process.body().decl(ref(MuleMessage.class), "muleMessage");
+        org.mule.devkit.model.code.Variable muleMessage = process.body().decl(ref(MuleMessage.class), "muleMessage");
         Invocation newMuleMessage = ExpressionFactory._new(ref(DefaultMuleMessage.class));
         newMuleMessage.arg(message);
         newMuleMessage.arg(muleContext);
         process.body().assign(muleMessage, newMuleMessage);
 
-        Variable muleSession = process.body().decl(ref(MuleSession.class), "muleSession");
+        org.mule.devkit.model.code.Variable muleSession = process.body().decl(ref(MuleSession.class), "muleSession");
         Invocation newMuleSession = ExpressionFactory._new(ref(DefaultMuleSession.class));
         newMuleSession.arg(flowConstruct);
         newMuleSession.arg(muleContext);
         process.body().assign(muleSession, newMuleSession);
 
-        Variable muleEvent = process.body().decl(ref(MuleEvent.class), "muleEvent");
+        org.mule.devkit.model.code.Variable muleEvent = process.body().decl(ref(MuleEvent.class), "muleEvent");
         Invocation newMuleEvent = ExpressionFactory._new(ref(DefaultMuleEvent.class));
         newMuleEvent.arg(muleMessage);
         newMuleEvent.arg(ref(MessageExchangePattern.class).staticRef("ONE_WAY"));
@@ -939,7 +937,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         process.body().assign(muleEvent, newMuleEvent);
 
         TryStatement tryBlock = process.body()._try();
-        Variable responseEvent = tryBlock.body().decl(ref(MuleEvent.class), "responseEvent");
+        org.mule.devkit.model.code.Variable responseEvent = tryBlock.body().decl(ref(MuleEvent.class), "responseEvent");
         Invocation messageProcess = messageProcessor.invoke("process");
         messageProcess.arg(muleEvent);
         tryBlock.body().assign(responseEvent, messageProcess);
@@ -950,20 +948,20 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         ifResponse._then()._return(responseEvent.invoke("getMessage").invoke("getPayload"));
 
         CatchBlock catchException = tryBlock._catch(ref(Exception.class));
-        Variable exception = catchException.param("e");
+        org.mule.devkit.model.code.Variable exception = catchException.param("e");
         catchException.body()._throw(exception);
 
         process.body()._return(ExpressionFactory._null());
     }
 
     protected void generateSourceCallbackProcessMethodWithNoPayload(DefinedClass messageSourceClass, FieldVariable messageProcessor, FieldVariable muleContext, FieldVariable flowConstruct) {
-        Method process = messageSourceClass.method(Modifier.PUBLIC, ref(Object.class), "process");
+        org.mule.devkit.model.code.Method process = messageSourceClass.method(Modifier.PUBLIC, ref(Object.class), "process");
         process.javadoc().add("Implements {@link SourceCallback#process()}. This message source will be passed on to ");
         process.javadoc().add("the actual pojo's method as a callback mechanism.");
         process._throws(ref(Exception.class));
 
         TryStatement tryBlock = process.body()._try();
-        Variable responseEvent = tryBlock.body().decl(ref(MuleEvent.class), "responseEvent");
+        org.mule.devkit.model.code.Variable responseEvent = tryBlock.body().decl(ref(MuleEvent.class), "responseEvent");
         Invocation messageProcess = messageProcessor.invoke("process");
         messageProcess.arg(ref(RequestContext.class).staticInvoke("getEvent"));
         tryBlock.body().assign(responseEvent, messageProcess);
@@ -974,7 +972,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         ifResponse._then()._return(responseEvent.invoke("getMessage").invoke("getPayload"));
 
         CatchBlock catchException = tryBlock._catch(ref(Exception.class));
-        Variable exception = catchException.param("e");
+        org.mule.devkit.model.code.Variable exception = catchException.param("e");
         catchException.body()._throw(exception);
 
         process.body()._return(ExpressionFactory._null());
@@ -982,14 +980,14 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
 
     protected void generateSourceCallbackProcessWithPropertiesMethod(DefinedClass messageSourceClass, FieldVariable messageProcessor, FieldVariable muleContext, FieldVariable flowConstruct) {
-        Method process = messageSourceClass.method(Modifier.PUBLIC, ref(Object.class), "process");
+        org.mule.devkit.model.code.Method process = messageSourceClass.method(Modifier.PUBLIC, ref(Object.class), "process");
         process.javadoc().add("Implements {@link SourceCallback#process(org.mule.api.MuleEvent)}. This message source will be passed on to ");
         process.javadoc().add("the actual pojo's method as a callback mechanism.");
         process._throws(ref(Exception.class));
-        Variable message = process.param(ref(Object.class), "message");
-        Variable properties = process.param(ref(Map.class).narrow(String.class).narrow(Object.class), "properties");
+        org.mule.devkit.model.code.Variable message = process.param(ref(Object.class), "message");
+        org.mule.devkit.model.code.Variable properties = process.param(ref(Map.class).narrow(String.class).narrow(Object.class), "properties");
 
-        Variable muleMessage = process.body().decl(ref(MuleMessage.class), "muleMessage");
+        org.mule.devkit.model.code.Variable muleMessage = process.body().decl(ref(MuleMessage.class), "muleMessage");
         Invocation newMuleMessage = ExpressionFactory._new(ref(DefaultMuleMessage.class));
         newMuleMessage.arg(message);
         newMuleMessage.arg(properties);
@@ -998,13 +996,13 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         newMuleMessage.arg(muleContext);
         process.body().assign(muleMessage, newMuleMessage);
 
-        Variable muleSession = process.body().decl(ref(MuleSession.class), "muleSession");
+        org.mule.devkit.model.code.Variable muleSession = process.body().decl(ref(MuleSession.class), "muleSession");
         Invocation newMuleSession = ExpressionFactory._new(ref(DefaultMuleSession.class));
         newMuleSession.arg(flowConstruct);
         newMuleSession.arg(muleContext);
         process.body().assign(muleSession, newMuleSession);
 
-        Variable muleEvent = process.body().decl(ref(MuleEvent.class), "muleEvent");
+        org.mule.devkit.model.code.Variable muleEvent = process.body().decl(ref(MuleEvent.class), "muleEvent");
         Invocation newMuleEvent = ExpressionFactory._new(ref(DefaultMuleEvent.class));
         newMuleEvent.arg(muleMessage);
         newMuleEvent.arg(ref(MessageExchangePattern.class).staticRef("ONE_WAY"));
@@ -1012,7 +1010,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         process.body().assign(muleEvent, newMuleEvent);
 
         TryStatement tryBlock = process.body()._try();
-        Variable responseEvent = tryBlock.body().decl(ref(MuleEvent.class), "responseEvent");
+        org.mule.devkit.model.code.Variable responseEvent = tryBlock.body().decl(ref(MuleEvent.class), "responseEvent");
         Invocation messageProcess = messageProcessor.invoke("process");
         messageProcess.arg(muleEvent);
         tryBlock.body().assign(responseEvent, messageProcess);
@@ -1023,7 +1021,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         ifResponse._then()._return(responseEvent.invoke("getMessage").invoke("getPayload"));
 
         CatchBlock catchException = tryBlock._catch(ref(Exception.class));
-        Variable exception = catchException.param("e");
+        org.mule.devkit.model.code.Variable exception = catchException.param("e");
         catchException.body()._throw(exception);
 
         process.body()._return(ExpressionFactory._null());
@@ -1031,15 +1029,15 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
 
     protected void generateStartMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields) {
-        Method startMethod = messageProcessorClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "start");
+        org.mule.devkit.model.code.Method startMethod = messageProcessorClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "start");
         startMethod._throws(ref(MuleException.class));
 
         if (fields != null) {
             for (String fieldName : fields.keySet()) {
                 FieldVariableElement variableElement = fields.get(fieldName);
 
-                if (variableElement.getVariableElement().isNestedProcessor()) {
-                    boolean isList = variableElement.getVariableElement().isArrayOrList();
+                if (variableElement.getVariable().isNestedProcessor()) {
+                    boolean isList = variableElement.getVariable().isArrayOrList();
 
                     if (!isList) {
                         Conditional ifStartable = startMethod.body()._if(Op._instanceof(variableElement.getField(), ref(Startable.class)));
@@ -1054,7 +1052,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                                 ExpressionFactory.cast(ref(Startable.class), forEachProcessor.var()).invoke("start")
                         );
                     }
-                } else if (variableElement.getVariableElement().asType().toString().startsWith(HttpCallback.class.getName())) {
+                } else if (variableElement.getVariable().asType().toString().startsWith(HttpCallback.class.getName())) {
                     startMethod.body()._if(Op.ne(variableElement.getFieldType(), ExpressionFactory._null()))._then().invoke(variableElement.getFieldType(), "start");
                 }
             }
@@ -1062,15 +1060,15 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected void generateStopMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields) {
-        Method stopMethod = messageProcessorClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "stop");
+        org.mule.devkit.model.code.Method stopMethod = messageProcessorClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "stop");
         stopMethod._throws(ref(MuleException.class));
 
         if (fields != null) {
             for (String fieldName : fields.keySet()) {
                 FieldVariableElement variableElement = fields.get(fieldName);
 
-                if (variableElement.getVariableElement().isNestedProcessor()) {
-                    boolean isList = variableElement.getVariableElement().isArrayOrList();
+                if (variableElement.getVariable().isNestedProcessor()) {
+                    boolean isList = variableElement.getVariable().isArrayOrList();
 
                     if (!isList) {
                         Conditional ifStoppable = stopMethod.body()._if(Op._instanceof(variableElement.getField(), ref(Stoppable.class)));
@@ -1086,7 +1084,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                                 ExpressionFactory.cast(ref(Stoppable.class), forEachProcessor.var()).invoke("stop")
                         );
                     }
-                } else if (variableElement.getVariableElement().asType().toString().startsWith(HttpCallback.class.getName())) {
+                } else if (variableElement.getVariable().asType().toString().startsWith(HttpCallback.class.getName())) {
                     stopMethod.body()._if(Op.ne(variableElement.getFieldType(), ExpressionFactory._null()))._then().invoke(variableElement.getFieldType(), "stop");
                 }
             }
@@ -1094,14 +1092,14 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected void generateDiposeMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields) {
-        Method diposeMethod = messageProcessorClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "dispose");
+        org.mule.devkit.model.code.Method diposeMethod = messageProcessorClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "dispose");
 
         if (fields != null) {
             for (String fieldName : fields.keySet()) {
                 FieldVariableElement variableElement = fields.get(fieldName);
 
-                if (variableElement.getVariableElement().isNestedProcessor()) {
-                    boolean isList = variableElement.getVariableElement().isArrayOrList();
+                if (variableElement.getVariable().isNestedProcessor()) {
+                    boolean isList = variableElement.getVariable().isArrayOrList();
 
                     if (!isList) {
                         Conditional ifDisposable = diposeMethod.body()._if(Op._instanceof(variableElement.getField(), ref(Disposable.class)));

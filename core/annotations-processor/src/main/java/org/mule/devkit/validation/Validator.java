@@ -18,11 +18,11 @@
 package org.mule.devkit.validation;
 
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Type;
 
 public interface Validator {
 
-    boolean shouldValidate(DevKitTypeElement typeElement, GeneratorContext context);
+    boolean shouldValidate(Type type, GeneratorContext context);
 
-    void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException;
+    void validate(Type type, GeneratorContext context) throws ValidationException;
 }

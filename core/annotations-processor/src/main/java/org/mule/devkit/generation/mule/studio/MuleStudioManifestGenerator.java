@@ -19,7 +19,7 @@ package org.mule.devkit.generation.mule.studio;
 
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.utils.NameUtils;
 import org.mule.util.IOUtils;
 
@@ -32,17 +32,17 @@ public class MuleStudioManifestGenerator extends AbstractMessageGenerator {
     public static final String MANIFEST_FILE_NAME = "META-INF/MANIFEST.MF";
 
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(Type type) {
         return !ctx().hasOption("skipStudioPluginPackage");
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) throws GenerationException {
+    public void generate(Type type) throws GenerationException {
         PrintStream printStream = null;
         try {
             OutputStream outputStream = ctx().getCodeModel().getCodeWriter().openBinary(null, MANIFEST_FILE_NAME);
             printStream = new PrintStream(outputStream);
-            printStream.append(getManifestContents(typeElement));
+            printStream.append(getManifestContents(type));
             printStream.flush();
         } catch (IOException e) {
             throw new GenerationException("Could not create MANIFEST for Studio plugin: " + e.getMessage(), e);
@@ -52,15 +52,15 @@ public class MuleStudioManifestGenerator extends AbstractMessageGenerator {
         }
     }
 
-    private String getManifestContents(DevKitTypeElement typeElement) {
+    private String getManifestContents(Type type) {
         StringBuilder manfiestContentBuilder = new StringBuilder(100);
         manfiestContentBuilder.append("Manifest-Version: 1.0\n");
         manfiestContentBuilder.append("Bundle-ManifestVersion: 2\n");
-        manfiestContentBuilder.append("Bundle-Name: ").append(NameUtils.friendlyNameFromCamelCase(typeElement.name())).append("\n");
-        manfiestContentBuilder.append("Bundle-SymbolicName: " + MuleStudioFeatureGenerator.STUDIO_PREFIX).append(typeElement.name()).append(";singleton:=true\n");
+        manfiestContentBuilder.append("Bundle-Name: ").append(NameUtils.friendlyNameFromCamelCase(type.name())).append("\n");
+        manfiestContentBuilder.append("Bundle-SymbolicName: " + MuleStudioFeatureGenerator.STUDIO_PREFIX).append(type.name()).append(";singleton:=true\n");
         manfiestContentBuilder.append("Bundle-Version: %VERSION%\n");
         manfiestContentBuilder.append("Bundle-Activator: org.mule.tooling.ui.contribution.Activator\n");
-        manfiestContentBuilder.append("Bundle-Vendor: ").append(typeElement.getJavaDocTagContent("author")).append("\n");
+        manfiestContentBuilder.append("Bundle-Vendor: ").append(type.getJavaDocTagContent("author")).append("\n");
         manfiestContentBuilder.append("Require-Bundle: org.eclipse.ui,\n");
         manfiestContentBuilder.append(" org.eclipse.core.runtime,\n");
         manfiestContentBuilder.append(" org.mule.tooling.core;bundle-version=\"1.0.0\"\n");

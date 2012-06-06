@@ -21,8 +21,8 @@ import com.sun.source.util.Trees;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.Generator;
-import org.mule.devkit.model.DefaultDevKitTypeElement;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Type;
+import org.mule.devkit.model.apt.AptType;
 import org.mule.devkit.validation.ValidationException;
 import org.mule.devkit.validation.Validator;
 
@@ -62,12 +62,12 @@ public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
             Set<? extends Element> elements = env.getElementsAnnotatedWith(annotation);
             Set<TypeElement> typeElements = ElementFilter.typesIn(elements);
             for (TypeElement e : typeElements) {
-                DevKitTypeElement devKitTypeElement = new DefaultDevKitTypeElement(e, processingEnv.getTypeUtils(), processingEnv.getElementUtils(), Trees.instance(processingEnv));
-                context.note("Validating " + devKitTypeElement.getSimpleName().toString() + " class");
+                Type type = new AptType(e, processingEnv.getTypeUtils(), processingEnv.getElementUtils(), Trees.instance(processingEnv));
+                context.note("Validating " + type.getSimpleName().toString() + " class");
                 for (Validator validator : getValidators()) {
                     try {
-                        if (validator.shouldValidate(devKitTypeElement, context)) {
-                            validator.validate(devKitTypeElement, context);
+                        if (validator.shouldValidate(type, context)) {
+                            validator.validate(type, context);
                         }
                     } catch (ValidationException tve) {
                         context.error(tve.getMessage(), tve.getElement());
@@ -76,13 +76,13 @@ public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
                 }
             }
             for (TypeElement e : typeElements) {
-                DevKitTypeElement devKitTypeElement = new DefaultDevKitTypeElement(e, processingEnv.getTypeUtils(), processingEnv.getElementUtils(), Trees.instance(processingEnv));
-                context.note("Generating code for " + devKitTypeElement.getSimpleName().toString() + " class");
+                Type type = new AptType(e, processingEnv.getTypeUtils(), processingEnv.getElementUtils(), Trees.instance(processingEnv));
+                context.note("Generating code for " + type.getSimpleName().toString() + " class");
                 for (Generator generator : getGenerators()) {
                     try {
                         generator.setCtx(context);
-                        if( generator.shouldGenerate(devKitTypeElement) ) {
-                            generator.generate(devKitTypeElement);
+                        if( generator.shouldGenerate(type) ) {
+                            generator.generate(type);
                         }
                     } catch (GenerationException ge) {
                         context.error(ge.getMessage());

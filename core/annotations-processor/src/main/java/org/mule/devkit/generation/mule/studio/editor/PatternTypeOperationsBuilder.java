@@ -20,8 +20,8 @@ package org.mule.devkit.generation.mule.studio.editor;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Transformer;
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.PatternType;
 
@@ -35,8 +35,8 @@ public class PatternTypeOperationsBuilder extends BaseStudioXmlBuilder {
     private static final MethodComparator METHOD_COMPARATOR = new MethodComparator();
     private PatternTypes patternTypeToUse;
 
-    public PatternTypeOperationsBuilder(GeneratorContext context, DevKitTypeElement typeElement, PatternTypes patternTypeToUse) {
-        super(context, typeElement);
+    public PatternTypeOperationsBuilder(GeneratorContext context, Type type, PatternTypes patternTypeToUse) {
+        super(context, type);
         if (!patternTypeToUse.equals(PatternTypes.CLOUD_CONNECTOR) && !patternTypeToUse.equals(PatternTypes.TRANSFORMER)) {
             throw new IllegalArgumentException("PatternType not supported: " + patternTypeToUse);
         }
@@ -52,16 +52,16 @@ public class PatternTypeOperationsBuilder extends BaseStudioXmlBuilder {
 
         PatternType patternType = new PatternType();
         patternType.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().add(attributeCategory);
-        patternType.setCaption(helper.getFormattedCaption(typeElement));
+        patternType.setCaption(helper.getFormattedCaption(type));
 
         if (patternTypeToUse.equals(PatternTypes.CLOUD_CONNECTOR)) {
-            patternType.setLocalId(typeElement.name() + "-connector");
-            patternType.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name()));
+            patternType.setLocalId(type.name() + "-connector");
+            patternType.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + type.name() + '/' + helper.getGlobalRefId(type.name()));
         } else {
-            patternType.setLocalId(typeElement.name() + "-transformer");
+            patternType.setLocalId(type.name() + "-transformer");
         }
-        patternType.setDescription(helper.getFormattedDescription(typeElement));
-        patternType.setAliasId(ALIAS_ID_PREFIX + typeElement.name());
+        patternType.setDescription(helper.getFormattedDescription(type));
+        patternType.setAliasId(ALIAS_ID_PREFIX + type.name());
         patternType.setIcon(getIcon());
         patternType.setImage(getImage());
 
@@ -74,26 +74,26 @@ public class PatternTypeOperationsBuilder extends BaseStudioXmlBuilder {
 
     private String getImage() {
         if (patternTypeToUse.equals(PatternTypes.TRANSFORMER)) {
-            return helper.getTransformerImage(typeElement);
+            return helper.getTransformerImage(type);
         } else {
-            return helper.getConnectorImage(typeElement);
+            return helper.getConnectorImage(type);
         }
     }
 
     private String getIcon() {
         if (patternTypeToUse.equals(PatternTypes.TRANSFORMER)) {
-            return helper.getTransformerIcon(typeElement);
+            return helper.getTransformerIcon(type);
         } else {
-            return helper.getConnectorIcon(typeElement);
+            return helper.getConnectorIcon(type);
         }
     }
 
-    private List<DevKitExecutableElement> getMethods() {
-        List<DevKitExecutableElement> methods;
+    private List<Method> getMethods() {
+        List<Method> methods;
         if (patternTypeToUse.equals(PatternTypes.CLOUD_CONNECTOR)) {
-            methods = typeElement.getMethodsAnnotatedWith(Processor.class);
+            methods = type.getMethodsAnnotatedWith(Processor.class);
         } else {
-            methods = typeElement.getMethodsAnnotatedWith(Transformer.class);
+            methods = type.getMethodsAnnotatedWith(Transformer.class);
         }
         Collections.sort(methods, METHOD_COMPARATOR);
         return methods;

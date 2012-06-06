@@ -23,7 +23,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.NamingConstants;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -41,14 +41,14 @@ import org.mule.transformer.types.DataTypeFactory;
 public class StringToClassTransformerGenerator extends AbstractMessageGenerator {
 
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return typeElement.hasProcessorMethodWithParameter(Class.class) ||
-                typeElement.hasConfigurableWithType(Class.class);
+    public boolean shouldGenerate(Type type) {
+        return type.hasProcessorMethodWithParameter(Class.class) ||
+                type.hasConfigurableWithType(Class.class);
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) {
-        DefinedClass transformerClass = getTransformerClass(typeElement);
+    public void generate(Type type) {
+        DefinedClass transformerClass = getTransformerClass(type);
 
         ctx().note("Generating String to Class transformer as " + transformerClass.fullName());
 
@@ -112,8 +112,8 @@ public class StringToClassTransformerGenerator extends AbstractMessageGenerator 
         registerSourceType.arg(ref(DataTypeFactory.class).staticInvoke("create").arg(ref(String.class).boxify().dotclass()));
     }
 
-    private DefinedClass getTransformerClass(DevKitTypeElement typeElement) {
-        Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingConstants.TRANSFORMERS_NAMESPACE);
+    private DefinedClass getTransformerClass(Type type) {
+        Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.TRANSFORMERS_NAMESPACE);
         return pkg._class(NamingConstants.STRING_TO_CLASS_TRANSFORMER_CLASS_NAME, AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class, MuleContextAware.class});
     }
 }

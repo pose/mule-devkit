@@ -31,12 +31,12 @@ import org.mule.api.callback.HttpCallback;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.adapter.HttpCallbackAdapterGenerator;
-import org.mule.devkit.model.DevKitElement;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitFieldElement;
-import org.mule.devkit.model.DevKitParameterElement;
-import org.mule.devkit.model.DevKitTypeElement;
-import org.mule.devkit.model.DevKitVariableElement;
+import org.mule.devkit.model.Field;
+import org.mule.devkit.model.Identifiable;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Parameter;
+import org.mule.devkit.model.Type;
+import org.mule.devkit.model.Variable;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.schema.Annotation;
@@ -127,13 +127,13 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     }
 
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class);
+    public boolean shouldGenerate(Type type) {
+        return type.hasAnnotation(Module.class) || type.hasAnnotation(Connector.class);
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) throws GenerationException {
-        String targetNamespace = getNamespace(typeElement);
+    public void generate(Type type) throws GenerationException {
+        String targetNamespace = getNamespace(type);
 
         Schema schema = new Schema();
         schema.setTargetNamespace(targetNamespace);
@@ -146,23 +146,23 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         importMuleDevKitNamespace(schema);
 
         registerTypes(schema);
-        registerConfigElement(schema, targetNamespace, typeElement);
-        registerProcessorsAndSources(schema, targetNamespace, typeElement);
-        registerTransformers(schema, typeElement);
-        registerEnums(schema, typeElement);
-        registerComplexTypes(schema, typeElement);
+        registerConfigElement(schema, targetNamespace, type);
+        registerProcessorsAndSources(schema, targetNamespace, type);
+        registerTransformers(schema, type);
+        registerEnums(schema, type);
+        registerComplexTypes(schema, type);
 
-        String fileName = "META-INF/mule-" + typeElement.name() + XSD_EXTENSION;
+        String fileName = "META-INF/mule-" + type.name() + XSD_EXTENSION;
 
-        String versionedLocation = getVersionedLocation(typeElement);
+        String versionedLocation = getVersionedLocation(type);
         String currentLocation = null;
-        if (typeElement.schemaLocation() == null || typeElement.schemaLocation().length() == 0) {
-            currentLocation = schema.getTargetNamespace() + "/current/mule-" + typeElement.name() + XSD_EXTENSION;
+        if (type.schemaLocation() == null || type.schemaLocation().length() == 0) {
+            currentLocation = schema.getTargetNamespace() + "/current/mule-" + type.name() + XSD_EXTENSION;
         }
 
         // TODO: replace with a class role
-        String namespaceHandlerName = ctx().getCodeModel()._class(DefinedClassRoles.NAMESPACE_HANDLER, ref(typeElement)).boxify().fullName();
-        String className = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement)).boxify().fullName();
+        String namespaceHandlerName = ctx().getCodeModel()._class(DefinedClassRoles.NAMESPACE_HANDLER, ref(type)).boxify().fullName();
+        String className = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(type)).boxify().fullName();
 
         SchemaLocation versionedSchemaLocation = new SchemaLocation(schema, schema.getTargetNamespace(), fileName, versionedLocation, namespaceHandlerName, className);
 
@@ -174,26 +174,26 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         }
     }
 
-    public static String getVersionedLocation(DevKitTypeElement typeElement) {
-        String versionedLocation = typeElement.schemaLocation();
-        if (typeElement.schemaLocation() == null || typeElement.schemaLocation().length() == 0) {
-            versionedLocation = getNamespace(typeElement) + "/" + typeElement.schemaVersion() + "/mule-" + typeElement.name() + XSD_EXTENSION;
+    public static String getVersionedLocation(Type type) {
+        String versionedLocation = type.schemaLocation();
+        if (type.schemaLocation() == null || type.schemaLocation().length() == 0) {
+            versionedLocation = getNamespace(type) + "/" + type.schemaVersion() + "/mule-" + type.name() + XSD_EXTENSION;
         }
         return versionedLocation;
     }
 
-    public static String getNamespace(DevKitTypeElement typeElement) {
-        String targetNamespace = typeElement.namespace();
+    public static String getNamespace(Type type) {
+        String targetNamespace = type.namespace();
         if (targetNamespace == null || targetNamespace.length() == 0) {
-            targetNamespace = SchemaConstants.BASE_NAMESPACE + typeElement.name();
+            targetNamespace = SchemaConstants.BASE_NAMESPACE + type.name();
         }
         return targetNamespace;
     }
 
-    private void registerComplexTypes(Schema schema, DevKitTypeElement typeElement) {
+    private void registerComplexTypes(Schema schema, Type type) {
         Set<TypeMirror> registeredComplexTypes = new HashSet<TypeMirror>();
 
-        for (DevKitFieldElement field : typeElement.getFields()) {
+        for (Field field : type.getFields()) {
 
             if (!isTypeSupported(field.asType()) && !(field.isArrayOrList() || field.isMap()) &&
                     !field.isEnum() && !field.asType().toString().equals("java.lang.Object")) {
@@ -205,14 +205,14 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         }
 
-        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Processor.class)) {
-            for (DevKitParameterElement variable : method.getParameters()) {
+        for (Method method : type.getMethodsAnnotatedWith(Processor.class)) {
+            for (Parameter variable : method.getParameters()) {
                 if (!isTypeSupported(variable.asType()) && !(variable.isArrayOrList() || variable.isMap()) &&
                         !variable.isEnum() && !variable.asType().toString().equals("java.lang.Object") && !registeredComplexTypes.contains(variable.asType())) {
                     registerComplexType(schema, variable);
                     registeredComplexTypes.add(variable.asType());
                 } else if (variable.isCollection()) {
-                    for (DevKitElement variableTypeParameter : variable.getTypeArguments()) {
+                    for (Identifiable variableTypeParameter : variable.getTypeArguments()) {
                         if (!isTypeSupported(variableTypeParameter.asType()) && !(variableTypeParameter.isArrayOrList() || variableTypeParameter.isMap()) &&
                                 !variableTypeParameter.isEnum() && !variableTypeParameter.asType().toString().equals("java.lang.Object")
                                 && !registeredComplexTypes.contains(variableTypeParameter.asType())) {
@@ -225,16 +225,16 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         }
     }
 
-    private void registerComplexType(Schema schema, DevKitElement element) {
+    private void registerComplexType(Schema schema, Identifiable element) {
         TopLevelComplexType complexType = new TopLevelComplexType();
         complexType.setName(element.getSimpleName() + OBJECT_TYPE_SUFFIX);
 
         ExplicitGroup all = new ExplicitGroup();
         complexType.setSequence(all);
 
-        if( element instanceof DevKitTypeElement ) {
-            DevKitTypeElement typeElement = (DevKitTypeElement)element;
-            for( DevKitFieldElement field : typeElement.getFields() ) {
+        if( element instanceof Type) {
+            Type type = (Type)element;
+            for( Field field : type.getFields() ) {
                 if( field.isCollection() ) {
                     generateCollectionElement(schema, schema.getTargetNamespace(), all, field);
                 } else {
@@ -247,10 +247,10 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
     }
 
-    private void registerEnums(Schema schema, DevKitTypeElement typeElement) {
+    private void registerEnums(Schema schema, Type type) {
         Set<TypeMirror> registeredEnums = new HashSet<TypeMirror>();
 
-        for (DevKitFieldElement field : typeElement.getFields()) {
+        for (Field field : type.getFields()) {
             if (field.isEnum()) {
                 if (!registeredEnums.contains(field.asType())) {
                     registerEnum(schema, field.asType());
@@ -260,13 +260,13 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         }
 
-        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Processor.class)) {
-            for (DevKitParameterElement variable : method.getParameters()) {
+        for (Method method : type.getMethodsAnnotatedWith(Processor.class)) {
+            for (Parameter variable : method.getParameters()) {
                 if (variable.isEnum() && !registeredEnums.contains(variable.asType())) {
                     registerEnum(schema, variable.asType());
                     registeredEnums.add(variable.asType());
                 } else if (variable.isCollection()) {
-                    for (DevKitElement variableTypeParameter : variable.getTypeArguments()) {
+                    for (Identifiable variableTypeParameter : variable.getTypeArguments()) {
                         if (variableTypeParameter.isEnum() && !registeredEnums.contains(variableTypeParameter.asType())) {
                             registerEnum(schema, variableTypeParameter.asType());
                             registeredEnums.add(variableTypeParameter.asType());
@@ -276,8 +276,8 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             }
         }
 
-        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Source.class)) {
-            for (DevKitParameterElement variable : method.getParameters()) {
+        for (Method method : type.getMethodsAnnotatedWith(Source.class)) {
+            for (Parameter variable : method.getParameters()) {
                 if (!variable.isEnum()) {
                     continue;
                 }
@@ -322,21 +322,21 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         return enumValues;
     }
 
-    private void registerTransformers(Schema schema, DevKitTypeElement typeElement) {
-        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Transformer.class)) {
+    private void registerTransformers(Schema schema, Type type) {
+        for (Method method : type.getMethodsAnnotatedWith(Transformer.class)) {
             Element transformerElement = registerTransformer(NameUtils.uncamel(method.getSimpleName().toString()));
             schema.getSimpleTypeOrComplexTypeOrGroup().add(transformerElement);
         }
     }
 
-    private void registerProcessorsAndSources(Schema schema, String targetNamespace, DevKitTypeElement typeElement) {
-        if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class)) {
+    private void registerProcessorsAndSources(Schema schema, String targetNamespace, Type type) {
+        if (type.hasAnnotation(OAuth.class) || type.hasAnnotation(OAuth2.class)) {
             // generate an MP to start the OAuth process
             registerProcessorElement(schema, false, targetNamespace, "authorize", "AuthorizeType", "Starts OAuth authorization process. It must be called from a flow with an http:inbound-endpoint.");
             registerProcessorType(schema, false, targetNamespace, "AuthorizeType", null);
         }
 
-        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Processor.class)) {
+        for (Method method : type.getMethodsAnnotatedWith(Processor.class)) {
             String name = method.getSimpleName().toString();
             Processor processor = method.getAnnotation(Processor.class);
             if (processor.name().length() > 0) {
@@ -349,7 +349,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             registerProcessorType(schema, processor.intercepting(), targetNamespace, typeName, method);
         }
 
-        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Source.class)) {
+        for (Method method : type.getMethodsAnnotatedWith(Source.class)) {
             String name = method.getSimpleName().toString();
             Source source = method.getAnnotation(Source.class);
             if (source.name().length() > 0) {
@@ -385,7 +385,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         schema.getSimpleTypeOrComplexTypeOrGroup().add(element);
     }
 
-    private void registerSourceElement(Schema schema, String targetNamespace, String name, String typeName, DevKitExecutableElement executableElement) {
+    private void registerSourceElement(Schema schema, String targetNamespace, String name, String typeName, Method executableElement) {
         Element element = new TopLevelElement();
         element.setName(NameUtils.uncamel(name));
         element.setSubstitutionGroup(SchemaConstants.MULE_ABSTRACT_INBOUND_ENDPOINT);
@@ -402,7 +402,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         schema.getSimpleTypeOrComplexTypeOrGroup().add(element);
     }
 
-    private void registerProcessorType(Schema schema, boolean intercepting, String targetNamespace, String name, DevKitExecutableElement element) {
+    private void registerProcessorType(Schema schema, boolean intercepting, String targetNamespace, String name, Method element) {
         if (intercepting) {
             registerExtendedType(schema, SchemaConstants.MULE_ABSTRACT_INTERCEPTING_MESSAGE_PROCESSOR_TYPE, targetNamespace, name, element);
         } else {
@@ -410,11 +410,11 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         }
     }
 
-    private void registerSourceType(Schema schema, String targetNamespace, String name, DevKitExecutableElement element) {
+    private void registerSourceType(Schema schema, String targetNamespace, String name, Method element) {
         registerExtendedType(schema, SchemaConstants.MULE_ABSTRACT_INBOUND_ENDPOINT_TYPE, targetNamespace, name, element);
     }
 
-    private void registerExtendedType(Schema schema, QName base, String targetNamespace, String name, DevKitExecutableElement element) {
+    private void registerExtendedType(Schema schema, QName base, String targetNamespace, String name, Method element) {
         TopLevelComplexType complexType = new TopLevelComplexType();
         complexType.setName(name);
 
@@ -432,7 +432,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         if (element != null) {
             int requiredChildElements = 0;
-            for (DevKitParameterElement variable : element.getParameters()) {
+            for (Parameter variable : element.getParameters()) {
                 if (variable.shouldBeIgnored()) {
                     continue;
                 }
@@ -444,7 +444,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                     requiredChildElements++;
                 }
             }
-            for (DevKitParameterElement variable : element.getParameters()) {
+            for (Parameter variable : element.getParameters()) {
                 if (variable.shouldBeIgnored()) {
                     continue;
                 }
@@ -472,7 +472,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                 }
             }
 
-            DevKitExecutableElement connectExecutableElement = connectForMethod(element);
+            Method connectExecutableElement = connectForMethod(element);
             if (connectExecutableElement != null) {
                 if (element.getAnnotation(Processor.class) != null) {
                     Attribute retryMaxAttr = createAttribute(ATTRIBUTE_RETRY_MAX, true, SchemaConstants.STRING, ATTRIBUTE_RETRY_MAX_DESCRIPTION);
@@ -480,7 +480,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                     complexContentExtension.getAttributeOrAttributeGroup().add(retryMaxAttr);
                 }
 
-                for (DevKitParameterElement connectVariable : connectExecutableElement.getParameters()) {
+                for (Parameter connectVariable : connectExecutableElement.getParameters()) {
                     if (connectVariable.isCollection()) {
                         generateCollectionElement(schema, targetNamespace, all, connectVariable, true);
                     } else {
@@ -498,7 +498,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
     }
 
-    private void generateNestedProcessorElement(ExplicitGroup all, DevKitVariableElement variable) {
+    private void generateNestedProcessorElement(ExplicitGroup all, Variable variable) {
         Optional optional = variable.getAnnotation(Optional.class);
 
         TopLevelElement collectionElement = new TopLevelElement();
@@ -542,11 +542,11 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         return group;
     }
 
-    private void generateCollectionElement(Schema schema, String targetNamespace, ExplicitGroup all, DevKitVariableElement variable) {
+    private void generateCollectionElement(Schema schema, String targetNamespace, ExplicitGroup all, Variable variable) {
         generateCollectionElement(schema, targetNamespace, all, variable, false);
     }
 
-    private void generateCollectionElement(Schema schema, String targetNamespace, ExplicitGroup all, DevKitVariableElement variable, boolean forceOptional) {
+    private void generateCollectionElement(Schema schema, String targetNamespace, ExplicitGroup all, Variable variable, boolean forceOptional) {
         Optional optional = variable.getAnnotation(Optional.class);
 
         TopLevelElement collectionElement = new TopLevelElement();
@@ -577,7 +577,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         collectionElement.setComplexType(collectionComplexType);
     }
 
-    private LocalComplexType generateCollectionComplexType(Schema schema, String targetNamespace, String name, DevKitElement type) {
+    private LocalComplexType generateCollectionComplexType(Schema schema, String targetNamespace, String name, Identifiable type) {
         LocalComplexType collectionComplexType = new LocalComplexType();
         ExplicitGroup sequence = new ExplicitGroup();
         ExplicitGroup choice = new ExplicitGroup();
@@ -616,11 +616,11 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         return collectionComplexType;
     }
 
-    private LocalComplexType generateComplexType(Schema schema, String targetNamespace, String name, DevKitElement typeMirror) {
+    private LocalComplexType generateComplexType(Schema schema, String targetNamespace, String name, Identifiable typeMirror) {
         if (typeMirror.isArrayOrList()) {
-            java.util.List<DevKitElement> variableTypeParameters = typeMirror.getTypeArguments();
+            java.util.List<Identifiable> variableTypeParameters = typeMirror.getTypeArguments();
             if (variableTypeParameters.size() != 0) {
-                DevKitElement genericType = variableTypeParameters.get(0);
+                Identifiable genericType = variableTypeParameters.get(0);
 
                 if (isTypeSupported(genericType.asType())) {
                     return generateComplexTypeWithRef(schema, genericType);
@@ -636,7 +636,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                 return generateRefComplexType(ATTRIBUTE_NAME_VALUE_REF);
             }
         } else if (typeMirror.isMap()) {
-            java.util.List<DevKitElement> variableTypeParameters = typeMirror.getTypeArguments();
+            java.util.List<Identifiable> variableTypeParameters = typeMirror.getTypeArguments();
 
             LocalComplexType mapComplexType = new LocalComplexType();
             Attribute keyAttribute = new Attribute();
@@ -698,7 +698,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         return null;
     }
 
-    private LocalComplexType genereateEnumComplexType(DevKitElement genericType, String targetNamespace) {
+    private LocalComplexType genereateEnumComplexType(Identifiable genericType, String targetNamespace) {
         LocalComplexType complexType = new LocalComplexType();
         SimpleContent simpleContent = new SimpleContent();
         complexType.setSimpleContent(simpleContent);
@@ -709,7 +709,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         return complexType;
     }
 
-    private LocalComplexType generateComplexTypeWithRef(Schema schema, DevKitElement genericType) {
+    private LocalComplexType generateComplexTypeWithRef(Schema schema, Identifiable genericType) {
         LocalComplexType complexType = new LocalComplexType();
         SimpleContent simpleContent = new SimpleContent();
         complexType.setSimpleContent(simpleContent);
@@ -727,7 +727,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         return complexType;
     }
 
-    private LocalComplexType generateExtendedRefComplexType(Schema schema, DevKitElement element, String name) {
+    private LocalComplexType generateExtendedRefComplexType(Schema schema, Identifiable element, String name) {
         LocalComplexType itemComplexType = new LocalComplexType();
         itemComplexType.setComplexContent(new ComplexContent());
         itemComplexType.getComplexContent().setExtension(new ExtensionType());
@@ -780,9 +780,9 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         return xmlComplexType;
     }
 
-    private void registerConfigElement(Schema schema, String targetNamespace, DevKitTypeElement typeElement) {
+    private void registerConfigElement(Schema schema, String targetNamespace, Type type) {
 
-        DefinedClass moduleClass = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
+        DefinedClass moduleClass = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(type));
         Map<QName, String> otherAttributes = new HashMap<QName, String>();
         otherAttributes.put(SchemaConstants.MULE_DEVKIT_JAVA_CLASS_TYPE, moduleClass.fullName());
         ExtensionType config = registerExtension(schema, SchemaConstants.ELEMENT_NAME_CONFIG, otherAttributes);
@@ -792,7 +792,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         ExplicitGroup all = new ExplicitGroup();
         config.setSequence(all);
 
-        for (DevKitFieldElement variable : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
+        for (Field variable : type.getFieldsAnnotatedWith(Configurable.class)) {
             if (variable.isCollection()) {
                 generateCollectionElement(schema, targetNamespace, all, variable);
             } else {
@@ -800,18 +800,18 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             }
         }
 
-        for (DevKitFieldElement variable : typeElement.getFieldsAnnotatedWith(Inject.class)) {
+        for (Field variable : type.getFieldsAnnotatedWith(Inject.class)) {
             if (variable.asType().toString().equals("org.mule.api.store.ObjectStore")) {
                 config.getAttributeOrAttributeGroup().add(createObjectStoreRefAttribute(variable));
             }
         }
 
-        // get the executable typeElement for create connectivity
-        DevKitExecutableElement connectMethod = connectMethodForClass(typeElement);
+        // get the executable type for create connectivity
+        Method connectMethod = connectMethodForClass(type);
 
         if (connectMethod != null) {
             // add a configurable argument for each connectivity variable
-            for (DevKitParameterElement connectVariable : connectMethod.getParameters()) {
+            for (Parameter connectVariable : connectMethod.getParameters()) {
                 if (connectVariable.isCollection()) {
                     generateCollectionElement(schema, targetNamespace, all, connectVariable, true);
                 } else {
@@ -835,17 +835,17 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         }
 
         // add oauth callback configuration
-        if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class)) {
+        if (type.hasAnnotation(OAuth.class) || type.hasAnnotation(OAuth2.class)) {
             generateHttpCallbackElement(OAUTH_CALLBACK_CONFIG_ELEMENT_NAME, all);
 
             generateOAuthSaveAccessTokenElement(all);
             generateOAuthRestoreAccessTokenElement(all);
         }
-        if (typeElement.hasProcessorMethodWithParameter(HttpCallback.class)) {
+        if (type.hasProcessorMethodWithParameter(HttpCallback.class)) {
             generateHttpCallbackElement(HTTP_CALLBACK_CONFIG_ELEMENT_NAME, all);
         }
 
-        if (typeElement.isPoolable()) {
+        if (type.isPoolable()) {
             //<xsd:element name="abstract-pooling-profile" abstract="true" type="abstractPoolingProfileType"/>
 
             TopLevelElement poolingProfile = new TopLevelElement();
@@ -865,7 +865,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         Annotation annotation = new Annotation();
         Documentation doc = new Documentation();
-        doc.getContent().add(typeElement.getJavaDocSummary());
+        doc.getContent().add(type.getJavaDocSummary());
         annotation.getAppinfoOrDocumentation().add(doc);
         config.setAnnotation(annotation);
 
@@ -979,7 +979,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         all.getParticle().add(objectFactory.createElement(httpCallbackConfig));
     }
 
-    private Attribute createObjectStoreRefAttribute(DevKitVariableElement variable) {
+    private Attribute createObjectStoreRefAttribute(Variable variable) {
         Attribute attribute = new Attribute();
 
         // set whenever or not is optional
@@ -998,7 +998,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         return attribute;
     }
 
-    private Attribute createAttribute(Schema schema, DevKitVariableElement variable) {
+    private Attribute createAttribute(Schema schema, Variable variable) {
         Named named = variable.getAnnotation(Named.class);
         Optional optional = variable.getAnnotation(Optional.class);
         Default def = variable.getAnnotation(Default.class);
@@ -1041,11 +1041,11 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         return attribute;
     }
 
-    private Attribute createParameterAttribute(Schema schema, DevKitVariableElement variable) {
+    private Attribute createParameterAttribute(Schema schema, Variable variable) {
         return createParameterAttribute(schema, variable, false);
     }
 
-    private Attribute createParameterAttribute(Schema schema, DevKitVariableElement variable, boolean forceOptional) {
+    private Attribute createParameterAttribute(Schema schema, Variable variable, boolean forceOptional) {
         Named named = variable.getAnnotation(Named.class);
         Optional optional = variable.getAnnotation(Optional.class);
         Default def = variable.getAnnotation(Default.class);

@@ -52,11 +52,11 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.NamingConstants;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitFieldElement;
-import org.mule.devkit.model.DevKitParameterElement;
-import org.mule.devkit.model.DevKitTypeElement;
-import org.mule.devkit.model.DevKitVariableElement;
+import org.mule.devkit.model.Field;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Parameter;
+import org.mule.devkit.model.Type;
+import org.mule.devkit.model.Variable;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
@@ -66,12 +66,10 @@ import org.mule.devkit.model.code.Expression;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.Invocation;
-import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.TypeReference;
-import org.mule.devkit.model.code.Variable;
 import org.mule.devkit.model.code.WhileLoop;
 import org.mule.registry.TypeBasedTransformerResolver;
 import org.mule.transformer.types.DataTypeFactory;
@@ -94,13 +92,13 @@ import java.util.Map;
 public class RestAdapterGenerator extends AbstractModuleGenerator {
 
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return typeElement.isModuleOrConnector() && typeElement.hasMethodsAnnotatedWith(RestCall.class);
+    public boolean shouldGenerate(Type type) {
+        return type.isModuleOrConnector() && type.hasMethodsAnnotatedWith(RestCall.class);
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) {
-        DefinedClass restClientAdapterClass = getRestClientAdapterClass(typeElement);
+    public void generate(Type type) {
+        DefinedClass restClientAdapterClass = getRestClientAdapterClass(type);
 
         // logger field
         //FieldVariable logger = generateLoggerField(restClientAdapterClass);
@@ -109,21 +107,21 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
         FieldVariable muleContext = restClientAdapterClass.field(Modifier.PRIVATE, ref(MuleContext.class), "muleContext");
 
         Expression httpClient = null;
-        if (!typeElement.hasFieldAnnotatedWith(RestHttpClient.class)) {
+        if (!type.hasFieldAnnotatedWith(RestHttpClient.class)) {
             httpClient = restClientAdapterClass.field(Modifier.PRIVATE | Modifier.VOLATILE, ref(HttpClient.class), "httpClient");
         } else {
-            httpClient = ExpressionFactory.invoke("get" + StringUtils.capitalize(typeElement.getFieldsAnnotatedWith(RestHttpClient.class).get(0).getSimpleName().toString()));
+            httpClient = ExpressionFactory.invoke("get" + StringUtils.capitalize(type.getFieldsAnnotatedWith(RestHttpClient.class).get(0).getSimpleName().toString()));
         }
 
         generateSetMuleContext(restClientAdapterClass, muleContext);
 
-        Method initialise = restClientAdapterClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "initialise");
+        org.mule.devkit.model.code.Method initialise = restClientAdapterClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "initialise");
         initialise.annotate(ref(Override.class));
         initialise.body().add(ExpressionFactory._super().invoke("initialise"));
-        if (!typeElement.hasFieldAnnotatedWith(RestHttpClient.class)) {
+        if (!type.hasFieldAnnotatedWith(RestHttpClient.class)) {
             initialise.body().assign((FieldVariable) httpClient, ExpressionFactory._new(ref(HttpClient.class)));
         } else {
-            initialise.body().invoke("set" + StringUtils.capitalize(typeElement.getFieldsAnnotatedWith(RestHttpClient.class).get(0).getSimpleName().toString())).arg(ExpressionFactory._new(ref(HttpClient.class)));
+            initialise.body().invoke("set" + StringUtils.capitalize(type.getFieldsAnnotatedWith(RestHttpClient.class).get(0).getSimpleName().toString())).arg(ExpressionFactory._new(ref(HttpClient.class)));
         }
         initialise.body().add(httpClient.invoke("getParams").invoke("setParameter").arg("http.protocol.version").arg(ref(HttpVersion.class).staticRef("HTTP_1_1")));
         initialise.body().add(httpClient.invoke("getParams").invoke("setParameter").arg("http.socket.timeout").arg(responseTimeout));
@@ -132,24 +130,24 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
 
         generateSetter(restClientAdapterClass, responseTimeout);
 
-        generateRestCallImplementations(typeElement, httpClient, muleContext, restClientAdapterClass);
+        generateRestCallImplementations(type, httpClient, muleContext, restClientAdapterClass);
     }
 
     private void generateSetMuleContext(DefinedClass restClientAdapterClass, FieldVariable muleContext) {
-        Method setMuleContext = restClientAdapterClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setMuleContext");
+        org.mule.devkit.model.code.Method setMuleContext = restClientAdapterClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setMuleContext");
         setMuleContext.annotate(Override.class);
-        Variable context = setMuleContext.param(ref(MuleContext.class), "context");
+        org.mule.devkit.model.code.Variable context = setMuleContext.param(ref(MuleContext.class), "context");
         setMuleContext.body().assign(muleContext, context);
     }
 
-    private void generateRestCallImplementations(DevKitTypeElement typeElement, Expression httpClient, Variable muleContext, DefinedClass capabilitiesAdapter) {
-        Map<String, Variable> variables = new HashMap<String, Variable>();
-        for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(RestCall.class)) {
-            Method override = capabilitiesAdapter.method(Modifier.PUBLIC, ref(executableElement.getReturnType()), executableElement.getSimpleName().toString());
+    private void generateRestCallImplementations(Type type, Expression httpClient, org.mule.devkit.model.code.Variable muleContext, DefinedClass capabilitiesAdapter) {
+        Map<String, org.mule.devkit.model.code.Variable> variables = new HashMap<String, org.mule.devkit.model.code.Variable>();
+        for (Method executableElement : type.getMethodsAnnotatedWith(RestCall.class)) {
+            org.mule.devkit.model.code.Method override = capabilitiesAdapter.method(Modifier.PUBLIC, ref(executableElement.getReturnType()), executableElement.getSimpleName().toString());
             override._throws(ref(IOException.class));
             RestCall restCall = executableElement.getAnnotation(RestCall.class);
 
-            for (DevKitParameterElement parameter : executableElement.getParameters()) {
+            for (Parameter parameter : executableElement.getParameters()) {
                 if (parameter.getAnnotation(OAuthAccessToken.class) != null ||
                         parameter.getAnnotation(OAuthAccessTokenSecret.class) != null) {
                     continue;
@@ -161,16 +159,16 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
                 );
             }
 
-            Variable method = override.body().decl(ref(org.apache.commons.httpclient.HttpMethod.class), "method", ExpressionFactory._null());
-            Variable queryString = override.body().decl(ref(List.class).narrow(ref(NameValuePair.class)), "queryString", ExpressionFactory._new(ref(ArrayList.class).narrow(ref(NameValuePair.class))));
+            org.mule.devkit.model.code.Variable method = override.body().decl(ref(org.apache.commons.httpclient.HttpMethod.class), "method", ExpressionFactory._null());
+            org.mule.devkit.model.code.Variable queryString = override.body().decl(ref(List.class).narrow(ref(NameValuePair.class)), "queryString", ExpressionFactory._new(ref(ArrayList.class).narrow(ref(NameValuePair.class))));
 
             generateMethodAssignment(override, restCall, method);
 
-            generateParametersCode(typeElement, variables, executableElement, override, restCall, method, queryString);
+            generateParametersCode(type, variables, executableElement, override, restCall, method, queryString);
 
             if (restCall.method() == HttpMethod.POST || restCall.method() == HttpMethod.PUT) {
-                DevKitParameterElement payloadParameter = null;
-                for (DevKitParameterElement parameter : executableElement.getParameters()) {
+                Parameter payloadParameter = null;
+                for (Parameter parameter : executableElement.getParameters()) {
                     if (parameter.getAnnotation(RestUriParam.class) == null &&
                             parameter.getAnnotation(RestHeaderParam.class) == null &&
                             parameter.getAnnotation(RestQueryParam.class) == null) {
@@ -181,47 +179,47 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
                 if (payloadParameter != null) {
                     if (!restCall.contentType().equals(MimeTypes.ANY)) {
                         TryStatement tryToTransform = override.body()._try();
-                        Variable payloadInputDataType = tryToTransform.body().decl(ref(DataType.class), "payloadInputDataType", ref(DataTypeFactory.class).staticInvoke("createFromObject").arg(variables.get(payloadParameter.getSimpleName().toString())));
-                        Variable payloadOutputDataType = tryToTransform.body().decl(ref(DataType.class), "payloadOutputDataType", ref(DataTypeFactory.class).staticInvoke("create").arg(ref(String.class).dotclass()).arg(restCall.contentType()));
-                        Variable typeBasedResolver = tryToTransform.body().decl(ref(TransformerResolver.class), "typeBasedResolver", muleContext.invoke("getRegistry").invoke("lookupObject").arg(ref(TypeBasedTransformerResolver.class).dotclass()));
-                        Variable payloadTransformer = tryToTransform.body().decl(ref(Transformer.class), "payloadTransformer", typeBasedResolver.invoke("resolve").arg(payloadInputDataType).arg(payloadOutputDataType));
+                        org.mule.devkit.model.code.Variable payloadInputDataType = tryToTransform.body().decl(ref(DataType.class), "payloadInputDataType", ref(DataTypeFactory.class).staticInvoke("createFromObject").arg(variables.get(payloadParameter.getSimpleName().toString())));
+                        org.mule.devkit.model.code.Variable payloadOutputDataType = tryToTransform.body().decl(ref(DataType.class), "payloadOutputDataType", ref(DataTypeFactory.class).staticInvoke("create").arg(ref(String.class).dotclass()).arg(restCall.contentType()));
+                        org.mule.devkit.model.code.Variable typeBasedResolver = tryToTransform.body().decl(ref(TransformerResolver.class), "typeBasedResolver", muleContext.invoke("getRegistry").invoke("lookupObject").arg(ref(TypeBasedTransformerResolver.class).dotclass()));
+                        org.mule.devkit.model.code.Variable payloadTransformer = tryToTransform.body().decl(ref(Transformer.class), "payloadTransformer", typeBasedResolver.invoke("resolve").arg(payloadInputDataType).arg(payloadOutputDataType));
                         tryToTransform.body()._if(Op.eq(payloadTransformer, ExpressionFactory._null()))._then().assign(payloadTransformer, muleContext.invoke("getRegistry").invoke("lookupTransformer").arg(payloadInputDataType).arg(payloadOutputDataType));
 
-                        Variable payloadRequestEntity = tryToTransform.body().decl(ref(RequestEntity.class), "payloadRequestEntity", ExpressionFactory._new(ref(StringRequestEntity.class)).arg(ExpressionFactory.cast(ref(String.class), payloadTransformer.invoke("transform").arg(variables.get(payloadParameter.getSimpleName().toString())))).arg(restCall.contentType()).arg(ExpressionFactory.lit("UTF-8")));
+                        org.mule.devkit.model.code.Variable payloadRequestEntity = tryToTransform.body().decl(ref(RequestEntity.class), "payloadRequestEntity", ExpressionFactory._new(ref(StringRequestEntity.class)).arg(ExpressionFactory.cast(ref(String.class), payloadTransformer.invoke("transform").arg(variables.get(payloadParameter.getSimpleName().toString())))).arg(restCall.contentType()).arg(ExpressionFactory.lit("UTF-8")));
                         tryToTransform.body().add(ExpressionFactory.cast(ref(PostMethod.class), method).invoke("setRequestEntity").arg(payloadRequestEntity));
 
                         CatchBlock catchResolverException = tryToTransform._catch(ref(ResolverException.class));
-                        Variable resolverException = catchResolverException.param("rese");
+                        org.mule.devkit.model.code.Variable resolverException = catchResolverException.param("rese");
 
                         catchResolverException.body()._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg(resolverException.invoke("getMessage")).arg(resolverException));
 
                         CatchBlock catchRegistrationException = tryToTransform._catch(ref(RegistrationException.class));
-                        Variable registrationException = catchRegistrationException.param("re");
+                        org.mule.devkit.model.code.Variable registrationException = catchRegistrationException.param("re");
 
                         catchRegistrationException.body()._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg(registrationException.invoke("getMessage")).arg(registrationException));
 
                         CatchBlock catchTransformerException = tryToTransform._catch(ref(TransformerException.class));
-                        Variable transformerException = catchTransformerException.param("te");
+                        org.mule.devkit.model.code.Variable transformerException = catchTransformerException.param("te");
 
                         catchTransformerException.body()._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg(transformerException.invoke("getMessage")).arg(transformerException));
                     } else {
-                        Variable payloadRequestEntity = override.body().decl(ref(RequestEntity.class), "payloadRequestEntity", ExpressionFactory._new(ref(StringRequestEntity.class)).arg(variables.get(payloadParameter.getSimpleName().toString()).invoke("toString")));
+                        org.mule.devkit.model.code.Variable payloadRequestEntity = override.body().decl(ref(RequestEntity.class), "payloadRequestEntity", ExpressionFactory._new(ref(StringRequestEntity.class)).arg(variables.get(payloadParameter.getSimpleName().toString()).invoke("toString")));
                         override.body().add(ExpressionFactory.cast(ref(PostMethod.class), method).invoke("setRequestEntity").arg(payloadRequestEntity));
                     }
                 }
             }
 
-            Variable statusCode = override.body().decl(ctx().getCodeModel().INT, "statusCode", httpClient.invoke("executeMethod").arg(method));
+            org.mule.devkit.model.code.Variable statusCode = override.body().decl(ctx().getCodeModel().INT, "statusCode", httpClient.invoke("executeMethod").arg(method));
 
-            generateParseResponseCode(typeElement, executableElement, override, method, statusCode, muleContext);
+            generateParseResponseCode(type, executableElement, override, method, statusCode, muleContext);
 
             override.body()._return(ExpressionFactory._null());
         }
     }
 
-    private void generateParametersCode(DevKitTypeElement typeElement, Map<String, Variable> variables, DevKitExecutableElement executableElement, Method override, RestCall restCall, Variable method, Variable queryString) {
-        Variable uri = override.body().decl(ref(String.class), "uri", ExpressionFactory.lit(restCall.uri()));
-        for (DevKitParameterElement parameter : executableElement.getParameters()) {
+    private void generateParametersCode(Type type, Map<String, org.mule.devkit.model.code.Variable> variables, Method executableElement, org.mule.devkit.model.code.Method override, RestCall restCall, org.mule.devkit.model.code.Variable method, org.mule.devkit.model.code.Variable queryString) {
+        org.mule.devkit.model.code.Variable uri = override.body().decl(ref(String.class), "uri", ExpressionFactory.lit(restCall.uri()));
+        for (Parameter parameter : executableElement.getParameters()) {
             RestUriParam restUriParam = parameter.getAnnotation(RestUriParam.class);
             if (restUriParam != null) {
                 if (restCall.uri().contains("{" + restUriParam.value() + "}")) {
@@ -229,7 +227,7 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
                 }
             }
         }
-        for (DevKitFieldElement field : typeElement.getFieldsAnnotatedWith(RestUriParam.class)) {
+        for (Field field : type.getFieldsAnnotatedWith(RestUriParam.class)) {
             RestUriParam restUriParam = field.getAnnotation(RestUriParam.class);
             if (restUriParam != null) {
                 if (restCall.uri().contains("{" + restUriParam.value() + "}")) {
@@ -239,7 +237,7 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
         }
 
         override.body().add(method.invoke("setURI").arg(ExpressionFactory._new(ref(URI.class)).arg(uri).arg(ExpressionFactory.FALSE)));
-        for (DevKitParameterElement parameter : executableElement.getParameters()) {
+        for (Parameter parameter : executableElement.getParameters()) {
             RestUriParam restUriParam = parameter.getAnnotation(RestUriParam.class);
             if (restUriParam != null) {
                 if (restCall.uri().contains("{" + restUriParam.value() + "}")) {
@@ -249,7 +247,7 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
             }
         }
 
-        for (DevKitFieldElement field : typeElement.getFieldsAnnotatedWith(RestUriParam.class)) {
+        for (Field field : type.getFieldsAnnotatedWith(RestUriParam.class)) {
             RestUriParam restUriParam = field.getAnnotation(RestUriParam.class);
             if (restUriParam != null) {
                 if (restCall.uri().contains("{" + restUriParam.value() + "}")) {
@@ -259,14 +257,14 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
             }
         }
 
-        for (DevKitParameterElement parameter : executableElement.getParameters()) {
+        for (Parameter parameter : executableElement.getParameters()) {
             RestHeaderParam restHeaderParam = parameter.getAnnotation(RestHeaderParam.class);
             if (restHeaderParam != null) {
                 override.body().add(method.invoke("addRequestHeader").arg(restHeaderParam.value()).arg(variables.get(parameter.getSimpleName().toString())));
             }
         }
 
-        for (DevKitFieldElement field : typeElement.getFieldsAnnotatedWith(RestHeaderParam.class)) {
+        for (Field field : type.getFieldsAnnotatedWith(RestHeaderParam.class)) {
             RestHeaderParam restHeaderParam = field.getAnnotation(RestHeaderParam.class);
             if (restHeaderParam != null) {
                 override.body().add(method.invoke("addRequestHeader").arg(restHeaderParam.value()).arg(ExpressionFactory.invoke("get" + StringUtils.capitalize(field.getSimpleName().toString()))));
@@ -287,7 +285,7 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
         }
     }
 
-    private void generateMethodAssignment(Method override, RestCall restCall, Variable method) {
+    private void generateMethodAssignment(org.mule.devkit.model.code.Method override, RestCall restCall, org.mule.devkit.model.code.Variable method) {
         if (restCall.method() == HttpMethod.GET) {
             override.body().assign(method, ExpressionFactory._new(ref(GetMethod.class)));
         } else if (restCall.method() == HttpMethod.PUT) {
@@ -301,14 +299,14 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
         }
     }
 
-    private void generateParseResponseCode(DevKitTypeElement typeElement, DevKitExecutableElement executableElement, Method override, Variable method, Variable statusCode, Variable muleContext) {
+    private void generateParseResponseCode(Type type, Method executableElement, org.mule.devkit.model.code.Method override, org.mule.devkit.model.code.Variable method, org.mule.devkit.model.code.Variable statusCode, org.mule.devkit.model.code.Variable muleContext) {
         Conditional ifMethodExecuted = override.body()._if(Op.cand(Op.ne(method, ExpressionFactory._null()), method.invoke("hasBeenUsed")));
-        Variable bufferedReader = ifMethodExecuted._then().decl(ref(BufferedReader.class), "bufferedReader", ExpressionFactory._null());
-        Variable stringWriter = ifMethodExecuted._then().decl(ref(StringWriter.class), "stringWriter", ExpressionFactory._new(ref(StringWriter.class)));
-        Variable bufferedWriter = ifMethodExecuted._then().decl(ref(BufferedWriter.class), "bufferedWriter", ExpressionFactory._new(ref(BufferedWriter.class)).arg(stringWriter).arg(ExpressionFactory.lit(8192)));
+        org.mule.devkit.model.code.Variable bufferedReader = ifMethodExecuted._then().decl(ref(BufferedReader.class), "bufferedReader", ExpressionFactory._null());
+        org.mule.devkit.model.code.Variable stringWriter = ifMethodExecuted._then().decl(ref(StringWriter.class), "stringWriter", ExpressionFactory._new(ref(StringWriter.class)));
+        org.mule.devkit.model.code.Variable bufferedWriter = ifMethodExecuted._then().decl(ref(BufferedWriter.class), "bufferedWriter", ExpressionFactory._new(ref(BufferedWriter.class)).arg(stringWriter).arg(ExpressionFactory.lit(8192)));
 
         TryStatement readStream = ifMethodExecuted._then()._try();
-        Variable line = readStream.body().decl(ref(String.class), "line", ExpressionFactory.lit(""));
+        org.mule.devkit.model.code.Variable line = readStream.body().decl(ref(String.class), "line", ExpressionFactory.lit(""));
         readStream.body().assign(bufferedReader, ExpressionFactory._new(ref(BufferedReader.class)).arg(ExpressionFactory._new(ref(InputStreamReader.class)).arg(method.invoke("getResponseBodyAsStream"))));
         WhileLoop whileLoop = readStream.body()._while(Op.ne(ExpressionFactory.assign(line, bufferedReader.invoke("readLine")), ExpressionFactory._null()));
         whileLoop.body().add(bufferedWriter.invoke("write").arg(line));
@@ -318,65 +316,65 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
         readStream._finally().add(bufferedWriter.invoke("close"));
         readStream._finally()._if(Op.ne(bufferedReader, ExpressionFactory._null()))._then().add(bufferedReader.invoke("close"));
 
-        Variable output = ifMethodExecuted._then().decl(ref(String.class), "output", ref(StringEscapeUtils.class).staticInvoke("unescapeHtml").arg(stringWriter.invoke("toString")));
+        org.mule.devkit.model.code.Variable output = ifMethodExecuted._then().decl(ref(String.class), "output", ref(StringEscapeUtils.class).staticInvoke("unescapeHtml").arg(stringWriter.invoke("toString")));
 
         generateExeptionOnBlock(executableElement, statusCode, ifMethodExecuted, output);
 
-        generateTransformAndReturn(typeElement, executableElement, muleContext, ifMethodExecuted, output);
+        generateTransformAndReturn(type, executableElement, muleContext, ifMethodExecuted, output);
     }
 
-    private void generateTransformAndReturn(DevKitTypeElement moduleClass, DevKitExecutableElement executableElement, Variable muleContext, Conditional block, Variable output) {
+    private void generateTransformAndReturn(Type moduleClass, Method executableElement, org.mule.devkit.model.code.Variable muleContext, Conditional block, org.mule.devkit.model.code.Variable output) {
         Conditional shouldTransform = block._then()._if(Op.cand(
                 Op.ne(output, ExpressionFactory._null()),
                 Op.not(ref(executableElement.getReturnType()).boxify().dotclass().invoke("isAssignableFrom").arg(ref(String.class).dotclass()))
         ));
 
-        Variable outputDataType = shouldTransform._then().decl(ref(DataType.class), "outputDataType",
+        org.mule.devkit.model.code.Variable outputDataType = shouldTransform._then().decl(ref(DataType.class), "outputDataType",
                 ExpressionFactory._null());
 
         TryStatement tryToTransform = shouldTransform._then()._try();
 
         Invocation getMethod = ref(moduleClass.asType()).boxify().dotclass().invoke("getMethod").arg(executableElement.getSimpleName().toString());
-        for (DevKitParameterElement parameter : executableElement.getParameters()) {
+        for (Parameter parameter : executableElement.getParameters()) {
             getMethod.arg(ref(parameter.asType()).boxify().dotclass());
         }
 
-        Variable method = tryToTransform.body().decl(ref(java.lang.reflect.Method.class), "reflectedMethod", getMethod);
+        org.mule.devkit.model.code.Variable method = tryToTransform.body().decl(ref(java.lang.reflect.Method.class), "reflectedMethod", getMethod);
 
         tryToTransform.body().assign(outputDataType,
                 ref(DataTypeFactory.class).staticInvoke("createFromReturnType").arg(method));
 
-        Variable typeBasedResolver = tryToTransform.body().decl(ref(TransformerResolver.class), "typeBasedResolver", muleContext.invoke("getRegistry").invoke("lookupObject").arg(ref(TypeBasedTransformerResolver.class).dotclass()));
+        org.mule.devkit.model.code.Variable typeBasedResolver = tryToTransform.body().decl(ref(TransformerResolver.class), "typeBasedResolver", muleContext.invoke("getRegistry").invoke("lookupObject").arg(ref(TypeBasedTransformerResolver.class).dotclass()));
 
-        Variable transformer = tryToTransform.body().decl(ref(Transformer.class), "payloadTransformer", typeBasedResolver.invoke("resolve").arg(ref(DataType.class).staticRef("STRING_DATA_TYPE")).arg(outputDataType));
+        org.mule.devkit.model.code.Variable transformer = tryToTransform.body().decl(ref(Transformer.class), "payloadTransformer", typeBasedResolver.invoke("resolve").arg(ref(DataType.class).staticRef("STRING_DATA_TYPE")).arg(outputDataType));
         tryToTransform.body()._if(Op.eq(transformer, ExpressionFactory._null()))._then().assign(transformer, muleContext.invoke("getRegistry").invoke("lookupTransformer").arg(ref(DataType.class).staticRef("STRING_DATA_TYPE")).arg(outputDataType));
 
         tryToTransform.body()._return(ExpressionFactory.cast(ref(executableElement.getReturnType()), transformer.invoke("transform").arg(output)));
 
         CatchBlock catchResolverException = tryToTransform._catch(ref(ResolverException.class));
-        Variable resolverException = catchResolverException.param("rese");
+        org.mule.devkit.model.code.Variable resolverException = catchResolverException.param("rese");
 
         catchResolverException.body()._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg(resolverException.invoke("getMessage")).arg(resolverException));
 
         CatchBlock catchRegistrationException = tryToTransform._catch(ref(RegistrationException.class));
-        Variable registrationException = catchRegistrationException.param("re");
+        org.mule.devkit.model.code.Variable registrationException = catchRegistrationException.param("re");
 
         catchRegistrationException.body()._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg(registrationException.invoke("getMessage")).arg(registrationException));
 
         CatchBlock catchTransformerException = tryToTransform._catch(ref(TransformerException.class));
-        Variable transformerException = catchTransformerException.param("te");
+        org.mule.devkit.model.code.Variable transformerException = catchTransformerException.param("te");
 
         catchTransformerException.body()._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg(Op.plus(ExpressionFactory.lit("Unable to transform output from String to "), outputDataType.invoke("toString"))).arg(transformerException));
 
         CatchBlock catchNoSuchMethodException = tryToTransform._catch(ref(NoSuchMethodException.class));
-        Variable noSuchMethodException = catchNoSuchMethodException.param("nsme");
+        org.mule.devkit.model.code.Variable noSuchMethodException = catchNoSuchMethodException.param("nsme");
 
         catchNoSuchMethodException.body()._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg(ExpressionFactory.lit("Unable to find method named " + executableElement.getSimpleName().toString())).arg(noSuchMethodException));
 
         shouldTransform._else()._return(ExpressionFactory.cast(ref(executableElement.getReturnType()), ExpressionFactory.cast(ref(Object.class), output)));
     }
 
-    private void generateExeptionOnBlock(DevKitExecutableElement executableElement, Variable statusCode, Conditional block, Variable message) {
+    private void generateExeptionOnBlock(Method executableElement, org.mule.devkit.model.code.Variable statusCode, Conditional block, org.mule.devkit.model.code.Variable message) {
         RestExceptionOn restExceptionOn = executableElement.getAnnotation(RestExceptionOn.class);
         final String restExceptionOnAnnotationName = RestExceptionOn.class.getName();
         DeclaredType exception = null;
@@ -421,7 +419,7 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
         }
     }
 
-    private void addQueryParameter(Block body, Variable queryString, Expression variable, DevKitVariableElement parameter) {
+    private void addQueryParameter(Block body, org.mule.devkit.model.code.Variable queryString, Expression variable, Variable parameter) {
         RestUriParam restUriParam = parameter.getAnnotation(RestUriParam.class);
         Expression rvalue = variable.invoke("toString");
         if (restUriParam != null) {
@@ -434,20 +432,20 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
         }
     }
 
-    private DefinedClass getRestClientAdapterClass(DevKitTypeElement typeElement) {
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingConstants.ADAPTERS_NAMESPACE);
-        TypeReference previous = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
+    private DefinedClass getRestClientAdapterClass(Type type) {
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.ADAPTERS_NAMESPACE);
+        TypeReference previous = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(type));
 
         if (previous == null) {
-            previous = (TypeReference) ref(typeElement.asType());
+            previous = (TypeReference) ref(type.asType());
         }
 
-        DefinedClass clazz = pkg._class(typeElement.getClassName() + NamingConstants.REST_CLIENT_ADAPTER_CLASS_NAME_SUFFIX, previous);
+        DefinedClass clazz = pkg._class(type.getClassName() + NamingConstants.REST_CLIENT_ADAPTER_CLASS_NAME_SUFFIX, previous);
         clazz._implements(ref(Initialisable.class));
         clazz._implements(ref(Disposable.class));
         clazz._implements(ref(MuleContextAware.class));
 
-        clazz.role(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
+        clazz.role(DefinedClassRoles.MODULE_OBJECT, ref(type));
 
         return clazz;
     }

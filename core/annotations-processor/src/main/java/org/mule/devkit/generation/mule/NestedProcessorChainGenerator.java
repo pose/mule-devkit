@@ -27,7 +27,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.NamingConstants;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -43,14 +43,14 @@ import java.util.Map;
 public class NestedProcessorChainGenerator extends AbstractModuleGenerator {
 
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return typeElement.hasProcessorMethodWithParameter(NestedProcessor.class) ||
-               typeElement.hasProcessorMethodWithParameterListOf(NestedProcessor.class);
+    public boolean shouldGenerate(Type type) {
+        return type.hasProcessorMethodWithParameter(NestedProcessor.class) ||
+               type.hasProcessorMethodWithParameterListOf(NestedProcessor.class);
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) {
-        DefinedClass callbackClass = getNestedProcessorChainClass(typeElement);
+    public void generate(Type type) {
+        DefinedClass callbackClass = getNestedProcessorChainClass(type);
         callbackClass._implements(ref(NestedProcessor.class));
 
         FieldVariable muleContext = callbackClass.field(Modifier.PRIVATE, ref(MuleContext.class), "muleContext");
@@ -173,8 +173,8 @@ public class NestedProcessorChainGenerator extends AbstractModuleGenerator {
         constructor.body().assign(ExpressionFactory._this().ref(muleContext), muleContext2);
     }
 
-    private DefinedClass getNestedProcessorChainClass(DevKitTypeElement typeElement) {
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingConstants.CONFIG_NAMESPACE);
+    private DefinedClass getNestedProcessorChainClass(Type type) {
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.CONFIG_NAMESPACE);
         DefinedClass clazz = pkg._class(NamingConstants.NESTED_PROCESSOR_CHAIN_CLASS_NAME, new Class[]{MuleContextAware.class});
         clazz.role(DefinedClassRoles.NESTED_PROCESSOR_CHAIN);
 

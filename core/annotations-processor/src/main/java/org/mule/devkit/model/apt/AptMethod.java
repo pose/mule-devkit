@@ -14,10 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.mule.devkit.model;
+package org.mule.devkit.model.apt;
 
 import com.sun.source.util.Trees;
 import org.apache.commons.lang.StringUtils;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Parameter;
+import org.mule.devkit.model.Type;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeParameterElement;
@@ -28,16 +31,16 @@ import javax.lang.model.util.Types;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DefaultDevKitExecutableElement extends DefaultDevKitElement<ExecutableElement, DevKitTypeElement> implements DevKitExecutableElement {
-    public DefaultDevKitExecutableElement(ExecutableElement element, DevKitTypeElement parent, Types types, Elements elements, Trees trees) {
+public class AptMethod extends AptIdentifiable<ExecutableElement, Type> implements Method {
+    public AptMethod(ExecutableElement element, Type parent, Types types, Elements elements, Trees trees) {
         super(element, parent, types, elements, trees);
     }
 
     @Override
-    public List<DevKitParameterElement> getParameters() {
-        List<DevKitParameterElement> parameters = new ArrayList<DevKitParameterElement>();
+    public List<Parameter> getParameters() {
+        List<Parameter> parameters = new ArrayList<Parameter>();
         for(VariableElement variableElement : innerElement.getParameters() ) {
-            parameters.add(new DefaultDevKitParameterElement(variableElement, this, types, elements, trees));
+            parameters.add(new AptParameter(variableElement, this, types, elements, trees));
         }
 
         return parameters;
@@ -61,7 +64,7 @@ public class DefaultDevKitExecutableElement extends DefaultDevKitElement<Executa
     @Override
     public boolean hasOnlyOneChildElement() {
         int requiredChildElements = 0;
-        for (DevKitParameterElement variable : getParameters()) {
+        for (Parameter variable : getParameters()) {
             if (variable.shouldBeIgnored()) {
                 continue;
             }

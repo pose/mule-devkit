@@ -18,28 +18,28 @@
 package org.mule.devkit.validation;
 
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Type;
 
 public class StudioValidator extends JavaDocValidator {
 
     @Override
-    public boolean shouldValidate(DevKitTypeElement typeElement, GeneratorContext context) {
-        return !super.shouldValidate(typeElement, context) && !context.isEnvOptionSet("skipStudioPluginPackage");
+    public boolean shouldValidate(Type type, GeneratorContext context) {
+        return !super.shouldValidate(type, context) && !context.isEnvOptionSet("skipStudioPluginPackage");
     }
 
     @Override
-    public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
+    public void validate(Type type, GeneratorContext context) throws ValidationException {
         try {
-            super.validate(typeElement, context);
+            super.validate(type, context);
         } catch (ValidationException e) {
-            throw new ValidationException(typeElement, "Cannot generate Mule Studio plugin if required javadoc comments are not present. " +
+            throw new ValidationException(type, "Cannot generate Mule Studio plugin if required javadoc comments are not present. " +
                     "If you want to skip the generation of the Mule Studio plugin use -Ddevkit.studio.package.skip=true. Error is: " + e.getMessage(), e);
         }
     }
 
     @Override
-    protected boolean exampleDoesNotExist(GeneratorContext context, DevKitExecutableElement method) throws ValidationException {
+    protected boolean exampleDoesNotExist(GeneratorContext context, Method method) throws ValidationException {
         // do not check for example correctness
         return false;
     }

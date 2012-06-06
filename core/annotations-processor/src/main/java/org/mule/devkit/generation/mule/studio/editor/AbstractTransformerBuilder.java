@@ -18,7 +18,7 @@
 package org.mule.devkit.generation.mule.studio.editor;
 
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.Booleantype;
 import org.mule.devkit.model.studio.EncodingType;
@@ -36,8 +36,8 @@ public class AbstractTransformerBuilder extends BaseStudioXmlBuilder {
     public static final String ABSTRACT_TRANSFORMER_ATTRIBUTE_CATEGORY_CAPTION = "Advanced";
     public static final String ABSTRACT_TRANSFORMER_ATTRIBUTE_CATEGORY_DESCRIPTION = "Advanced settings for transformer";
 
-    public AbstractTransformerBuilder(GeneratorContext context, DevKitTypeElement typeElement) {
-        super(context, typeElement);
+    public AbstractTransformerBuilder(GeneratorContext context, Type type) {
+        super(context, type);
     }
 
     public JAXBElement<PatternType> build() {
@@ -50,7 +50,7 @@ public class AbstractTransformerBuilder extends BaseStudioXmlBuilder {
         abstractTransformer.setCaption(helper.formatCaption("Base transformer"));
         abstractTransformer.setDescription(helper.formatDescription("Base transformer"));
         abstractTransformer.setAbstract(true);
-        abstractTransformer.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + "/" + typeElement.name() + "-transformer");
+        abstractTransformer.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + type.name() + "/" + type.name() + "-transformer");
 
         AttributeCategory attributeCategory = new AttributeCategory();
         attributeCategory.setCaption(helper.formatCaption(ABSTRACT_TRANSFORMER_ATTRIBUTE_CATEGORY_CAPTION));

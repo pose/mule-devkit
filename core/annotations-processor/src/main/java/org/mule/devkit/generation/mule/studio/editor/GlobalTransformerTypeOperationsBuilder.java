@@ -19,8 +19,8 @@ package org.mule.devkit.generation.mule.studio.editor;
 
 import org.mule.api.annotations.Transformer;
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.studio.AttributeCategory;
 
 import java.util.ArrayList;
@@ -29,8 +29,8 @@ import java.util.List;
 
 public class GlobalTransformerTypeOperationsBuilder extends GlobalTypeBuilder {
 
-    public GlobalTransformerTypeOperationsBuilder(GeneratorContext context, DevKitTypeElement typeElement) {
-        super(context, typeElement);
+    public GlobalTransformerTypeOperationsBuilder(GeneratorContext context, Type type) {
+        super(context, type);
     }
 
     protected List<AttributeCategory> getAttributeCategories() {
@@ -45,8 +45,8 @@ public class GlobalTransformerTypeOperationsBuilder extends GlobalTypeBuilder {
         return attributeCategories;
     }
 
-    private List<DevKitExecutableElement> getTransformerMethodsSorted() {
-        List<DevKitExecutableElement> transformer = typeElement.getMethodsAnnotatedWith(Transformer.class);
+    private List<Method> getTransformerMethodsSorted() {
+        List<Method> transformer = type.getMethodsAnnotatedWith(Transformer.class);
         Collections.sort(transformer, new MethodComparator());
         return transformer;
     }
@@ -56,7 +56,7 @@ public class GlobalTransformerTypeOperationsBuilder extends GlobalTypeBuilder {
     }
 
     protected String getExtendsBasedOnType() {
-        return MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + AbstractTransformerBuilder.ABSTRACT_TRANSFORMER_LOCAL_ID;
+        return MuleStudioEditorXmlGenerator.URI_PREFIX + type.name() + '/' + AbstractTransformerBuilder.ABSTRACT_TRANSFORMER_LOCAL_ID;
     }
 
     protected String getLocalIdBasedOnType() {
@@ -64,7 +64,7 @@ public class GlobalTransformerTypeOperationsBuilder extends GlobalTypeBuilder {
     }
 
     protected String getCaptionBasedOnType() {
-        return helper.getFormattedCaption(typeElement);
+        return helper.getFormattedCaption(type);
     }
 
     protected String getNameDescriptionBasedOnType() {
@@ -73,11 +73,11 @@ public class GlobalTransformerTypeOperationsBuilder extends GlobalTypeBuilder {
 
     @Override
     protected String getImage() {
-        return helper.getTransformerImage(typeElement);
+        return helper.getTransformerImage(type);
     }
 
     @Override
     protected String getIcon() {
-        return helper.getTransformerIcon(typeElement);
+        return helper.getTransformerIcon(type);
     }
 }

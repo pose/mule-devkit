@@ -16,14 +16,11 @@
  */
 package org.mule.devkit.model;
 
-import com.sun.source.util.Trees;
+import java.util.List;
 
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.util.Elements;
-import javax.lang.model.util.Types;
+public interface Generifiable {
 
-public class DefaultDevKitFieldElement extends DefaultDevKitVariableElement<DevKitTypeElement> implements DevKitFieldElement {
-    public DefaultDevKitFieldElement(VariableElement variableElement, DevKitTypeElement parent, Types types, Elements elements, Trees trees) {
-        super(variableElement, parent, types, elements, trees);
-    }
+    List<Identifiable> getTypeArguments();
+
+    boolean hasTypeArguments();
 }

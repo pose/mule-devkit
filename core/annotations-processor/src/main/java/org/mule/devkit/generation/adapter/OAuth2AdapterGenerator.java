@@ -26,7 +26,7 @@ import org.mule.api.oauth.OAuth2Adapter;
 import org.mule.api.oauth.UnableToAcquireAccessTokenException;
 import org.mule.devkit.generation.AbstractOAuthAdapterGenerator;
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
@@ -54,14 +54,14 @@ import java.util.regex.Pattern;
 public class OAuth2AdapterGenerator extends AbstractOAuthAdapterGenerator {
 
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return typeElement.hasAnnotation(OAuth2.class);
+    public boolean shouldGenerate(Type type) {
+        return type.hasAnnotation(OAuth2.class);
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) throws GenerationException {
-        DefinedClass oauthAdapter = getOAuthAdapterClass(typeElement, "OAuth2Adapter", OAuth2Adapter.class);
-        OAuth2 oauth2 = typeElement.getAnnotation(OAuth2.class);
+    public void generate(Type type) throws GenerationException {
+        DefinedClass oauthAdapter = getOAuthAdapterClass(type, "OAuth2Adapter", OAuth2Adapter.class);
+        OAuth2 oauth2 = type.getAnnotation(OAuth2.class);
 
         authorizationCodePatternConstant(oauthAdapter, oauth2.verifierRegex());
 
@@ -79,7 +79,7 @@ public class OAuth2AdapterGenerator extends AbstractOAuthAdapterGenerator {
         FieldVariable saveAccessTokenCallback = saveAccessTokenCallbackField(oauthAdapter);
         FieldVariable restoreAccessTokenCallback = restoreAccessTokenCallbackField(oauthAdapter);
 
-        expirationField(oauthAdapter, typeElement.getAnnotation(OAuth2.class));
+        expirationField(oauthAdapter, type.getAnnotation(OAuth2.class));
 
         DefinedClass messageProcessor = generateMessageProcessorInnerClass(oauthAdapter);
 
@@ -88,13 +88,13 @@ public class OAuth2AdapterGenerator extends AbstractOAuthAdapterGenerator {
         generateInitialiseMethod(oauthAdapter, messageProcessor, oauth2.callbackPath());
 
         FieldVariable logger = FieldBuilder.newLoggerField(oauthAdapter);
-        generateGetAuthorizationUrlMethod(oauthAdapter, typeElement, oauth2, logger);
+        generateGetAuthorizationUrlMethod(oauthAdapter, type, oauth2, logger);
         generateRestoreAccessTokenMethod(oauthAdapter, restoreAccessTokenCallback, logger);
-        generateFetchAccessTokenMethod(oauthAdapter, typeElement, oauth2, saveAccessTokenCallback, logger);
+        generateFetchAccessTokenMethod(oauthAdapter, type, oauth2, saveAccessTokenCallback, logger);
         generateHasTokenExpiredMethod(oauthAdapter, oauth2);
         generateResetMethod(oauthAdapter, oauth2);
         generateHasBeenAuthorizedMethod(oauthAdapter, oauthAccessToken);
-        generateOverrides(typeElement, oauthAdapter, oauthAccessToken, null);
+        generateOverrides(type, oauthAdapter, oauthAccessToken, null);
     }
 
     private void accessTokenPatternConstant(DefinedClass oauthAdapter, OAuth2 oauth2) {
@@ -115,7 +115,7 @@ public class OAuth2AdapterGenerator extends AbstractOAuthAdapterGenerator {
         }
     }
 
-    private void generateGetAuthorizationUrlMethod(DefinedClass oauthAdapter, DevKitTypeElement typeElement, OAuth2 oauth2, FieldVariable logger) {
+    private void generateGetAuthorizationUrlMethod(DefinedClass oauthAdapter, Type type, OAuth2 oauth2, FieldVariable logger) {
         Method getAuthorizationUrl = oauthAdapter.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, GET_AUTHORIZATION_URL_METHOD_NAME);
         getAuthorizationUrl.type(ref(String.class));
 
@@ -124,12 +124,12 @@ public class OAuth2AdapterGenerator extends AbstractOAuthAdapterGenerator {
         getAuthorizationUrl.body().invoke(urlBuilder, "append").arg("?");
         getAuthorizationUrl.body().invoke(urlBuilder, "append").arg("response_type=code&");
         getAuthorizationUrl.body().invoke(urlBuilder, "append").arg("client_id=");
-        getAuthorizationUrl.body().invoke(urlBuilder, "append").arg(ExpressionFactory.invoke(getterMethodForFieldAnnotatedWith(typeElement, OAuthConsumerKey.class)));
+        getAuthorizationUrl.body().invoke(urlBuilder, "append").arg(ExpressionFactory.invoke(getterMethodForFieldAnnotatedWith(type, OAuthConsumerKey.class)));
         getAuthorizationUrl.body().invoke(urlBuilder, "append").arg("&redirect_uri=");
         getAuthorizationUrl.body().invoke(urlBuilder, "append").arg(oauthAdapter.fields().get(REDIRECT_URL_FIELD_NAME));
 
-        if (typeElement.hasFieldAnnotatedWith(OAuthScope.class)) {
-            Variable scope = getAuthorizationUrl.body().decl(ref(String.class), "scope", ExpressionFactory.invoke(getterMethodForFieldAnnotatedWith(typeElement, OAuthScope.class)));
+        if (type.hasFieldAnnotatedWith(OAuthScope.class)) {
+            Variable scope = getAuthorizationUrl.body().decl(ref(String.class), "scope", ExpressionFactory.invoke(getterMethodForFieldAnnotatedWith(type, OAuthScope.class)));
             Block ifScopeNotNull = getAuthorizationUrl.body()._if(Op.ne(scope, ExpressionFactory._null()))._then();
             ifScopeNotNull.invoke(urlBuilder, "append").arg("&scope=");
             ifScopeNotNull.invoke(urlBuilder, "append").arg(scope);
@@ -171,7 +171,7 @@ public class OAuth2AdapterGenerator extends AbstractOAuthAdapterGenerator {
         restoreAccessTokenMethod.body()._return(ExpressionFactory.FALSE);
     }
 
-    private void generateFetchAccessTokenMethod(DefinedClass oauthAdapter, DevKitTypeElement typeElement, OAuth2 oauth2, FieldVariable saveAccessTokenCallback, FieldVariable logger) {
+    private void generateFetchAccessTokenMethod(DefinedClass oauthAdapter, Type type, OAuth2 oauth2, FieldVariable saveAccessTokenCallback, FieldVariable logger) {
         Method fetchAccessToken = oauthAdapter.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "fetchAccessToken");
         fetchAccessToken._throws(ref(UnableToAcquireAccessTokenException.class));
 
@@ -193,8 +193,8 @@ public class OAuth2AdapterGenerator extends AbstractOAuthAdapterGenerator {
         body.invoke(conn, "setRequestMethod").arg("POST");
         body.invoke(conn, "setDoOutput").arg(ExpressionFactory.lit(true));
 
-        Invocation consumerKey = ExpressionFactory.invoke(getterMethodForFieldAnnotatedWith(typeElement, OAuthConsumerKey.class));
-        Invocation consumerSecret = ExpressionFactory.invoke(getterMethodForFieldAnnotatedWith(typeElement, OAuthConsumerSecret.class));
+        Invocation consumerKey = ExpressionFactory.invoke(getterMethodForFieldAnnotatedWith(type, OAuthConsumerKey.class));
+        Invocation consumerSecret = ExpressionFactory.invoke(getterMethodForFieldAnnotatedWith(type, OAuthConsumerSecret.class));
 
         Variable builder = body.decl(ref(StringBuilder.class), "builder", ExpressionFactory._new(ref(StringBuilder.class)));
 

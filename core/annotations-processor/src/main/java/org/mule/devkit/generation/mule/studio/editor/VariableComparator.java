@@ -20,12 +20,12 @@ package org.mule.devkit.generation.mule.studio.editor;
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.annotations.display.FriendlyName;
 import org.mule.api.annotations.display.Placement;
-import org.mule.devkit.model.DevKitVariableElement;
+import org.mule.devkit.model.Variable;
 
 import javax.lang.model.element.VariableElement;
 import java.util.Comparator;
 
-public class VariableComparator implements Comparator<DevKitVariableElement> {
+public class VariableComparator implements Comparator<Variable> {
 
     private static final int VARIABLE1_FIRST = -1;
     private static final int VARIABLE2_FIRST = 1;
@@ -40,7 +40,7 @@ public class VariableComparator implements Comparator<DevKitVariableElement> {
      * For same types or types not listed here, order alphabetically.
      */
     @Override
-    public int compare(DevKitVariableElement variable1, DevKitVariableElement variable2) {
+    public int compare(Variable variable1, Variable variable2) {
 
         Placement placementVar1 = variable1.getAnnotation(Placement.class);
         Placement placementVar2 = variable2.getAnnotation(Placement.class);
@@ -98,7 +98,7 @@ public class VariableComparator implements Comparator<DevKitVariableElement> {
         return BaseStudioXmlBuilder.GENERAL_GROUP_NAME;
     }
 
-    private boolean bothOfSameType(DevKitVariableElement variable1, DevKitVariableElement variable2) {
+    private boolean bothOfSameType(Variable variable1, Variable variable2) {
         return variable1.isString() && variable2.isString() ||
                 variable1.isInteger() && variable2.isInteger() ||
                 variable1.isEnum() && variable2.isEnum() ||
@@ -106,17 +106,17 @@ public class VariableComparator implements Comparator<DevKitVariableElement> {
                 variable1.isCollection() && variable2.isCollection();
     }
 
-    private int compareByName(DevKitVariableElement variable1, DevKitVariableElement variable2) {
+    private int compareByName(Variable variable1, Variable variable2) {
         String name1 = extractName(variable1);
         String name2 = extractName(variable2);
         return name1.compareTo(name2);
     }
 
-    private String extractName(DevKitVariableElement variableElement) {
-        if (variableElement.getAnnotation(FriendlyName.class) != null) {
-            return variableElement.getAnnotation(FriendlyName.class).value();
+    private String extractName(Variable variable) {
+        if (variable.getAnnotation(FriendlyName.class) != null) {
+            return variable.getAnnotation(FriendlyName.class).value();
         } else {
-            return variableElement.getSimpleName().toString();
+            return variable.getSimpleName().toString();
         }
     }
 }

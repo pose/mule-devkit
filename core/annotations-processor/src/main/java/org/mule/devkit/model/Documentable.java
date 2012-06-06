@@ -14,19 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.mule.devkit.model;
 
-package org.mule.devkit.generation;
+public interface Documentable {
 
-import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.Type;
+    boolean hasJavaDocTag(String tagName);
 
-public interface Generator {
+    String getJavaDocSummary();
 
-    boolean shouldGenerate(Type type);
+    String getJavaDocTagContent(String tagName);
 
-    void generate(Type type) throws GenerationException;
-
-    void setCtx(GeneratorContext generationContext);
-
-    GeneratorContext ctx();
+    String getJavaDocParameterSummary(String paramName);
 }

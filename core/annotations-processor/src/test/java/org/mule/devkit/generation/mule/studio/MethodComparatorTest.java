@@ -22,7 +22,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mule.devkit.generation.mule.studio.editor.MethodComparator;
-import org.mule.devkit.model.DevKitExecutableElement;
+import org.mule.devkit.model.Method;
 
 import javax.lang.model.element.Name;
 import java.util.ArrayList;
@@ -37,21 +37,21 @@ import static org.mockito.Mockito.when;
 public class MethodComparatorTest {
 
     @Mock
-    private DevKitExecutableElement method1;
+    private Method method1;
     @Mock
-    private DevKitExecutableElement method2;
+    private Method method2;
     @Mock
     private Name name1;
     @Mock
     private Name name2;
-    private List<DevKitExecutableElement> methods;
+    private List<Method> methods;
 
     @Before
     public void setUpTests() throws Exception {
         MockitoAnnotations.initMocks(this);
         when(method1.getSimpleName()).thenReturn(name1);
         when(method2.getSimpleName()).thenReturn(name2);
-        methods = new ArrayList<DevKitExecutableElement>(2);
+        methods = new ArrayList<Method>(2);
         methods.add(method1);
         methods.add(method2);
     }

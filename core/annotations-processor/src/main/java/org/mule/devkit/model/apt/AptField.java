@@ -14,23 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.mule.devkit.model;
+package org.mule.devkit.model.apt;
 
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeParameterElement;
-import javax.lang.model.type.TypeMirror;
-import java.util.List;
+import com.sun.source.util.Trees;
+import org.mule.devkit.model.Field;
+import org.mule.devkit.model.Type;
 
-public interface DevKitExecutableElement extends DevKitElement<ExecutableElement, DevKitTypeElement> {
-    List<DevKitParameterElement> getParameters();
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 
-    List<? extends TypeMirror> getThrownTypes();
-
-    TypeMirror getReturnType();
-
-    List<? extends TypeParameterElement> getTypeParameters();
-
-    boolean hasOnlyOneChildElement();
-
-    String getCapitalizedName();
+public class AptField extends AptVariable<Type> implements Field {
+    public AptField(VariableElement variableElement, Type parent, Types types, Elements elements, Trees trees) {
+        super(variableElement, parent, types, elements, trees);
+    }
 }

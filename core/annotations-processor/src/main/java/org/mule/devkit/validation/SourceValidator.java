@@ -20,27 +20,27 @@ package org.mule.devkit.validation;
 import org.mule.api.annotations.Source;
 import org.mule.api.callback.SourceCallback;
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitParameterElement;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Parameter;
+import org.mule.devkit.model.Type;
 
 import java.util.List;
 
 public class SourceValidator implements Validator {
 
     @Override
-    public boolean shouldValidate(DevKitTypeElement typeElement, GeneratorContext context) {
-        return typeElement.isModuleOrConnector() && typeElement.hasMethodsAnnotatedWith(Source.class);
+    public boolean shouldValidate(Type type, GeneratorContext context) {
+        return type.isModuleOrConnector() && type.hasMethodsAnnotatedWith(Source.class);
     }
 
     @Override
-    public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
+    public void validate(Type type, GeneratorContext context) throws ValidationException {
 
-        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Source.class)) {
+        for (Method method : type.getMethodsAnnotatedWith(Source.class)) {
 
             if (method.getAnnotation(Source.class).primaryNodeOnly()) {
                 String[] expectedMinVersion = new String[]{"3", "3"};
-                String minMuleVersion = typeElement.minMuleVersion();
+                String minMuleVersion = type.minMuleVersion();
                 if (minMuleVersion.contains("-")) {
                     minMuleVersion = minMuleVersion.split("-")[0];
                 }
@@ -70,8 +70,8 @@ public class SourceValidator implements Validator {
 
             // verify that every @Source receives a SourceCallback
             boolean containsSourceCallback = false;
-            List<DevKitParameterElement> parameters = method.getParameters();
-            for (DevKitParameterElement parameter : parameters) {
+            List<Parameter> parameters = method.getParameters();
+            for (Parameter parameter : parameters) {
                 if (parameter.asType().toString().startsWith(SourceCallback.class.getName())) {
                     containsSourceCallback = true;
                 }

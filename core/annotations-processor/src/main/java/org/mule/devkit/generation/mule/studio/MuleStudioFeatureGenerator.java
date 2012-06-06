@@ -19,7 +19,7 @@ package org.mule.devkit.generation.mule.studio;
 
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.utils.NameUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -40,12 +40,12 @@ public class MuleStudioFeatureGenerator extends AbstractMessageGenerator {
     public static final String LABEL_SUFFIX = " Mule Studio Extension";
 
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
+    public boolean shouldGenerate(Type type) {
         return !ctx().hasOption("skipStudioPluginPackage");
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) throws GenerationException {
+    public void generate(Type type) throws GenerationException {
         try {
 
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -53,8 +53,8 @@ public class MuleStudioFeatureGenerator extends AbstractMessageGenerator {
             Document document = documentBuilder.newDocument();
 
             Element feature = document.createElement("feature");
-            feature.setAttribute("id", STUDIO_PREFIX + typeElement.name());
-            feature.setAttribute("label", NameUtils.friendlyNameFromCamelCase(typeElement.name()) + LABEL_SUFFIX);
+            feature.setAttribute("id", STUDIO_PREFIX + type.name());
+            feature.setAttribute("label", NameUtils.friendlyNameFromCamelCase(type.name()) + LABEL_SUFFIX);
             feature.setAttribute("version", "%VERSION%");
             feature.setAttribute("provider-name", "Mulesoft, Inc.");
             document.appendChild(feature);
@@ -65,7 +65,7 @@ public class MuleStudioFeatureGenerator extends AbstractMessageGenerator {
             feature.appendChild(license);
 
             Element plugin = document.createElement("plugin");
-            plugin.setAttribute("id", STUDIO_PREFIX + typeElement.name());
+            plugin.setAttribute("id", STUDIO_PREFIX + type.name());
             plugin.setAttribute("download-size", "0");
             plugin.setAttribute("install-size", "0");
             plugin.setAttribute("version", "%VERSION%");

@@ -17,37 +17,37 @@
 
 package org.mule.devkit.validation;
 
-import org.mule.devkit.model.DevKitElement;
+import org.mule.devkit.model.Identifiable;
 
 public class ValidationException extends Exception {
-    private DevKitElement element;
+    private Identifiable element;
 
-    public ValidationException(DevKitElement element) {
+    public ValidationException(Identifiable element) {
         super();
 
         this.element = element;
     }
 
-    public ValidationException(DevKitElement element, String s) {
+    public ValidationException(Identifiable element, String s) {
         super(s);
 
         this.element = element;
     }
 
-    public ValidationException(DevKitElement element, String s, Throwable throwable) {
+    public ValidationException(Identifiable element, String s, Throwable throwable) {
         super(s, throwable);
 
         this.element = element;
     }
 
 
-    public ValidationException(DevKitElement element, Throwable throwable) {
+    public ValidationException(Identifiable element, Throwable throwable) {
         super(throwable);
 
         this.element = element;
     }
 
-    public DevKitElement getElement() {
+    public Identifiable getElement() {
         return element;
     }
 }

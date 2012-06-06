@@ -25,11 +25,11 @@ import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.DevKitElement;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitFieldElement;
-import org.mule.devkit.model.DevKitParameterElement;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Field;
+import org.mule.devkit.model.Identifiable;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Parameter;
+import org.mule.devkit.model.Type;
 import org.mule.util.IOUtils;
 
 import java.io.File;
@@ -39,57 +39,57 @@ import java.io.IOException;
 public class JavaDocValidator implements Validator {
 
     @Override
-    public boolean shouldValidate(DevKitTypeElement typeElement, GeneratorContext context) {
-        return typeElement.isModuleOrConnector() && !context.isEnvOptionSet("skipJavaDocValidation");
+    public boolean shouldValidate(Type type, GeneratorContext context) {
+        return type.isModuleOrConnector() && !context.isEnvOptionSet("skipJavaDocValidation");
     }
 
     @Override
-    public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
+    public void validate(Type type, GeneratorContext context) throws ValidationException {
 
-        if (!hasComment(typeElement, context)) {
-            throw new ValidationException(typeElement, "Class " + typeElement.getQualifiedName().toString() + " is not properly documented. A summary is missing.");
+        if (!hasComment(type, context)) {
+            throw new ValidationException(type, "Class " + type.getQualifiedName().toString() + " is not properly documented. A summary is missing.");
         }
 
-        if (!typeElement.hasJavaDocTag("author")) {
-            throw new ValidationException(typeElement, "Class " + typeElement.getQualifiedName().toString() + " needs to have an @author tag.");
+        if (!type.hasJavaDocTag("author")) {
+            throw new ValidationException(type, "Class " + type.getQualifiedName().toString() + " needs to have an @author tag.");
         }
 
-        for (DevKitFieldElement variable : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
+        for (Field variable : type.getFieldsAnnotatedWith(Configurable.class)) {
             if (!hasComment(variable, context)) {
                 throw new ValidationException(variable, "Field " + variable.getSimpleName().toString() + " is not properly documented. The description is missing.");
             }
         }
 
-        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Processor.class)) {
-            validateMethod(typeElement, context, method);
+        for (Method method : type.getMethodsAnnotatedWith(Processor.class)) {
+            validateMethod(type, context, method);
         }
 
-        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Source.class)) {
-            validateMethod(typeElement, context, method);
+        for (Method method : type.getMethodsAnnotatedWith(Source.class)) {
+            validateMethod(type, context, method);
         }
 
-        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Transformer.class)) {
-            validateMethod(typeElement, context, method);
+        for (Method method : type.getMethodsAnnotatedWith(Transformer.class)) {
+            validateMethod(type, context, method);
         }
 
-        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Connect.class)) {
+        for (Method method : type.getMethodsAnnotatedWith(Connect.class)) {
             validateAllParameters(context, method);
         }
 
-        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Disconnect.class)) {
+        for (Method method : type.getMethodsAnnotatedWith(Disconnect.class)) {
             validateAllParameters(context, method);
         }
     }
 
-    private void validateAllParameters(GeneratorContext context, DevKitExecutableElement method) throws ValidationException {
-        for (DevKitParameterElement variable : method.getParameters()) {
+    private void validateAllParameters(GeneratorContext context, Method method) throws ValidationException {
+        for (Parameter variable : method.getParameters()) {
             if (!hasParameterComment(variable.getSimpleName().toString(), variable.parent(), context)) {
                 throw new ValidationException(variable, "Parameter " + variable.getSimpleName().toString() + " of method " + method.getSimpleName().toString() + " is not properly documented. A matching @param in the method documentation was not found. ");
             }
         }
     }
 
-    private void validateMethod(DevKitTypeElement typeElement, GeneratorContext context, DevKitExecutableElement method) throws ValidationException {
+    private void validateMethod(Type type, GeneratorContext context, Method method) throws ValidationException {
         if (!hasComment(method, context)) {
             throw new ValidationException(method, "Method " + method.getSimpleName().toString() + " is not properly documented. A description of what it can do is missing.");
         }
@@ -97,29 +97,29 @@ public class JavaDocValidator implements Validator {
         if (!method.getReturnType().toString().equals("void") &&
                 !method.getReturnType().toString().contains("StopSourceCallback")) {
             if (!method.hasJavaDocTag("return")) {
-                throw new ValidationException(typeElement, "The return type of a non-void method must be documented. Method " + method.getSimpleName().toString() + " is at fault. Missing @return.");
+                throw new ValidationException(type, "The return type of a non-void method must be documented. Method " + method.getSimpleName().toString() + " is at fault. Missing @return.");
             }
         }
 
         if (exampleDoesNotExist(context, method)) {
-            throw new ValidationException(typeElement, "Method " + method.getSimpleName().toString() + " does not have the example pointed by the {@sample.xml} tag");
+            throw new ValidationException(type, "Method " + method.getSimpleName().toString() + " does not have the example pointed by the {@sample.xml} tag");
         }
 
         validateAllParameters(context, method);
     }
 
-    private boolean hasComment(DevKitElement element, GeneratorContext context) {
+    private boolean hasComment(Identifiable element, GeneratorContext context) {
         String comment = element.getJavaDocSummary();
         return StringUtils.isNotBlank(comment);
 
     }
 
-    private boolean hasParameterComment(String paramName, DevKitElement element, GeneratorContext context) {
+    private boolean hasParameterComment(String paramName, Identifiable element, GeneratorContext context) {
         String comment = element.getJavaDocParameterSummary(paramName);
         return StringUtils.isNotBlank(comment);
     }
 
-    protected boolean exampleDoesNotExist(GeneratorContext context, DevKitExecutableElement method) throws ValidationException {
+    protected boolean exampleDoesNotExist(GeneratorContext context, Method method) throws ValidationException {
 
         if (!method.hasJavaDocTag("sample.xml")) {
             throw new ValidationException(method, "Method " + method.getSimpleName().toString() + " does not contain an example using {@sample.xml} tag.");

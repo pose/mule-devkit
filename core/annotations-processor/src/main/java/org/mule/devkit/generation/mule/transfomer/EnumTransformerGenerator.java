@@ -27,16 +27,15 @@ import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.NamingConstants;
-import org.mule.devkit.model.DevKitElement;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitFieldElement;
-import org.mule.devkit.model.DevKitParameterElement;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Field;
+import org.mule.devkit.model.Identifiable;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Parameter;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.Invocation;
-import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
@@ -46,14 +45,14 @@ import org.mule.transformer.types.DataTypeFactory;
 public class EnumTransformerGenerator extends AbstractMessageGenerator {
 
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class);
+    public boolean shouldGenerate(Type type) {
+        return type.hasAnnotation(Module.class) || type.hasAnnotation(Connector.class);
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) {
+    public void generate(Type type) {
 
-        for (DevKitFieldElement field : typeElement.getFields()) {
+        for (Field field : type.getFields()) {
             if (field.isEnum()) {
                 if (!ctx().isEnumRegistered(field.asType())) {
                     registerEnumTransformer(field);
@@ -62,13 +61,13 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
             }
         }
 
-        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Processor.class)) {
-            for (DevKitParameterElement variable : method.getParameters()) {
+        for (Method method : type.getMethodsAnnotatedWith(Processor.class)) {
+            for (Parameter variable : method.getParameters()) {
                 if (variable.isEnum() && !ctx().isEnumRegistered(variable.asType())) {
                     registerEnumTransformer(variable);
                     ctx().registerEnum(variable.asType());
                 } else if (variable.isCollection()) {
-                    for (DevKitElement variableTypeParameter : variable.getTypeArguments()) {
+                    for (Identifiable variableTypeParameter : variable.getTypeArguments()) {
                         if (variableTypeParameter.isEnum() && !ctx().isEnumRegistered(variableTypeParameter.asType())) {
                             registerEnumTransformer(variableTypeParameter);
                             ctx().registerEnum(variableTypeParameter.asType());
@@ -78,8 +77,8 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
             }
         }
 
-        for (DevKitExecutableElement method : typeElement.getMethodsAnnotatedWith(Source.class)) {
-            for (DevKitParameterElement variable : method.getParameters()) {
+        for (Method method : type.getMethodsAnnotatedWith(Source.class)) {
+            for (Parameter variable : method.getParameters()) {
                 if (!variable.isEnum()) {
                     continue;
                 }
@@ -92,7 +91,7 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
         }
     }
 
-    private void registerEnumTransformer(DevKitElement variableElement) {
+    private void registerEnumTransformer(Identifiable variableElement) {
         // get class
         DefinedClass transformerClass = getEnumTransformerClass(variableElement);
 
@@ -119,18 +118,18 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
     }
 
     private void generateSetPriorityWeighting(DefinedClass jaxbTransformerClass, FieldVariable weighting) {
-        Method setPriorityWeighting = jaxbTransformerClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setPriorityWeighting");
+        org.mule.devkit.model.code.Method setPriorityWeighting = jaxbTransformerClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "setPriorityWeighting");
         Variable localWeighting = setPriorityWeighting.param(ctx().getCodeModel().INT, "weighting");
         setPriorityWeighting.body().assign(ExpressionFactory._this().ref(weighting), localWeighting);
     }
 
     private void generateGetPriorityWeighting(DefinedClass jaxbTransformerClass, FieldVariable weighting) {
-        Method getPriorityWeighting = jaxbTransformerClass.method(Modifier.PUBLIC, ctx().getCodeModel().INT, "getPriorityWeighting");
+        org.mule.devkit.model.code.Method getPriorityWeighting = jaxbTransformerClass.method(Modifier.PUBLIC, ctx().getCodeModel().INT, "getPriorityWeighting");
         getPriorityWeighting.body()._return(weighting);
     }
 
-    private void generateDoTransform(DefinedClass jaxbTransformerClass, DevKitElement variableElement) {
-        Method doTransform = jaxbTransformerClass.method(Modifier.PROTECTED, ref(Object.class), "doTransform");
+    private void generateDoTransform(DefinedClass jaxbTransformerClass, Identifiable variableElement) {
+        org.mule.devkit.model.code.Method doTransform = jaxbTransformerClass.method(Modifier.PROTECTED, ref(Object.class), "doTransform");
         doTransform._throws(TransformerException.class);
         Variable src = doTransform.param(ref(Object.class), "src");
         doTransform.param(ref(String.class), "encoding");
@@ -146,9 +145,9 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
         doTransform.body()._return(result);
     }
 
-    private void generateConstructor(DefinedClass transformerClass, DevKitElement variableElement) {
+    private void generateConstructor(DefinedClass transformerClass, Identifiable variableElement) {
         // generate constructor
-        Method constructor = transformerClass.constructor(Modifier.PUBLIC);
+        org.mule.devkit.model.code.Method constructor = transformerClass.constructor(Modifier.PUBLIC);
 
         // register source data type
         registerSourceTypes(constructor);
@@ -159,26 +158,26 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
         constructor.body().invoke("setName").arg(transformerClass.name());
     }
 
-    private void registerDestinationType(Method constructor, TypeReference clazz) {
+    private void registerDestinationType(org.mule.devkit.model.code.Method constructor, TypeReference clazz) {
         Invocation setReturnClass = constructor.body().invoke("setReturnClass");
         setReturnClass.arg(ExpressionFactory.dotclass(clazz));
     }
 
-    private void registerSourceTypes(Method constructor) {
+    private void registerSourceTypes(org.mule.devkit.model.code.Method constructor) {
         Invocation registerSourceType = constructor.body().invoke("registerSourceType");
         registerSourceType.arg(ref(DataTypeFactory.class).staticInvoke("create").arg(ref(String.class).boxify().dotclass()));
     }
 
-    private DefinedClass getEnumTransformerClass(DevKitElement variableElement) {
+    private DefinedClass getEnumTransformerClass(Identifiable variableElement) {
         javax.lang.model.element.Element enumElement = ctx().getTypeUtils().asElement(variableElement.asType());
 
         String packageName = "";
-        if (variableElement instanceof DevKitTypeElement) {
-            packageName = ((DevKitTypeElement)variableElement).getPackageName();
-        } else if (variableElement instanceof DevKitParameterElement) {
-            packageName = ((DevKitTypeElement)((DevKitParameterElement) variableElement).parent().parent()).getPackageName();
-        } else if (variableElement.parent() instanceof DevKitTypeElement) {
-            packageName = ((DevKitTypeElement)variableElement.parent()).getPackageName();
+        if (variableElement instanceof Type) {
+            packageName = ((Type)variableElement).getPackageName();
+        } else if (variableElement instanceof Parameter) {
+            packageName = ((Type)((Parameter) variableElement).parent().parent()).getPackageName();
+        } else if (variableElement.parent() instanceof Type) {
+            packageName = ((Type)variableElement.parent()).getPackageName();
         }
 
         org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(packageName + NamingConstants.TRANSFORMERS_NAMESPACE);

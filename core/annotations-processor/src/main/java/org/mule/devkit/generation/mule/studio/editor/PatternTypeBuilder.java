@@ -20,8 +20,8 @@ package org.mule.devkit.generation.mule.studio.editor;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Transformer;
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.model.DevKitExecutableElement;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.AttributeType;
 import org.mule.devkit.model.studio.Group;
@@ -34,8 +34,8 @@ import java.util.Map;
 
 public class PatternTypeBuilder extends BaseStudioXmlBuilder {
 
-    public PatternTypeBuilder(GeneratorContext context, DevKitExecutableElement executableElement, DevKitTypeElement typeElement) {
-        super(context, executableElement, typeElement);
+    public PatternTypeBuilder(GeneratorContext context, Method executableElement, Type type) {
+        super(context, executableElement, type);
     }
 
     public PatternType build() {
@@ -54,10 +54,10 @@ public class PatternTypeBuilder extends BaseStudioXmlBuilder {
         patternType.setAbstract(true);
 
         if (executableElement.getAnnotation(Processor.class) != null) {
-            patternType.setExtends(helper.getUrl(typeElement) + helper.getGlobalRefId(typeElement.name()));
+            patternType.setExtends(helper.getUrl(type) + helper.getGlobalRefId(type.name()));
             patternType.setReturnType(executableElement.getReturnType().toString());
         } else if (executableElement.getAnnotation(Transformer.class) != null) {
-            patternType.setExtends(helper.getUrl(typeElement) + AbstractTransformerBuilder.ABSTRACT_TRANSFORMER_LOCAL_ID);
+            patternType.setExtends(helper.getUrl(type) + AbstractTransformerBuilder.ABSTRACT_TRANSFORMER_LOCAL_ID);
             patternType.setDescription(helper.formatDescription(executableElement.getJavaDocSummary()));
         }
 
@@ -68,29 +68,29 @@ public class PatternTypeBuilder extends BaseStudioXmlBuilder {
 
     protected String getImage() {
         if (executableElement.getAnnotation(Transformer.class) != null) {
-            return helper.getTransformerImage(typeElement);
+            return helper.getTransformerImage(type);
         } else {
-            return helper.getConnectorImage(typeElement);
+            return helper.getConnectorImage(type);
         }
     }
 
     protected String getIcon() {
         if (executableElement.getAnnotation(Transformer.class) != null) {
-            return helper.getTransformerIcon(typeElement);
+            return helper.getTransformerIcon(type);
         } else {
-            return helper.getConnectorIcon(typeElement);
+            return helper.getConnectorIcon(type);
         }
     }
 
     @Override
     protected void processConnectionAttributes(Map<String, Group> groupsByName, Map<String, AttributeCategory> attributeCategoriesByName) {
-        if (typeElement.usesConnectionManager()) {
+        if (type.usesConnectionManager()) {
             Group connectionAttributesGroup = new Group();
             connectionAttributesGroup.setCaption(helper.formatCaption(CONNECTION_GROUP_NAME));
             connectionAttributesGroup.setId(StringUtils.uncapitalize(CONNECTION_GROUP_NAME));
 
             AttributeType label = new AttributeType();
-            label.setCaption(String.format(CONNECTION_GROUP_LABEL, helper.getFormattedCaption(typeElement)));
+            label.setCaption(String.format(CONNECTION_GROUP_LABEL, helper.getFormattedCaption(type)));
 
             AttributeType newLine = new AttributeType();
             newLine.setCaption("");
@@ -100,7 +100,7 @@ public class PatternTypeBuilder extends BaseStudioXmlBuilder {
 
             groupsByName.put(CONNECTION_GROUP_NAME, connectionAttributesGroup);
 
-            List<AttributeType> connectionAttributes = getConnectionAttributes(typeElement);
+            List<AttributeType> connectionAttributes = getConnectionAttributes(type);
             connectionAttributesGroup.getRegexpOrEncodingOrModeSwitch().addAll(helper.createJAXBElements(connectionAttributes));
 
             AttributeCategory connectionAttributeCategory = new AttributeCategory();

@@ -23,7 +23,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.NamingConstants;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -43,14 +43,14 @@ import java.math.BigInteger;
 public class StringToBigIntegerTransformerGenerator extends AbstractMessageGenerator {
 
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return typeElement.hasProcessorMethodWithParameter(BigInteger.class) ||
-                typeElement.hasConfigurableWithType(BigInteger.class);
+    public boolean shouldGenerate(Type type) {
+        return type.hasProcessorMethodWithParameter(BigInteger.class) ||
+                type.hasConfigurableWithType(BigInteger.class);
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) {
-        DefinedClass transformerClass = getTransformerClass(typeElement);
+    public void generate(Type type) {
+        DefinedClass transformerClass = getTransformerClass(type);
 
         ctx().note("Generating String to BigInteger transformer as " + transformerClass.fullName());
 
@@ -114,8 +114,8 @@ public class StringToBigIntegerTransformerGenerator extends AbstractMessageGener
         registerSourceType.arg(ref(DataTypeFactory.class).staticInvoke("create").arg(ref(String.class).boxify().dotclass()));
     }
 
-    private DefinedClass getTransformerClass(DevKitTypeElement typeElement) {
-        Package pkg = ctx().getCodeModel()._package(typeElement.getPackageName() + NamingConstants.TRANSFORMERS_NAMESPACE);
+    private DefinedClass getTransformerClass(Type type) {
+        Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.TRANSFORMERS_NAMESPACE);
         return pkg._class(NamingConstants.STRING_TO_BIGINTEGER_TRANSFORMER_CLASS_NAME, AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class, MuleContextAware.class});
     }
 }

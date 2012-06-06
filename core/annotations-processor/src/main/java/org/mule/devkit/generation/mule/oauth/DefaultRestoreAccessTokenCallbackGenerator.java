@@ -28,7 +28,7 @@ import org.mule.api.oauth.RestoreAccessTokenCallback;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.NamingConstants;
-import org.mule.devkit.model.DevKitTypeElement;
+import org.mule.devkit.model.Type;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
@@ -45,8 +45,8 @@ import org.mule.devkit.model.code.Variable;
 public class DefaultRestoreAccessTokenCallbackGenerator extends AbstractMessageGenerator {
 
     @Override
-    public boolean shouldGenerate(DevKitTypeElement typeElement) {
-        if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class)) {
+    public boolean shouldGenerate(Type type) {
+        if (type.hasAnnotation(OAuth.class) || type.hasAnnotation(OAuth2.class)) {
             return true;
         }
 
@@ -54,8 +54,8 @@ public class DefaultRestoreAccessTokenCallbackGenerator extends AbstractMessageG
     }
 
     @Override
-    public void generate(DevKitTypeElement typeElement) throws GenerationException {
-        DefinedClass callbackClass = getDefaultRestoreAccessTokenCallbackClass(typeElement);
+    public void generate(Type type) throws GenerationException {
+        DefinedClass callbackClass = getDefaultRestoreAccessTokenCallbackClass(type);
 
         FieldVariable messageProcessor = generateFieldForMessageProcessor(callbackClass, "messageProcessor");
         FieldVariable logger = generateLoggerField(callbackClass);
@@ -149,7 +149,7 @@ public class DefaultRestoreAccessTokenCallbackGenerator extends AbstractMessageG
         getAccessTokenSecretMethod.body()._return(accessTokenSecret);
     }
 
-    private DefinedClass getDefaultRestoreAccessTokenCallbackClass(DevKitTypeElement type) {
+    private DefinedClass getDefaultRestoreAccessTokenCallbackClass(Type type) {
         Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.CONFIG_NAMESPACE);
         DefinedClass clazz = pkg._class(NamingConstants.DEFAULT_RESTORE_ACCESS_TOKEN_CALLBACK_CLASS_NAME, new Class[]{
                 RestoreAccessTokenCallback.class});

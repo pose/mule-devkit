@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.mule.devkit.model;
+package org.mule.devkit.model.apt;
 
 import com.sun.source.util.Trees;
 import org.mule.api.MuleMessage;
@@ -32,6 +32,8 @@ import org.mule.api.annotations.param.OutboundHeaders;
 import org.mule.api.annotations.param.Payload;
 import org.mule.api.annotations.param.SessionHeaders;
 import org.mule.api.callback.SourceCallback;
+import org.mule.devkit.model.Method;
+import org.mule.devkit.model.Parameter;
 
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
@@ -40,7 +42,7 @@ import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
 
-public class DefaultDevKitParameterElement extends DefaultDevKitVariableElement<DevKitExecutableElement> implements DevKitParameterElement {
+public class AptParameter extends AptVariable<Method> implements Parameter {
     private static final List<Class<?>> PARAMETER_TYPES_TO_IGNORE = Arrays.asList(SourceCallback.class, MuleMessage.class);
     private static final List<Class<? extends Annotation>> PARAMETERS_ANNOTATIONS_TO_IGNORE =
             Arrays.asList(InboundHeaders.class, InvocationHeaders.class, OutboundHeaders.class,
@@ -49,7 +51,7 @@ public class DefaultDevKitParameterElement extends DefaultDevKitVariableElement<
                     CorrelationSequence.class, CorrelationGroupSize.class, MessageUniqueId.class,
                     MessageRootId.class);
 
-    public DefaultDevKitParameterElement(VariableElement element, DevKitExecutableElement parent, Types types, Elements elements, Trees trees) {
+    public AptParameter(VariableElement element, Method parent, Types types, Elements elements, Trees trees) {
         super(element, parent, types, elements, trees);
     }
 
