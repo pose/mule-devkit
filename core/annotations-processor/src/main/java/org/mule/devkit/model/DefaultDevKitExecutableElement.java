@@ -16,6 +16,8 @@
  */
 package org.mule.devkit.model;
 
+import com.sun.source.util.Trees;
+
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
@@ -26,15 +28,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DefaultDevKitExecutableElement extends DefaultDevKitElement<ExecutableElement, DevKitTypeElement> implements DevKitExecutableElement {
-    public DefaultDevKitExecutableElement(ExecutableElement element, DevKitTypeElement parent, Types types, Elements elements) {
-        super(element, parent, types, elements);
+    public DefaultDevKitExecutableElement(ExecutableElement element, DevKitTypeElement parent, Types types, Elements elements, Trees trees) {
+        super(element, parent, types, elements, trees);
     }
 
     @Override
     public List<DevKitParameterElement> getParameters() {
         List<DevKitParameterElement> parameters = new ArrayList<DevKitParameterElement>();
         for(VariableElement variableElement : innerElement.getParameters() ) {
-            parameters.add(new DefaultDevKitParameterElement(variableElement, this, types, elements));
+            parameters.add(new DefaultDevKitParameterElement(variableElement, this, types, elements, trees));
         }
 
         return parameters;

@@ -16,6 +16,7 @@
  */
 package org.mule.devkit.model;
 
+import com.sun.source.util.Trees;
 import org.mule.api.MuleMessage;
 import org.mule.api.annotations.oauth.OAuthAccessToken;
 import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
@@ -48,8 +49,8 @@ public class DefaultDevKitParameterElement extends DefaultDevKitVariableElement<
                     CorrelationSequence.class, CorrelationGroupSize.class, MessageUniqueId.class,
                     MessageRootId.class);
 
-    public DefaultDevKitParameterElement(VariableElement element, DevKitExecutableElement parent, Types types, Elements elements) {
-        super(element, parent, types, elements);
+    public DefaultDevKitParameterElement(VariableElement element, DevKitExecutableElement parent, Types types, Elements elements, Trees trees) {
+        super(element, parent, types, elements, trees);
     }
 
     @Override

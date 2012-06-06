@@ -17,6 +17,7 @@
 
 package org.mule.devkit.apt;
 
+import com.sun.source.util.Trees;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.Generator;
@@ -61,7 +62,7 @@ public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
             Set<? extends Element> elements = env.getElementsAnnotatedWith(annotation);
             Set<TypeElement> typeElements = ElementFilter.typesIn(elements);
             for (TypeElement e : typeElements) {
-                DevKitTypeElement devKitTypeElement = new DefaultDevKitTypeElement(e, processingEnv.getTypeUtils(), processingEnv.getElementUtils());
+                DevKitTypeElement devKitTypeElement = new DefaultDevKitTypeElement(e, processingEnv.getTypeUtils(), processingEnv.getElementUtils(), Trees.instance(processingEnv));
                 context.note("Validating " + devKitTypeElement.getSimpleName().toString() + " class");
                 for (Validator validator : getValidators()) {
                     try {
@@ -75,7 +76,7 @@ public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
                 }
             }
             for (TypeElement e : typeElements) {
-                DevKitTypeElement devKitTypeElement = new DefaultDevKitTypeElement(e, processingEnv.getTypeUtils(), processingEnv.getElementUtils());
+                DevKitTypeElement devKitTypeElement = new DefaultDevKitTypeElement(e, processingEnv.getTypeUtils(), processingEnv.getElementUtils(), Trees.instance(processingEnv));
                 context.note("Generating code for " + devKitTypeElement.getSimpleName().toString() + " class");
                 for (Generator generator : getGenerators()) {
                     try {

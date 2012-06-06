@@ -17,6 +17,7 @@
 
 package org.mule.devkit.model;
 
+import com.sun.source.util.Trees;
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Connect;
 import org.mule.api.annotations.Connector;
@@ -43,8 +44,8 @@ import java.util.List;
 
 public class DefaultDevKitTypeElement extends DefaultDevKitElement<TypeElement, DevKitTypeElement> implements DevKitTypeElement {
 
-    public DefaultDevKitTypeElement(TypeElement innerElement, Types types, Elements elements) {
-        super(innerElement, null, types, elements);
+    public DefaultDevKitTypeElement(TypeElement innerElement, Types types, Elements elements, Trees trees) {
+        super(innerElement, null, types, elements, trees);
     }
 
     @Override
@@ -164,7 +165,7 @@ public class DefaultDevKitTypeElement extends DefaultDevKitElement<TypeElement, 
     public List<DevKitFieldElement> getFields() {
         List<DevKitFieldElement> fields = new ArrayList<DevKitFieldElement>();
         for(VariableElement variableElement : ElementFilter.fieldsIn(innerElement.getEnclosedElements()) ) {
-            fields.add(new DefaultDevKitFieldElement(variableElement, this, types, elements));
+            fields.add(new DefaultDevKitFieldElement(variableElement, this, types, elements, trees));
         }
 
         return fields;
@@ -174,7 +175,7 @@ public class DefaultDevKitTypeElement extends DefaultDevKitElement<TypeElement, 
     public List<DevKitExecutableElement> getMethods() {
         List<DevKitExecutableElement> methods = new ArrayList<DevKitExecutableElement>();
         for(ExecutableElement executableElement : ElementFilter.methodsIn(innerElement.getEnclosedElements()) ) {
-            methods.add(new DefaultDevKitExecutableElement(executableElement, this, types, elements));
+            methods.add(new DefaultDevKitExecutableElement(executableElement, this, types, elements, trees));
         }
 
         return methods;

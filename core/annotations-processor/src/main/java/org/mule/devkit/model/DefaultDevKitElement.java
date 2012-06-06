@@ -16,6 +16,7 @@
  */
 package org.mule.devkit.model;
 
+import com.sun.source.util.Trees;
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.NestedProcessor;
 import org.mule.api.callback.HttpCallback;
@@ -48,12 +49,14 @@ public class DefaultDevKitElement<T extends Element, P extends DevKitElement> im
     protected P parent;
     protected Types types;
     protected Elements elements;
+    protected Trees trees;
 
-    public DefaultDevKitElement(T element, P parent, Types types, Elements elements) {
+    public DefaultDevKitElement(T element, P parent, Types types, Elements elements, Trees trees) {
         this.innerElement = element;
         this.parent = parent;
         this.types = types;
         this.elements = elements;
+        this.trees = trees;
     }
 
     public P parent() {
@@ -234,9 +237,9 @@ public class DefaultDevKitElement<T extends Element, P extends DevKitElement> im
             }
             Element element = types.asElement(typeMirror);
             if( element instanceof TypeElement ) {
-                typeArguments.add(new DefaultDevKitTypeElement((TypeElement)element, types, elements));
+                typeArguments.add(new DefaultDevKitTypeElement((TypeElement)element, types, elements, trees));
             } else {
-                typeArguments.add(new DefaultDevKitElement(element, this, types, elements));
+                typeArguments.add(new DefaultDevKitElement(element, this, types, elements, trees));
             }
         }
 
