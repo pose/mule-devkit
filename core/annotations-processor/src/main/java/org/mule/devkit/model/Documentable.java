@@ -16,8 +16,19 @@
  */
 package org.mule.devkit.model;
 
+/**
+ * This interface provides a way to interact with model elements that can
+ * have javadoc comments and tags.
+ */
 public interface Documentable {
 
+    /**
+     * Checks if the element contains the specified tag in this javadoc
+     * comments.
+     *
+     * @param tagName The name of the javadoc tag to check
+     * @return true if it contains it, false otherwise
+     */
     boolean hasJavaDocTag(String tagName);
 
     String getJavaDocSummary();

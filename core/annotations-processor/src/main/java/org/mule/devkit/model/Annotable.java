@@ -20,8 +20,33 @@ import javax.lang.model.element.AnnotationMirror;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
+/**
+ * This interface provides a way to interact this model elements that can
+ * have annotations.
+ */
 public interface Annotable {
+
+    /**
+     * Returns the annotations that are directly present on this element.
+     *
+     * @return the annotations directly present on this element; an empty list if there are none
+     */
     List<? extends AnnotationMirror> getAnnotationMirrors();
 
+    /**
+     * Returns this element's annotation for the specified type if such an annotation is present, else null. The
+     * annotation may be either inherited or directly present on this element.
+     *
+     * The annotation returned by this method could contain an element whose value is of type Class. This value
+     * cannot be returned directly: information necessary to locate and load a class (such as the class loader to
+     * use) is not available, and the class might not be loadable at all. Attempting to read a Class object by
+     * invoking the relevant method on the returned annotation will result in a MirroredTypeException, from which
+     * the corresponding TypeMirror may be extracted. Similarly, attempting to read a Class[]-valued element will
+     * result in a MirroredTypesException.
+
+     * @param aClass the Class object corresponding to the annotation type
+     * @param <A> the annotation type
+     * @return this element's annotation for the specified annotation type if present on this element, else null
+     */
     <A extends Annotation> A getAnnotation(Class<A> aClass);
 }

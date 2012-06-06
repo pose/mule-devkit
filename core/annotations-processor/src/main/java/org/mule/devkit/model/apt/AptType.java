@@ -71,6 +71,11 @@ public class AptType extends AptIdentifiable<TypeElement, Type> implements Type 
     }
 
     @Override
+    public boolean isParametrized() {
+        return !innerElement.getTypeParameters().isEmpty();
+    }
+
+    @Override
     public boolean hasProcessorMethodWithParameter(Class<?> parameterType) {
         for (Method method : getMethodsAnnotatedWith(Processor.class)) {
             for (Parameter parameter : method.getParameters()) {

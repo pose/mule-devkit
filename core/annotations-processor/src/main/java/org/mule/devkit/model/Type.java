@@ -44,6 +44,8 @@ public interface Type extends Identifiable<TypeElement, Type> {
 
     List<Method> getMethods();
 
+    boolean isParametrized();
+
     boolean hasFieldAnnotatedWith(Class<? extends Annotation> annotation);
 
     boolean isInterface();
