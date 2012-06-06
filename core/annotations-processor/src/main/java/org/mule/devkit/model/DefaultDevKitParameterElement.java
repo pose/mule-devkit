@@ -33,6 +33,7 @@ import org.mule.api.annotations.param.SessionHeaders;
 import org.mule.api.callback.SourceCallback;
 
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
@@ -47,8 +48,8 @@ public class DefaultDevKitParameterElement extends DefaultDevKitVariableElement<
                     CorrelationSequence.class, CorrelationGroupSize.class, MessageUniqueId.class,
                     MessageRootId.class);
 
-    public DefaultDevKitParameterElement(VariableElement element, DevKitExecutableElement parent, Types types) {
-        super(element, parent, types);
+    public DefaultDevKitParameterElement(VariableElement element, DevKitExecutableElement parent, Types types, Elements elements) {
+        super(element, parent, types, elements);
     }
 
     @Override

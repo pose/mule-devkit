@@ -17,10 +17,11 @@
 package org.mule.devkit.model;
 
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 public class DefaultDevKitVariableElement<P extends DevKitElement> extends DefaultDevKitElement<VariableElement, P> implements DevKitVariableElement<P> {
-    public DefaultDevKitVariableElement(VariableElement variableElement, P parent, Types types) {
-        super(variableElement, parent, types);
+    public DefaultDevKitVariableElement(VariableElement variableElement, P parent, Types types, Elements elements) {
+        super(variableElement, parent, types, elements);
     }
 }

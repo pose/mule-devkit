@@ -29,6 +29,7 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import javax.lang.model.type.WildcardType;
+import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.xml.bind.annotation.XmlType;
 import java.lang.annotation.Annotation;
@@ -44,11 +45,13 @@ public class DefaultDevKitElement<T extends Element, P extends DevKitElement> im
     protected T innerElement;
     protected P parent;
     protected Types types;
+    protected Elements elements;
 
-    public DefaultDevKitElement(T element, P parent, Types types) {
+    public DefaultDevKitElement(T element, P parent, Types types, Elements elements) {
         this.innerElement = element;
         this.parent = parent;
         this.types = types;
+        this.elements = elements;
     }
 
     public P parent() {
@@ -229,9 +232,9 @@ public class DefaultDevKitElement<T extends Element, P extends DevKitElement> im
             }
             Element element = types.asElement(typeMirror);
             if( element instanceof TypeElement ) {
-                typeArguments.add(new DefaultDevKitTypeElement((TypeElement)element, types));
+                typeArguments.add(new DefaultDevKitTypeElement((TypeElement)element, types, elements));
             } else {
-                typeArguments.add(new DefaultDevKitElement(element, this, types));
+                typeArguments.add(new DefaultDevKitElement(element, this, types, elements));
             }
         }
 
