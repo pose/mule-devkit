@@ -53,7 +53,7 @@ public class JavaDocUtilsTest {
                 "     @param addressId  the customer address to update\n" +
                 "     @param attributes the address attributes to update");
         JavaDocUtils javaDocUtils = new JavaDocUtils(elements);
-        String sample = javaDocUtils.getTagContent("sample.xml", executableElement);
+        String sample = executableElement.getJavaDocTagContent("sample.xml");
         assertEquals("../../../doc/magento-connector.xml.sample magento:updateCustomerAddress", sample);
     }
 
@@ -67,7 +67,7 @@ public class JavaDocUtilsTest {
                 "     @param addressId  the customer address to update\n" +
                 "     @param attributes the address attributes to update");
         JavaDocUtils javaDocUtils = new JavaDocUtils(elements);
-        String sample = javaDocUtils.getTagContent("sample.xml", executableElement);
+        String sample = executableElement.getJavaDocTagContent("sample.xml");
         assertEquals("../../../doc/magento-connector.xml.sample magento:updateCustomerAddress", sample);
     }
 

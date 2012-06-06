@@ -59,7 +59,7 @@ public class MuleStudioManifestGenerator extends AbstractMessageGenerator {
         manfiestContentBuilder.append("Bundle-SymbolicName: " + MuleStudioFeatureGenerator.STUDIO_PREFIX).append(typeElement.name()).append(";singleton:=true\n");
         manfiestContentBuilder.append("Bundle-Version: %VERSION%\n");
         manfiestContentBuilder.append("Bundle-Activator: org.mule.tooling.ui.contribution.Activator\n");
-        manfiestContentBuilder.append("Bundle-Vendor: ").append(ctx().getJavaDocUtils().getTagContent("author", typeElement)).append("\n");
+        manfiestContentBuilder.append("Bundle-Vendor: ").append(typeElement.getJavaDocTagContent("author")).append("\n");
         manfiestContentBuilder.append("Require-Bundle: org.eclipse.ui,\n");
         manfiestContentBuilder.append(" org.eclipse.core.runtime,\n");
         manfiestContentBuilder.append(" org.mule.tooling.core;bundle-version=\"1.0.0\"\n");

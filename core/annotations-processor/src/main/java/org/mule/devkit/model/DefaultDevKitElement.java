@@ -383,4 +383,38 @@ public class DefaultDevKitElement<T extends Element, P extends DevKitElement> im
         return false;
     }
 
+    @Override
+    public String getJavaDocTagContent(String tagName) {
+        String comment = elements.getDocComment(innerElement);
+        if (StringUtils.isBlank(comment)) {
+            return "";
+        }
+
+        StringTokenizer st = new StringTokenizer(comment.trim(), "\n\r");
+        boolean insideTag = false;
+        StringBuilder tagContent = new StringBuilder();
+        while (st.hasMoreTokens()) {
+            String nextToken = st.nextToken().trim();
+            if (nextToken.startsWith("@" + tagName)) {
+                return StringUtils.difference("@" + tagName, nextToken).trim();
+            }
+            if (nextToken.startsWith("{@" + tagName)) {
+                if (nextToken.endsWith("}")) {
+                    return StringUtils.difference("{@" + tagName, nextToken).replaceAll("}", "").trim();
+                } else {
+                    tagContent.append(StringUtils.difference("{@" + tagName, nextToken).replaceAll("}", "").trim());
+                    insideTag = true;
+                }
+            } else if (insideTag) {
+                if (nextToken.endsWith("}")) {
+                    tagContent.append(' ').append(nextToken.replaceAll("}", ""));
+                    insideTag = false;
+                } else {
+                    tagContent.append(' ').append(nextToken);
+                }
+            }
+        }
+
+        return tagContent.toString();
+    }
 }

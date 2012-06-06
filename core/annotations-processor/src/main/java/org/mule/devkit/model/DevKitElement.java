@@ -85,4 +85,6 @@ public interface DevKitElement<T extends Element, P extends DevKitElement> exten
     boolean hasJavaDocTag(String tagName);
 
     String getJavaDocSummary();
+
+    String getJavaDocTagContent(String tagName);
 }

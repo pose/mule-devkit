@@ -126,7 +126,7 @@ public class JavaDocValidator implements Validator {
         }
 
         boolean found = false;
-        String sample = context.getJavaDocUtils().getTagContent("sample.xml", method);
+        String sample = method.getJavaDocTagContent("sample.xml");
         String[] split = sample.split(" ");
 
         if (split.length != 2) {
