@@ -250,72 +250,8 @@ public class NameUtils {
 
     }
 
-    public String generateModuleObjectRoleKey(DevKitTypeElement typeElement) {
-        String typeFullName = getBinaryName(typeElement);
-        String pkg = getPackageName(typeFullName);
-        String className = getClassName(typeFullName);
-
-        return pkg + "." + className + "ModuleObject";
-    }
-
-    public String generateConnectorObjectRoleKey(DevKitTypeElement typeElement) {
-        String typeFullName = getBinaryName(typeElement);
-        String pkg = getPackageName(typeFullName);
-        String className = getClassName(typeFullName);
-
-        return pkg + "." + className + "Connector";
-    }
-
-    public String generateConnectionParametersRoleKey(DevKitTypeElement typeElement) {
-        String typeFullName = getBinaryName(typeElement);
-        String pkg = getPackageName(typeFullName);
-        String className = getClassName(typeFullName);
-
-        return pkg + "." + className + "ConnectionKey";
-    }
-
-    public String generateConnectionManagerRoleKey(DevKitTypeElement typeElement) {
-        String typeFullName = getBinaryName(typeElement);
-        String pkg = getPackageName(typeFullName);
-        String className = getClassName(typeFullName);
-
-        return pkg + "." + className + "ConnectionManager";
-    }
-
     public String getBinaryName(DevKitTypeElement typeElement) {
         return elements.getBinaryName(typeElement.unwrap()).toString();
-    }
-
-    public String generateConfigDefParserRoleKey(DevKitTypeElement typeElement) {
-        String typeFullName = getBinaryName(typeElement);
-        String pkg = getPackageName(typeFullName);
-        String className = getClassName(typeFullName);
-
-        return pkg + "." + className + "ConfigDefinitionParser";
-    }
-
-    public String generatePoolingProfileDefParserRoleKey(DevKitTypeElement typeElement) {
-        String typeFullName = getBinaryName(typeElement);
-        String pkg = getPackageName(typeFullName);
-        String className = getClassName(typeFullName);
-
-        return pkg + "." + className + "PoolingProfileDefinitionParser";
-    }
-
-    public String generatePojoFactoryKey(DevKitTypeElement typeElement) {
-        String typeFullName = getBinaryName(typeElement);
-        String pkg = getPackageName(typeFullName);
-        String className = getClassName(typeFullName);
-
-        return pkg + "." + className + "Factory";
-    }
-
-    public String generatePoolObjectRoleKey(DevKitTypeElement typeElement) {
-        String typeFullName = getBinaryName(typeElement);
-        String pkg = getPackageName(typeFullName);
-        String className = getClassName(typeFullName);
-
-        return pkg + "." + className + "PoolObject";
     }
 
     public String generateClassName(DevKitTypeElement typeElement, String extraPackage, String classNameAppend) {
