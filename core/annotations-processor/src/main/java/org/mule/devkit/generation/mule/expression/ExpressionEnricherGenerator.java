@@ -50,6 +50,7 @@ import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.ClassAlreadyExistsException;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.ForEach;
@@ -84,7 +85,7 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
         String name = typeElement.getAnnotation(ExpressionLanguage.class).name();
 
         DevKitExecutableElement executableElement = typeElement.getMethodsAnnotatedWith(ExpressionEnricher.class).get(0);
-        TypeReference moduleObject = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement));
+        TypeReference moduleObject = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
         DefinedClass enricherClass = getEnricherClass(name, typeElement);
 
         // build trackmap

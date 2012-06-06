@@ -31,6 +31,7 @@ import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.ClassAlreadyExistsException;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.ForEach;
@@ -56,9 +57,6 @@ import org.w3c.dom.Element;
 import java.util.List;
 
 public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenerator {
-    public static final String ROLE = "AbstractBeanDefinitionParser";
-    public static final String DELEGATE_ROLE = "ParserDelegateInterface";
-
     @Override
     public boolean shouldGenerate(DevKitTypeElement typeElement) {
         return typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class);
@@ -104,7 +102,7 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
         org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(abstractBeanDefinitionParserClass));
         DefinedClass clazz = pkg._class(Modifier.ABSTRACT, ctx().getNameUtils().getClassName(abstractBeanDefinitionParserClass), new Class[]{BeanDefinitionParser.class});
 
-        ctx().setClassRole(ROLE, clazz);
+        clazz.role(DefinedClassRoles.ABSTRACT_BEAN_DEFINITION_PARSER);
 
         return clazz;
     }
@@ -117,7 +115,7 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
             Method parse = parseDelegate.method(Modifier.PUBLIC, typeVariable, "parse");
             parse.param(ref(Element.class), "element");
 
-            ctx().setClassRole(DELEGATE_ROLE, parseDelegate);
+            parseDelegate.role(DefinedClassRoles.PARSER_DELEGATE);
 
             return parseDelegate;
         } catch (ClassAlreadyExistsException e) {

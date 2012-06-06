@@ -929,6 +929,24 @@ public class DefinedClass
         return mods;
     }
 
+    /**
+     * Specify the role of this generated class
+     *
+     * @param role Role that its fulfilled by this generated class
+     */
+    public void role(DefinedClassRoles role) {
+        owner().setDefinedClassRole(role, this);
+    }
+
+    /**
+     * Specify the role of this generated class
+     *
+     * @param role Role that its fulfilled by this generated class
+     */
+    public void role(DefinedClassRoles role, Type type) {
+        owner().setDefinedClassRole(role, type, this);
+    }
+
     @Override
     public String toString() {
         return "DefinedClass{" +

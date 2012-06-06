@@ -29,6 +29,7 @@ import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.ForEach;
@@ -40,8 +41,6 @@ import org.mule.devkit.model.code.Variable;
 import java.util.Map;
 
 public class NestedProcessorChainGenerator extends AbstractModuleGenerator {
-
-    public static final String ROLE = "NestedProcessorChain";
 
     @Override
     public boolean shouldGenerate(DevKitTypeElement typeElement) {
@@ -78,8 +77,6 @@ public class NestedProcessorChainGenerator extends AbstractModuleGenerator {
         generateCallbackProcessWithProperties(callbackClass, chain, event);
 
         generateCallbackProcessWithPayloadAndProperties(callbackClass, chain, event, muleContext);
-
-        ctx().setClassRole(ROLE, callbackClass);
     }
 
     private void generateCallbackProcessWithPayload(DefinedClass callbackClass, FieldVariable chain, FieldVariable event, FieldVariable muleContext) {
@@ -180,8 +177,7 @@ public class NestedProcessorChainGenerator extends AbstractModuleGenerator {
         String processorCallbackClassName = ctx().getNameUtils().generateClassNameInPackage(typeElement, NamingContants.CONFIG_NAMESPACE, NamingContants.NESTED_PROCESSOR_CHAIN_CLASS_NAME);
         org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(processorCallbackClassName));
         DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(processorCallbackClassName), new Class[]{MuleContextAware.class});
-
-        ctx().setClassRole(ROLE, clazz);
+        clazz.role(DefinedClassRoles.NESTED_PROCESSOR_CHAIN);
 
         return clazz;
     }

@@ -30,6 +30,7 @@ import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.DevKitFieldElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.Method;
@@ -50,8 +51,8 @@ public class LifecycleAdapterFactoryGenerator extends AbstractModuleGenerator {
         lifecycleAdapterFactory.javadoc().add(" of {@link ObjectFactory} interface for ");
         lifecycleAdapterFactory.javadoc().add(ref(typeElement.asType()));
 
-        DefinedClass poolObjectClass = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement));
-        ctx().setClassRole(ctx().getNameUtils().generatePoolObjectRoleKey(typeElement), poolObjectClass);
+        DefinedClass poolObjectClass = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
+        poolObjectClass.role(DefinedClassRoles.POOL_OBJECT, ref(typeElement));
 
         generateFields(typeElement, lifecycleAdapterFactory);
 
@@ -125,7 +126,7 @@ public class LifecycleAdapterFactoryGenerator extends AbstractModuleGenerator {
         DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(lifecycleAdapterName));
         clazz._implements(ref(ObjectFactory.class));
 
-        ctx().setClassRole(ctx().getNameUtils().generatePojoFactoryKey(typeElement), clazz);
+        clazz.role(DefinedClassRoles.POJO_FACTORY, ref(typeElement));
 
         return clazz;
     }

@@ -106,6 +106,11 @@ public final class CodeModel {
      */
     private final HashMap<Class<?>, ReferencedClass> refClasses = new HashMap<Class<?>, ReferencedClass>();
 
+    /**
+     * Created classes by its role
+     */
+    private Map<Pair<DefinedClassRoles, Type>, DefinedClass> classesByRole = new HashMap<Pair<DefinedClassRoles, Type>, DefinedClass>();
+
     private CodeWriter codeWriter;
     
     private OutputStream registryBootstrapStream;
@@ -176,6 +181,27 @@ public final class CodeModel {
     public Iterator<Package> packages() {
         return packages.values().iterator();
     }
+
+    /**
+     * Retrieve a previously generated class that fulfills the specified role
+     *
+     * @param role Role to be fulfilled
+     * @return A previously generated class
+     */
+    public DefinedClass _class(DefinedClassRoles role) {
+        return classesByRole.get(new Pair<DefinedClassRoles, Type>(role, null));
+    }
+
+    /**
+     * Retrieve a previously generated class that fulfills the specified role
+     *
+     * @param role Role to be fulfilled
+     * @return A previously generated class
+     */
+    public DefinedClass _class(DefinedClassRoles role, Type type) {
+        return classesByRole.get(new Pair<DefinedClassRoles, Type>(role, type));
+    }
+
 
     /**
      * Creates a new generated class.
@@ -712,6 +738,24 @@ public final class CodeModel {
     }
 
     /**
+     *
+     * @param role
+     * @param clazz
+     */
+    protected void setDefinedClassRole(DefinedClassRoles role, DefinedClass clazz) {
+        this.classesByRole.put(new Pair<DefinedClassRoles, Type>(role, null), clazz);
+    }
+
+    /**
+     *
+     * @param role
+     * @param clazz
+     */
+    protected void setDefinedClassRole(DefinedClassRoles role, Type type, DefinedClass clazz) {
+        this.classesByRole.put(new Pair<DefinedClassRoles, Type>(role, type), clazz);
+    }
+
+    /**
      * Conversion from primitive type {@link Class} (such as {@link Integer#TYPE}
      * to its boxed type (such as <tt>Integer.class</tt>)
      */
@@ -742,5 +786,48 @@ public final class CodeModel {
         boxToPrimitive = Collections.unmodifiableMap(m1);
         primitiveToBox = Collections.unmodifiableMap(m2);
 
+    }
+
+    private class Pair<T, U>
+    {
+        private final T first;
+        private final U second;
+        private transient final int hash;
+        public Pair( T f, U s )
+        {
+            this.first = f;
+            this.second = s;
+            hash = (first == null? 0 : first.hashCode() * 31)
+                    +(second == null? 0 : second.hashCode());
+        }
+        public T getFirst()
+        {
+            return first;
+        }
+        public U getSecond()
+        {
+            return second;
+        }
+        @Override
+        public int hashCode()
+        {
+            return hash;
+        }
+
+        @Override
+        public boolean equals( Object oth )
+        {
+            if ( this == oth )
+            {
+                return true;
+            }
+            if ( oth == null || !(getClass().isInstance( oth )) )
+            {
+                return false;
+            }
+            Pair<T, U> other = getClass().cast( oth );
+            return (first == null? other.first == null : first.equals( other.first ))
+                    && (second == null? other.second == null : second.equals( other.second ));
+        }
     }
 }

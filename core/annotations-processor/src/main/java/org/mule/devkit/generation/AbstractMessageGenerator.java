@@ -61,6 +61,7 @@ import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.Expression;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
@@ -417,7 +418,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     protected DefinedClass getBeanDefinitionParserClass(DevKitExecutableElement executableElement) {
         String beanDefinitionParserName = ctx().getNameUtils().generateClassName(executableElement, NamingContants.DEFINITION_PARSER_CLASS_NAME_SUFFIX);
         Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(beanDefinitionParserName) + NamingContants.CONFIG_NAMESPACE);
-        DefinedClass abstractBeanDefinitionParser = ctx().getClassForRole(AbstractBeanDefinitionParserGenerator.ROLE);
+        DefinedClass abstractBeanDefinitionParser = ctx().getCodeModel()._class(DefinedClassRoles.ABSTRACT_BEAN_DEFINITION_PARSER);
         DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(beanDefinitionParserName), abstractBeanDefinitionParser);
 
         return clazz;
@@ -427,10 +428,10 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         String configBeanDefinitionParserClass = ctx().getNameUtils().generateClassName(typeElement, NamingContants.CONFIG_NAMESPACE, NamingContants.CONFIG_DEFINITION_PARSER_CLASS_NAME_SUFFIX);
         org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(configBeanDefinitionParserClass));
 
-        DefinedClass abstractBeanDefinitionParser = ctx().getClassForRole(AbstractBeanDefinitionParserGenerator.ROLE);
+        DefinedClass abstractBeanDefinitionParser = ctx().getCodeModel()._class(DefinedClassRoles.ABSTRACT_BEAN_DEFINITION_PARSER);
         DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(configBeanDefinitionParserClass), abstractBeanDefinitionParser);
 
-        ctx().setClassRole(ctx().getNameUtils().generateConfigDefParserRoleKey(typeElement), clazz);
+        clazz.role(DefinedClassRoles.CONFIG_BEAN_DEFINITION_PARSER, ref(typeElement));
 
         return clazz;
     }
@@ -583,7 +584,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected Method generateInitialiseMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, DevKitTypeElement typeElement, FieldVariable muleContext, FieldVariable expressionManager, FieldVariable patternInfo, FieldVariable object, FieldVariable retryCount, boolean shouldAutoCreate) {
-        DefinedClass pojoClass = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement));
+        DefinedClass pojoClass = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
 
         Method initialise = messageProcessorClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "initialise");
         initialise.javadoc().add("Obtains the expression manager from the Mule context and initialises the connector. If a target object ");
@@ -662,7 +663,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                     Invocation localPort = castedModuleObject.invoke("get" + StringUtils.capitalize(DefaultHttpCallbackGenerator.LOCAL_PORT_FIELD_NAME));
                     Invocation remotePort = castedModuleObject.invoke("get" + StringUtils.capitalize(DefaultHttpCallbackGenerator.REMOTE_PORT_FIELD_NAME));
                     Invocation async = castedModuleObject.invoke("get" + StringUtils.capitalize(DefaultHttpCallbackGenerator.ASYNC_FIELD_NAME));
-                    ifCallbackFlowNameIsNull.assign(variableElement.getFieldType(), ExpressionFactory._new(ctx().getClassForRole(DefaultHttpCallbackGenerator.HTTP_CALLBACK_ROLE)).
+                    ifCallbackFlowNameIsNull.assign(variableElement.getFieldType(), ExpressionFactory._new(ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT)).
                             arg(callbackFlowName).arg(muleContext).arg(domain).arg(localPort).arg(remotePort).arg(async));
                 }
             }

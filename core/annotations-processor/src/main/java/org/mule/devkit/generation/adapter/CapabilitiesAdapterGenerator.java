@@ -24,6 +24,7 @@ import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.TypeReference;
 
@@ -49,7 +50,7 @@ public class CapabilitiesAdapterGenerator extends AbstractModuleGenerator {
         String lifecycleAdapterName = ctx().getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.CAPABILITIES_ADAPTER_CLASS_NAME_SUFFIX);
         org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(lifecycleAdapterName));
 
-        TypeReference previous = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement));
+        TypeReference previous = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
 
         if( previous == null ) {
             previous = (TypeReference) ref(typeElement.asType());
@@ -63,7 +64,7 @@ public class CapabilitiesAdapterGenerator extends AbstractModuleGenerator {
         DefinedClass clazz = pkg._class(modifiers, ctx().getNameUtils().getClassName(lifecycleAdapterName), previous);
         clazz._implements(Capabilities.class);
 
-        ctx().setClassRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement), clazz);
+        clazz.role(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
 
         return clazz;
     }

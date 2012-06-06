@@ -31,6 +31,7 @@ import org.mule.devkit.generation.mule.oauth.AuthorizeBeanDefinitionParserGenera
 import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
@@ -74,13 +75,13 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
     }
 
     private void registerConfig(Method init, DevKitTypeElement pojo) {
-        DefinedClass configBeanDefinitionParser = ctx().getClassForRole(ctx().getNameUtils().generateConfigDefParserRoleKey(pojo));
+        DefinedClass configBeanDefinitionParser = ctx().getCodeModel()._class(DefinedClassRoles.CONFIG_BEAN_DEFINITION_PARSER, ref(pojo));
         init.body().invoke("registerBeanDefinitionParser").arg("config").arg(ExpressionFactory._new(configBeanDefinitionParser));
     }
 
     private void registerBeanDefinitionParserForEachProcessor(DevKitTypeElement typeElement, Method init) {
         if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class)) {
-            DefinedClass authorizeMessageProcessorClass = ctx().getClassForRole(AuthorizeBeanDefinitionParserGenerator.AUTHORIZE_DEFINITION_PARSER_ROLE);
+            DefinedClass authorizeMessageProcessorClass = ctx().getCodeModel()._class(DefinedClassRoles.AUTHORIZE_BEAN_DEFINITION_PARSER);
             init.body().invoke("registerBeanDefinitionParser").arg(ExpressionFactory.lit("authorize")).arg(ExpressionFactory._new(authorizeMessageProcessorClass));
         }
         for (DevKitExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Processor.class)) {

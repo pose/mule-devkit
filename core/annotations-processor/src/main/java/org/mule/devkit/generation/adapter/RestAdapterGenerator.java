@@ -61,6 +61,7 @@ import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.Expression;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
@@ -436,7 +437,7 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
     private DefinedClass getRestClientAdapterClass(DevKitTypeElement typeElement) {
         String restClientAdapterClassName = ctx().getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.REST_CLIENT_ADAPTER_CLASS_NAME_SUFFIX);
         org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(restClientAdapterClassName));
-        TypeReference previous = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement));
+        TypeReference previous = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
 
         if (previous == null) {
             previous = (TypeReference) ref(typeElement.asType());
@@ -447,7 +448,7 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
         clazz._implements(ref(Disposable.class));
         clazz._implements(ref(MuleContextAware.class));
 
-        ctx().setClassRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement), clazz);
+        clazz.role(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
 
         return clazz;
     }

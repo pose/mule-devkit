@@ -25,14 +25,13 @@ import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Variable;
 
 public class DefaultRestoreAccessTokenCallbackFactoryGenerator extends AbstractMessageGenerator {
-
-    public static final String ROLE = "RestoreAccessTokenCallbackFactoryBean";
 
     @Override
     public boolean shouldGenerate(DevKitTypeElement typeElement) {
@@ -47,7 +46,7 @@ public class DefaultRestoreAccessTokenCallbackFactoryGenerator extends AbstractM
     public void generate(DevKitTypeElement typeElement) throws GenerationException {
         DefinedClass factory = getDefaultRestoreAccessTokenCallbackFactoryClass(typeElement);
 
-        DefinedClass callback = ctx().getClassForRole(DefaultRestoreAccessTokenCallbackGenerator.ROLE);
+        DefinedClass callback = ctx().getCodeModel()._class(DefinedClassRoles.DEFAULT_RESTORE_ACCESS_TOKEN_CALLBACK);
         Method getObjectType = factory.method(Modifier.PUBLIC, ref(Class.class), "getObjectType");
         getObjectType.body()._return(callback.dotclass());
 
@@ -67,8 +66,7 @@ public class DefaultRestoreAccessTokenCallbackFactoryGenerator extends AbstractM
         org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(callbackClassName));
         DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(callbackClassName));
         clazz._extends(ref(MessageProcessorChainFactoryBean.class));
-
-        ctx().setClassRole(ROLE, clazz);
+        clazz.role(DefinedClassRoles.DEFAULT_RESTORE_ACCESS_TOKEN_CALLBACK_FACTORY);
 
         return clazz;
     }

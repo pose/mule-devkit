@@ -32,6 +32,7 @@ import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.Method;
@@ -152,7 +153,7 @@ public class DefaultSaveAccessTokenCallbackGenerator extends AbstractMessageGene
         org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(callbackClassName));
         DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(callbackClassName), new Class[]{
                 SaveAccessTokenCallback.class});
-        ctx().setClassRole(ROLE, clazz);
+        clazz.role(DefinedClassRoles.DEFAULT_SAVE_ACCESS_TOKEN_CALLBACK);
 
         return clazz;
     }

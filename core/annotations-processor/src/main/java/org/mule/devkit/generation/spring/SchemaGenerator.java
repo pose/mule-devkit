@@ -39,6 +39,7 @@ import org.mule.devkit.model.DevKitParameterElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.DevKitVariableElement;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.schema.Annotation;
 import org.mule.devkit.model.schema.Any;
 import org.mule.devkit.model.schema.Attribute;
@@ -161,7 +162,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         // TODO: replace with a class role
         String namespaceHandlerName = ctx().getNameUtils().generateClassName(typeElement, NamingContants.CONFIG_NAMESPACE, NamingContants.NAMESPACE_HANDLER_CLASS_NAME_SUFFIX);
-        String className = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement)).boxify().fullName();
+        String className = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement)).boxify().fullName();
 
         SchemaLocation versionedSchemaLocation = new SchemaLocation(schema, schema.getTargetNamespace(), fileName, versionedLocation, namespaceHandlerName, className);
 
@@ -781,7 +782,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
     private void registerConfigElement(Schema schema, String targetNamespace, DevKitTypeElement typeElement) {
 
-        DefinedClass moduleClass = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement));
+        DefinedClass moduleClass = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
         Map<QName, String> otherAttributes = new HashMap<QName, String>();
         otherAttributes.put(SchemaConstants.MULE_DEVKIT_JAVA_CLASS_TYPE, moduleClass.fullName());
         ExtensionType config = registerExtension(schema, SchemaConstants.ELEMENT_NAME_CONFIG, otherAttributes);

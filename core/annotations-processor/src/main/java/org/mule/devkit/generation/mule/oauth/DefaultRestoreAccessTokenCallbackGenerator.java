@@ -32,6 +32,7 @@ import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.Method;
@@ -42,8 +43,6 @@ import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Variable;
 
 public class DefaultRestoreAccessTokenCallbackGenerator extends AbstractMessageGenerator {
-
-    public static final String ROLE = "DefaultRestoreAccessTokenCallback";
 
     @Override
     public boolean shouldGenerate(DevKitTypeElement typeElement) {
@@ -156,7 +155,7 @@ public class DefaultRestoreAccessTokenCallbackGenerator extends AbstractMessageG
         DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(callbackClassName), new Class[]{
                 RestoreAccessTokenCallback.class});
 
-        ctx().setClassRole(ROLE, clazz);
+        clazz.role(DefinedClassRoles.DEFAULT_RESTORE_ACCESS_TOKEN_CALLBACK);
 
         return clazz;
     }

@@ -42,6 +42,7 @@ import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.ClassAlreadyExistsException;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.Invocation;
@@ -85,7 +86,7 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
         String oauthAdapterName = ctx().getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, classSuffix);
         org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(oauthAdapterName));
 
-        DefinedClass classToExtend = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement));
+        DefinedClass classToExtend = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
 
         DefinedClass oauthAdapter = pkg._class(ctx().getNameUtils().getClassName(oauthAdapterName), classToExtend);
         oauthAdapter._implements(MuleContextAware.class);
@@ -94,7 +95,7 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
         oauthAdapter._implements(Stoppable.class);
         oauthAdapter._implements(interf);
 
-        ctx().setClassRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement), oauthAdapter);
+        oauthAdapter.role(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
 
         oauthAdapter.javadoc().add("A {@code " + oauthAdapter.name() + "} is a wrapper around ");
         oauthAdapter.javadoc().add(ref(typeElement.asType()));
@@ -160,10 +161,10 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
         FieldVariable callback = oauthAdapter.fields().get(CALLBACK_FIELD_NAME);
         FieldVariable muleContext = oauthAdapter.fields().get(MULE_CONTEXT_FIELD_NAME);
         if (StringUtils.isEmpty(callbackPath)) {
-            initialise.body().assign(callback, ExpressionFactory._new(ctx().getClassForRole(DefaultHttpCallbackGenerator.HTTP_CALLBACK_ROLE)).
+            initialise.body().assign(callback, ExpressionFactory._new(ctx().getCodeModel()._class(DefinedClassRoles.DEFAULT_HTTP_CALLBACK)).
                     arg(ExpressionFactory._new(messageProcessor)).arg(muleContext).arg(domain).arg(localPort).arg(remotePort).arg(async).arg(connector));
         } else {
-            initialise.body().assign(callback, ExpressionFactory._new(ctx().getClassForRole(DefaultHttpCallbackGenerator.HTTP_CALLBACK_ROLE)).
+            initialise.body().assign(callback, ExpressionFactory._new(ctx().getCodeModel()._class(DefinedClassRoles.DEFAULT_HTTP_CALLBACK)).
                     arg(ExpressionFactory._new(messageProcessor)).arg(muleContext).arg(domain).arg(localPort).arg(remotePort).arg(callbackPath).arg(async));
         }
         return initialise;

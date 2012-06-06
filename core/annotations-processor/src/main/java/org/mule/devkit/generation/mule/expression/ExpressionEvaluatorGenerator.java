@@ -48,6 +48,7 @@ import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.Invocation;
@@ -77,7 +78,7 @@ public class ExpressionEvaluatorGenerator extends AbstractMessageGenerator {
         String name = typeElement.getAnnotation(ExpressionLanguage.class).name();
 
         DevKitExecutableElement executableElement = typeElement.getMethodsAnnotatedWith(ExpressionEvaluator.class).get(0);
-        TypeReference moduleObject = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement));
+        TypeReference moduleObject = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
         DefinedClass evaluatorClass = getEvaluatorClass(name, typeElement);
 
         ctx().note("Generating expression evaluator " + evaluatorClass.fullName() + " for language at class " + typeElement.getSimpleName().toString());

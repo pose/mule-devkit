@@ -41,6 +41,7 @@ import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.ClassAlreadyExistsException;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.Expression;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
@@ -201,7 +202,7 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
     }
 
     private void generateBorrowConnectionMethod(DevKitExecutableElement connect, DefinedClass connectionManagerClass, FieldVariable connectionPool, DefinedClass connectionKeyClass) {
-        DefinedClass connectorClass = ctx().getClassForRole(ctx().getNameUtils().generateConnectorObjectRoleKey(connect.parent()));
+        DefinedClass connectorClass = ctx().getCodeModel()._class(DefinedClassRoles.CONNECTOR_OBJECT, ref(connect.parent()));
         Method borrowConnector = connectionManagerClass.method(Modifier.PUBLIC, connectorClass, "acquireConnection");
         Variable key = borrowConnector.param(connectionKeyClass, "key");
         borrowConnector._throws(ref(Exception.class));
@@ -215,7 +216,7 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
     }
 
     private void generateReturnConnectionMethod(DevKitExecutableElement connect, DefinedClass connectionManagerClass, FieldVariable connectionPool, DefinedClass connectionKeyClass) {
-        DefinedClass connectorClass = ctx().getClassForRole(ctx().getNameUtils().generateConnectorObjectRoleKey(connect.parent()));
+        DefinedClass connectorClass = ctx().getCodeModel()._class(DefinedClassRoles.CONNECTOR_OBJECT, ref(connect.parent()));
         Method returnConnector = connectionManagerClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "releaseConnection");
         Variable key = returnConnector.param(connectionKeyClass, "key");
         returnConnector._throws(ref(Exception.class));
@@ -228,7 +229,7 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
     }
 
     private void generateDestroyConnectionMethod(DevKitExecutableElement connect, DefinedClass connectionManagerClass, FieldVariable connectionPool, DefinedClass connectionKeyClass) {
-        DefinedClass connectorClass = ctx().getClassForRole(ctx().getNameUtils().generateConnectorObjectRoleKey(connect.parent()));
+        DefinedClass connectorClass = ctx().getCodeModel()._class(DefinedClassRoles.CONNECTOR_OBJECT, ref(connect.parent()));
         Method destroyConnector = connectionManagerClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "destroyConnection");
         Variable key = destroyConnector.param(connectionKeyClass, "key");
         destroyConnector._throws(ref(Exception.class));
@@ -260,7 +261,7 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
     }
 
     private void generateActivateObjectMethod(DefinedClass connectionFactoryClass, DevKitExecutableElement validateConnectionMethod, DevKitExecutableElement connect, Map<String, FieldVariableElement> keyFields, DefinedClass connectionKeyClass) {
-        DefinedClass connectorClass = ctx().getClassForRole(ctx().getNameUtils().generateConnectorObjectRoleKey(validateConnectionMethod.parent()));
+        DefinedClass connectorClass = ctx().getCodeModel()._class(DefinedClassRoles.CONNECTOR_OBJECT, ref(validateConnectionMethod.parent()));
         Method activateObject = connectionFactoryClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "activateObject");
         activateObject._throws(ref(Exception.class));
         Variable key = activateObject.param(Object.class, "key");
@@ -298,7 +299,7 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
     }
 
     private void generateValidateObjectMethod(DefinedClass connectionFactoryClass, FieldVariable logger, DevKitExecutableElement validateConnectionMethod) {
-        DefinedClass connectorClass = ctx().getClassForRole(ctx().getNameUtils().generateConnectorObjectRoleKey(validateConnectionMethod.parent()));
+        DefinedClass connectorClass = ctx().getCodeModel()._class(DefinedClassRoles.CONNECTOR_OBJECT, ref(validateConnectionMethod.parent()));
         Method validateObject = connectionFactoryClass.method(Modifier.PUBLIC, ctx().getCodeModel().BOOLEAN, "validateObject");
         validateObject.param(Object.class, "key");
         Variable obj = validateObject.param(Object.class, "obj");
@@ -316,7 +317,7 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
     }
 
     private void generateDestroyObjectMethod(DevKitExecutableElement connect, DevKitExecutableElement disconnect, DefinedClass connectionKeyClass, DefinedClass connectionFactoryClass) {
-        DefinedClass connectorClass = ctx().getClassForRole(ctx().getNameUtils().generateConnectorObjectRoleKey(connect.parent()));
+        DefinedClass connectorClass = ctx().getCodeModel()._class(DefinedClassRoles.CONNECTOR_OBJECT, ref(connect.parent()));
 
         Method destroyObject = connectionFactoryClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "destroyObject");
         destroyObject._throws(ref(Exception.class));
@@ -339,7 +340,7 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
     }
 
     private void generateMakeObjectMethod(DevKitTypeElement typeElement, DevKitExecutableElement connect, DefinedClass connectionFactoryClass, DefinedClass connectionKey, FieldVariable connectionManagerInFactory) {
-        DefinedClass connectorClass = ctx().getClassForRole(ctx().getNameUtils().generateConnectorObjectRoleKey(connect.parent()));
+        DefinedClass connectorClass = ctx().getCodeModel()._class(DefinedClassRoles.CONNECTOR_OBJECT, ref(connect.parent()));
         Method makeObject = connectionFactoryClass.method(Modifier.PUBLIC, Object.class, "makeObject");
         makeObject._throws(ref(Exception.class));
         Variable key = makeObject.param(Object.class, "key");
@@ -391,8 +392,8 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         String connectionManagerName = ctx().getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.CONNECTION_MANAGER_ADAPTER_CLASS_NAME_SUFFIX);
         org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(connectionManagerName));
 
-        DefinedClass classToExtend = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement));
-        ctx().setClassRole(ctx().getNameUtils().generateConnectorObjectRoleKey(typeElement), classToExtend);
+        DefinedClass classToExtend = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
+        classToExtend.role(DefinedClassRoles.CONNECTOR_OBJECT, ref(typeElement));
 
         DefinedClass connectionManagerClass = pkg._class(ctx().getNameUtils().getClassName(connectionManagerName));
         connectionManagerClass._implements(ref(Initialisable.class));
@@ -400,7 +401,7 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         connectionManagerClass._implements(ref(MuleContextAware.class));
         connectionManagerClass._implements(ref(ConnectionManager.class).narrow(getConnectionParametersClass(typeElement, connectionManagerClass)).narrow(classToExtend));
 
-        ctx().setClassRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement), connectionManagerClass);
+        connectionManagerClass.role(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
 
         connectionManagerClass.javadoc().add("A {@code " + connectionManagerClass.name() + "} is a wrapper around ");
         connectionManagerClass.javadoc().add(ref(typeElement.asType()));
@@ -413,7 +414,7 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         try {
             DefinedClass connectionKey = connectionManagerClass._class(Modifier.PUBLIC | Modifier.STATIC, NamingContants.CONNECTION_KEY_CLASS_NAME_SUFFIX);
             connectionKey.javadoc().add("A tuple of connection parameters");
-            ctx().setClassRole(ctx().getNameUtils().generateConnectionParametersRoleKey(typeElement), connectionKey);
+            connectionKey.role(DefinedClassRoles.CONNECTION_PARAMETERS, ref(typeElement));
             return connectionKey;
         } catch (ClassAlreadyExistsException e) {
             return e.getExistingClass();

@@ -24,6 +24,7 @@ import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.generation.spring.AbstractBeanDefinitionParserGenerator;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Variable;
@@ -46,7 +47,7 @@ public class AuthorizeBeanDefinitionParserGenerator extends AbstractMessageGener
     @Override
     public void generate(DevKitTypeElement typeElement) throws GenerationException {
         DefinedClass beanDefinitionParser = getAuthorizeBeanDefinitionParserClass(typeElement);
-        DefinedClass messageProcessorClass = ctx().getClassForRole(AuthorizeMessageProcessorGenerator.AUTHORIZE_MESSAGE_PROCESSOR_ROLE);
+        DefinedClass messageProcessorClass = ctx().getCodeModel()._class(DefinedClassRoles.AUTHORIZE_MESSAGE_PROCESSOR);
 
         Method parse = beanDefinitionParser.method(Modifier.PUBLIC, ref(BeanDefinition.class), "parse");
         Variable element = parse.param(ref(org.w3c.dom.Element.class), "element");
@@ -69,10 +70,9 @@ public class AuthorizeBeanDefinitionParserGenerator extends AbstractMessageGener
     private DefinedClass getAuthorizeBeanDefinitionParserClass(DevKitTypeElement type) {
         String authorizeBeanDefinitionParserClass = ctx().getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, NamingContants.AUTHORIZE_DEFINITION_PARSER_CLASS_NAME);
         org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(authorizeBeanDefinitionParserClass));
-        DefinedClass abstractDefinitionParser = ctx().getClassForRole(AbstractBeanDefinitionParserGenerator.ROLE);
+        DefinedClass abstractDefinitionParser = ctx().getCodeModel()._class(DefinedClassRoles.ABSTRACT_BEAN_DEFINITION_PARSER);
         DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(authorizeBeanDefinitionParserClass), abstractDefinitionParser);
-
-        ctx().setClassRole(AUTHORIZE_DEFINITION_PARSER_ROLE, clazz);
+        clazz.role(DefinedClassRoles.AUTHORIZE_BEAN_DEFINITION_PARSER);
 
         return clazz;
     }

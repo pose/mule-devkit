@@ -198,4 +198,23 @@ public abstract class Type implements Generable, Comparable<Type> {
             return fullName().compareTo(rhs);
         }
     }
+
+    @Override
+    public int hashCode() {
+        return this.fullName().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object oth) {
+        if ( this == oth )
+        {
+            return true;
+        }
+        if ( oth == null || !(getClass().isInstance( oth )) )
+        {
+            return false;
+        }
+        Type other = getClass().cast( oth );
+        return this.fullName().equals(other.fullName());
+    }
 }

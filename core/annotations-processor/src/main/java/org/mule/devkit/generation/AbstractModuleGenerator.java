@@ -52,6 +52,10 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
 
     protected static final String MULE_CONTEXT_FIELD_NAME = "muleContext";
 
+    public Type ref(DevKitTypeElement typeElement) {
+        return ctx().getCodeModel().ref(typeElement.asType());
+    }
+
     public Type ref(TypeMirror typeMirror) {
         return ctx().getCodeModel().ref(typeMirror);
     }

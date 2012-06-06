@@ -43,6 +43,7 @@ import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
@@ -92,7 +93,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
     private void generateConfigBeanDefinitionParserFor(DevKitTypeElement typeElement) {
         DefinedClass beanDefinitionparser = getConfigBeanDefinitionParserClass(typeElement);
-        DefinedClass pojo = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement));
+        DefinedClass pojo = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
 
         ctx().note("Generating config element definition parser as " + beanDefinitionparser.fullName() + " for class " + typeElement.getSimpleName().toString());
 
@@ -160,8 +161,8 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class)) {
             generateParseHttpCallback(SchemaGenerator.OAUTH_CALLBACK_CONFIG_ELEMENT_NAME, parse, element, builder);
 
-            DefinedClass saveAccessTokenCallbackFactory = ctx().getClassForRole(DefaultSaveAccessTokenCallbackFactoryGenerator.ROLE);
-            DefinedClass restoreAccessTokenCallbackFactory = ctx().getClassForRole(DefaultRestoreAccessTokenCallbackFactoryGenerator.ROLE);
+            DefinedClass saveAccessTokenCallbackFactory = ctx().getCodeModel()._class(DefinedClassRoles.DEFAULT_SAVE_ACCESS_TOKEN_CALLBACK);
+            DefinedClass restoreAccessTokenCallbackFactory = ctx().getCodeModel()._class(DefinedClassRoles.DEFAULT_RESTORE_ACCESS_TOKEN_CALLBACK);
             generateParseNestedProcessor(parse.body(), element, parserContext, builder, "oauthSaveAccessToken", false, false, false, saveAccessTokenCallbackFactory);
             generateParseNestedProcessor(parse.body(), element, parserContext, builder, "oauthRestoreAccessToken", false, false, false, restoreAccessTokenCallbackFactory);
         }
@@ -474,7 +475,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
     }
 
     private DefinedClass generateParserDelegateForTextContent() {
-        DefinedClass parserDelegateInterface = ctx().getClassForRole(AbstractBeanDefinitionParserGenerator.DELEGATE_ROLE);
+        DefinedClass parserDelegateInterface = ctx().getCodeModel()._class(DefinedClassRoles.PARSER_DELEGATE);
         DefinedClass anonymousClass = ctx().getCodeModel().anonymousClass(parserDelegateInterface.narrow(ref(String.class)));
         Method parseMethod = anonymousClass.method(Modifier.PUBLIC, ref(String.class), "parse");
         Variable element = parseMethod.param(ref(Element.class), "element");
@@ -485,7 +486,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
     }
 
     private DefinedClass generateParserDelegateForList(String childElementName) {
-        DefinedClass parserDelegateInterface = ctx().getClassForRole(AbstractBeanDefinitionParserGenerator.DELEGATE_ROLE);
+        DefinedClass parserDelegateInterface = ctx().getCodeModel()._class(DefinedClassRoles.PARSER_DELEGATE);
         DefinedClass anonymousClass = ctx().getCodeModel().anonymousClass(parserDelegateInterface.narrow(ref(List.class)));
         Method parseMethod = anonymousClass.method(Modifier.PUBLIC, ref(List.class), "parse");
         Variable element = parseMethod.param(ref(Element.class), "element");
@@ -498,7 +499,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
     }
 
     private DefinedClass generateParserDelegateForMap(String childElementName) {
-        DefinedClass parserDelegateInterface = ctx().getClassForRole(AbstractBeanDefinitionParserGenerator.DELEGATE_ROLE);
+        DefinedClass parserDelegateInterface = ctx().getCodeModel()._class(DefinedClassRoles.PARSER_DELEGATE);
         DefinedClass anonymousClass = ctx().getCodeModel().anonymousClass(parserDelegateInterface.narrow(ref(Map.class)));
         Method parseMethod = anonymousClass.method(Modifier.PUBLIC, ref(Map.class), "parse");
         Variable element = parseMethod.param(ref(Element.class), "element");

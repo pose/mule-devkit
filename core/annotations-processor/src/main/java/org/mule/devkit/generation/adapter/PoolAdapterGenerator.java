@@ -33,6 +33,7 @@ import org.mule.devkit.model.DevKitFieldElement;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.Invocation;
@@ -90,7 +91,7 @@ public class PoolAdapterGenerator extends AbstractMessageGenerator {
     }
 
     private void generateStartMethod(DevKitTypeElement typeElement, DefinedClass poolAdapter, FieldVariable lifecyleEnabledObjectPool, FieldVariable muleContext, FieldVariable poolingProfile) {
-        DefinedClass objectFactory = ctx().getClassForRole(ctx().getNameUtils().generatePojoFactoryKey(typeElement));
+        DefinedClass objectFactory = ctx().getCodeModel()._class(DefinedClassRoles.POJO_FACTORY, ref(typeElement));
 
         Method startMethod = poolAdapter.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "start");
         startMethod._throws(MuleException.class);
@@ -120,7 +121,8 @@ public class PoolAdapterGenerator extends AbstractMessageGenerator {
         clazz._implements(MuleContextAware.class);
         clazz._implements(FlowConstructAware.class);
         clazz._implements(Capabilities.class);
-        ctx().setClassRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement), clazz);
+
+        clazz.role(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
 
         return clazz;
     }

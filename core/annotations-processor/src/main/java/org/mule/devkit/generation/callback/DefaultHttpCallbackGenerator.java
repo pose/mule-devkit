@@ -40,6 +40,7 @@ import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.Method;
@@ -112,8 +113,6 @@ public class DefaultHttpCallbackGenerator extends AbstractModuleGenerator {
         generateCreateHttpInboundEndpointMethod(callbackClass);
         generateStartMethod(callbackClass);
         generateStopMethod(callbackClass);
-
-        ctx().setClassRole(HTTP_CALLBACK_ROLE, callbackClass);
     }
 
     private void generateFields(DefinedClass callbackClass) {
@@ -402,8 +401,7 @@ public class DefaultHttpCallbackGenerator extends AbstractModuleGenerator {
         String httpCallbackClassName = ctx().getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, CLASS_NAME);
         Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(httpCallbackClassName));
         DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(httpCallbackClassName), new Class[]{HttpCallback.class});
-
-        ctx().setClassRole(HTTP_CALLBACK_ROLE, clazz);
+        clazz.role(DefinedClassRoles.DEFAULT_HTTP_CALLBACK);
 
         return clazz;
     }

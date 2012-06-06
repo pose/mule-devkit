@@ -23,6 +23,7 @@ import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.Method;
@@ -32,8 +33,6 @@ import org.mule.devkit.model.code.Variable;
 import java.util.Map;
 
 public class NestedProcessorStringGenerator extends AbstractModuleGenerator {
-
-    public static final String ROLE = "NestedProcessorString";
 
     @Override
     public boolean shouldGenerate(DevKitTypeElement typeElement) {
@@ -60,8 +59,6 @@ public class NestedProcessorStringGenerator extends AbstractModuleGenerator {
         generateCallbackProcessWithProperties(callbackClass, output);
 
         generateCallbackProcessWithPayloadAndProperties(callbackClass, output);
-
-        ctx().setClassRole(ROLE, callbackClass);
     }
 
     private void generateCallbackProcessWithPayload(DefinedClass callbackClass, FieldVariable output) {
@@ -104,7 +101,7 @@ public class NestedProcessorStringGenerator extends AbstractModuleGenerator {
         org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(processorCallbackClassName));
         DefinedClass clazz = pkg._class(ctx().getNameUtils().getClassName(processorCallbackClassName));
 
-        ctx().setClassRole(ROLE, clazz);
+        clazz.role(DefinedClassRoles.NESTED_PROCESSOR_STRING);
 
         return clazz;
     }

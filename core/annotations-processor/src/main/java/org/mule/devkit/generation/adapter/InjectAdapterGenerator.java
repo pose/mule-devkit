@@ -38,6 +38,7 @@ import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.Cast;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
@@ -124,7 +125,8 @@ public class InjectAdapterGenerator extends AbstractModuleGenerator {
         String muleContextAwareAdapter = ctx().getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.INJECTION_ADAPTER_CLASS_NAME_SUFFIX);
         org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(ctx().getNameUtils().getPackageName(muleContextAwareAdapter));
 
-        TypeReference previous = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement));
+        TypeReference previous = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
+
         if (previous == null) {
             previous = (TypeReference) ref(typeElement.asType());
         }
@@ -137,7 +139,7 @@ public class InjectAdapterGenerator extends AbstractModuleGenerator {
         DefinedClass clazz = pkg._class(modifiers, ctx().getNameUtils().getClassName(muleContextAwareAdapter), previous);
         clazz._implements(ref(MuleContextAware.class));
 
-        ctx().setClassRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement), clazz);
+        clazz.role(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
 
         return clazz;
     }

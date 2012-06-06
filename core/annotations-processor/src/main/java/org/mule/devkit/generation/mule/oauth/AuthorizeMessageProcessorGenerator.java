@@ -41,6 +41,7 @@ import org.mule.devkit.model.DevKitTypeElement;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.Invocation;
@@ -111,7 +112,7 @@ public class AuthorizeMessageProcessorGenerator extends AbstractMessageGenerator
         process._throws(MuleException.class);
         Variable event = process.param(muleEvent, "event");
 
-        DefinedClass moduleObjectClass = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(typeElement));
+        DefinedClass moduleObjectClass = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(typeElement));
         Variable moduleObject = process.body().decl(moduleObjectClass, "castedModuleObject", ExpressionFactory._null());
         findConfig(process.body(), muleContext, object, "authorize", event, moduleObjectClass, moduleObject);
 
@@ -175,7 +176,7 @@ public class AuthorizeMessageProcessorGenerator extends AbstractMessageGenerator
                 MuleContextAware.class,
                 FlowConstructAware.class});
 
-        ctx().setClassRole(AUTHORIZE_MESSAGE_PROCESSOR_ROLE, clazz);
+        clazz.role(DefinedClassRoles.AUTHORIZE_MESSAGE_PROCESSOR);
 
         return clazz;
     }

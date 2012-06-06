@@ -16,14 +16,17 @@
  */
 package org.mule.devkit.utils;
 
+import com.sun.source.util.Trees;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mule.devkit.model.DefaultDevKitExecutableElement;
 import org.mule.devkit.model.DevKitExecutableElement;
 import org.mule.util.StringUtils;
 
 import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -34,11 +37,17 @@ public class JavaDocUtilsTest {
     @Mock
     private Elements elements;
     @Mock
+    private Types types;
+    @Mock
+    private Trees trees;
+
     private DevKitExecutableElement executableElement;
 
     @Before
     public void setUpTests() {
         MockitoAnnotations.initMocks(this);
+
+        executableElement = new DefaultDevKitExecutableElement(null, null, types, elements, trees);
     }
 
     @Test

@@ -46,7 +46,6 @@ public class GeneratorContext {
     private SchemaModel schemaModel;
     private StudioModel studioModel;
     private List<DefinedClass> registerAtBoot;
-    private Map<String, DefinedClass> roles;
     private Types types;
     private Elements elements;
     private NameUtils nameUtils;
@@ -59,7 +58,6 @@ public class GeneratorContext {
         registerAtBoot = new ArrayList<DefinedClass>();
         codeModel = new CodeModel(new FilerCodeWriter(env.getFiler()));
         schemaModel = new SchemaModel(new FilerCodeWriter(env.getFiler()));
-        roles = new HashMap<String, DefinedClass>();
         elements = env.getElementUtils();
         types = env.getTypeUtils();
         nameUtils = new NameUtils(this.elements);
@@ -89,18 +87,6 @@ public class GeneratorContext {
 
     public Types getTypeUtils() {
         return types;
-    }
-
-    public Elements getElementsUtils() {
-        return elements;
-    }
-
-    public void setClassRole(String role, DefinedClass clazz) {
-        roles.put(role, clazz);
-    }
-
-    public DefinedClass getClassForRole(String role) {
-        return roles.get(role);
     }
 
     public NameUtils getNameUtils() {

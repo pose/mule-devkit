@@ -38,6 +38,7 @@ import org.mule.devkit.model.code.Cast;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.DefinedClassRoles;
 import org.mule.devkit.model.code.Expression;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
@@ -158,7 +159,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         } else {
             // get pool object if poolable
             if (typeElement.isPoolable()) {
-                DefinedClass poolObjectClass = ctx().getClassForRole(ctx().getNameUtils().generatePoolObjectRoleKey(typeElement));
+                DefinedClass poolObjectClass = ctx().getCodeModel()._class(DefinedClassRoles.POOL_OBJECT, ref(typeElement));
 
                 // add start method method
                 generateNoThreadStartMethod(messageSourceClass, executableElement, fields, connectFields, object, muleContext, poolObjectClass, flowConstruct, stopSourceCallback);
@@ -173,7 +174,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         if (sourceAnnotation.threadingModel() == SourceThreadingModel.SINGLE_THREAD) {
             // get pool object if poolable
             if (typeElement.isPoolable()) {
-                DefinedClass poolObjectClass = ctx().getClassForRole(ctx().getNameUtils().generatePoolObjectRoleKey(typeElement));
+                DefinedClass poolObjectClass = ctx().getCodeModel()._class(DefinedClassRoles.POOL_OBJECT, ref(typeElement));
 
                 // add run method
                 generateRunMethod(messageSourceClass, executableElement, fields, connectFields, object, muleContext, poolObjectClass, flowConstruct, stopSourceCallback);
@@ -198,7 +199,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
     }
 
     private void generateSourceExecution(Block body, DevKitExecutableElement executableElement, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> connectFields, FieldVariable object, FieldVariable muleContext, DefinedClass poolObjectClass, FieldVariable flowConstruct, String methodName, FieldVariable stopSourceCallback) {
-        DefinedClass moduleObjectClass = ctx().getClassForRole(ctx().getNameUtils().generateModuleObjectRoleKey(executableElement.parent()));
+        DefinedClass moduleObjectClass = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(executableElement.parent()));
         Variable moduleObject = body.decl(moduleObjectClass, "castedModuleObject", ExpressionFactory._null());
 
         Variable poolObject = null;
@@ -211,7 +212,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         DevKitExecutableElement connectMethod = connectForMethod(executableElement);
         Variable connection = null;
         if (connectMethod != null) {
-            DefinedClass connectionClass = ctx().getClassForRole(ctx().getNameUtils().generateConnectorObjectRoleKey(connectMethod.parent()));
+            DefinedClass connectionClass = ctx().getCodeModel()._class(DefinedClassRoles.CONNECTOR_OBJECT, ref(connectMethod.parent()));
             connection = body.decl(connectionClass, "connection", ExpressionFactory._null());
 
             for (DevKitParameterElement variable : connectMethod.getParameters()) {
@@ -289,7 +290,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
             callSource.body().assign(poolObject, ExpressionFactory.cast(poolObject.type(), moduleObject.invoke("getLifecyleEnabledObjectPool").invoke("borrowObject")));
             methodCall = poolObject.invoke(methodName);
         } else if (connectMethod != null) {
-            DefinedClass connectionKey = ctx().getClassForRole(ctx().getNameUtils().generateConnectionParametersRoleKey(executableElement.parent()));
+            DefinedClass connectionKey = ctx().getCodeModel()._class(DefinedClassRoles.CONNECTION_PARAMETERS, ref(executableElement.parent()));
 
             Invocation newKey = ExpressionFactory._new(connectionKey);
             Invocation createConnection = moduleObject.invoke("acquireConnection");
@@ -347,7 +348,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
             TryStatement tryToReleaseSession = connectionNotNull._try();
 
-            DefinedClass connectionKey = ctx().getClassForRole(ctx().getNameUtils().generateConnectionParametersRoleKey(executableElement.parent()));
+            DefinedClass connectionKey = ctx().getCodeModel()._class(DefinedClassRoles.CONNECTION_PARAMETERS, ref(executableElement.parent()));
             Invocation newKey = ExpressionFactory._new(connectionKey);
             for (String field : connectionParameters.keySet()) {
                 newKey.arg(connectionParameters.get(field));
