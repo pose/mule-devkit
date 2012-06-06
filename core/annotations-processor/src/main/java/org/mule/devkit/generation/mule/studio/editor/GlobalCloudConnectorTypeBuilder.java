@@ -17,7 +17,7 @@
 
 package org.mule.devkit.generation.mule.studio.editor;
 
-import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.Context;
 import org.mule.devkit.model.Type;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.AttributeType;
@@ -29,7 +29,7 @@ import java.util.Map;
 
 public class GlobalCloudConnectorTypeBuilder extends GlobalTypeBuilder {
 
-    public GlobalCloudConnectorTypeBuilder(GeneratorContext context, Type type) {
+    public GlobalCloudConnectorTypeBuilder(Context context, Type type) {
         super(context, type);
     }
 

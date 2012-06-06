@@ -19,7 +19,7 @@ package org.mule.devkit.generation.mule.studio.editor;
 
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Transformer;
-import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.Context;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Type;
 import org.mule.devkit.model.studio.AttributeCategory;
@@ -35,7 +35,7 @@ public class PatternTypeOperationsBuilder extends BaseStudioXmlBuilder {
     private static final MethodComparator METHOD_COMPARATOR = new MethodComparator();
     private PatternTypes patternTypeToUse;
 
-    public PatternTypeOperationsBuilder(GeneratorContext context, Type type, PatternTypes patternTypeToUse) {
+    public PatternTypeOperationsBuilder(Context context, Type type, PatternTypes patternTypeToUse) {
         super(context, type);
         if (!patternTypeToUse.equals(PatternTypes.CLOUD_CONNECTOR) && !patternTypeToUse.equals(PatternTypes.TRANSFORMER)) {
             throw new IllegalArgumentException("PatternType not supported: " + patternTypeToUse);

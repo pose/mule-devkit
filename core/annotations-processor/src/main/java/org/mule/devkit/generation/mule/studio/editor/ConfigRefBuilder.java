@@ -17,7 +17,7 @@
 
 package org.mule.devkit.generation.mule.studio.editor;
 
-import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.Context;
 import org.mule.devkit.generation.spring.SchemaGenerator;
 import org.mule.devkit.model.Type;
 import org.mule.devkit.model.studio.AttributeCategory;
@@ -33,7 +33,7 @@ public class ConfigRefBuilder extends BaseStudioXmlBuilder {
     public static final String GLOBAL_REF_NAME = SchemaGenerator.ATTRIBUTE_NAME_CONFIG_REF;
     private static final boolean CONFIG_REF_REQUIRED = true;
 
-    public ConfigRefBuilder(GeneratorContext context, Type type) {
+    public ConfigRefBuilder(Context context, Type type) {
         super(context, type);
     }
 

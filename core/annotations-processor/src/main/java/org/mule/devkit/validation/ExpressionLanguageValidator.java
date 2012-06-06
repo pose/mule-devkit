@@ -26,19 +26,21 @@ import org.mule.api.annotations.param.InvocationHeaders;
 import org.mule.api.annotations.param.OutboundHeaders;
 import org.mule.api.annotations.param.Payload;
 import org.mule.api.annotations.param.SessionHeaders;
-import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.Context;
+import org.mule.devkit.ValidationException;
+import org.mule.devkit.Validator;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Parameter;
 import org.mule.devkit.model.Type;
 
 public class ExpressionLanguageValidator implements Validator {
     @Override
-    public boolean shouldValidate(Type type, GeneratorContext context) {
+    public boolean shouldValidate(Type type, Context context) {
         return true;
     }
 
     @Override
-    public void validate(Type type, GeneratorContext context) throws ValidationException {
+    public void validate(Type type, Context context) throws ValidationException {
         if (type.getMethodsAnnotatedWith(ExpressionEvaluator.class).size() > 1) {
             throw new ValidationException(type, "An @ExpressionLanguage can only contain one @ExpressionEvaluator.");
         }

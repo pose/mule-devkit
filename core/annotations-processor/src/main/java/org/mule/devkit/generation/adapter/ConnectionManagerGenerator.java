@@ -30,7 +30,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.config.PoolingProfile;
 import org.mule.devkit.generation.AbstractMessageGenerator;
-import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.GenerationException;
 import org.mule.devkit.generation.NamingConstants;
 import org.mule.devkit.model.Field;
 import org.mule.devkit.model.Method;

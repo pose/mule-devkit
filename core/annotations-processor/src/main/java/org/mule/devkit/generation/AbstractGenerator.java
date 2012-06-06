@@ -17,17 +17,18 @@
 
 package org.mule.devkit.generation;
 
-import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.Generator;
+import org.mule.devkit.Context;
 
 public abstract class AbstractGenerator implements Generator {
 
-    protected GeneratorContext generatorContext;
+    protected Context context;
 
-    public GeneratorContext ctx() {
-        return generatorContext;
+    public Context ctx() {
+        return context;
     }
 
-    public void setCtx(GeneratorContext generationContext) {
-        this.generatorContext = generationContext;
+    public void setCtx(Context generationContext) {
+        this.context = generationContext;
     }
 }

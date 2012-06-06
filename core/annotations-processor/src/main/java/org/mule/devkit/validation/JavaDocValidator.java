@@ -24,7 +24,9 @@ import org.mule.api.annotations.Disconnect;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
-import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.Context;
+import org.mule.devkit.ValidationException;
+import org.mule.devkit.Validator;
 import org.mule.devkit.model.Field;
 import org.mule.devkit.model.Identifiable;
 import org.mule.devkit.model.Method;
@@ -39,12 +41,12 @@ import java.io.IOException;
 public class JavaDocValidator implements Validator {
 
     @Override
-    public boolean shouldValidate(Type type, GeneratorContext context) {
+    public boolean shouldValidate(Type type, Context context) {
         return type.isModuleOrConnector() && !context.isEnvOptionSet("skipJavaDocValidation");
     }
 
     @Override
-    public void validate(Type type, GeneratorContext context) throws ValidationException {
+    public void validate(Type type, Context context) throws ValidationException {
 
         if (!hasComment(type, context)) {
             throw new ValidationException(type, "Class " + type.getQualifiedName().toString() + " is not properly documented. A summary is missing.");
@@ -81,7 +83,7 @@ public class JavaDocValidator implements Validator {
         }
     }
 
-    private void validateAllParameters(GeneratorContext context, Method method) throws ValidationException {
+    private void validateAllParameters(Context context, Method method) throws ValidationException {
         for (Parameter variable : method.getParameters()) {
             if (!hasParameterComment(variable.getSimpleName().toString(), variable.parent(), context)) {
                 throw new ValidationException(variable, "Parameter " + variable.getSimpleName().toString() + " of method " + method.getSimpleName().toString() + " is not properly documented. A matching @param in the method documentation was not found. ");
@@ -89,7 +91,7 @@ public class JavaDocValidator implements Validator {
         }
     }
 
-    private void validateMethod(Type type, GeneratorContext context, Method method) throws ValidationException {
+    private void validateMethod(Type type, Context context, Method method) throws ValidationException {
         if (!hasComment(method, context)) {
             throw new ValidationException(method, "Method " + method.getSimpleName().toString() + " is not properly documented. A description of what it can do is missing.");
         }
@@ -108,18 +110,18 @@ public class JavaDocValidator implements Validator {
         validateAllParameters(context, method);
     }
 
-    private boolean hasComment(Identifiable element, GeneratorContext context) {
+    private boolean hasComment(Identifiable element, Context context) {
         String comment = element.getJavaDocSummary();
         return StringUtils.isNotBlank(comment);
 
     }
 
-    private boolean hasParameterComment(String paramName, Identifiable element, GeneratorContext context) {
+    private boolean hasParameterComment(String paramName, Identifiable element, Context context) {
         String comment = element.getJavaDocParameterSummary(paramName);
         return StringUtils.isNotBlank(comment);
     }
 
-    protected boolean exampleDoesNotExist(GeneratorContext context, Method method) throws ValidationException {
+    protected boolean exampleDoesNotExist(Context context, Method method) throws ValidationException {
 
         if (!method.hasJavaDocTag("sample.xml")) {
             throw new ValidationException(method, "Method " + method.getSimpleName().toString() + " does not contain an example using {@sample.xml} tag.");

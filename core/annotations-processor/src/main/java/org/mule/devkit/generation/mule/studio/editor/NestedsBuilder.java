@@ -21,7 +21,7 @@ import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
-import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.Context;
 import org.mule.devkit.generation.spring.SchemaGenerator;
 import org.mule.devkit.model.Identifiable;
 import org.mule.devkit.model.Method;
@@ -43,11 +43,11 @@ import java.util.List;
 
 public class NestedsBuilder extends BaseStudioXmlBuilder {
 
-    public NestedsBuilder(GeneratorContext context, Method executableElement, Type type) {
+    public NestedsBuilder(Context context, Method executableElement, Type type) {
         super(context, executableElement, type);
     }
 
-    public NestedsBuilder(GeneratorContext context, Type type) {
+    public NestedsBuilder(Context context, Type type) {
         super(context, type);
     }
 

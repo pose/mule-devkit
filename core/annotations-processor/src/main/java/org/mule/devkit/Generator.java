@@ -15,14 +15,17 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.validation;
+package org.mule.devkit;
 
-import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.model.Type;
 
-public interface Validator {
+public interface Generator {
 
-    boolean shouldValidate(Type type, GeneratorContext context);
+    boolean shouldGenerate(Type type);
 
-    void validate(Type type, GeneratorContext context) throws ValidationException;
+    void generate(Type type) throws GenerationException;
+
+    void setCtx(Context generationContext);
+
+    Context ctx();
 }

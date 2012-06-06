@@ -22,7 +22,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mule.api.annotations.display.FriendlyName;
 import org.mule.api.annotations.display.Placement;
-import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.Context;
 import org.mule.devkit.generation.mule.studio.editor.VariableComparator;
 import org.mule.devkit.model.Variable;
 
@@ -50,7 +50,7 @@ public class VariableComparatorTest {
     @Mock
     private Variable unknownTypeVariable;
     @Mock
-    private GeneratorContext context;
+    private Context context;
 
     @Before
     public void setUpTests() throws Exception {

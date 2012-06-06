@@ -14,19 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.mule.devkit.apt.model;
 
-package org.mule.devkit.generation;
-
-import org.mule.devkit.GeneratorContext;
+import com.sun.source.util.Trees;
+import org.mule.devkit.model.Field;
 import org.mule.devkit.model.Type;
 
-public interface Generator {
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 
-    boolean shouldGenerate(Type type);
-
-    void generate(Type type) throws GenerationException;
-
-    void setCtx(GeneratorContext generationContext);
-
-    GeneratorContext ctx();
+public class AptField extends AptVariable<Type> implements Field {
+    public AptField(VariableElement variableElement, Type parent, Types types, Elements elements, Trees trees) {
+        super(variableElement, parent, types, elements, trees);
+    }
 }

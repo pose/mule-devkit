@@ -14,18 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.mule.devkit.model.apt;
+package org.mule.devkit.apt.model;
 
 import com.sun.source.util.Trees;
-import org.mule.devkit.model.Field;
-import org.mule.devkit.model.Type;
+import org.mule.devkit.model.Identifiable;
+import org.mule.devkit.model.Variable;
 
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
-public class AptField extends AptVariable<Type> implements Field {
-    public AptField(VariableElement variableElement, Type parent, Types types, Elements elements, Trees trees) {
+public class AptVariable<P extends Identifiable> extends AptIdentifiable<VariableElement, P> implements Variable<P> {
+    public AptVariable(VariableElement variableElement, P parent, Types types, Elements elements, Trees trees) {
         super(variableElement, parent, types, elements, trees);
     }
 }

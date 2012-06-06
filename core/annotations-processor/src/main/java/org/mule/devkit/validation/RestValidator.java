@@ -25,7 +25,9 @@ import org.mule.api.annotations.rest.RestHeaderParam;
 import org.mule.api.annotations.rest.RestHttpClient;
 import org.mule.api.annotations.rest.RestQueryParam;
 import org.mule.api.annotations.rest.RestUriParam;
-import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.Context;
+import org.mule.devkit.ValidationException;
+import org.mule.devkit.Validator;
 import org.mule.devkit.model.Field;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Parameter;
@@ -34,12 +36,12 @@ import org.mule.devkit.model.Type;
 public class RestValidator implements Validator {
 
     @Override
-    public boolean shouldValidate(Type type, GeneratorContext context) {
+    public boolean shouldValidate(Type type, Context context) {
         return type.isModuleOrConnector() && type.hasMethodsAnnotatedWith(RestCall.class);
     }
 
     @Override
-    public void validate(Type type, GeneratorContext context) throws ValidationException {
+    public void validate(Type type, Context context) throws ValidationException {
 
         for (Method method : type.getMethodsAnnotatedWith(RestCall.class)) {
 

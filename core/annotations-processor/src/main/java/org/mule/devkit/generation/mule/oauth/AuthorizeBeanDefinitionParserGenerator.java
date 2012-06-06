@@ -19,7 +19,7 @@ package org.mule.devkit.generation.mule.oauth;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.devkit.generation.AbstractMessageGenerator;
-import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.GenerationException;
 import org.mule.devkit.generation.NamingConstants;
 import org.mule.devkit.model.Type;
 import org.mule.devkit.model.code.DefinedClass;

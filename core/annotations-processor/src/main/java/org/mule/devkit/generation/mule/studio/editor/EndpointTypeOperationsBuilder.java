@@ -18,7 +18,7 @@
 package org.mule.devkit.generation.mule.studio.editor;
 
 import org.mule.api.annotations.Source;
-import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.Context;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Type;
 import org.mule.devkit.model.studio.AttributeCategory;
@@ -29,7 +29,7 @@ import java.util.List;
 
 public class EndpointTypeOperationsBuilder extends EndpointTypeBuilder {
 
-    public EndpointTypeOperationsBuilder(GeneratorContext context, Type type) {
+    public EndpointTypeOperationsBuilder(Context context, Type type) {
         super(context, null, type);
     }
 

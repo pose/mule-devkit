@@ -20,7 +20,7 @@ package org.mule.devkit.generation.mule.studio.editor;
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Connect;
 import org.mule.api.annotations.display.Placement;
-import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.Context;
 import org.mule.devkit.model.Field;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Parameter;
@@ -60,17 +60,17 @@ public abstract class BaseStudioXmlBuilder {
     protected Method executableElement;
     protected Types typeUtils;
     protected String moduleName;
-    protected GeneratorContext context;
+    protected Context context;
 
 
-    protected BaseStudioXmlBuilder(GeneratorContext context) {
+    protected BaseStudioXmlBuilder(Context context) {
         this.context = context;
         typeUtils = context.getTypeUtils();
         helper = new MuleStudioUtils();
         objectFactory = new ObjectFactory();
     }
 
-    protected BaseStudioXmlBuilder(GeneratorContext context, Type type) {
+    protected BaseStudioXmlBuilder(Context context, Type type) {
         this(context);
         this.type = type;
         moduleName = type.getModuleName();
@@ -103,7 +103,7 @@ public abstract class BaseStudioXmlBuilder {
 	     return modes;
     }
 
-    protected BaseStudioXmlBuilder(GeneratorContext context, Method executableElement, Type type) {
+    protected BaseStudioXmlBuilder(Context context, Method executableElement, Type type) {
         this(context, type);
         this.executableElement = executableElement;
     }

@@ -17,19 +17,20 @@
 
 package org.mule.devkit.validation;
 
-import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.Context;
+import org.mule.devkit.ValidationException;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Type;
 
 public class StudioValidator extends JavaDocValidator {
 
     @Override
-    public boolean shouldValidate(Type type, GeneratorContext context) {
+    public boolean shouldValidate(Type type, Context context) {
         return !super.shouldValidate(type, context) && !context.isEnvOptionSet("skipStudioPluginPackage");
     }
 
     @Override
-    public void validate(Type type, GeneratorContext context) throws ValidationException {
+    public void validate(Type type, Context context) throws ValidationException {
         try {
             super.validate(type, context);
         } catch (ValidationException e) {
@@ -39,7 +40,7 @@ public class StudioValidator extends JavaDocValidator {
     }
 
     @Override
-    protected boolean exampleDoesNotExist(GeneratorContext context, Method method) throws ValidationException {
+    protected boolean exampleDoesNotExist(Context context, Method method) throws ValidationException {
         // do not check for example correctness
         return false;
     }

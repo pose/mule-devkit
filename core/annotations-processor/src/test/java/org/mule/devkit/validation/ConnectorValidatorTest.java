@@ -17,6 +17,7 @@
 package org.mule.devkit.validation;
 
 import org.junit.Test;
+import org.mule.devkit.Validator;
 import org.mule.devkit.tests.ConnectorWithConnectMethodInvalidReturnType;
 import org.mule.devkit.tests.ConnectorWithConnectMethodInvalidThrownType;
 import org.mule.devkit.tests.ConnectorWithConnectMethodManyThrownTypes;

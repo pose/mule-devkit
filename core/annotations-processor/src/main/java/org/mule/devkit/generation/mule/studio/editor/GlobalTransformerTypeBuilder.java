@@ -17,7 +17,7 @@
 
 package org.mule.devkit.generation.mule.studio.editor;
 
-import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.Context;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Type;
 import org.mule.devkit.model.studio.AttributeCategory;
@@ -30,7 +30,7 @@ import java.util.List;
 
 public class GlobalTransformerTypeBuilder extends GlobalTypeBuilder {
 
-    public GlobalTransformerTypeBuilder(GeneratorContext context, Method executableElement, Type type) {
+    public GlobalTransformerTypeBuilder(Context context, Method executableElement, Type type) {
         super(context, executableElement, type);
     }
 

@@ -16,7 +16,7 @@
  */
 package org.mule.devkit.apt;
 
-import org.mule.devkit.generation.Generator;
+import org.mule.devkit.Generator;
 import org.mule.devkit.generation.adapter.CapabilitiesAdapterGenerator;
 import org.mule.devkit.generation.adapter.ConnectionManagerGenerator;
 import org.mule.devkit.generation.adapter.HttpCallbackAdapterGenerator;
@@ -65,7 +65,7 @@ import org.mule.devkit.validation.RestValidator;
 import org.mule.devkit.validation.SourceValidator;
 import org.mule.devkit.validation.StudioValidator;
 import org.mule.devkit.validation.TransformerValidator;
-import org.mule.devkit.validation.Validator;
+import org.mule.devkit.Validator;
 
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;

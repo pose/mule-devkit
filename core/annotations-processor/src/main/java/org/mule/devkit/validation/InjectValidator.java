@@ -29,7 +29,9 @@ import org.mule.api.registry.Registry;
 import org.mule.api.security.SecurityManager;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreManager;
-import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.Context;
+import org.mule.devkit.ValidationException;
+import org.mule.devkit.Validator;
 import org.mule.devkit.model.Field;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Type;
@@ -40,12 +42,12 @@ import javax.transaction.TransactionManager;
 
 public class InjectValidator implements Validator {
     @Override
-    public boolean shouldValidate(Type type, GeneratorContext context) {
+    public boolean shouldValidate(Type type, Context context) {
         return type.getFieldsAnnotatedWith(Inject.class).size() > 0;
     }
 
     @Override
-    public void validate(Type type, GeneratorContext context) throws ValidationException {
+    public void validate(Type type, Context context) throws ValidationException {
         for (Field variable : type.getFieldsAnnotatedWith(Inject.class)) {
             if (!variable.asType().toString().equals(MuleContext.class.getName()) &&
                     !variable.asType().toString().equals(ObjectStoreManager.class.getName()) &&

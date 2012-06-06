@@ -15,39 +15,24 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.validation;
+package org.mule.devkit;
 
-import org.mule.devkit.model.Identifiable;
+public class GenerationException extends Exception {
 
-public class ValidationException extends Exception {
-    private Identifiable element;
-
-    public ValidationException(Identifiable element) {
+    public GenerationException() {
         super();
-
-        this.element = element;
     }
 
-    public ValidationException(Identifiable element, String s) {
+    public GenerationException(String s) {
         super(s);
-
-        this.element = element;
     }
 
-    public ValidationException(Identifiable element, String s, Throwable throwable) {
+    public GenerationException(String s, Throwable throwable) {
         super(s, throwable);
-
-        this.element = element;
     }
 
 
-    public ValidationException(Identifiable element, Throwable throwable) {
+    public GenerationException(Throwable throwable) {
         super(throwable);
-
-        this.element = element;
-    }
-
-    public Identifiable getElement() {
-        return element;
     }
 }

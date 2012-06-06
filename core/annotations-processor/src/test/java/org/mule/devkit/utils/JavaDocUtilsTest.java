@@ -22,7 +22,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mule.devkit.model.Method;
-import org.mule.devkit.model.apt.AptMethod;
+import org.mule.devkit.apt.model.AptMethod;
 import org.mule.util.StringUtils;
 
 import javax.lang.model.util.Elements;

@@ -31,7 +31,7 @@ import org.mule.api.registry.Registry;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.devkit.generation.AbstractModuleGenerator;
-import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.GenerationException;
 import org.mule.devkit.generation.NamingConstants;
 import org.mule.devkit.model.Field;
 import org.mule.devkit.model.Type;

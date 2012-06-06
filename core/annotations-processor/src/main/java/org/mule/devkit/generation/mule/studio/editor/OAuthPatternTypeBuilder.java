@@ -16,7 +16,7 @@
  */
 package org.mule.devkit.generation.mule.studio.editor;
 
-import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.Context;
 import org.mule.devkit.model.Type;
 import org.mule.devkit.model.studio.PatternType;
 
@@ -28,7 +28,7 @@ import org.mule.devkit.model.studio.PatternType;
  */
 public class OAuthPatternTypeBuilder extends PatternTypeBuilder {
 
-	public OAuthPatternTypeBuilder(GeneratorContext context, Type type) {
+	public OAuthPatternTypeBuilder(Context context, Type type) {
         super(context, null, type);
 	}
 	

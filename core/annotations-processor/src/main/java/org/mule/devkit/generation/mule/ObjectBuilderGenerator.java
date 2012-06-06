@@ -1,7 +1,7 @@
 package org.mule.devkit.generation.mule;
 
 import org.mule.devkit.generation.AbstractGenerator;
-import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.GenerationException;
 import org.mule.devkit.model.Type;
 
 public class ObjectBuilderGenerator extends AbstractGenerator {

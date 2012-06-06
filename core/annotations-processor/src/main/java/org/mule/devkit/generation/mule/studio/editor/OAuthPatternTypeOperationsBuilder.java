@@ -16,7 +16,7 @@
  */
 package org.mule.devkit.generation.mule.studio.editor;
 
-import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.Context;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Type;
 import org.mule.devkit.model.studio.ModeElementType;
@@ -34,7 +34,7 @@ import java.util.List;
  */
 public class OAuthPatternTypeOperationsBuilder extends PatternTypeOperationsBuilder {
 
-	public OAuthPatternTypeOperationsBuilder(GeneratorContext context, Type type, PatternTypes patternTypeToUse) {
+	public OAuthPatternTypeOperationsBuilder(Context context, Type type, PatternTypes patternTypeToUse) {
 		super(context, type, patternTypeToUse);
 	}
 	

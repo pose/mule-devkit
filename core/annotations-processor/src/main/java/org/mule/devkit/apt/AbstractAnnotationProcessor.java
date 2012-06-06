@@ -18,13 +18,13 @@
 package org.mule.devkit.apt;
 
 import com.sun.source.util.Trees;
-import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.generation.Generator;
+import org.mule.devkit.Context;
+import org.mule.devkit.GenerationException;
+import org.mule.devkit.Generator;
 import org.mule.devkit.model.Type;
-import org.mule.devkit.model.apt.AptType;
-import org.mule.devkit.validation.ValidationException;
-import org.mule.devkit.validation.Validator;
+import org.mule.devkit.apt.model.AptType;
+import org.mule.devkit.ValidationException;
+import org.mule.devkit.Validator;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
@@ -37,7 +37,7 @@ import java.util.Set;
 
 public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
 
-    private GeneratorContext context;
+    private Context context;
 
     /**
      * Retrieve a list of validators for the specified object type
@@ -118,10 +118,10 @@ public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
     }
 
     private void createContext() {
-        context = new GeneratorContext(processingEnv);
+        context = new AptContext(processingEnv);
     }
 
-    protected GeneratorContext getContext() {
+    protected Context getContext() {
         return context;
     }
 }

@@ -16,9 +16,10 @@
  */
 package org.mule.devkit.validation;
 
+import org.mule.devkit.Validator;
 import org.mule.devkit.apt.AbstractAnnotationProcessorTest;
 import org.mule.devkit.apt.DevKitAnnotationProcessor;
-import org.mule.devkit.generation.Generator;
+import org.mule.devkit.Generator;
 
 import java.util.Arrays;
 import java.util.Collections;

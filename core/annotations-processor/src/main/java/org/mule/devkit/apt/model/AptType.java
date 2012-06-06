@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.model.apt;
+package org.mule.devkit.apt.model;
 
 import com.sun.source.util.TreePath;
 import com.sun.source.util.Trees;

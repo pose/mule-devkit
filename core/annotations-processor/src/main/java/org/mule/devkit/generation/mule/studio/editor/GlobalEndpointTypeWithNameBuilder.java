@@ -17,7 +17,7 @@
 
 package org.mule.devkit.generation.mule.studio.editor;
 
-import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.Context;
 import org.mule.devkit.model.Type;
 import org.mule.devkit.model.studio.GlobalType;
 
@@ -25,7 +25,7 @@ public class GlobalEndpointTypeWithNameBuilder extends GlobalEndpointTypeBuilder
 
     public static final String ABSTRACT_GLOBAL_ENDPOINT_LOCAL_ID = "abstractGlobalEndpoint";
 
-    public GlobalEndpointTypeWithNameBuilder(GeneratorContext context, Type type) {
+    public GlobalEndpointTypeWithNameBuilder(Context context, Type type) {
         super(context, null, type);
     }
 

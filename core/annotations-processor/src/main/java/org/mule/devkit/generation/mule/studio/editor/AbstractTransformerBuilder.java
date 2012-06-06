@@ -17,7 +17,7 @@
 
 package org.mule.devkit.generation.mule.studio.editor;
 
-import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.Context;
 import org.mule.devkit.model.Type;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.Booleantype;
@@ -36,7 +36,7 @@ public class AbstractTransformerBuilder extends BaseStudioXmlBuilder {
     public static final String ABSTRACT_TRANSFORMER_ATTRIBUTE_CATEGORY_CAPTION = "Advanced";
     public static final String ABSTRACT_TRANSFORMER_ATTRIBUTE_CATEGORY_DESCRIPTION = "Advanced settings for transformer";
 
-    public AbstractTransformerBuilder(GeneratorContext context, Type type) {
+    public AbstractTransformerBuilder(Context context, Type type) {
         super(context, type);
     }
 

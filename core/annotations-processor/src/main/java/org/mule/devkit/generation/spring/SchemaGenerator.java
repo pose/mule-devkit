@@ -29,7 +29,7 @@ import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.mule.api.callback.HttpCallback;
 import org.mule.devkit.generation.AbstractModuleGenerator;
-import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.GenerationException;
 import org.mule.devkit.generation.adapter.HttpCallbackAdapterGenerator;
 import org.mule.devkit.model.Field;
 import org.mule.devkit.model.Identifiable;

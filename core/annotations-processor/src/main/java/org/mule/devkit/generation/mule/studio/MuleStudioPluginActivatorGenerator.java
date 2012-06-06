@@ -19,7 +19,7 @@ package org.mule.devkit.generation.mule.studio;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.mule.devkit.generation.AbstractMessageGenerator;
-import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.GenerationException;
 import org.mule.devkit.model.Type;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.mule.devkit.model.apt;
+package org.mule.devkit.apt.model;
 
 import com.sun.source.util.Trees;
 import org.apache.commons.lang.StringUtils;

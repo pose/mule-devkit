@@ -33,6 +33,7 @@ import org.mule.api.oauth.RestoreAccessTokenCallback;
 import org.mule.api.oauth.SaveAccessTokenCallback;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.devkit.GenerationException;
 import org.mule.devkit.generation.callback.DefaultHttpCallbackGenerator;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Parameter;

@@ -17,6 +17,7 @@
 package org.mule.devkit.validation;
 
 import org.junit.Test;
+import org.mule.devkit.Validator;
 import org.mule.devkit.tests.ArrayConfigurableField;
 import org.mule.devkit.tests.DefaultNonOptionalConfigurableField;
 import org.mule.devkit.tests.FinalConfigurableField;
