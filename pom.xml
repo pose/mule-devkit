@@ -29,7 +29,6 @@
     </properties>
 
     <modules>
-        <module>model</module>
         <module>core</module>
         <module>tools</module>
         <module>dynamic</module>

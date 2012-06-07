@@ -4,25 +4,19 @@
 
     <parent>
         <groupId>org.mule.tools.devkit</groupId>
-        <artifactId>mule-devkit-model</artifactId>
+        <artifactId>mule-devkit-core</artifactId>
         <version>3.4-SNAPSHOT</version>
     </parent>
 
-    <name>Mule DevKit Schema Model</name>
+    <name>Mule DevKit Studio Model</name>
 
-    <artifactId>mule-devkit-schemamodel</artifactId>
+    <artifactId>mule-devkit-studio-model</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.8.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.mule.tools.devkit</groupId>
-            <artifactId>mule-devkit-codemodel</artifactId>
+            <artifactId>mule-devkit-code-model</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -38,20 +32,4 @@
             </exclusions>
         </dependency>
     </dependencies>
-
-    <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-            <resource>
-                <directory>src/test/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**/*.xml</include>
-                </includes>
-            </resource>
-        </resources>
-    </build>
 </project>
