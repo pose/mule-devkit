@@ -27,9 +27,6 @@ import org.mule.devkit.generation.mule.oauth.DefaultRestoreAccessTokenCallbackFa
 import org.mule.devkit.generation.mule.oauth.DefaultRestoreAccessTokenCallbackGenerator;
 import org.mule.devkit.generation.mule.oauth.DefaultSaveAccessTokenCallbackFactoryGenerator;
 import org.mule.devkit.generation.mule.oauth.DefaultSaveAccessTokenCallbackGenerator;
-import org.mule.devkit.generation.mule.studio.MuleStudioFeatureGenerator;
-import org.mule.devkit.generation.mule.studio.MuleStudioPluginGenerator;
-import org.mule.devkit.generation.mule.studio.MuleStudioSiteXmlGenerator;
 import org.mule.devkit.generation.mule.transfomer.EnumTransformerGenerator;
 import org.mule.devkit.generation.mule.transfomer.JaxbTransformerGenerator;
 import org.mule.devkit.generation.mule.transfomer.StringToBigDecimalTransformerGenerator;
@@ -85,14 +82,9 @@ public class CorePlugin implements Plugin {
         generators.add(new ExpressionEvaluatorGenerator());
         generators.add(new ExpressionEnricherGenerator());
         generators.add(new RegistryBootstrapGenerator());
-        generators.add(new MuleStudioPluginGenerator());
-        generators.add(new MuleStudioFeatureGenerator());
-        generators.add(new MuleStudioSiteXmlGenerator());
         generators.add(new SchemaGenerator());
 
         validators = new ArrayList<Validator>();
-        validators.add(new JavaDocValidator());
-        validators.add(new StudioValidator());
         validators.add(new BasicValidator());
         validators.add(new OAuthValidator());
         validators.add(new ProcessorValidator());

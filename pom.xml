@@ -30,6 +30,7 @@
 
     <modules>
         <module>core</module>
+		<module>plugins</module>
         <module>tools</module>
         <module>dynamic</module>
         <module>archetypes</module>

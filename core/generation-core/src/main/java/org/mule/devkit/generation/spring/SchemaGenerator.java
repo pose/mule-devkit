@@ -30,7 +30,6 @@ import org.mule.api.annotations.param.Optional;
 import org.mule.api.callback.HttpCallback;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.api.GenerationException;
-import org.mule.devkit.generation.adapter.HttpCallbackAdapterGenerator;
 import org.mule.devkit.model.Field;
 import org.mule.devkit.model.Identifiable;
 import org.mule.devkit.model.Method;
@@ -60,6 +59,7 @@ import org.mule.devkit.model.schema.Restriction;
 import org.mule.devkit.model.schema.Schema;
 import org.mule.devkit.model.schema.SchemaConstants;
 import org.mule.devkit.model.schema.SchemaLocation;
+import org.mule.devkit.model.schema.SchemaTypeConversion;
 import org.mule.devkit.model.schema.SimpleContent;
 import org.mule.devkit.model.schema.SimpleExtensionType;
 import org.mule.devkit.model.schema.TopLevelComplexType;
@@ -83,43 +83,6 @@ import java.util.Set;
 
 public class SchemaGenerator extends AbstractModuleGenerator {
 
-    public static final String DOMAIN_ATTRIBUTE_NAME = HttpCallbackAdapterGenerator.DOMAIN_FIELD_NAME;
-    public static final String LOCAL_PORT_ATTRIBUTE_NAME = HttpCallbackAdapterGenerator.LOCAL_PORT_FIELD_NAME;
-    public static final String REMOTE_PORT_ATTRIBUTE_NAME = HttpCallbackAdapterGenerator.REMOTE_PORT_FIELD_NAME;
-    public static final String ASYNC_ATTRIBUTE_NAME = HttpCallbackAdapterGenerator.ASYNC_FIELD_NAME;
-    public static final String HTTP_CALLBACK_CONFIG_ELEMENT_NAME = "http-callback-config";
-    public static final String OAUTH_CALLBACK_CONFIG_ELEMENT_NAME = "oauth-callback-config";
-    public static final String REF_SUFFIX = "-ref";
-    public static final String FLOW_REF_SUFFIX = "-flow-ref";
-    public static final String INNER_PREFIX = "inner-";
-    public static final String ATTRIBUTE_NAME_CONFIG_REF = "config-ref";
-    public static final String ATTRIBUTE_NAME_KEY = "key";
-    private static final String ATTRIBUTE_NAME_REF = "ref";
-    private static final String ATTRIBUTE_NAME_VALUE_REF = "value-ref";
-    private static final String ATTRIBUTE_NAME_KEY_REF = "key-ref";
-    private static final String ATTRIBUTE_RETRY_MAX = "retryMax";
-    private static final String XSD_EXTENSION = ".xsd";
-    private static final String ENUM_TYPE_SUFFIX = "EnumType";
-    private static final String OBJECT_TYPE_SUFFIX = "ObjectType";
-    private static final String TYPE_SUFFIX = "Type";
-    private static final String XML_TYPE_SUFFIX = "XmlType";
-    private static final String UNBOUNDED = "unbounded";
-    private static final String LAX = "lax";
-    private static final String ATTRIBUTE_NAME_NAME = "name";
-    private static final String DOMAIN_DEFAULT_VALUE = "${fullDomain}";
-    private static final String PORT_DEFAULT_VALUE = "${http.port}";
-    private static final String ASYNC_DEFAULT_VALUE = "true";
-    private static final String ATTRIBUTE_RETRY_MAX_DESCRIPTION = "Specify how many times this operation can be retried automatically.";
-    private static final String ATTRIBUTE_NAME_REF_DESCRIPTION = "The reference object for this parameter";
-    private static final String ATTRIBUTE_NAME_NAME_DESCRIPTION = "Give a name to this configuration so it can be later referenced by config-ref.";
-    private static final String CONNECTION_POOLING_PROFILE = "connection-pooling-profile";
-    private static final String CONNECTION_POOLING_PROFILE_ELEMENT_DESCRIPTION = "Characteristics of the connection pool.";
-    private static final String POOLING_PROFILE_ELEMENT = "pooling-profile";
-    private static final String POOLING_PROFILE_ELEMENT_DESCRIPTION = "Characteristics of the object pool.";
-    private static final String OAUTH_SAVE_ACCESS_TOKEN_ELEMENT = "oauth-save-access-token";
-    private static final String OAUTH_RESTORE_ACCESS_TOKEN_ELEMENT = "oauth-restore-access-token";
-    private static final String OAUTH_SAVE_ACCESS_TOKEN_ELEMENT_DESCRIPTION = "A chain of message processors processed synchronously that can be used to save OAuth state. They will be executed once the connector acquires an OAuth access token.";
-    private static final String OAUTH_RESTORE_ACCESS_TOKEN_ELEMENT_DESCRIPTION = "A chain of message processors processed synchronously that can be used to restore OAuth state. They will be executed whenever access to a protected resource is requested and the connector is not authorized yet.";
     private ObjectFactory objectFactory;
 
     public SchemaGenerator() {
@@ -133,7 +96,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
     @Override
     public void generate(Type type) throws GenerationException {
-        String targetNamespace = getNamespace(type);
+        String targetNamespace = type.getXmlNamespace();
 
         Schema schema = new Schema();
         schema.setTargetNamespace(targetNamespace);
@@ -152,15 +115,10 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         registerEnums(schema, type);
         registerComplexTypes(schema, type);
 
-        String fileName = "META-INF/mule-" + type.getModuleName() + XSD_EXTENSION;
+        String fileName = "META-INF/mule-" + type.getModuleName() + SchemaConstants.XSD_EXTENSION;
 
-        String versionedLocation = getVersionedLocation(type);
-        String currentLocation = null;
-        if (type.getModuleSchemaLocation() == null || type.getModuleSchemaLocation().length() == 0) {
-            currentLocation = schema.getTargetNamespace() + "/current/mule-" + type.getModuleName() + XSD_EXTENSION;
-        }
-
-        // TODO: replace with a class role
+        String versionedLocation = type.getVersionedSchemaLocation();
+        String currentLocation = type.getCurrentSchemaLocation();
         String namespaceHandlerName = ctx().getCodeModel()._class(DefinedClassRoles.NAMESPACE_HANDLER, ref(type)).boxify().fullName();
         String className = ctx().getCodeModel()._class(DefinedClassRoles.MODULE_OBJECT, ref(type)).boxify().fullName();
 
@@ -172,22 +130,6 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             SchemaLocation currentSchemaLocation = new SchemaLocation(null, schema.getTargetNamespace(), fileName, currentLocation, namespaceHandlerName, className);
             ctx().getSchemaModel().addSchemaLocation(currentSchemaLocation);
         }
-    }
-
-    public static String getVersionedLocation(Type type) {
-        String versionedLocation = type.getModuleSchemaLocation();
-        if (type.getModuleSchemaLocation() == null || type.getModuleSchemaLocation().length() == 0) {
-            versionedLocation = getNamespace(type) + "/" + type.getModuleSchemaVersion() + "/mule-" + type.getModuleName() + XSD_EXTENSION;
-        }
-        return versionedLocation;
-    }
-
-    public static String getNamespace(Type type) {
-        String targetNamespace = type.getXmlNamespace();
-        if (targetNamespace == null || targetNamespace.length() == 0) {
-            targetNamespace = SchemaConstants.BASE_NAMESPACE + type.getModuleName();
-        }
-        return targetNamespace;
     }
 
     private void registerComplexTypes(Schema schema, Type type) {
@@ -227,7 +169,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
     private void registerComplexType(Schema schema, Identifiable element) {
         TopLevelComplexType complexType = new TopLevelComplexType();
-        complexType.setName(element.getSimpleName() + OBJECT_TYPE_SUFFIX);
+        complexType.setName(element.getSimpleName() + SchemaConstants.OBJECT_TYPE_SUFFIX);
 
         ExplicitGroup all = new ExplicitGroup();
         complexType.setSequence(all);
@@ -294,7 +236,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         javax.lang.model.element.Element enumElement = ctx().getTypeUtils().asElement(enumType);
 
         TopLevelSimpleType enumSimpleType = new TopLevelSimpleType();
-        enumSimpleType.setName(enumElement.getSimpleName() + ENUM_TYPE_SUFFIX);
+        enumSimpleType.setName(enumElement.getSimpleName() + SchemaConstants.ENUM_TYPE_SUFFIX);
 
         Union union = new Union();
         union.getSimpleType().add(createEnumSimpleType(enumElement));
@@ -342,7 +284,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             if (processor.name().length() > 0) {
                 name = processor.name();
             }
-            String typeName = StringUtils.capitalize(name) + TYPE_SUFFIX;
+            String typeName = StringUtils.capitalize(name) + SchemaConstants.TYPE_SUFFIX;
 
             registerProcessorElement(schema, processor.intercepting(), targetNamespace, name, typeName, method.getJavaDocSummary());
 
@@ -355,7 +297,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             if (source.name().length() > 0) {
                 name = source.name();
             }
-            String typeName = StringUtils.capitalize(name) + TYPE_SUFFIX;
+            String typeName = StringUtils.capitalize(name) + SchemaConstants.TYPE_SUFFIX;
 
             registerSourceElement(schema, targetNamespace, name, typeName, method);
 
@@ -424,7 +366,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         complexContentExtension.setBase(base);
         complexContent.setExtension(complexContentExtension);
 
-        Attribute configRefAttr = createAttribute(ATTRIBUTE_NAME_CONFIG_REF, true, SchemaConstants.STRING, "Specify which configuration to use for this invocation.");
+        Attribute configRefAttr = createAttribute(SchemaConstants.ATTRIBUTE_NAME_CONFIG_REF, true, SchemaConstants.STRING, "Specify which configuration to use for this invocation.");
         complexContentExtension.getAttributeOrAttributeGroup().add(configRefAttr);
 
         ExplicitGroup all = new ExplicitGroup();
@@ -475,7 +417,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             Method connectExecutableElement = connectForMethod(element);
             if (connectExecutableElement != null) {
                 if (element.getAnnotation(Processor.class) != null) {
-                    Attribute retryMaxAttr = createAttribute(ATTRIBUTE_RETRY_MAX, true, SchemaConstants.STRING, ATTRIBUTE_RETRY_MAX_DESCRIPTION);
+                    Attribute retryMaxAttr = createAttribute(SchemaConstants.ATTRIBUTE_RETRY_MAX, true, SchemaConstants.STRING, SchemaConstants.ATTRIBUTE_RETRY_MAX_DESCRIPTION);
                     retryMaxAttr.setDefault("1");
                     complexContentExtension.getAttributeOrAttributeGroup().add(retryMaxAttr);
                 }
@@ -587,9 +529,9 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             choice.getParticle().add(objectFactory.createSequence(sequence));
 
             Any any = new Any();
-            any.setProcessContents(LAX);
+            any.setProcessContents(SchemaConstants.LAX);
             any.setMinOccurs(new BigInteger("0"));
-            any.setMaxOccurs(UNBOUNDED);
+            any.setMaxOccurs(SchemaConstants.UNBOUNDED);
 
             ExplicitGroup anySequence = new ExplicitGroup();
             anySequence.getParticle().add(any);
@@ -606,11 +548,11 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         }
 
         collectionItemElement.setMinOccurs(BigInteger.valueOf(0L));
-        collectionItemElement.setMaxOccurs(UNBOUNDED);
+        collectionItemElement.setMaxOccurs(SchemaConstants.UNBOUNDED);
 
         collectionItemElement.setComplexType(generateComplexType(schema, targetNamespace, name, type));
 
-        Attribute ref = createAttribute(ATTRIBUTE_NAME_REF, true, SchemaConstants.STRING, "The reference object for this parameter");
+        Attribute ref = createAttribute(SchemaConstants.ATTRIBUTE_NAME_REF, true, SchemaConstants.STRING, "The reference object for this parameter");
         collectionComplexType.getAttributeOrAttributeGroup().add(ref);
 
         return collectionComplexType;
@@ -626,14 +568,14 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                     return generateComplexTypeWithRef(schema, genericType);
                 } else if (genericType.isArrayOrList() ||
                         genericType.isMap()) {
-                    return generateCollectionComplexType(schema, targetNamespace, INNER_PREFIX + name, genericType);
+                    return generateCollectionComplexType(schema, targetNamespace, SchemaConstants.INNER_PREFIX + name, genericType);
                 } else if (genericType.isEnum()) {
                     return genereateEnumComplexType(genericType, targetNamespace);
                 } else {
-                    return generateExtendedRefComplexType(schema, genericType, ATTRIBUTE_NAME_VALUE_REF);
+                    return generateExtendedRefComplexType(schema, genericType, SchemaConstants.ATTRIBUTE_NAME_VALUE_REF);
                 }
             } else {
-                return generateRefComplexType(ATTRIBUTE_NAME_VALUE_REF);
+                return generateRefComplexType(SchemaConstants.ATTRIBUTE_NAME_VALUE_REF);
             }
         } else if (typeMirror.isMap()) {
             java.util.List<Identifiable> variableTypeParameters = typeMirror.getTypeArguments();
@@ -641,14 +583,14 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             LocalComplexType mapComplexType = new LocalComplexType();
             Attribute keyAttribute = new Attribute();
             if (variableTypeParameters.size() > 0 && isTypeSupported(variableTypeParameters.get(0).asType())) {
-                keyAttribute.setName(ATTRIBUTE_NAME_KEY);
+                keyAttribute.setName(SchemaConstants.ATTRIBUTE_NAME_KEY);
                 keyAttribute.setType(SchemaTypeConversion.convertType(variableTypeParameters.get(0).asType().toString(), schema.getTargetNamespace()));
             } else if (variableTypeParameters.size() > 0 && variableTypeParameters.get(0).isEnum()) {
-                keyAttribute.setName(ATTRIBUTE_NAME_KEY);
-                keyAttribute.setType(new QName(schema.getTargetNamespace(), variableTypeParameters.get(0).getSimpleName() + ENUM_TYPE_SUFFIX));
+                keyAttribute.setName(SchemaConstants.ATTRIBUTE_NAME_KEY);
+                keyAttribute.setType(new QName(schema.getTargetNamespace(), variableTypeParameters.get(0).getSimpleName() + SchemaConstants.ENUM_TYPE_SUFFIX));
             } else {
                 keyAttribute.setUse(SchemaConstants.USE_REQUIRED);
-                keyAttribute.setName(ATTRIBUTE_NAME_KEY_REF);
+                keyAttribute.setName(SchemaConstants.ATTRIBUTE_NAME_KEY_REF);
                 keyAttribute.setType(SchemaConstants.STRING);
             }
 
@@ -661,7 +603,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
                 Attribute refAttribute = new Attribute();
                 refAttribute.setUse(SchemaConstants.USE_OPTIONAL);
-                refAttribute.setName(ATTRIBUTE_NAME_VALUE_REF);
+                refAttribute.setName(SchemaConstants.ATTRIBUTE_NAME_VALUE_REF);
                 refAttribute.setType(SchemaConstants.STRING);
 
                 complexContentExtension.getAttributeOrAttributeGroup().add(refAttribute);
@@ -675,7 +617,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
                 Attribute refAttribute = new Attribute();
                 refAttribute.setUse(SchemaConstants.USE_OPTIONAL);
-                refAttribute.setName(ATTRIBUTE_NAME_VALUE_REF);
+                refAttribute.setName(SchemaConstants.ATTRIBUTE_NAME_VALUE_REF);
                 refAttribute.setType(SchemaConstants.STRING);
 
                 complexContentExtension.getAttributeOrAttributeGroup().add(refAttribute);
@@ -704,7 +646,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         complexType.setSimpleContent(simpleContent);
         SimpleExtensionType simpleContentExtension = new SimpleExtensionType();
         //javax.lang.model.element.Element enumElement = context.getTypeUtils().asElement(genericType);
-        simpleContentExtension.setBase(new QName(targetNamespace, genericType.getSimpleName() + ENUM_TYPE_SUFFIX));
+        simpleContentExtension.setBase(new QName(targetNamespace, genericType.getSimpleName() + SchemaConstants.ENUM_TYPE_SUFFIX));
         simpleContent.setExtension(simpleContentExtension);
         return complexType;
     }
@@ -720,7 +662,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         Attribute refAttribute = new Attribute();
         refAttribute.setUse(SchemaConstants.USE_OPTIONAL);
-        refAttribute.setName(ATTRIBUTE_NAME_VALUE_REF);
+        refAttribute.setName(SchemaConstants.ATTRIBUTE_NAME_VALUE_REF);
         refAttribute.setType(SchemaConstants.STRING);
 
         simpleContentExtension.getAttributeOrAttributeGroup().add(refAttribute);
@@ -732,7 +674,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         itemComplexType.setComplexContent(new ComplexContent());
         itemComplexType.getComplexContent().setExtension(new ExtensionType());
         itemComplexType.getComplexContent().getExtension().setBase(
-                new QName(schema.getTargetNamespace(), element.getSimpleName() + OBJECT_TYPE_SUFFIX)
+                new QName(schema.getTargetNamespace(), element.getSimpleName() + SchemaConstants.OBJECT_TYPE_SUFFIX)
         ); // base to the element type
 
         Attribute refAttribute = new Attribute();
@@ -759,22 +701,22 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     private TopLevelElement generateXmlElement(String elementName, String targetNamespace) {
         TopLevelElement xmlElement = new TopLevelElement();
         xmlElement.setName(elementName);
-        xmlElement.setType(new QName(targetNamespace, XML_TYPE_SUFFIX));
+        xmlElement.setType(new QName(targetNamespace, SchemaConstants.XML_TYPE_SUFFIX));
         return xmlElement;
     }
 
     private TopLevelComplexType createAnyXmlType() {
         TopLevelComplexType xmlComplexType = new TopLevelComplexType();
-        xmlComplexType.setName(XML_TYPE_SUFFIX);
+        xmlComplexType.setName(SchemaConstants.XML_TYPE_SUFFIX);
         Any any = new Any();
-        any.setProcessContents(LAX);
+        any.setProcessContents(SchemaConstants.LAX);
         any.setMinOccurs(new BigInteger("0"));
-        any.setMaxOccurs(UNBOUNDED);
+        any.setMaxOccurs(SchemaConstants.UNBOUNDED);
         ExplicitGroup all = new ExplicitGroup();
         all.getParticle().add(any);
         xmlComplexType.setSequence(all);
 
-        Attribute ref = createAttribute(ATTRIBUTE_NAME_REF, true, SchemaConstants.STRING, ATTRIBUTE_NAME_REF_DESCRIPTION);
+        Attribute ref = createAttribute(SchemaConstants.ATTRIBUTE_NAME_REF, true, SchemaConstants.STRING, SchemaConstants.ATTRIBUTE_NAME_REF_DESCRIPTION);
         xmlComplexType.getAttributeOrAttributeGroup().add(ref);
 
         return xmlComplexType;
@@ -786,7 +728,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         Map<QName, String> otherAttributes = new HashMap<QName, String>();
         otherAttributes.put(SchemaConstants.MULE_DEVKIT_JAVA_CLASS_TYPE, moduleClass.fullName());
         ExtensionType config = registerExtension(schema, SchemaConstants.ELEMENT_NAME_CONFIG, otherAttributes);
-        Attribute nameAttribute = createAttribute(ATTRIBUTE_NAME_NAME, true, SchemaConstants.STRING, ATTRIBUTE_NAME_NAME_DESCRIPTION);
+        Attribute nameAttribute = createAttribute(SchemaConstants.ATTRIBUTE_NAME_NAME, true, SchemaConstants.STRING, SchemaConstants.ATTRIBUTE_NAME_NAME_DESCRIPTION);
         config.getAttributeOrAttributeGroup().add(nameAttribute);
 
         ExplicitGroup all = new ExplicitGroup();
@@ -820,13 +762,13 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             }
 
             TopLevelElement poolingProfile = new TopLevelElement();
-            poolingProfile.setName(CONNECTION_POOLING_PROFILE);
+            poolingProfile.setName(SchemaConstants.CONNECTION_POOLING_PROFILE);
             poolingProfile.setType(SchemaConstants.MULE_POOLING_PROFILE_TYPE);
             poolingProfile.setMinOccurs(BigInteger.valueOf(0L));
 
             Annotation annotation = new Annotation();
             Documentation doc = new Documentation();
-            doc.getContent().add(CONNECTION_POOLING_PROFILE_ELEMENT_DESCRIPTION);
+            doc.getContent().add(SchemaConstants.CONNECTION_POOLING_PROFILE_ELEMENT_DESCRIPTION);
             annotation.getAppinfoOrDocumentation().add(doc);
 
             poolingProfile.setAnnotation(annotation);
@@ -836,26 +778,26 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         // add oauth callback configuration
         if (type.hasAnnotation(OAuth.class) || type.hasAnnotation(OAuth2.class)) {
-            generateHttpCallbackElement(OAUTH_CALLBACK_CONFIG_ELEMENT_NAME, all);
+            generateHttpCallbackElement(SchemaConstants.OAUTH_CALLBACK_CONFIG_ELEMENT_NAME, all);
 
             generateOAuthSaveAccessTokenElement(all);
             generateOAuthRestoreAccessTokenElement(all);
         }
         if (type.hasProcessorMethodWithParameter(HttpCallback.class)) {
-            generateHttpCallbackElement(HTTP_CALLBACK_CONFIG_ELEMENT_NAME, all);
+            generateHttpCallbackElement(SchemaConstants.HTTP_CALLBACK_CONFIG_ELEMENT_NAME, all);
         }
 
         if (type.isPoolable()) {
             //<xsd:element name="abstract-pooling-profile" abstract="true" type="abstractPoolingProfileType"/>
 
             TopLevelElement poolingProfile = new TopLevelElement();
-            poolingProfile.setName(POOLING_PROFILE_ELEMENT);
+            poolingProfile.setName(SchemaConstants.POOLING_PROFILE_ELEMENT);
             poolingProfile.setType(SchemaConstants.MULE_POOLING_PROFILE_TYPE);
             poolingProfile.setMinOccurs(BigInteger.valueOf(0L));
 
             Annotation annotation = new Annotation();
             Documentation doc = new Documentation();
-            doc.getContent().add(POOLING_PROFILE_ELEMENT_DESCRIPTION);
+            doc.getContent().add(SchemaConstants.POOLING_PROFILE_ELEMENT_DESCRIPTION);
             annotation.getAppinfoOrDocumentation().add(doc);
 
             poolingProfile.setAnnotation(annotation);
@@ -877,7 +819,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     private void generateOAuthSaveAccessTokenElement(ExplicitGroup all) {
         TopLevelElement collectionElement = new TopLevelElement();
         all.getParticle().add(objectFactory.createElement(collectionElement));
-        collectionElement.setName(OAUTH_SAVE_ACCESS_TOKEN_ELEMENT);
+        collectionElement.setName(SchemaConstants.OAUTH_SAVE_ACCESS_TOKEN_ELEMENT);
 
         collectionElement.setMinOccurs(BigInteger.valueOf(0L));
         collectionElement.setMaxOccurs("1");
@@ -891,7 +833,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         // add doc
         Annotation annotation = new Annotation();
         Documentation doc = new Documentation();
-        doc.getContent().add(OAUTH_SAVE_ACCESS_TOKEN_ELEMENT_DESCRIPTION);
+        doc.getContent().add(SchemaConstants.OAUTH_SAVE_ACCESS_TOKEN_ELEMENT_DESCRIPTION);
         annotation.getAppinfoOrDocumentation().add(doc);
 
         collectionElement.setAnnotation(annotation);
@@ -900,7 +842,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     private void generateOAuthRestoreAccessTokenElement(ExplicitGroup all) {
         TopLevelElement collectionElement = new TopLevelElement();
         all.getParticle().add(objectFactory.createElement(collectionElement));
-        collectionElement.setName(OAUTH_RESTORE_ACCESS_TOKEN_ELEMENT);
+        collectionElement.setName(SchemaConstants.OAUTH_RESTORE_ACCESS_TOKEN_ELEMENT);
 
         collectionElement.setMinOccurs(BigInteger.valueOf(0L));
         collectionElement.setMaxOccurs("1");
@@ -914,7 +856,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         // add doc
         Annotation annotation = new Annotation();
         Documentation doc = new Documentation();
-        doc.getContent().add(OAUTH_RESTORE_ACCESS_TOKEN_ELEMENT_DESCRIPTION);
+        doc.getContent().add(SchemaConstants.OAUTH_RESTORE_ACCESS_TOKEN_ELEMENT_DESCRIPTION);
         annotation.getAppinfoOrDocumentation().add(doc);
 
         collectionElement.setAnnotation(annotation);
@@ -923,27 +865,27 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     private void generateHttpCallbackElement(String elementName, ExplicitGroup all) {
         Attribute domainAttribute = new Attribute();
         domainAttribute.setUse(SchemaConstants.USE_OPTIONAL);
-        domainAttribute.setName(DOMAIN_ATTRIBUTE_NAME);
+        domainAttribute.setName(SchemaConstants.DOMAIN_ATTRIBUTE_NAME);
         domainAttribute.setType(SchemaConstants.STRING);
-        domainAttribute.setDefault(DOMAIN_DEFAULT_VALUE);
+        domainAttribute.setDefault(SchemaConstants.DOMAIN_DEFAULT_VALUE);
 
         Attribute localPortAttribute = new Attribute();
         localPortAttribute.setUse(SchemaConstants.USE_OPTIONAL);
-        localPortAttribute.setName(LOCAL_PORT_ATTRIBUTE_NAME);
+        localPortAttribute.setName(SchemaConstants.LOCAL_PORT_ATTRIBUTE_NAME);
         localPortAttribute.setType(SchemaConstants.STRING);
-        localPortAttribute.setDefault(PORT_DEFAULT_VALUE);
+        localPortAttribute.setDefault(SchemaConstants.PORT_DEFAULT_VALUE);
 
         Attribute remotePortAttribute = new Attribute();
         remotePortAttribute.setUse(SchemaConstants.USE_OPTIONAL);
-        remotePortAttribute.setName(REMOTE_PORT_ATTRIBUTE_NAME);
+        remotePortAttribute.setName(SchemaConstants.REMOTE_PORT_ATTRIBUTE_NAME);
         remotePortAttribute.setType(SchemaConstants.STRING);
-        remotePortAttribute.setDefault(PORT_DEFAULT_VALUE);
+        remotePortAttribute.setDefault(SchemaConstants.PORT_DEFAULT_VALUE);
 
         Attribute asyncAttribute = new Attribute();
         asyncAttribute.setUse(SchemaConstants.USE_OPTIONAL);
-        asyncAttribute.setName(ASYNC_ATTRIBUTE_NAME);
+        asyncAttribute.setName(SchemaConstants.ASYNC_ATTRIBUTE_NAME);
         asyncAttribute.setType(SchemaConstants.BOOLEAN);
-        asyncAttribute.setDefault(ASYNC_DEFAULT_VALUE);
+        asyncAttribute.setDefault(SchemaConstants.ASYNC_DEFAULT_VALUE);
 
         Attribute connectorRefAttribute = new Attribute();
         connectorRefAttribute.setUse(SchemaConstants.USE_OPTIONAL);
@@ -1019,10 +961,10 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         } else if (variable.isEnum()) {
             attribute.setName(name);
             javax.lang.model.element.Element enumElement = ctx().getTypeUtils().asElement(variable.asType());
-            attribute.setType(new QName(schema.getTargetNamespace(), enumElement.getSimpleName() + ENUM_TYPE_SUFFIX));
+            attribute.setType(new QName(schema.getTargetNamespace(), enumElement.getSimpleName() + SchemaConstants.ENUM_TYPE_SUFFIX));
         } else {
             // non-supported types will get "-ref" so beans can be injected
-            attribute.setName(name + REF_SUFFIX);
+            attribute.setName(name + SchemaConstants.REF_SUFFIX);
             attribute.setType(SchemaConstants.STRING);
         }
 
@@ -1071,13 +1013,13 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         } else if (variable.isEnum()) {
             attribute.setName(name);
             javax.lang.model.element.Element enumElement = ctx().getTypeUtils().asElement(variable.asType());
-            attribute.setType(new QName(schema.getTargetNamespace(), enumElement.getSimpleName() + ENUM_TYPE_SUFFIX));
+            attribute.setType(new QName(schema.getTargetNamespace(), enumElement.getSimpleName() + SchemaConstants.ENUM_TYPE_SUFFIX));
         } else if (variable.isHttpCallback()) {
-            attribute.setName(NameUtils.uncamel(name) + FLOW_REF_SUFFIX);
+            attribute.setName(NameUtils.uncamel(name) + SchemaConstants.FLOW_REF_SUFFIX);
             attribute.setType(SchemaConstants.STRING);
         } else {
             // non-supported types will get "-ref" so beans can be injected
-            attribute.setName(name + REF_SUFFIX);
+            attribute.setName(name + SchemaConstants.REF_SUFFIX);
             attribute.setType(SchemaConstants.STRING);
         }
 

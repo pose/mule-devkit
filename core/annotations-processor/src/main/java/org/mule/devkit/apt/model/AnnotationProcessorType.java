@@ -32,6 +32,7 @@ import org.mule.devkit.model.Field;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Parameter;
 import org.mule.devkit.model.Type;
+import org.mule.devkit.model.schema.SchemaConstants;
 
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
@@ -49,6 +50,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AnnotationProcessorType extends AnnotationProcessorIdentifiable<TypeElement, Type> implements Type {
+    private static final String XSD_EXTENSION = ".xsd";
 
     public AnnotationProcessorType(TypeElement innerElement, Types types, Elements elements, Trees trees) {
         super(innerElement, null, types, elements, trees);
@@ -229,14 +231,18 @@ public class AnnotationProcessorType extends AnnotationProcessorIdentifiable<Typ
 
     @Override
     public String getXmlNamespace() {
+        String targetNamespace = "";
         if (hasAnnotation(Module.class)) {
-            return getAnnotation(Module.class).namespace();
+            targetNamespace = getAnnotation(Module.class).namespace();
         }
         if (hasAnnotation(Connector.class)) {
-            return getAnnotation(Connector.class).namespace();
+            targetNamespace = getAnnotation(Connector.class).namespace();
         }
 
-        return null;
+        if (targetNamespace == null || targetNamespace.length() == 0) {
+            targetNamespace = SchemaConstants.BASE_NAMESPACE + getModuleName();
+        }
+        return targetNamespace;
     }
 
     @Override
@@ -252,7 +258,7 @@ public class AnnotationProcessorType extends AnnotationProcessorIdentifiable<Typ
     }
 
     @Override
-    public String getModuleSchemaLocation() {
+    public String getAnnotatedSchemaLocation() {
         if (hasAnnotation(Module.class)) {
             return getAnnotation(Module.class).schemaLocation();
         }
@@ -262,6 +268,23 @@ public class AnnotationProcessorType extends AnnotationProcessorIdentifiable<Typ
 
         return null;
     }
+
+    public String getVersionedSchemaLocation() {
+        String versionedLocation = getAnnotatedSchemaLocation();
+        if (versionedLocation == null || versionedLocation.length() == 0) {
+            versionedLocation = getXmlNamespace() + "/" + getModuleSchemaVersion() + "/mule-" + getModuleName() + XSD_EXTENSION;
+        }
+        return versionedLocation;
+    }
+
+    public String getCurrentSchemaLocation() {
+        String versionedLocation = getAnnotatedSchemaLocation();
+        if (versionedLocation == null || versionedLocation.length() == 0) {
+            versionedLocation = getXmlNamespace() + "/current/mule-" + getModuleName() + XSD_EXTENSION;
+        }
+        return versionedLocation;
+    }
+
 
     @Override
     public String getModuleSchemaVersion() {

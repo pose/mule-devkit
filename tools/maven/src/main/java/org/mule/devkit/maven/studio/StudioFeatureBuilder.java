@@ -20,7 +20,7 @@ package org.mule.devkit.maven.studio;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
-import org.mule.devkit.generation.mule.studio.MuleStudioFeatureGenerator;
+import org.mule.devkit.generation.studio.MuleStudioFeatureGenerator;
 
 import java.io.File;
 import java.io.IOException;

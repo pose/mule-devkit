@@ -20,6 +20,16 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.mule.tools.devkit</groupId>
+            <artifactId>mule-devkit-plugin-studio</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tools.devkit</groupId>
+            <artifactId>mule-devkit-plugin-javadoc</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.jfrog.maven.annomojo</groupId>
             <artifactId>maven-plugin-tools-anno</artifactId>
             <version>1.4.0</version>

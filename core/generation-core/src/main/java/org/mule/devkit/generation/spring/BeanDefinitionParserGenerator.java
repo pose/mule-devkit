@@ -50,6 +50,8 @@ import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 import org.mule.devkit.generation.utils.NameUtils;
+import org.mule.devkit.model.schema.SchemaConstants;
+import org.mule.devkit.model.schema.SchemaTypeConversion;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -157,7 +159,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         }
 
         if (type.hasAnnotation(OAuth.class) || type.hasAnnotation(OAuth2.class)) {
-            generateParseHttpCallback(SchemaGenerator.OAUTH_CALLBACK_CONFIG_ELEMENT_NAME, parse, element, builder);
+            generateParseHttpCallback(SchemaConstants.OAUTH_CALLBACK_CONFIG_ELEMENT_NAME, parse, element, builder);
 
             DefinedClass saveAccessTokenCallbackFactory = ctx().getCodeModel()._class(DefinedClassRoles.DEFAULT_SAVE_ACCESS_TOKEN_CALLBACK);
             DefinedClass restoreAccessTokenCallbackFactory = ctx().getCodeModel()._class(DefinedClassRoles.DEFAULT_RESTORE_ACCESS_TOKEN_CALLBACK);
@@ -165,7 +167,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             generateParseNestedProcessor(parse.body(), element, parserContext, builder, "oauthRestoreAccessToken", false, false, false, restoreAccessTokenCallbackFactory);
         }
         if (type.hasProcessorMethodWithParameter(HttpCallback.class)) {
-            generateParseHttpCallback(SchemaGenerator.HTTP_CALLBACK_CONFIG_ELEMENT_NAME, parse, element, builder);
+            generateParseHttpCallback(SchemaConstants.HTTP_CALLBACK_CONFIG_ELEMENT_NAME, parse, element, builder);
         }
 
         if (connect != null) {

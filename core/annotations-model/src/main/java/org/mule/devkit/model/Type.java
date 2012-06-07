@@ -60,7 +60,11 @@ public interface Type extends Identifiable<TypeElement, Type> {
 
     String getModuleName();
 
-    String getModuleSchemaLocation();
+    String getAnnotatedSchemaLocation();
+
+    String getVersionedSchemaLocation();
+
+    String getCurrentSchemaLocation();
 
     String getModuleSchemaVersion();
 

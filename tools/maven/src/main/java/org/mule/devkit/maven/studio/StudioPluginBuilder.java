@@ -20,8 +20,8 @@ package org.mule.devkit.maven.studio;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
-import org.mule.devkit.generation.mule.studio.MuleStudioIconsGenerator;
-import org.mule.devkit.generation.mule.studio.MuleStudioPluginGenerator;
+import org.mule.devkit.generation.studio.MuleStudioIconsGenerator;
+import org.mule.devkit.generation.studio.MuleStudioPluginGenerator;
 
 import java.io.File;
 import java.io.IOException;

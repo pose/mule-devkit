@@ -19,7 +19,7 @@ package org.mule.devkit.maven.studio;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.mule.devkit.generation.mule.studio.MuleStudioSiteXmlGenerator;
+import org.mule.devkit.generation.studio.MuleStudioSiteXmlGenerator;
 import org.mule.util.FileUtils;
 
 import java.io.File;

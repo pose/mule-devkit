@@ -37,14 +37,15 @@ import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.Package;
 import org.mule.devkit.model.code.Variable;
 import org.mule.devkit.model.code.builders.FieldBuilder;
+import org.mule.devkit.model.schema.SchemaConstants;
 import org.mule.util.NumberUtils;
 
 public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
 
-    public static final String LOCAL_PORT_FIELD_NAME = "localPort";
-    public static final String REMOTE_PORT_FIELD_NAME = "remotePort";
-    public static final String DOMAIN_FIELD_NAME = "domain";
-    public static final String ASYNC_FIELD_NAME = "async";
+    public static final String LOCAL_PORT_FIELD_NAME = SchemaConstants.LOCAL_PORT_ATTRIBUTE_NAME;
+    public static final String REMOTE_PORT_FIELD_NAME = SchemaConstants.REMOTE_PORT_ATTRIBUTE_NAME;
+    public static final String DOMAIN_FIELD_NAME = SchemaConstants.DOMAIN_ATTRIBUTE_NAME;
+    public static final String ASYNC_FIELD_NAME = SchemaConstants.ASYNC_ATTRIBUTE_NAME;
     public static final String CONNECTOR_FIELD_NAME = "connector";
     private static final int DEFAULT_LOCAL_PORT = 8080;
     private static final int DEFAULT_REMOTE_PORT = 80;
