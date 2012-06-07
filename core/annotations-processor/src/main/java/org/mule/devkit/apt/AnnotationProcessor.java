@@ -5,6 +5,9 @@ import org.mule.devkit.generation.api.Generator;
 import org.mule.devkit.generation.api.PluginScanner;
 import org.mule.devkit.generation.api.Validator;
 
+import javax.annotation.processing.SupportedAnnotationTypes;
+import javax.annotation.processing.SupportedSourceVersion;
+import javax.lang.model.SourceVersion;
 import javax.tools.Diagnostic;
 import java.io.File;
 import java.net.MalformedURLException;
@@ -14,6 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@SupportedAnnotationTypes(value = {"org.mule.api.annotations.Connector",
+        "org.mule.api.annotations.ExpressionLanguage",
+        "org.mule.api.annotations.Module"})
+@SupportedSourceVersion(SourceVersion.RELEASE_6)
 public class AnnotationProcessor extends AbstractAnnotationProcessor {
 
     @Override
