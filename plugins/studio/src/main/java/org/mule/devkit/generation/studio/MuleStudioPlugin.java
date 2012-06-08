@@ -28,7 +28,7 @@ public class MuleStudioPlugin implements Plugin {
 
     @Override
     public String getOptionName() {
-        return "skipStudioPluginPackage";
+        return "enabledStudioPluginPackage";
     }
 
     @Override

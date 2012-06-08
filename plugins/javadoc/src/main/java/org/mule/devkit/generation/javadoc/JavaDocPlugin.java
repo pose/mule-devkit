@@ -20,7 +20,7 @@ public class JavaDocPlugin implements Plugin {
 
     @Override
     public String getOptionName() {
-        return "skipJavaDocValidation";
+        return "enableJavaDocValidation";
     }
 
     @Override

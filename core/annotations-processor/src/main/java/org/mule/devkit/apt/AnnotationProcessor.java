@@ -1,7 +1,7 @@
 package org.mule.devkit.apt;
 
-import org.mule.devkit.generation.api.Plugin;
 import org.mule.devkit.generation.api.Generator;
+import org.mule.devkit.generation.api.Plugin;
 import org.mule.devkit.generation.api.PluginScanner;
 import org.mule.devkit.generation.api.Validator;
 
@@ -30,7 +30,10 @@ public class AnnotationProcessor extends AbstractAnnotationProcessor {
         try {
             List<Plugin> plugins = PluginScanner.getInstance().getAllPlugins(getUserClassLoader(getClass().getClassLoader()));
             for (Plugin p : plugins) {
-                validators.addAll(p.getValidators());
+                if (processingEnv.getOptions().get(p.getOptionName()) != null &&
+                        processingEnv.getOptions().get(p.getOptionName()).equals("true")) {
+                    validators.addAll(p.getValidators());
+                }
             }
         } catch (MalformedURLException e) {
             processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, e.getLocalizedMessage());
@@ -46,7 +49,10 @@ public class AnnotationProcessor extends AbstractAnnotationProcessor {
         try {
             List<Plugin> plugins = PluginScanner.getInstance().getAllPlugins(getUserClassLoader(getClass().getClassLoader()));
             for (Plugin p : plugins) {
-                generators.addAll(p.getGenerators());
+                if (processingEnv.getOptions().get(p.getOptionName()) != null &&
+                    processingEnv.getOptions().get(p.getOptionName()).equals("true")) {
+                    generators.addAll(p.getGenerators());
+                }
             }
         } catch (MalformedURLException e) {
             processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, e.getLocalizedMessage());

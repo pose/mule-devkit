@@ -90,10 +90,14 @@ public class AnnotationProcessorMojo extends AbstractAnnotationProcessorMojo {
     @Override
     protected void addCompilerArguments(List<String> options) {
         if (skipJavaDocValidation) {
-            options.add("-AskipJavaDocValidation=true");
+            options.add("-AenableJavaDocValidation=false");
+        } else {
+            options.add("-AenableJavaDocValidation=true");
         }
         if (skipStudioPluginPackage) {
-            options.add("-AskipStudioPluginPackage=true");
+            options.add("-AenabledStudioPluginPackage=false");
+        } else {
+            options.add("-AenabledStudioPluginPackage=true");
         }
 
         super.addCompilerArguments(options);
