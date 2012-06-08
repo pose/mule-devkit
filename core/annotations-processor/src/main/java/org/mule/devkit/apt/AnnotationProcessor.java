@@ -30,7 +30,9 @@ public class AnnotationProcessor extends AbstractAnnotationProcessor {
         try {
             List<Plugin> plugins = PluginScanner.getInstance().getAllPlugins(getUserClassLoader(getClass().getClassLoader()));
             for (Plugin p : plugins) {
-                if (processingEnv.getOptions().get(p.getOptionName()) != null &&
+                if (p.getOptionName() == null) {
+                    validators.addAll(p.getValidators());
+                } else if (processingEnv.getOptions().get(p.getOptionName()) != null &&
                         processingEnv.getOptions().get(p.getOptionName()).equals("true")) {
                     validators.addAll(p.getValidators());
                 }
@@ -49,8 +51,10 @@ public class AnnotationProcessor extends AbstractAnnotationProcessor {
         try {
             List<Plugin> plugins = PluginScanner.getInstance().getAllPlugins(getUserClassLoader(getClass().getClassLoader()));
             for (Plugin p : plugins) {
-                if (processingEnv.getOptions().get(p.getOptionName()) != null &&
-                    processingEnv.getOptions().get(p.getOptionName()).equals("true")) {
+                if (p.getOptionName() == null) {
+                    generators.addAll(p.getGenerators());
+                } else if (processingEnv.getOptions().get(p.getOptionName()) != null &&
+                        processingEnv.getOptions().get(p.getOptionName()).equals("true")) {
                     generators.addAll(p.getGenerators());
                 }
             }
