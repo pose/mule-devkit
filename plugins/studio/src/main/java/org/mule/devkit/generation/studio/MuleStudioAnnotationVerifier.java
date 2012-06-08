@@ -18,7 +18,6 @@
 package org.mule.devkit.generation.studio;
 
 import org.mule.devkit.generation.api.AnnotationVerificationException;
-import org.mule.devkit.generation.api.Context;
 import org.mule.devkit.generation.javadoc.JavaDocAnnotationVerifier;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Type;
@@ -26,14 +25,14 @@ import org.mule.devkit.model.Type;
 public class MuleStudioAnnotationVerifier extends JavaDocAnnotationVerifier {
 
     @Override
-    public boolean shouldVerify(Type type, Context context) {
-        return !super.shouldVerify(type, context);
+    public boolean shouldVerify(Type type) {
+        return !super.shouldVerify(type);
     }
 
     @Override
-    public void verify(Type type, Context context) throws AnnotationVerificationException {
+    public void verify(Type type) throws AnnotationVerificationException {
         try {
-            super.verify(type, context);
+            super.verify(type);
         } catch (AnnotationVerificationException e) {
             throw new AnnotationVerificationException(type, "Cannot generate Mule Studio plugin if required javadoc comments are not present. " +
                     "If you want to skip the generation of the Mule Studio plugin use -Ddevkit.studio.package.skip=true. Error is: " + e.getMessage(), e);
@@ -41,7 +40,7 @@ public class MuleStudioAnnotationVerifier extends JavaDocAnnotationVerifier {
     }
 
     @Override
-    protected boolean exampleDoesNotExist(Context context, Method method) throws AnnotationVerificationException {
+    protected boolean exampleDoesNotExist(Method method) throws AnnotationVerificationException {
         // do not check for example correctness
         return false;
     }

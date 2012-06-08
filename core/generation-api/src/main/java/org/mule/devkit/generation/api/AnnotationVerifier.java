@@ -19,9 +19,25 @@ package org.mule.devkit.generation.api;
 
 import org.mule.devkit.model.Type;
 
+/**
+ * An annotation verifier like its implies verifiers that the annotations used
+ * are correctly used.
+ */
 public interface AnnotationVerifier {
 
-    boolean shouldVerify(Type type, Context context);
+    /**
+     * Should this verifier be executed for the given type?
+     *
+     * @param type The type to test
+     * @return true if it should be verified, false otherwise
+     */
+    boolean shouldVerify(Type type);
 
-    void verify(Type type, Context context) throws AnnotationVerificationException;
+    /**
+     * Verify the annotations on this type
+     *
+     * @param type The type to be verified
+     * @throws AnnotationVerificationException if the verification fails
+     */
+    void verify(Type type) throws AnnotationVerificationException;
 }

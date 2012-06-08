@@ -66,8 +66,8 @@ public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
                 context.note("Validating " + type.getSimpleName().toString() + " class");
                 for (AnnotationVerifier annotationVerifier : getAnnotationVerifiers()) {
                     try {
-                        if (annotationVerifier.shouldVerify(type, context)) {
-                            annotationVerifier.verify(type, context);
+                        if (annotationVerifier.shouldVerify(type)) {
+                            annotationVerifier.verify(type);
                         }
                     } catch (AnnotationVerificationException tve) {
                         context.error(tve.getMessage(), tve.getElement());

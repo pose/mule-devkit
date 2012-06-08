@@ -41,14 +41,14 @@ import java.io.IOException;
 public class JavaDocAnnotationVerifier implements AnnotationVerifier {
 
     @Override
-    public boolean shouldVerify(Type type, Context context) {
+    public boolean shouldVerify(Type type) {
         return type.isModuleOrConnector();
     }
 
     @Override
-    public void verify(Type type, Context context) throws AnnotationVerificationException {
+    public void verify(Type type) throws AnnotationVerificationException {
 
-        if (!hasComment(type, context)) {
+        if (!hasComment(type)) {
             throw new AnnotationVerificationException(type, "Class " + type.getQualifiedName().toString() + " is not properly documented. A summary is missing.");
         }
 
@@ -57,42 +57,42 @@ public class JavaDocAnnotationVerifier implements AnnotationVerifier {
         }
 
         for (Field variable : type.getFieldsAnnotatedWith(Configurable.class)) {
-            if (!hasComment(variable, context)) {
+            if (!hasComment(variable)) {
                 throw new AnnotationVerificationException(variable, "Field " + variable.getSimpleName().toString() + " is not properly documented. The description is missing.");
             }
         }
 
         for (Method method : type.getMethodsAnnotatedWith(Processor.class)) {
-            validateMethod(type, context, method);
+            validateMethod(type, method);
         }
 
         for (Method method : type.getMethodsAnnotatedWith(Source.class)) {
-            validateMethod(type, context, method);
+            validateMethod(type, method);
         }
 
         for (Method method : type.getMethodsAnnotatedWith(Transformer.class)) {
-            validateMethod(type, context, method);
+            validateMethod(type, method);
         }
 
         for (Method method : type.getMethodsAnnotatedWith(Connect.class)) {
-            validateAllParameters(context, method);
+            validateAllParameters(method);
         }
 
         for (Method method : type.getMethodsAnnotatedWith(Disconnect.class)) {
-            validateAllParameters(context, method);
+            validateAllParameters(method);
         }
     }
 
-    private void validateAllParameters(Context context, Method method) throws AnnotationVerificationException {
+    private void validateAllParameters(Method method) throws AnnotationVerificationException {
         for (Parameter variable : method.getParameters()) {
-            if (!hasParameterComment(variable.getSimpleName().toString(), variable.parent(), context)) {
+            if (!hasParameterComment(variable.getSimpleName().toString(), variable.parent())) {
                 throw new AnnotationVerificationException(variable, "Parameter " + variable.getSimpleName().toString() + " of method " + method.getSimpleName().toString() + " is not properly documented. A matching @param in the method documentation was not found. ");
             }
         }
     }
 
-    private void validateMethod(Type type, Context context, Method method) throws AnnotationVerificationException {
-        if (!hasComment(method, context)) {
+    private void validateMethod(Type type, Method method) throws AnnotationVerificationException {
+        if (!hasComment(method)) {
             throw new AnnotationVerificationException(method, "Method " + method.getSimpleName().toString() + " is not properly documented. A description of what it can do is missing.");
         }
 
@@ -103,25 +103,25 @@ public class JavaDocAnnotationVerifier implements AnnotationVerifier {
             }
         }
 
-        if (exampleDoesNotExist(context, method)) {
+        if (exampleDoesNotExist(method)) {
             throw new AnnotationVerificationException(type, "Method " + method.getSimpleName().toString() + " does not have the example pointed by the {@sample.xml} tag");
         }
 
-        validateAllParameters(context, method);
+        validateAllParameters(method);
     }
 
-    private boolean hasComment(Identifiable element, Context context) {
+    private boolean hasComment(Identifiable element) {
         String comment = element.getJavaDocSummary();
         return StringUtils.isNotBlank(comment);
 
     }
 
-    private boolean hasParameterComment(String paramName, Identifiable element, Context context) {
+    private boolean hasParameterComment(String paramName, Identifiable element) {
         String comment = element.getJavaDocParameterSummary(paramName);
         return StringUtils.isNotBlank(comment);
     }
 
-    protected boolean exampleDoesNotExist(Context context, Method method) throws AnnotationVerificationException {
+    protected boolean exampleDoesNotExist(Method method) throws AnnotationVerificationException {
 
         if (!method.hasJavaDocTag("sample.xml")) {
             throw new AnnotationVerificationException(method, "Method " + method.getSimpleName().toString() + " does not contain an example using {@sample.xml} tag.");

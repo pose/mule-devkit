@@ -36,12 +36,12 @@ import java.lang.annotation.Annotation;
 public class OAuthAnnotationVerifier implements AnnotationVerifier {
 
     @Override
-    public boolean shouldVerify(Type type, Context context) {
+    public boolean shouldVerify(Type type) {
         return type.isModuleOrConnector();
     }
 
     @Override
-    public void verify(Type type, Context context) throws AnnotationVerificationException {
+    public void verify(Type type) throws AnnotationVerificationException {
         if (type.hasAnnotation(OAuth.class)) {
             validateOAuth1Class(type);
         } else if (type.hasAnnotation(OAuth2.class)) {

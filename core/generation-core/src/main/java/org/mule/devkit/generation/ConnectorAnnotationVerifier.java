@@ -33,12 +33,12 @@ import java.util.List;
 public class ConnectorAnnotationVerifier implements AnnotationVerifier {
 
     @Override
-    public boolean shouldVerify(Type type, Context context) {
+    public boolean shouldVerify(Type type) {
         return type.isModuleOrConnector();
     }
 
     @Override
-    public void verify(Type type, Context context) throws AnnotationVerificationException {
+    public void verify(Type type) throws AnnotationVerificationException {
 
         List<Method> connectMethods = type.getMethodsAnnotatedWith(Connect.class);
         List<Method> validateConnectionMethods = type.getMethodsAnnotatedWith(ValidateConnection.class);

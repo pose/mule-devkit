@@ -43,12 +43,12 @@ import java.util.List;
 public class ProcessorAnnotationVerifier implements AnnotationVerifier {
 
     @Override
-    public boolean shouldVerify(Type type, Context context) {
+    public boolean shouldVerify(Type type) {
         return type.isModuleOrConnector();
     }
 
     @Override
-    public void verify(Type type, Context context) throws AnnotationVerificationException {
+    public void verify(Type type) throws AnnotationVerificationException {
 
         for (Method method : type.getMethodsAnnotatedWith(Processor.class)) {
 

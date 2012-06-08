@@ -36,12 +36,12 @@ import org.mule.devkit.model.Type;
 public class RestAnnotationVerifier implements AnnotationVerifier {
 
     @Override
-    public boolean shouldVerify(Type type, Context context) {
+    public boolean shouldVerify(Type type) {
         return type.isModuleOrConnector() && type.hasMethodsAnnotatedWith(RestCall.class);
     }
 
     @Override
-    public void verify(Type type, Context context) throws AnnotationVerificationException {
+    public void verify(Type type) throws AnnotationVerificationException {
 
         for (Method method : type.getMethodsAnnotatedWith(RestCall.class)) {
 

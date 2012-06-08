@@ -35,12 +35,12 @@ import org.mule.devkit.model.Type;
 
 public class ExpressionLanguageAnnotationVerifier implements AnnotationVerifier {
     @Override
-    public boolean shouldVerify(Type type, Context context) {
+    public boolean shouldVerify(Type type) {
         return true;
     }
 
     @Override
-    public void verify(Type type, Context context) throws AnnotationVerificationException {
+    public void verify(Type type) throws AnnotationVerificationException {
         if (type.getMethodsAnnotatedWith(ExpressionEvaluator.class).size() > 1) {
             throw new AnnotationVerificationException(type, "An @ExpressionLanguage can only contain one @ExpressionEvaluator.");
         }

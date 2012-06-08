@@ -31,12 +31,12 @@ import java.util.List;
 public class SourceAnnotationVerifier implements AnnotationVerifier {
 
     @Override
-    public boolean shouldVerify(Type type, Context context) {
+    public boolean shouldVerify(Type type) {
         return type.isModuleOrConnector() && type.hasMethodsAnnotatedWith(Source.class);
     }
 
     @Override
-    public void verify(Type type, Context context) throws AnnotationVerificationException {
+    public void verify(Type type) throws AnnotationVerificationException {
 
         for (Method method : type.getMethodsAnnotatedWith(Source.class)) {
 

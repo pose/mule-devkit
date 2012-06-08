@@ -33,12 +33,12 @@ import java.util.Map;
 public class TransformerAnnotationVerifier implements AnnotationVerifier {
 
     @Override
-    public boolean shouldVerify(Type type, Context context) {
+    public boolean shouldVerify(Type type) {
         return type.isModuleOrConnector() && type.hasMethodsAnnotatedWith(Transformer.class);
     }
 
     @Override
-    public void verify(Type type, Context context) throws AnnotationVerificationException {
+    public void verify(Type type) throws AnnotationVerificationException {
         for (Method method : type.getMethodsAnnotatedWith(Transformer.class)) {
 
             if (!method.isStatic()) {

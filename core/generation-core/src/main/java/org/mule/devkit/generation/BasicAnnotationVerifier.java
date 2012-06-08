@@ -31,12 +31,12 @@ import javax.lang.model.type.TypeKind;
 public class BasicAnnotationVerifier implements AnnotationVerifier {
 
     @Override
-    public boolean shouldVerify(Type type, Context context) {
+    public boolean shouldVerify(Type type) {
         return type.isModuleOrConnector();
     }
 
     @Override
-    public void verify(Type type, Context context) throws AnnotationVerificationException {
+    public void verify(Type type) throws AnnotationVerificationException {
 
         if (type.isInterface()) {
             throw new AnnotationVerificationException(type, "@Module/@Connector cannot be applied to an interface");

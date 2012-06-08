@@ -42,12 +42,12 @@ import javax.transaction.TransactionManager;
 
 public class InjectAnnotationVerifier implements AnnotationVerifier {
     @Override
-    public boolean shouldVerify(Type type, Context context) {
+    public boolean shouldVerify(Type type) {
         return type.getFieldsAnnotatedWith(Inject.class).size() > 0;
     }
 
     @Override
-    public void verify(Type type, Context context) throws AnnotationVerificationException {
+    public void verify(Type type) throws AnnotationVerificationException {
         for (Field variable : type.getFieldsAnnotatedWith(Inject.class)) {
             if (!variable.asType().toString().equals(MuleContext.class.getName()) &&
                     !variable.asType().toString().equals(ObjectStoreManager.class.getName()) &&

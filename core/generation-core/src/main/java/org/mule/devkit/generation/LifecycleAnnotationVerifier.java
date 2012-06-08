@@ -34,12 +34,12 @@ import java.util.List;
 public class LifecycleAnnotationVerifier implements AnnotationVerifier {
 
     @Override
-    public boolean shouldVerify(Type type, Context context) {
+    public boolean shouldVerify(Type type) {
         return true;
     }
 
     @Override
-    public void verify(Type type, Context context) throws AnnotationVerificationException {
+    public void verify(Type type) throws AnnotationVerificationException {
         check(type, PostConstruct.class);
         check(type, Start.class);
         check(type, Stop.class);
