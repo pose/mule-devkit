@@ -26,7 +26,6 @@ import org.mule.api.annotations.oauth.OAuthConsumerKey;
 import org.mule.api.annotations.oauth.OAuthConsumerSecret;
 import org.mule.devkit.generation.api.AnnotationVerificationException;
 import org.mule.devkit.generation.api.AnnotationVerifier;
-import org.mule.devkit.generation.api.Context;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Parameter;
 import org.mule.devkit.model.Type;

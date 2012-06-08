@@ -30,6 +30,7 @@ import org.mule.api.annotations.param.Optional;
 import org.mule.api.callback.HttpCallback;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.api.GenerationException;
+import org.mule.devkit.generation.utils.NameUtils;
 import org.mule.devkit.model.Field;
 import org.mule.devkit.model.Identifiable;
 import org.mule.devkit.model.Method;
@@ -66,7 +67,6 @@ import org.mule.devkit.model.schema.TopLevelComplexType;
 import org.mule.devkit.model.schema.TopLevelElement;
 import org.mule.devkit.model.schema.TopLevelSimpleType;
 import org.mule.devkit.model.schema.Union;
-import org.mule.devkit.generation.utils.NameUtils;
 import org.mule.util.StringUtils;
 
 import javax.inject.Inject;

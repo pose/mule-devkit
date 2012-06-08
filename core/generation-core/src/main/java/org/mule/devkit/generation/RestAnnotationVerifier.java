@@ -26,7 +26,6 @@ import org.mule.api.annotations.rest.RestHttpClient;
 import org.mule.api.annotations.rest.RestQueryParam;
 import org.mule.api.annotations.rest.RestUriParam;
 import org.mule.devkit.generation.api.AnnotationVerificationException;
-import org.mule.devkit.generation.api.Context;
 import org.mule.devkit.generation.api.AnnotationVerifier;
 import org.mule.devkit.model.Field;
 import org.mule.devkit.model.Method;

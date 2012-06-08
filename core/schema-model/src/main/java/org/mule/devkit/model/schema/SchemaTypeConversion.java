@@ -17,8 +17,6 @@
 
 package org.mule.devkit.model.schema;
 
-import org.mule.devkit.model.schema.SchemaConstants;
-
 import javax.xml.namespace.QName;
 
 public final class SchemaTypeConversion {

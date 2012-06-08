@@ -21,7 +21,6 @@ import org.mule.api.annotations.lifecycle.Start;
 import org.mule.api.annotations.lifecycle.Stop;
 import org.mule.devkit.generation.api.AnnotationVerificationException;
 import org.mule.devkit.generation.api.AnnotationVerifier;
-import org.mule.devkit.generation.api.Context;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Type;
 

@@ -29,7 +29,6 @@ import org.mule.api.callback.SourceCallback;
 import org.mule.api.callback.StopSourceCallback;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.devkit.generation.AbstractMessageGenerator;
-import org.mule.devkit.model.schema.SchemaTypeConversion;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Parameter;
 import org.mule.devkit.model.Type;
@@ -48,6 +47,7 @@ import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
+import org.mule.devkit.model.schema.SchemaTypeConversion;
 
 import java.util.ArrayList;
 import java.util.HashMap;

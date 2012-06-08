@@ -27,6 +27,7 @@ import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.NamingConstants;
+import org.mule.devkit.generation.utils.NameUtils;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Type;
 import org.mule.devkit.model.code.DefinedClass;
@@ -36,7 +37,6 @@ import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Package;
 import org.mule.devkit.model.schema.SchemaConstants;
-import org.mule.devkit.generation.utils.NameUtils;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 public class NamespaceHandlerGenerator extends AbstractMessageGenerator {

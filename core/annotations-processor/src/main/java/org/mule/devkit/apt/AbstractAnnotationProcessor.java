@@ -20,10 +20,10 @@ package org.mule.devkit.apt;
 import com.sun.source.util.Trees;
 import org.mule.devkit.apt.model.AnnotationProcessorType;
 import org.mule.devkit.generation.api.AnnotationVerificationException;
+import org.mule.devkit.generation.api.AnnotationVerifier;
 import org.mule.devkit.generation.api.Context;
 import org.mule.devkit.generation.api.GenerationException;
 import org.mule.devkit.generation.api.Generator;
-import org.mule.devkit.generation.api.AnnotationVerifier;
 import org.mule.devkit.model.Type;
 
 import javax.annotation.processing.AbstractProcessor;

@@ -22,7 +22,6 @@ import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.mule.devkit.generation.api.AnnotationVerificationException;
 import org.mule.devkit.generation.api.AnnotationVerifier;
-import org.mule.devkit.generation.api.Context;
 import org.mule.devkit.model.Field;
 import org.mule.devkit.model.Type;
 

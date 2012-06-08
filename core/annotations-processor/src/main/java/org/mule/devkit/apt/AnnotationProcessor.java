@@ -1,9 +1,9 @@
 package org.mule.devkit.apt;
 
+import org.mule.devkit.generation.api.AnnotationVerifier;
 import org.mule.devkit.generation.api.Generator;
 import org.mule.devkit.generation.api.Plugin;
 import org.mule.devkit.generation.api.PluginScanner;
-import org.mule.devkit.generation.api.AnnotationVerifier;
 
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;

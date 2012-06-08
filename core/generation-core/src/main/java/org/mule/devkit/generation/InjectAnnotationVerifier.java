@@ -30,7 +30,6 @@ import org.mule.api.security.SecurityManager;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.devkit.generation.api.AnnotationVerificationException;
-import org.mule.devkit.generation.api.Context;
 import org.mule.devkit.generation.api.AnnotationVerifier;
 import org.mule.devkit.model.Field;
 import org.mule.devkit.model.Method;

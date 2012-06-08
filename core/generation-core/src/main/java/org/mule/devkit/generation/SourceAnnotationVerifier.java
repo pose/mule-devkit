@@ -20,7 +20,6 @@ package org.mule.devkit.generation;
 import org.mule.api.annotations.Source;
 import org.mule.api.callback.SourceCallback;
 import org.mule.devkit.generation.api.AnnotationVerificationException;
-import org.mule.devkit.generation.api.Context;
 import org.mule.devkit.generation.api.AnnotationVerifier;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Parameter;

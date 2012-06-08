@@ -19,8 +19,8 @@ package org.mule.devkit.generation.mule;
 
 import org.mule.api.NestedProcessor;
 import org.mule.devkit.generation.AbstractModuleGenerator;
-import org.mule.devkit.generation.api.GenerationException;
 import org.mule.devkit.generation.NamingConstants;
+import org.mule.devkit.generation.api.GenerationException;
 import org.mule.devkit.model.Type;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.DefinedClassRoles;

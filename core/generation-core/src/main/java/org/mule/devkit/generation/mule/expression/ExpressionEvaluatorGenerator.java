@@ -42,6 +42,7 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.transformer.TransformerException;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.NamingConstants;
+import org.mule.devkit.generation.utils.NameUtils;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Parameter;
 import org.mule.devkit.model.Type;
@@ -57,7 +58,6 @@ import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
-import org.mule.devkit.generation.utils.NameUtils;
 import org.mule.expression.ExpressionUtils;
 
 import javax.lang.model.type.TypeKind;

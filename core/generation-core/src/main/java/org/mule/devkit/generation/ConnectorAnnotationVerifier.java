@@ -23,7 +23,6 @@ import org.mule.api.annotations.Disconnect;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.ValidateConnection;
 import org.mule.devkit.generation.api.AnnotationVerificationException;
-import org.mule.devkit.generation.api.Context;
 import org.mule.devkit.generation.api.AnnotationVerifier;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Type;
