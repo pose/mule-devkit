@@ -16,6 +16,10 @@
  */
 package org.mule.devkit.model;
 
+import org.mule.api.annotations.SourceThreadingModel;
+
 public interface SourceMethod extends Method {
     boolean shouldRunOnPrimaryNodeOnly();
+
+    SourceThreadingModel getThreadingModel();
 }

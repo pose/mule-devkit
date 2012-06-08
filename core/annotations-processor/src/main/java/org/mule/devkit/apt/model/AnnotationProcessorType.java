@@ -26,11 +26,13 @@ import org.mule.api.annotations.Disconnect;
 import org.mule.api.annotations.ExpressionLanguage;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.Source;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.devkit.model.Field;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Parameter;
+import org.mule.devkit.model.SourceMethod;
 import org.mule.devkit.model.Type;
 import org.mule.devkit.model.schema.SchemaConstants;
 
@@ -349,6 +351,19 @@ public class AnnotationProcessorType extends AnnotationProcessorIdentifiable<Typ
     public String getClassName() {
         int lastDot = getBinaryName().lastIndexOf('.');
         return getBinaryName().substring(lastDot + 1);
+    }
+
+    @Override
+    public List<SourceMethod> getSourceMethods() {
+        List<SourceMethod> methods = new ArrayList<SourceMethod>();
+        for(ExecutableElement executableElement : ElementFilter.methodsIn(innerElement.getEnclosedElements()) ) {
+            if(executableElement.getAnnotation(Source.class) != null ) {
+                methods.add(new AnnotationProcessorSourceMethod(executableElement, this, types, elements, trees));
+            }
+        }
+
+        return methods;
+
     }
 
 }

@@ -18,6 +18,7 @@ package org.mule.devkit.apt.model;
 
 import com.sun.source.util.Trees;
 import org.mule.api.annotations.Source;
+import org.mule.api.annotations.SourceThreadingModel;
 import org.mule.devkit.model.SourceMethod;
 import org.mule.devkit.model.Type;
 
@@ -34,5 +35,10 @@ public class AnnotationProcessorSourceMethod extends AnnotationProcessorMethod i
     @Override
     public boolean shouldRunOnPrimaryNodeOnly() {
         return getAnnotation(Source.class).primaryNodeOnly();
+    }
+
+    @Override
+    public SourceThreadingModel getThreadingModel() {
+        return getAnnotation(Source.class).threadingModel();
     }
 }

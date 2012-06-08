@@ -34,6 +34,8 @@ public interface Type extends Identifiable<TypeElement, Type> {
 
     List<Method> getMethodsAnnotatedWith(Class<? extends Annotation> annotation);
 
+    List<SourceMethod> getSourceMethods();
+
     List<Method> getMethodsWhoseParametersAreAnnotatedWith(Class<? extends Annotation> annotation);
 
     List<Field> getFieldsAnnotatedWith(Class<? extends Annotation> annotation);
