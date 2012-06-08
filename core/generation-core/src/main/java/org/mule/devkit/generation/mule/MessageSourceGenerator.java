@@ -27,26 +27,20 @@ import org.mule.api.annotations.Source;
 import org.mule.api.annotations.SourceThreadingModel;
 import org.mule.api.callback.SourceCallback;
 import org.mule.api.callback.StopSourceCallback;
+import org.mule.api.construct.FlowConstructAware;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.source.ClusterizableMessageSource;
+import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.devkit.generation.AbstractMessageGenerator;
+import org.mule.devkit.generation.NamingConstants;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Parameter;
 import org.mule.devkit.model.Type;
-import org.mule.devkit.model.code.Block;
-import org.mule.devkit.model.code.Cast;
-import org.mule.devkit.model.code.CatchBlock;
-import org.mule.devkit.model.code.Conditional;
-import org.mule.devkit.model.code.DefinedClass;
-import org.mule.devkit.model.code.DefinedClassRoles;
-import org.mule.devkit.model.code.Expression;
-import org.mule.devkit.model.code.ExpressionFactory;
-import org.mule.devkit.model.code.FieldVariable;
-import org.mule.devkit.model.code.Invocation;
-import org.mule.devkit.model.code.Modifier;
-import org.mule.devkit.model.code.Op;
-import org.mule.devkit.model.code.TryStatement;
-import org.mule.devkit.model.code.TypeReference;
-import org.mule.devkit.model.code.Variable;
+import org.mule.devkit.model.code.*;
 import org.mule.devkit.model.schema.SchemaTypeConversion;
 
 import java.util.ArrayList;
@@ -72,7 +66,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
     private void generateMessageSource(Type type, Method executableElement) {
         // get class
         Source sourceAnnotation = executableElement.getAnnotation(Source.class);
-        DefinedClass messageSourceClass = getMessageSourceClass(executableElement, sourceAnnotation.threadingModel() == SourceThreadingModel.SINGLE_THREAD);
+        DefinedClass messageSourceClass = getMessageSourceClass(executableElement);
 
         messageSourceClass.javadoc().add(messageSourceClass.name() + " wraps ");
         messageSourceClass.javadoc().add("{@link " + (executableElement.parent()).getQualifiedName().toString() + "#");
@@ -420,4 +414,29 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         }
     }
 
+    private DefinedClass getMessageSourceClass(Method method) {
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(method.parent().getPackageName() + NamingConstants.MESSAGE_SOURCE_NAMESPACE);
+        ArrayList<Class> inherits = new ArrayList<Class>();
+        inherits.add(MuleContextAware.class);
+        inherits.add(Startable.class);
+        inherits.add(Stoppable.class);
+        inherits.add(Initialisable.class);
+        inherits.add(SourceCallback.class);
+        inherits.add(FlowConstructAware.class);
+
+        if (method.getAnnotation(Source.class).threadingModel() == SourceThreadingModel.SINGLE_THREAD) {
+            inherits.add(Runnable.class);
+        }
+
+        if( method.getAnnotation(Source.class).primaryNodeOnly() ) {
+            inherits.add(ClusterizableMessageSource.class);
+        } else {
+            inherits.add(MessageSource.class);
+        }
+
+        DefinedClass clazz = pkg._class(method.getCapitalizedName() + NamingConstants.MESSAGE_SOURCE_CLASS_NAME_SUFFIX, inherits.toArray( new Class<?>[] {} ));
+        clazz.role(DefinedClassRoles.MESSAGE_SOURCE, method);
+
+        return clazz;
+    }
 }

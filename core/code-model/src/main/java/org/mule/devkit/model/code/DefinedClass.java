@@ -943,8 +943,8 @@ public class DefinedClass
      *
      * @param role Role that its fulfilled by this generated class
      */
-    public void role(DefinedClassRoles role, Type type) {
-        owner().setDefinedClassRole(role, type, this);
+    public void role(DefinedClassRoles role, Object object) {
+        owner().setDefinedClassRole(role, object, this);
     }
 
     @Override

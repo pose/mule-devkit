@@ -233,7 +233,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         // get class
         Source sourceAnnotation = executableElement.getAnnotation(Source.class);
         DefinedClass beanDefinitionparser = getBeanDefinitionParserClass(executableElement);
-        DefinedClass messageSourceClass = getMessageSourceClass(executableElement, sourceAnnotation.threadingModel() == SourceThreadingModel.SINGLE_THREAD);
+        DefinedClass messageSourceClass = ctx().getCodeModel()._class(DefinedClassRoles.MESSAGE_SOURCE, executableElement);
 
         ctx().note("Generating bean definition parser as " + beanDefinitionparser.fullName() + " for message source " + messageSourceClass.fullName());
 

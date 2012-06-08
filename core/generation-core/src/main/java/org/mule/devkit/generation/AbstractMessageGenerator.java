@@ -464,32 +464,6 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         return clazz;
     }
 
-
-    protected DefinedClass getMessageSourceClass(Method executableElement, boolean runnable) {
-        Package pkg = ctx().getCodeModel()._package(executableElement.parent().getPackageName() + NamingConstants.MESSAGE_SOURCE_NAMESPACE);
-        ArrayList<Class> inherits = new ArrayList<Class>();
-        inherits.add(MuleContextAware.class);
-        inherits.add(Startable.class);
-        inherits.add(Stoppable.class);
-        inherits.add(Initialisable.class);
-        inherits.add(SourceCallback.class);
-        inherits.add(FlowConstructAware.class);
-
-        if (runnable) {
-            inherits.add(Runnable.class);
-        }
-
-        if( executableElement.getAnnotation(Source.class).primaryNodeOnly() ) {
-            inherits.add(ClusterizableMessageSource.class);
-        } else {
-            inherits.add(MessageSource.class);
-        }
-
-        DefinedClass clazz = pkg._class(executableElement.getCapitalizedName() + NamingConstants.MESSAGE_SOURCE_CLASS_NAME_SUFFIX, inherits.toArray( new Class<?>[] {} ));
-
-        return clazz;
-    }
-
     protected Map<String, FieldVariableElement> generateProcessorFieldForEachParameter(DefinedClass messageProcessorClass, Method processorMethod) {
         return generateProcessorFieldForEachParameter(messageProcessorClass, processorMethod, null);
     }

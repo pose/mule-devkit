@@ -109,7 +109,7 @@ public final class CodeModel {
     /**
      * Created classes by its role
      */
-    private Map<Pair<DefinedClassRoles, Type>, DefinedClass> classesByRole = new HashMap<Pair<DefinedClassRoles, Type>, DefinedClass>();
+    private Map<Pair<DefinedClassRoles, Object>, DefinedClass> classesByRole = new HashMap<Pair<DefinedClassRoles, Object>, DefinedClass>();
 
     private CodeWriter codeWriter;
     
@@ -198,8 +198,8 @@ public final class CodeModel {
      * @param role Role to be fulfilled
      * @return A previously generated class
      */
-    public DefinedClass _class(DefinedClassRoles role, Type type) {
-        return classesByRole.get(new Pair<DefinedClassRoles, Type>(role, type));
+    public DefinedClass _class(DefinedClassRoles role, Object object) {
+        return classesByRole.get(new Pair<DefinedClassRoles, Object>(role, object));
     }
 
 
@@ -743,7 +743,7 @@ public final class CodeModel {
      * @param clazz
      */
     protected void setDefinedClassRole(DefinedClassRoles role, DefinedClass clazz) {
-        this.classesByRole.put(new Pair<DefinedClassRoles, Type>(role, null), clazz);
+        this.classesByRole.put(new Pair<DefinedClassRoles, Object>(role, null), clazz);
     }
 
     /**
@@ -751,8 +751,8 @@ public final class CodeModel {
      * @param role
      * @param clazz
      */
-    protected void setDefinedClassRole(DefinedClassRoles role, Type type, DefinedClass clazz) {
-        this.classesByRole.put(new Pair<DefinedClassRoles, Type>(role, type), clazz);
+    protected void setDefinedClassRole(DefinedClassRoles role, Object object, DefinedClass clazz) {
+        this.classesByRole.put(new Pair<DefinedClassRoles, Object>(role, object), clazz);
     }
 
     /**
