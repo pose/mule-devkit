@@ -27,7 +27,7 @@ public class MuleStudioValidator extends JavaDocValidator {
 
     @Override
     public boolean shouldValidate(Type type, Context context) {
-        return !super.shouldValidate(type, context) && !context.isEnvOptionSet("skipStudioPluginPackage");
+        return !super.shouldValidate(type, context);
     }
 
     @Override

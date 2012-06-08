@@ -39,8 +39,6 @@ public interface Context {
 
     StudioModel getStudioModel();
 
-    boolean hasOption(String option);
-
     void registerEnum(TypeMirror enumToRegister);
 
     boolean isEnumRegistered(TypeMirror enumToCheck);
@@ -48,8 +46,6 @@ public interface Context {
     boolean isJaxbElementRegistered(TypeMirror jaxbElement);
 
     void registerJaxbElement(TypeMirror jaxbElement);
-
-    boolean isEnvOptionSet(String envOption);
 
     void note(String msg);
 

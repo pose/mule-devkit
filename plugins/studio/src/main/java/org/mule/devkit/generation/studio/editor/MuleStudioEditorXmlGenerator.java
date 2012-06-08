@@ -46,7 +46,7 @@ public class MuleStudioEditorXmlGenerator extends AbstractMuleStudioGenerator {
 
     @Override
     public boolean shouldGenerate(Type type) {
-        return !ctx().hasOption("skipStudioPluginPackage");
+        return true;
     }
 
     @Override

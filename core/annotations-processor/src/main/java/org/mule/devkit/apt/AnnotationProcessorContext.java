@@ -47,9 +47,7 @@ public class AnnotationProcessorContext implements Context {
     private List<DefinedClass> registerAtBoot;
     private Types types;
     private Elements elements;
-    private Map<String, String> options;
     private Set<TypeMirror> registeredEnums;
-    private Map<String, String> envOptions;
     private Set<TypeMirror> registeredJaxbElements;
 
     public AnnotationProcessorContext(ProcessingEnvironment env) {
@@ -59,10 +57,8 @@ public class AnnotationProcessorContext implements Context {
         elements = env.getElementUtils();
         types = env.getTypeUtils();
         studioModel = new StudioModel(new FilerCodeWriter(env.getFiler()));
-        options = env.getOptions();
         registeredEnums = new HashSet<TypeMirror>();
         registeredJaxbElements = new HashSet<TypeMirror>();
-        envOptions = Collections.unmodifiableMap(env.getOptions());
         messager = env.getMessager();
     }
 
@@ -97,11 +93,6 @@ public class AnnotationProcessorContext implements Context {
     }
 
     @Override
-    public boolean hasOption(String option) {
-        return options.containsKey(option);
-    }
-
-    @Override
     public void registerEnum(TypeMirror enumToRegister) {
         registeredEnums.add(enumToRegister);
     }
@@ -119,11 +110,6 @@ public class AnnotationProcessorContext implements Context {
     @Override
     public void registerJaxbElement(TypeMirror jaxbElement) {
         registeredJaxbElements.add(jaxbElement);
-    }
-
-    @Override
-    public boolean isEnvOptionSet(String envOption) {
-        return envOptions.containsKey(envOption);
     }
 
     @Override
