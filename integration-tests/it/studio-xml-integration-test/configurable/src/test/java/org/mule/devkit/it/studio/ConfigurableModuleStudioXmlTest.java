@@ -21,7 +21,6 @@ import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
 import org.junit.Test;
-import org.mule.devkit.generation.studio.editor.MuleStudioEditorXmlGenerator;
 import org.mule.util.IOUtils;
 
 import static org.junit.Assert.assertTrue;
@@ -29,7 +28,7 @@ import static org.junit.Assert.assertTrue;
 public class ConfigurableModuleStudioXmlTest {
 
     private static final String EXPECTED_STUDIO_XML = "expected-studio-xml.xml";
-    private static final String ACTUAL_STUDIO_XML = MuleStudioEditorXmlGenerator.EDITOR_XML_FILE_NAME;
+    private static final String ACTUAL_STUDIO_XML = "editors.xml";
 
     @Test
     public void configurableModuleStudioXmlGeneration() throws Exception {
