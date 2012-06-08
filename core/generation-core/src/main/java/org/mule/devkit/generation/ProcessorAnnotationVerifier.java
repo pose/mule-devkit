@@ -30,9 +30,9 @@ import org.mule.api.annotations.param.OutboundHeaders;
 import org.mule.api.annotations.param.Payload;
 import org.mule.api.annotations.param.SessionHeaders;
 import org.mule.api.callback.SourceCallback;
+import org.mule.devkit.generation.api.AnnotationVerificationException;
 import org.mule.devkit.generation.api.Context;
-import org.mule.devkit.generation.api.ValidationException;
-import org.mule.devkit.generation.api.Validator;
+import org.mule.devkit.generation.api.AnnotationVerifier;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Parameter;
 import org.mule.devkit.model.Type;
@@ -40,28 +40,28 @@ import org.mule.devkit.model.Type;
 import javax.lang.model.type.TypeKind;
 import java.util.List;
 
-public class ProcessorValidator implements Validator {
+public class ProcessorAnnotationVerifier implements AnnotationVerifier {
 
     @Override
-    public boolean shouldValidate(Type type, Context context) {
+    public boolean shouldVerify(Type type, Context context) {
         return type.isModuleOrConnector();
     }
 
     @Override
-    public void validate(Type type, Context context) throws ValidationException {
+    public void verify(Type type, Context context) throws AnnotationVerificationException {
 
         for (Method method : type.getMethodsAnnotatedWith(Processor.class)) {
 
             if (method.isStatic()) {
-                throw new ValidationException(method, "@Processor cannot be applied to a static method");
+                throw new AnnotationVerificationException(method, "@Processor cannot be applied to a static method");
             }
 
             if (!method.getTypeParameters().isEmpty()) {
-                throw new ValidationException(method, "@Processor cannot be applied to a generic method");
+                throw new AnnotationVerificationException(method, "@Processor cannot be applied to a generic method");
             }
 
             if (!method.isPublic()) {
-                throw new ValidationException(method, "@Processor cannot be applied to a non-public method");
+                throw new AnnotationVerificationException(method, "@Processor cannot be applied to a non-public method");
             }
 
             validateIntercepting(method);
@@ -103,17 +103,17 @@ public class ProcessorValidator implements Validator {
                 }
 
                 if (count > 1) {
-                    throw new ValidationException(parameter, "You cannot have more than one of InboundHeader, InvocationHeaders or Payload annotation");
+                    throw new AnnotationVerificationException(parameter, "You cannot have more than one of InboundHeader, InvocationHeaders or Payload annotation");
                 }
 
                 if (parameter.getAnnotation(Payload.class) == null && parameter.asType().getKind() == TypeKind.ARRAY) {
-                    throw new ValidationException(parameter, "@Processor parameter cannot be arrays, use List instead");
+                    throw new AnnotationVerificationException(parameter, "@Processor parameter cannot be arrays, use List instead");
                 }
             }
         }
     }
 
-    private void validateIntercepting(Method method) throws ValidationException {
+    private void validateIntercepting(Method method) throws AnnotationVerificationException {
         if (method.getAnnotation(Processor.class).intercepting()) {
             boolean containsSourceCallback = false;
             List<Parameter> parameters = method.getParameters();
@@ -124,7 +124,7 @@ public class ProcessorValidator implements Validator {
             }
 
             if (!containsSourceCallback) {
-                throw new ValidationException(method, "An intercepting method method must contain a SourceCallback as one of its parameters");
+                throw new AnnotationVerificationException(method, "An intercepting method method must contain a SourceCallback as one of its parameters");
             }
         }
     }

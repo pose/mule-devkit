@@ -24,24 +24,24 @@ import org.mule.api.annotations.oauth.OAuthAccessToken;
 import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
 import org.mule.api.annotations.oauth.OAuthConsumerKey;
 import org.mule.api.annotations.oauth.OAuthConsumerSecret;
+import org.mule.devkit.generation.api.AnnotationVerificationException;
+import org.mule.devkit.generation.api.AnnotationVerifier;
 import org.mule.devkit.generation.api.Context;
-import org.mule.devkit.generation.api.ValidationException;
-import org.mule.devkit.generation.api.Validator;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Parameter;
 import org.mule.devkit.model.Type;
 
 import java.lang.annotation.Annotation;
 
-public class OAuthValidator implements Validator {
+public class OAuthAnnotationVerifier implements AnnotationVerifier {
 
     @Override
-    public boolean shouldValidate(Type type, Context context) {
+    public boolean shouldVerify(Type type, Context context) {
         return type.isModuleOrConnector();
     }
 
     @Override
-    public void validate(Type type, Context context) throws ValidationException {
+    public void verify(Type type, Context context) throws AnnotationVerificationException {
         if (type.hasAnnotation(OAuth.class)) {
             validateOAuth1Class(type);
         } else if (type.hasAnnotation(OAuth2.class)) {
@@ -51,45 +51,45 @@ public class OAuthValidator implements Validator {
         }
     }
 
-    private void validateOAuth1Class(Type type) throws ValidationException {
+    private void validateOAuth1Class(Type type) throws AnnotationVerificationException {
         if (type.hasAnnotation(Connector.class)) {
-            throw new ValidationException(type, "It is not possible to use OAuth support in @Connector annotated classes, use @Module instead");
+            throw new AnnotationVerificationException(type, "It is not possible to use OAuth support in @Connector annotated classes, use @Module instead");
         }
         if (!type.hasFieldAnnotatedWith(OAuthConsumerKey.class)) {
-            throw new ValidationException(type, "@OAuth class must contain a field annotated with @OAuthConsumerKey");
+            throw new AnnotationVerificationException(type, "@OAuth class must contain a field annotated with @OAuthConsumerKey");
         }
         if (!type.hasFieldAnnotatedWith(OAuthConsumerSecret.class)) {
-            throw new ValidationException(type, "@OAuth class must contain a field annotated with @OAuthConsumerSecret");
+            throw new AnnotationVerificationException(type, "@OAuth class must contain a field annotated with @OAuthConsumerSecret");
         }
         if (!classHasMethodWithParameterAnnotated(type, OAuthAccessToken.class)) {
-            throw new ValidationException(type, "@OAuth class must have at least one method parameter annotated with @OAuthAccessToken");
+            throw new AnnotationVerificationException(type, "@OAuth class must have at least one method parameter annotated with @OAuthAccessToken");
         }
     }
 
-    private void validateOAuth2Class(Type type) throws ValidationException {
+    private void validateOAuth2Class(Type type) throws AnnotationVerificationException {
         if (type.hasAnnotation(Connector.class)) {
-            throw new ValidationException(type, "It is not possible to use OAuth support in @Connector annotated classes, use @Module instead");
+            throw new AnnotationVerificationException(type, "It is not possible to use OAuth support in @Connector annotated classes, use @Module instead");
         }
         if (!type.hasFieldAnnotatedWith(OAuthConsumerKey.class)) {
-            throw new ValidationException(type, "@OAuth2 class must contain a field annotated with @OAuthConsumerKey");
+            throw new AnnotationVerificationException(type, "@OAuth2 class must contain a field annotated with @OAuthConsumerKey");
         }
         if (!type.hasFieldAnnotatedWith(OAuthConsumerSecret.class)) {
-            throw new ValidationException(type, "@OAuth2 class must contain a field annotated with @OAuthConsumerSecret");
+            throw new AnnotationVerificationException(type, "@OAuth2 class must contain a field annotated with @OAuthConsumerSecret");
         }
         if (!classHasMethodWithParameterAnnotated(type, OAuthAccessToken.class)) {
-            throw new ValidationException(type, "@OAuth2 class must have at least one method parameter annotated with @OAuthAccessToken");
+            throw new AnnotationVerificationException(type, "@OAuth2 class must have at least one method parameter annotated with @OAuthAccessToken");
         }
         if (classHasMethodWithParameterAnnotated(type, OAuthAccessTokenSecret.class)) {
-            throw new ValidationException(type, "@OAuth2 class cannot have method parameters annotated with @OAuthAccessTokenSecret");
+            throw new AnnotationVerificationException(type, "@OAuth2 class cannot have method parameters annotated with @OAuthAccessTokenSecret");
         }
     }
 
-    private void validateNonOAuthClass(Type type) throws ValidationException {
+    private void validateNonOAuthClass(Type type) throws AnnotationVerificationException {
         if (classHasMethodWithParameterAnnotated(type, OAuthAccessToken.class)) {
-            throw new ValidationException(type, "Cannot annotate parameter with @OAuthAccessToken without annotating the class with @OAuth or @OAuth2");
+            throw new AnnotationVerificationException(type, "Cannot annotate parameter with @OAuthAccessToken without annotating the class with @OAuth or @OAuth2");
         }
         if (classHasMethodWithParameterAnnotated(type, OAuthAccessTokenSecret.class)) {
-            throw new ValidationException(type, "Cannot annotate parameter with @OAuthAccessTokenSecret without annotating the class with @OAuth");
+            throw new AnnotationVerificationException(type, "Cannot annotate parameter with @OAuthAccessTokenSecret without annotating the class with @OAuth");
         }
     }
 

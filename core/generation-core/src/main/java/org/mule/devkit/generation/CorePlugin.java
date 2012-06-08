@@ -12,7 +12,7 @@ import org.mule.devkit.generation.adapter.PoolAdapterGenerator;
 import org.mule.devkit.generation.adapter.RestAdapterGenerator;
 import org.mule.devkit.generation.api.Generator;
 import org.mule.devkit.generation.api.Plugin;
-import org.mule.devkit.generation.api.Validator;
+import org.mule.devkit.generation.api.AnnotationVerifier;
 import org.mule.devkit.generation.callback.DefaultHttpCallbackGenerator;
 import org.mule.devkit.generation.mule.MessageProcessorGenerator;
 import org.mule.devkit.generation.mule.MessageSourceGenerator;
@@ -43,7 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CorePlugin implements Plugin {
-    private List<Validator> validators;
+    private List<AnnotationVerifier> annotationVerifiers;
     private List<Generator> generators;
 
     public CorePlugin() {
@@ -84,15 +84,15 @@ public class CorePlugin implements Plugin {
         generators.add(new RegistryBootstrapGenerator());
         generators.add(new SchemaGenerator());
 
-        validators = new ArrayList<Validator>();
-        validators.add(new BasicValidator());
-        validators.add(new OAuthValidator());
-        validators.add(new ProcessorValidator());
-        validators.add(new ConnectorValidator());
-        validators.add(new SourceValidator());
-        validators.add(new TransformerValidator());
-        validators.add(new InjectValidator());
-        validators.add(new RestValidator());
+        annotationVerifiers = new ArrayList<AnnotationVerifier>();
+        annotationVerifiers.add(new BasicAnnotationVerifier());
+        annotationVerifiers.add(new OAuthAnnotationVerifier());
+        annotationVerifiers.add(new ProcessorAnnotationVerifier());
+        annotationVerifiers.add(new ConnectorAnnotationVerifier());
+        annotationVerifiers.add(new SourceAnnotationVerifier());
+        annotationVerifiers.add(new TransformerAnnotationVerifier());
+        annotationVerifiers.add(new InjectAnnotationVerifier());
+        annotationVerifiers.add(new RestAnnotationVerifier());
     }
 
     @Override
@@ -101,8 +101,8 @@ public class CorePlugin implements Plugin {
     }
 
     @Override
-    public List<Validator> getValidators() {
-        return validators;
+    public List<AnnotationVerifier> getAnnotationVerifiers() {
+        return annotationVerifiers;
     }
 
     @Override

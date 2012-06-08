@@ -1,21 +1,21 @@
 package org.mule.devkit.generation.javadoc;
 
+import org.mule.devkit.generation.api.AnnotationVerifier;
 import org.mule.devkit.generation.api.Generator;
 import org.mule.devkit.generation.api.Plugin;
-import org.mule.devkit.generation.api.Validator;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class JavaDocPlugin implements Plugin {
-    private List<Validator> validators;
+    private List<AnnotationVerifier> annotationVerifiers;
     private List<Generator> generators;
 
     public JavaDocPlugin() {
         generators = new ArrayList<Generator>();
 
-        validators = new ArrayList<Validator>();
-        validators.add(new JavaDocValidator());
+        annotationVerifiers = new ArrayList<AnnotationVerifier>();
+        annotationVerifiers.add(new JavaDocAnnotationVerifier());
     }
 
     @Override
@@ -24,8 +24,8 @@ public class JavaDocPlugin implements Plugin {
     }
 
     @Override
-    public List<Validator> getValidators() {
-        return validators;
+    public List<AnnotationVerifier> getAnnotationVerifiers() {
+        return annotationVerifiers;
     }
 
     @Override

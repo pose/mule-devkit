@@ -3,7 +3,7 @@ package org.mule.devkit.apt;
 import org.mule.devkit.generation.api.Generator;
 import org.mule.devkit.generation.api.Plugin;
 import org.mule.devkit.generation.api.PluginScanner;
-import org.mule.devkit.generation.api.Validator;
+import org.mule.devkit.generation.api.AnnotationVerifier;
 
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
@@ -24,24 +24,24 @@ import java.util.Map;
 public class AnnotationProcessor extends AbstractAnnotationProcessor {
 
     @Override
-    public List<Validator> getValidators() {
-        List<Validator> validators = new ArrayList<Validator>();
+    public List<AnnotationVerifier> getAnnotationVerifiers() {
+        List<AnnotationVerifier> annotationVerifiers = new ArrayList<AnnotationVerifier>();
 
         try {
             List<Plugin> plugins = PluginScanner.getInstance().getAllPlugins(getUserClassLoader(getClass().getClassLoader()));
             for (Plugin p : plugins) {
                 if (p.getOptionName() == null) {
-                    validators.addAll(p.getValidators());
+                    annotationVerifiers.addAll(p.getAnnotationVerifiers());
                 } else if (processingEnv.getOptions().get(p.getOptionName()) != null &&
                         processingEnv.getOptions().get(p.getOptionName()).equals("true")) {
-                    validators.addAll(p.getValidators());
+                    annotationVerifiers.addAll(p.getAnnotationVerifiers());
                 }
             }
         } catch (MalformedURLException e) {
             processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, e.getLocalizedMessage());
         }
 
-        return validators;
+        return annotationVerifiers;
     }
 
     @Override

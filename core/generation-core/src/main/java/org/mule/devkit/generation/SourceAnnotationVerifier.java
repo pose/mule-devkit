@@ -19,24 +19,24 @@ package org.mule.devkit.generation;
 
 import org.mule.api.annotations.Source;
 import org.mule.api.callback.SourceCallback;
+import org.mule.devkit.generation.api.AnnotationVerificationException;
 import org.mule.devkit.generation.api.Context;
-import org.mule.devkit.generation.api.ValidationException;
-import org.mule.devkit.generation.api.Validator;
+import org.mule.devkit.generation.api.AnnotationVerifier;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Parameter;
 import org.mule.devkit.model.Type;
 
 import java.util.List;
 
-public class SourceValidator implements Validator {
+public class SourceAnnotationVerifier implements AnnotationVerifier {
 
     @Override
-    public boolean shouldValidate(Type type, Context context) {
+    public boolean shouldVerify(Type type, Context context) {
         return type.isModuleOrConnector() && type.hasMethodsAnnotatedWith(Source.class);
     }
 
     @Override
-    public void validate(Type type, Context context) throws ValidationException {
+    public void verify(Type type, Context context) throws AnnotationVerificationException {
 
         for (Method method : type.getMethodsAnnotatedWith(Source.class)) {
 
@@ -50,24 +50,24 @@ public class SourceValidator implements Validator {
                 for (int i = 0; (i < expectedMinVersion.length); i++) {
                     try {
                         if (Integer.parseInt(minMuleVersions[i]) < Integer.parseInt(expectedMinVersion[i])) {
-                            throw new ValidationException(method, "The attribute primaryNodeOnly works with Mule 3.3 only therefore you must set the minMuleVersion of your @Connector or @Module to \"3.3\". Example: @Module(minMuleVersion=\"3.3\")");
+                            throw new AnnotationVerificationException(method, "The attribute primaryNodeOnly works with Mule 3.3 only therefore you must set the minMuleVersion of your @Connector or @Module to \"3.3\". Example: @Module(minMuleVersion=\"3.3\")");
                         }
                     } catch (NumberFormatException nfe) {
-                        throw new ValidationException(method, "Error parsing Mule version, verify that the minMuleVersion is in the correct format: X.X.X");
+                        throw new AnnotationVerificationException(method, "Error parsing Mule version, verify that the minMuleVersion is in the correct format: X.X.X");
                     }
                 }
             }
 
             if (method.isStatic()) {
-                throw new ValidationException(method, "@Source cannot be applied to a static method");
+                throw new AnnotationVerificationException(method, "@Source cannot be applied to a static method");
             }
 
             if (!method.getTypeParameters().isEmpty()) {
-                throw new ValidationException(method, "@Source cannot be applied to a generic method");
+                throw new AnnotationVerificationException(method, "@Source cannot be applied to a generic method");
             }
 
             if (!method.isPublic()) {
-                throw new ValidationException(method, "@Source cannot be applied to a non-public method");
+                throw new AnnotationVerificationException(method, "@Source cannot be applied to a non-public method");
             }
 
             // verify that every @Source receives a SourceCallback
@@ -80,7 +80,7 @@ public class SourceValidator implements Validator {
             }
 
             if (!containsSourceCallback) {
-                throw new ValidationException(method, "@Source method must contain a SourceCallback as one of its parameters");
+                throw new AnnotationVerificationException(method, "@Source method must contain a SourceCallback as one of its parameters");
             }
         }
     }

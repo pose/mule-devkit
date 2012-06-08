@@ -17,31 +17,31 @@
 
 package org.mule.devkit.generation.studio;
 
+import org.mule.devkit.generation.api.AnnotationVerificationException;
 import org.mule.devkit.generation.api.Context;
-import org.mule.devkit.generation.api.ValidationException;
-import org.mule.devkit.generation.javadoc.JavaDocValidator;
+import org.mule.devkit.generation.javadoc.JavaDocAnnotationVerifier;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Type;
 
-public class MuleStudioValidator extends JavaDocValidator {
+public class MuleStudioAnnotationVerifier extends JavaDocAnnotationVerifier {
 
     @Override
-    public boolean shouldValidate(Type type, Context context) {
-        return !super.shouldValidate(type, context);
+    public boolean shouldVerify(Type type, Context context) {
+        return !super.shouldVerify(type, context);
     }
 
     @Override
-    public void validate(Type type, Context context) throws ValidationException {
+    public void verify(Type type, Context context) throws AnnotationVerificationException {
         try {
-            super.validate(type, context);
-        } catch (ValidationException e) {
-            throw new ValidationException(type, "Cannot generate Mule Studio plugin if required javadoc comments are not present. " +
+            super.verify(type, context);
+        } catch (AnnotationVerificationException e) {
+            throw new AnnotationVerificationException(type, "Cannot generate Mule Studio plugin if required javadoc comments are not present. " +
                     "If you want to skip the generation of the Mule Studio plugin use -Ddevkit.studio.package.skip=true. Error is: " + e.getMessage(), e);
         }
     }
 
     @Override
-    protected boolean exampleDoesNotExist(Context context, Method method) throws ValidationException {
+    protected boolean exampleDoesNotExist(Context context, Method method) throws AnnotationVerificationException {
         // do not check for example correctness
         return false;
     }

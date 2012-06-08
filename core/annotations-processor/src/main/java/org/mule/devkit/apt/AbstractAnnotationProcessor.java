@@ -19,11 +19,11 @@ package org.mule.devkit.apt;
 
 import com.sun.source.util.Trees;
 import org.mule.devkit.apt.model.AnnotationProcessorType;
+import org.mule.devkit.generation.api.AnnotationVerificationException;
 import org.mule.devkit.generation.api.Context;
 import org.mule.devkit.generation.api.GenerationException;
 import org.mule.devkit.generation.api.Generator;
-import org.mule.devkit.generation.api.ValidationException;
-import org.mule.devkit.generation.api.Validator;
+import org.mule.devkit.generation.api.AnnotationVerifier;
 import org.mule.devkit.model.Type;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -42,9 +42,9 @@ public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
     /**
      * Retrieve a list of validators for the specified object type
      *
-     * @return A list of validators implementing Validator
+     * @return A list of validators implementing AnnotationVerifier
      */
-    public abstract List<Validator> getValidators();
+    public abstract List<AnnotationVerifier> getAnnotationVerifiers();
 
     /**
      * Retrieve a list of generators for the specified object type
@@ -64,12 +64,12 @@ public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
             for (TypeElement e : typeElements) {
                 Type type = new AnnotationProcessorType(e, processingEnv.getTypeUtils(), processingEnv.getElementUtils(), Trees.instance(processingEnv));
                 context.note("Validating " + type.getSimpleName().toString() + " class");
-                for (Validator validator : getValidators()) {
+                for (AnnotationVerifier annotationVerifier : getAnnotationVerifiers()) {
                     try {
-                        if (validator.shouldValidate(type, context)) {
-                            validator.validate(type, context);
+                        if (annotationVerifier.shouldVerify(type, context)) {
+                            annotationVerifier.verify(type, context);
                         }
-                    } catch (ValidationException tve) {
+                    } catch (AnnotationVerificationException tve) {
                         context.error(tve.getMessage(), tve.getElement());
                         return false;
                     }

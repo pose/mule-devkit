@@ -19,9 +19,9 @@ package org.mule.devkit.generation;
 
 import org.mule.api.annotations.lifecycle.Start;
 import org.mule.api.annotations.lifecycle.Stop;
+import org.mule.devkit.generation.api.AnnotationVerificationException;
+import org.mule.devkit.generation.api.AnnotationVerifier;
 import org.mule.devkit.generation.api.Context;
-import org.mule.devkit.generation.api.ValidationException;
-import org.mule.devkit.generation.api.Validator;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Type;
 
@@ -31,41 +31,41 @@ import javax.lang.model.type.TypeKind;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
-public class LifecycleValidator implements Validator {
+public class LifecycleAnnotationVerifier implements AnnotationVerifier {
 
     @Override
-    public boolean shouldValidate(Type type, Context context) {
+    public boolean shouldVerify(Type type, Context context) {
         return true;
     }
 
     @Override
-    public void validate(Type type, Context context) throws ValidationException {
+    public void verify(Type type, Context context) throws AnnotationVerificationException {
         check(type, PostConstruct.class);
         check(type, Start.class);
         check(type, Stop.class);
         check(type, PreDestroy.class);
     }
 
-    private void check(Type type, Class<? extends Annotation> annotation) throws ValidationException {
+    private void check(Type type, Class<? extends Annotation> annotation) throws AnnotationVerificationException {
         List<Method> methods = type.getMethodsAnnotatedWith(annotation);
         if (methods.isEmpty()) {
             return;
         }
         if (methods.size() > 1) {
-            throw new ValidationException(type, "Cannot have more than method annotated with " + annotation.getSimpleName());
+            throw new AnnotationVerificationException(type, "Cannot have more than method annotated with " + annotation.getSimpleName());
         }
         Method method = methods.get(0);
         if (!method.getParameters().isEmpty()) {
-            throw new ValidationException(type, "A method annotated with " + annotation.getSimpleName() + " cannot receive any paramters");
+            throw new AnnotationVerificationException(type, "A method annotated with " + annotation.getSimpleName() + " cannot receive any paramters");
         }
         if (method.getReturnType().getKind() != TypeKind.VOID) {
-            throw new ValidationException(type, "A method annotated with " + annotation.getSimpleName() + " can only return void");
+            throw new AnnotationVerificationException(type, "A method annotated with " + annotation.getSimpleName() + " can only return void");
         }
         if (!method.isStatic()) {
-            throw new ValidationException(method, "A method annotated with " + annotation.getSimpleName() + " cannot be static");
+            throw new AnnotationVerificationException(method, "A method annotated with " + annotation.getSimpleName() + " cannot be static");
         }
         if (!method.isPublic()) {
-            throw new ValidationException(method, "A method annotated with " + annotation.getSimpleName() + " can only be public");
+            throw new AnnotationVerificationException(method, "A method annotated with " + annotation.getSimpleName() + " can only be public");
         }
     }
 }

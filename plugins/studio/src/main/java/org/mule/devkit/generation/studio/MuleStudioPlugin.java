@@ -1,15 +1,15 @@
 package org.mule.devkit.generation.studio;
 
+import org.mule.devkit.generation.api.AnnotationVerifier;
 import org.mule.devkit.generation.api.Generator;
 import org.mule.devkit.generation.api.Plugin;
-import org.mule.devkit.generation.api.Validator;
 import org.mule.devkit.generation.studio.editor.MuleStudioEditorXmlGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MuleStudioPlugin implements Plugin {
-    private List<Validator> validators;
+    private List<AnnotationVerifier> annotationVerifiers;
     private List<Generator> generators;
 
     public MuleStudioPlugin() {
@@ -22,8 +22,8 @@ public class MuleStudioPlugin implements Plugin {
         generators.add(new MuleStudioFeatureGenerator());
         generators.add(new MuleStudioSiteXmlGenerator());
 
-        validators = new ArrayList<Validator>();
-        validators.add(new MuleStudioValidator());
+        annotationVerifiers = new ArrayList<AnnotationVerifier>();
+        annotationVerifiers.add(new MuleStudioAnnotationVerifier());
     }
 
     @Override
@@ -32,8 +32,8 @@ public class MuleStudioPlugin implements Plugin {
     }
 
     @Override
-    public List<Validator> getValidators() {
-        return validators;
+    public List<AnnotationVerifier> getAnnotationVerifiers() {
+        return annotationVerifiers;
     }
 
     @Override

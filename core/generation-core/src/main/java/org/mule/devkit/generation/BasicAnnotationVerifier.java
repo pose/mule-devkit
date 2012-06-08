@@ -20,58 +20,58 @@ package org.mule.devkit.generation;
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
+import org.mule.devkit.generation.api.AnnotationVerificationException;
+import org.mule.devkit.generation.api.AnnotationVerifier;
 import org.mule.devkit.generation.api.Context;
-import org.mule.devkit.generation.api.ValidationException;
-import org.mule.devkit.generation.api.Validator;
 import org.mule.devkit.model.Field;
 import org.mule.devkit.model.Type;
 
 import javax.lang.model.type.TypeKind;
 
-public class BasicValidator implements Validator {
+public class BasicAnnotationVerifier implements AnnotationVerifier {
 
     @Override
-    public boolean shouldValidate(Type type, Context context) {
+    public boolean shouldVerify(Type type, Context context) {
         return type.isModuleOrConnector();
     }
 
     @Override
-    public void validate(Type type, Context context) throws ValidationException {
+    public void verify(Type type, Context context) throws AnnotationVerificationException {
 
         if (type.isInterface()) {
-            throw new ValidationException(type, "@Module/@Connector cannot be applied to an interface");
+            throw new AnnotationVerificationException(type, "@Module/@Connector cannot be applied to an interface");
         }
 
         if (type.isParametrized()) {
-            throw new ValidationException(type, "@Module/@Connector type cannot have type parameters");
+            throw new AnnotationVerificationException(type, "@Module/@Connector type cannot have type parameters");
         }
 
         if (!type.isPublic()) {
-            throw new ValidationException(type, "@Module/@Connector must be public");
+            throw new AnnotationVerificationException(type, "@Module/@Connector must be public");
         }
 
         for (Field variable : type.getFieldsAnnotatedWith(Configurable.class)) {
 
             if (variable.isFinal()) {
-                throw new ValidationException(variable, "@Configurable cannot be applied to field with final modifier");
+                throw new AnnotationVerificationException(variable, "@Configurable cannot be applied to field with final modifier");
             }
 
             if (variable.isStatic()) {
-                throw new ValidationException(variable, "@Configurable cannot be applied to field with static modifier");
+                throw new AnnotationVerificationException(variable, "@Configurable cannot be applied to field with static modifier");
             }
 
             if (variable.asType().getKind() == TypeKind.ARRAY) {
-                throw new ValidationException(variable, "@Configurable cannot be applied to arrays");
+                throw new AnnotationVerificationException(variable, "@Configurable cannot be applied to arrays");
             }
 
             Optional optional = variable.getAnnotation(Optional.class);
             Default def = variable.getAnnotation(Default.class);
             if (variable.asType().getKind().isPrimitive() && optional != null && (def == null || def.value().length() == 0)) {
-                throw new ValidationException(variable, "@Optional @Configurable fields can only be applied to non-primitive types with a @Default value");
+                throw new AnnotationVerificationException(variable, "@Optional @Configurable fields can only be applied to non-primitive types with a @Default value");
             }
 
             if (def != null && optional == null) {
-                throw new ValidationException(variable, "@Default @Configurable fields must also include @Optional, otherwise the @Default will never take place.");
+                throw new AnnotationVerificationException(variable, "@Default @Configurable fields must also include @Optional, otherwise the @Default will never take place.");
             }
         }
     }

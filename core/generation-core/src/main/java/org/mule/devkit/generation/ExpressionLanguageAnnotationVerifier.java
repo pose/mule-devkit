@@ -26,38 +26,38 @@ import org.mule.api.annotations.param.InvocationHeaders;
 import org.mule.api.annotations.param.OutboundHeaders;
 import org.mule.api.annotations.param.Payload;
 import org.mule.api.annotations.param.SessionHeaders;
+import org.mule.devkit.generation.api.AnnotationVerificationException;
+import org.mule.devkit.generation.api.AnnotationVerifier;
 import org.mule.devkit.generation.api.Context;
-import org.mule.devkit.generation.api.ValidationException;
-import org.mule.devkit.generation.api.Validator;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Parameter;
 import org.mule.devkit.model.Type;
 
-public class ExpressionLanguageValidator implements Validator {
+public class ExpressionLanguageAnnotationVerifier implements AnnotationVerifier {
     @Override
-    public boolean shouldValidate(Type type, Context context) {
+    public boolean shouldVerify(Type type, Context context) {
         return true;
     }
 
     @Override
-    public void validate(Type type, Context context) throws ValidationException {
+    public void verify(Type type, Context context) throws AnnotationVerificationException {
         if (type.getMethodsAnnotatedWith(ExpressionEvaluator.class).size() > 1) {
-            throw new ValidationException(type, "An @ExpressionLanguage can only contain one @ExpressionEvaluator.");
+            throw new AnnotationVerificationException(type, "An @ExpressionLanguage can only contain one @ExpressionEvaluator.");
         }
         if (type.getMethodsAnnotatedWith(ExpressionEnricher.class).size() > 1) {
-            throw new ValidationException(type, "An @ExpressionLanguage can only contain one @ExpressionEnricher.");
+            throw new AnnotationVerificationException(type, "An @ExpressionLanguage can only contain one @ExpressionEnricher.");
         }
         if (type.getMethodsAnnotatedWith(ExpressionEvaluator.class).size() == 0 &&
                 type.getMethodsAnnotatedWith(ExpressionEnricher.class).size() == 0) {
-            throw new ValidationException(type, "An @ExpressionLanguage must contain one @ExpressionEnricher or one @ExpressionEvaluator or both.");
+            throw new AnnotationVerificationException(type, "An @ExpressionLanguage must contain one @ExpressionEnricher or one @ExpressionEvaluator or both.");
         }
         for (Method executableElement : type.getMethodsAnnotatedWith(ExpressionEvaluator.class)) {
             if (executableElement.getParameters().size() == 0) {
-                throw new ValidationException(executableElement, "An @ExpressionEvaluator must receive at least a String that represents the expression to evaluate.");
+                throw new AnnotationVerificationException(executableElement, "An @ExpressionEvaluator must receive at least a String that represents the expression to evaluate.");
             }
 
             if (executableElement.getReturnType().toString().equals("void")) {
-                throw new ValidationException(executableElement, "@ExpressionEvaluator cannot be void");
+                throw new AnnotationVerificationException(executableElement, "@ExpressionEvaluator cannot be void");
             }
 
             boolean expressionStringFound = false;
@@ -72,11 +72,11 @@ public class ExpressionLanguageValidator implements Validator {
                         parameter.getAnnotation(CorrelationSequence.class) == null) {
                     if (parameter.asType().toString().contains("String")) {
                         if (expressionStringFound) {
-                            throw new ValidationException(executableElement, "An @ExpressionEvaluator can receive only one String and the rest of the arguments must be annotated with either @Payload, @InboundHeaders, @OutboundHeaders, @SessionHeader or @InvocationHeaders.");
+                            throw new AnnotationVerificationException(executableElement, "An @ExpressionEvaluator can receive only one String and the rest of the arguments must be annotated with either @Payload, @InboundHeaders, @OutboundHeaders, @SessionHeader or @InvocationHeaders.");
                         }
                         expressionStringFound = true;
                     } else {
-                        throw new ValidationException(executableElement, "An @ExpressionEvaluator can receive only one String and the rest of the arguments must be annotated with either @Payload, @InboundHeaders, @OutboundHeaders, @SessionHeader or @InvocationHeaders.");
+                        throw new AnnotationVerificationException(executableElement, "An @ExpressionEvaluator can receive only one String and the rest of the arguments must be annotated with either @Payload, @InboundHeaders, @OutboundHeaders, @SessionHeader or @InvocationHeaders.");
                     }
                 }
             }
@@ -84,11 +84,11 @@ public class ExpressionLanguageValidator implements Validator {
 
         for (Method executableElement : type.getMethodsAnnotatedWith(ExpressionEnricher.class)) {
             if (executableElement.getParameters().size() == 0) {
-                throw new ValidationException(executableElement, "An @ExpressionEnricher must receive at least a String that represents the expression and Object that represents the object to be used for enrichment.");
+                throw new AnnotationVerificationException(executableElement, "An @ExpressionEnricher must receive at least a String that represents the expression and Object that represents the object to be used for enrichment.");
             }
 
             if (!executableElement.getReturnType().toString().equals("void")) {
-                throw new ValidationException(executableElement, "@ExpressionEnricher must be void");
+                throw new AnnotationVerificationException(executableElement, "@ExpressionEnricher must be void");
             }
 
             boolean expressionStringFound = false;
@@ -104,16 +104,16 @@ public class ExpressionLanguageValidator implements Validator {
                         parameter.getAnnotation(CorrelationSequence.class) == null) {
                     if (parameter.asType().toString().contains("String")) {
                         if (expressionStringFound) {
-                            throw new ValidationException(executableElement, "An @ExpressionEnricher can receive only one Object and one String and the rest of the arguments must be annotated with either @Payload, @InboundHeaders, @OutboundHeaders, @SessionHeader or @InvocationHeaders.");
+                            throw new AnnotationVerificationException(executableElement, "An @ExpressionEnricher can receive only one Object and one String and the rest of the arguments must be annotated with either @Payload, @InboundHeaders, @OutboundHeaders, @SessionHeader or @InvocationHeaders.");
                         }
                         expressionStringFound = true;
                     } else if (parameter.asType().toString().contains("Object")) {
                         if (enrichObjectFound) {
-                            throw new ValidationException(executableElement, "An @ExpressionEnricher can receive only one Object and one String and the rest of the arguments must be annotated with either @Payload, @InboundHeaders, @OutboundHeaders, @SessionHeader or @InvocationHeaders.");
+                            throw new AnnotationVerificationException(executableElement, "An @ExpressionEnricher can receive only one Object and one String and the rest of the arguments must be annotated with either @Payload, @InboundHeaders, @OutboundHeaders, @SessionHeader or @InvocationHeaders.");
                         }
                         enrichObjectFound = true;
                     } else {
-                        throw new ValidationException(executableElement, "An @ExpressionEnricher can receive only one Object and one String and the rest of the arguments must be annotated with either @Payload, @InboundHeaders, @OutboundHeaders, @SessionHeader or @InvocationHeaders.");
+                        throw new AnnotationVerificationException(executableElement, "An @ExpressionEnricher can receive only one Object and one String and the rest of the arguments must be annotated with either @Payload, @InboundHeaders, @OutboundHeaders, @SessionHeader or @InvocationHeaders.");
                     }
                 }
             }

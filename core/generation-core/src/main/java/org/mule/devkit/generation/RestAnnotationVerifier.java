@@ -25,43 +25,43 @@ import org.mule.api.annotations.rest.RestHeaderParam;
 import org.mule.api.annotations.rest.RestHttpClient;
 import org.mule.api.annotations.rest.RestQueryParam;
 import org.mule.api.annotations.rest.RestUriParam;
+import org.mule.devkit.generation.api.AnnotationVerificationException;
 import org.mule.devkit.generation.api.Context;
-import org.mule.devkit.generation.api.ValidationException;
-import org.mule.devkit.generation.api.Validator;
+import org.mule.devkit.generation.api.AnnotationVerifier;
 import org.mule.devkit.model.Field;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Parameter;
 import org.mule.devkit.model.Type;
 
-public class RestValidator implements Validator {
+public class RestAnnotationVerifier implements AnnotationVerifier {
 
     @Override
-    public boolean shouldValidate(Type type, Context context) {
+    public boolean shouldVerify(Type type, Context context) {
         return type.isModuleOrConnector() && type.hasMethodsAnnotatedWith(RestCall.class);
     }
 
     @Override
-    public void validate(Type type, Context context) throws ValidationException {
+    public void verify(Type type, Context context) throws AnnotationVerificationException {
 
         for (Method method : type.getMethodsAnnotatedWith(RestCall.class)) {
 
             if (!method.isAbstract()) {
-                throw new ValidationException(method, "@RestCall can only be applied to abstract methods");
+                throw new AnnotationVerificationException(method, "@RestCall can only be applied to abstract methods");
             }
 
             if (method.getThrownTypes().size() != 1) {
-                throw new ValidationException(method, "@RestCall abstract method must throw IOException");
+                throw new AnnotationVerificationException(method, "@RestCall abstract method must throw IOException");
             }
 
             RestExceptionOn restExceptionOn = method.getAnnotation(RestExceptionOn.class);
             if (restExceptionOn != null) {
                 if (restExceptionOn.statusCodeIs().length != 0 &&
                         restExceptionOn.statusCodeIsNot().length != 0) {
-                    throw new ValidationException(method, "@RestExceptionOn can only be used with statusCodeIs or statusCodeIsNot. Not both.");
+                    throw new AnnotationVerificationException(method, "@RestExceptionOn can only be used with statusCodeIs or statusCodeIsNot. Not both.");
                 }
                 if (restExceptionOn.statusCodeIs().length == 0 &&
                         restExceptionOn.statusCodeIsNot().length == 0) {
-                    throw new ValidationException(method, "@RestExceptionOn must have either statusCodeIs or statusCodeIsNot.");
+                    throw new AnnotationVerificationException(method, "@RestExceptionOn must have either statusCodeIs or statusCodeIsNot.");
                 }
             }
 
@@ -75,7 +75,7 @@ public class RestValidator implements Validator {
             }
 
             if (nonAnnotatedParameterCount > 1) {
-                throw new ValidationException(method, "Only one parameter can be used as payload, everything else must be annotated with @RestUriParam, @RestQueryParam or @RestHeaderParam.");
+                throw new AnnotationVerificationException(method, "Only one parameter can be used as payload, everything else must be annotated with @RestUriParam, @RestQueryParam or @RestHeaderParam.");
             }
         }
 
@@ -88,17 +88,17 @@ public class RestValidator implements Validator {
                 }
             }
             if (!getterFound) {
-                throw new ValidationException(field, "Cannot find a getter method for " + field.getSimpleName().toString() + " but its being marked as URI parameter of a REST call.");
+                throw new AnnotationVerificationException(field, "Cannot find a getter method for " + field.getSimpleName().toString() + " but its being marked as URI parameter of a REST call.");
             }
         }
 
         if (type.getFieldsAnnotatedWith(RestHttpClient.class).size() > 1) {
-            throw new ValidationException(type, "There can only be one field annotated with @RestHttpClient.");
+            throw new AnnotationVerificationException(type, "There can only be one field annotated with @RestHttpClient.");
         }
 
         if( type.getFieldsAnnotatedWith(RestHttpClient.class).size() > 0 ) {
             if (!type.getFieldsAnnotatedWith(RestHttpClient.class).get(0).asType().toString().equals(HttpClient.class.getName())) {
-                throw new ValidationException(type.getFieldsAnnotatedWith(RestHttpClient.class).get(0), "A field annotated with @RestHttpClient must be of type " + HttpClient.class.getName());
+                throw new AnnotationVerificationException(type.getFieldsAnnotatedWith(RestHttpClient.class).get(0), "A field annotated with @RestHttpClient must be of type " + HttpClient.class.getName());
             }
         }
 
@@ -111,7 +111,7 @@ public class RestValidator implements Validator {
                 }
             }
             if (!getterFound) {
-                throw new ValidationException(field, "Cannot find a getter method for " + field.getSimpleName().toString() + " but its being marked with @RestHttpClient.");
+                throw new AnnotationVerificationException(field, "Cannot find a getter method for " + field.getSimpleName().toString() + " but its being marked with @RestHttpClient.");
             }
         }
 

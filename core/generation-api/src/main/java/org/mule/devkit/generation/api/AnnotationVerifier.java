@@ -19,9 +19,9 @@ package org.mule.devkit.generation.api;
 
 import org.mule.devkit.model.Type;
 
-public interface Validator {
+public interface AnnotationVerifier {
 
-    boolean shouldValidate(Type type, Context context);
+    boolean shouldVerify(Type type, Context context);
 
-    void validate(Type type, Context context) throws ValidationException;
+    void verify(Type type, Context context) throws AnnotationVerificationException;
 }

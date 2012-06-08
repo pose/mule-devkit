@@ -24,9 +24,9 @@ import org.mule.api.annotations.Disconnect;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
+import org.mule.devkit.generation.api.AnnotationVerificationException;
+import org.mule.devkit.generation.api.AnnotationVerifier;
 import org.mule.devkit.generation.api.Context;
-import org.mule.devkit.generation.api.ValidationException;
-import org.mule.devkit.generation.api.Validator;
 import org.mule.devkit.model.Field;
 import org.mule.devkit.model.Identifiable;
 import org.mule.devkit.model.Method;
@@ -38,27 +38,27 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-public class JavaDocValidator implements Validator {
+public class JavaDocAnnotationVerifier implements AnnotationVerifier {
 
     @Override
-    public boolean shouldValidate(Type type, Context context) {
+    public boolean shouldVerify(Type type, Context context) {
         return type.isModuleOrConnector();
     }
 
     @Override
-    public void validate(Type type, Context context) throws ValidationException {
+    public void verify(Type type, Context context) throws AnnotationVerificationException {
 
         if (!hasComment(type, context)) {
-            throw new ValidationException(type, "Class " + type.getQualifiedName().toString() + " is not properly documented. A summary is missing.");
+            throw new AnnotationVerificationException(type, "Class " + type.getQualifiedName().toString() + " is not properly documented. A summary is missing.");
         }
 
         if (!type.hasJavaDocTag("author")) {
-            throw new ValidationException(type, "Class " + type.getQualifiedName().toString() + " needs to have an @author tag.");
+            throw new AnnotationVerificationException(type, "Class " + type.getQualifiedName().toString() + " needs to have an @author tag.");
         }
 
         for (Field variable : type.getFieldsAnnotatedWith(Configurable.class)) {
             if (!hasComment(variable, context)) {
-                throw new ValidationException(variable, "Field " + variable.getSimpleName().toString() + " is not properly documented. The description is missing.");
+                throw new AnnotationVerificationException(variable, "Field " + variable.getSimpleName().toString() + " is not properly documented. The description is missing.");
             }
         }
 
@@ -83,28 +83,28 @@ public class JavaDocValidator implements Validator {
         }
     }
 
-    private void validateAllParameters(Context context, Method method) throws ValidationException {
+    private void validateAllParameters(Context context, Method method) throws AnnotationVerificationException {
         for (Parameter variable : method.getParameters()) {
             if (!hasParameterComment(variable.getSimpleName().toString(), variable.parent(), context)) {
-                throw new ValidationException(variable, "Parameter " + variable.getSimpleName().toString() + " of method " + method.getSimpleName().toString() + " is not properly documented. A matching @param in the method documentation was not found. ");
+                throw new AnnotationVerificationException(variable, "Parameter " + variable.getSimpleName().toString() + " of method " + method.getSimpleName().toString() + " is not properly documented. A matching @param in the method documentation was not found. ");
             }
         }
     }
 
-    private void validateMethod(Type type, Context context, Method method) throws ValidationException {
+    private void validateMethod(Type type, Context context, Method method) throws AnnotationVerificationException {
         if (!hasComment(method, context)) {
-            throw new ValidationException(method, "Method " + method.getSimpleName().toString() + " is not properly documented. A description of what it can do is missing.");
+            throw new AnnotationVerificationException(method, "Method " + method.getSimpleName().toString() + " is not properly documented. A description of what it can do is missing.");
         }
 
         if (!method.getReturnType().toString().equals("void") &&
                 !method.getReturnType().toString().contains("StopSourceCallback")) {
             if (!method.hasJavaDocTag("return")) {
-                throw new ValidationException(type, "The return type of a non-void method must be documented. Method " + method.getSimpleName().toString() + " is at fault. Missing @return.");
+                throw new AnnotationVerificationException(type, "The return type of a non-void method must be documented. Method " + method.getSimpleName().toString() + " is at fault. Missing @return.");
             }
         }
 
         if (exampleDoesNotExist(context, method)) {
-            throw new ValidationException(type, "Method " + method.getSimpleName().toString() + " does not have the example pointed by the {@sample.xml} tag");
+            throw new AnnotationVerificationException(type, "Method " + method.getSimpleName().toString() + " does not have the example pointed by the {@sample.xml} tag");
         }
 
         validateAllParameters(context, method);
@@ -121,10 +121,10 @@ public class JavaDocValidator implements Validator {
         return StringUtils.isNotBlank(comment);
     }
 
-    protected boolean exampleDoesNotExist(Context context, Method method) throws ValidationException {
+    protected boolean exampleDoesNotExist(Context context, Method method) throws AnnotationVerificationException {
 
         if (!method.hasJavaDocTag("sample.xml")) {
-            throw new ValidationException(method, "Method " + method.getSimpleName().toString() + " does not contain an example using {@sample.xml} tag.");
+            throw new AnnotationVerificationException(method, "Method " + method.getSimpleName().toString() + " does not contain an example using {@sample.xml} tag.");
         }
 
         boolean found = false;
@@ -132,7 +132,7 @@ public class JavaDocValidator implements Validator {
         String[] split = sample.split(" ");
 
         if (split.length != 2) {
-            throw new ValidationException(method, "Check @sample.xml javadoc tag because is not well formed for method: " + method.getSimpleName());
+            throw new AnnotationVerificationException(method, "Check @sample.xml javadoc tag because is not well formed for method: " + method.getSimpleName());
         }
 
         String pathToExamplesFile = split[0];

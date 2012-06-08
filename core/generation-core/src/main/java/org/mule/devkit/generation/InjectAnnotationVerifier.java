@@ -29,9 +29,9 @@ import org.mule.api.registry.Registry;
 import org.mule.api.security.SecurityManager;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreManager;
+import org.mule.devkit.generation.api.AnnotationVerificationException;
 import org.mule.devkit.generation.api.Context;
-import org.mule.devkit.generation.api.ValidationException;
-import org.mule.devkit.generation.api.Validator;
+import org.mule.devkit.generation.api.AnnotationVerifier;
 import org.mule.devkit.model.Field;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Type;
@@ -40,14 +40,14 @@ import org.mule.util.queue.QueueManager;
 import javax.inject.Inject;
 import javax.transaction.TransactionManager;
 
-public class InjectValidator implements Validator {
+public class InjectAnnotationVerifier implements AnnotationVerifier {
     @Override
-    public boolean shouldValidate(Type type, Context context) {
+    public boolean shouldVerify(Type type, Context context) {
         return type.getFieldsAnnotatedWith(Inject.class).size() > 0;
     }
 
     @Override
-    public void validate(Type type, Context context) throws ValidationException {
+    public void verify(Type type, Context context) throws AnnotationVerificationException {
         for (Field variable : type.getFieldsAnnotatedWith(Inject.class)) {
             if (!variable.asType().toString().equals(MuleContext.class.getName()) &&
                     !variable.asType().toString().equals(ObjectStoreManager.class.getName()) &&
@@ -64,7 +64,7 @@ public class InjectValidator implements Validator {
                     !variable.asType().toString().equals(WorkManager.class.getName()) &&
                     !variable.asType().toString().equals(ObjectStore.class.getName()) &&
                     !variable.asType().toString().equals(Registry.class.getName())) {
-                throw new ValidationException(variable, "I don't know how to inject the type " + variable.asType().toString() + " in field " + variable.getSimpleName().toString() + ". "
+                throw new AnnotationVerificationException(variable, "I don't know how to inject the type " + variable.asType().toString() + " in field " + variable.getSimpleName().toString() + ". "
                         + "The only types I know how to inject are: MuleContext, ObjectStoreManager, ObjectStore, TransactionManager, QueueManager, MuleConfiguration, LifecycleManager, ClassLoader,"
                         + "ExpressionManager, EndpointFactory, MuleClient, SystemExceptionHandler, SecurityManager, WorkManager, Registry");
             } else {
@@ -76,7 +76,7 @@ public class InjectValidator implements Validator {
                     }
                 }
                 if( !found ) {
-                    throw new ValidationException(variable, "Cannot find a setter method for " + variable.getSimpleName().toString() + " but its being marked as injectable.");
+                    throw new AnnotationVerificationException(variable, "Cannot find a setter method for " + variable.getSimpleName().toString() + " but its being marked as injectable.");
                 }
 
                 if( variable.asType().toString().equals(ObjectStore.class.getName()) ) {
@@ -88,7 +88,7 @@ public class InjectValidator implements Validator {
                         }
                     }
                     if( !getterFound ) {
-                        throw new ValidationException(variable, "Cannot find a getter method for " + variable.getSimpleName().toString() + " but its being marked as an injectable Object Store.");
+                        throw new AnnotationVerificationException(variable, "Cannot find a getter method for " + variable.getSimpleName().toString() + " but its being marked as an injectable Object Store.");
                     }
 
                 }

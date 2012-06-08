@@ -19,16 +19,16 @@ public interface Plugin {
     String getOptionName();
 
     /**
-     * Retrieve a list of validators for the specified object type
+     * Retrieve a list of verifiers for the specified object type
      *
-     * @return A list of validators implementing Validator
+     * @return A list of verifiers implementing AnnotationVerifier
      */
-    public abstract List<Validator> getValidators();
+    public abstract List<AnnotationVerifier> getAnnotationVerifiers();
 
     /**
      * Retrieve a list of generators for the specified object type
      *
-     * @return A list of validators implementing Generator
+     * @return A list of generators implementing Generator
      */
     public abstract List<Generator> getGenerators();
 }

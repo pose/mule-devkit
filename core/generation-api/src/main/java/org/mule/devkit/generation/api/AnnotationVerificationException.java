@@ -19,29 +19,29 @@ package org.mule.devkit.generation.api;
 
 import org.mule.devkit.model.Identifiable;
 
-public class ValidationException extends Exception {
+public class AnnotationVerificationException extends Exception {
     private Identifiable element;
 
-    public ValidationException(Identifiable element) {
+    public AnnotationVerificationException(Identifiable element) {
         super();
 
         this.element = element;
     }
 
-    public ValidationException(Identifiable element, String s) {
+    public AnnotationVerificationException(Identifiable element, String s) {
         super(s);
 
         this.element = element;
     }
 
-    public ValidationException(Identifiable element, String s, Throwable throwable) {
+    public AnnotationVerificationException(Identifiable element, String s, Throwable throwable) {
         super(s, throwable);
 
         this.element = element;
     }
 
 
-    public ValidationException(Identifiable element, Throwable throwable) {
+    public AnnotationVerificationException(Identifiable element, Throwable throwable) {
         super(throwable);
 
         this.element = element;
