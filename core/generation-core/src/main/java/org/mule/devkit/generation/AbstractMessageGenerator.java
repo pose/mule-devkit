@@ -33,7 +33,6 @@ import org.mule.api.callback.SourceCallback;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -43,7 +42,6 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.construct.Flow;
@@ -64,20 +62,15 @@ import org.mule.devkit.model.code.ForEach;
 import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
-import org.mule.devkit.model.code.Package;
 import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.builders.FieldBuilder;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.TemplateParser;
 
 import javax.lang.model.type.TypeMirror;
-import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -183,9 +176,8 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
             String fieldName = variable.getSimpleName().toString();
 
-            FieldVariable field = null;
             FieldVariable fieldType = null;
-            field = new FieldBuilder(messageProcessorClass).
+            FieldVariable field = new FieldBuilder(messageProcessorClass).
                     privateVisibility().
                     type(ref(variable.asType())).
                     name(fieldName).

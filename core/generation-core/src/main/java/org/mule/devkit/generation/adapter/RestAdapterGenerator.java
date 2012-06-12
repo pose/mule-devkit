@@ -106,7 +106,7 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
         FieldVariable responseTimeout = restClientAdapterClass.field(Modifier.PRIVATE, ctx().getCodeModel().INT, "responseTimeout");
         FieldVariable muleContext = restClientAdapterClass.field(Modifier.PRIVATE, ref(MuleContext.class), "muleContext");
 
-        Expression httpClient = null;
+        Expression httpClient;
         if (!type.hasFieldAnnotatedWith(RestHttpClient.class)) {
             httpClient = restClientAdapterClass.field(Modifier.PRIVATE | Modifier.VOLATILE, ref(HttpClient.class), "httpClient");
         } else {

@@ -322,8 +322,8 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
             methodCall = moduleObject.invoke(methodName);
         }
 
-        for (int i = 0; i < parameters.size(); i++) {
-            methodCall.arg(parameters.get(i));
+        for(Expression expression : parameters ) {
+            methodCall.arg(expression);
         }
 
         if (sourceMethod.getReturnType().toString().contains("StopSourceCallback")) {

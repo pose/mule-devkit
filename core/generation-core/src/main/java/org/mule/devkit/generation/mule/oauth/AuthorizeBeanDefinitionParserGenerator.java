@@ -32,8 +32,6 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 
 public class AuthorizeBeanDefinitionParserGenerator extends AbstractMessageGenerator {
-    public static final String AUTHORIZE_DEFINITION_PARSER_ROLE = "AuthorizeDefinitionParser";
-
     @Override
     public boolean shouldGenerate(Type type) {
         if (type.hasAnnotation(OAuth.class) || type.hasAnnotation(OAuth2.class)) {

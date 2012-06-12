@@ -38,7 +38,18 @@ import org.mule.devkit.model.Identifiable;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Parameter;
 import org.mule.devkit.model.Type;
-import org.mule.devkit.model.code.*;
+import org.mule.devkit.model.code.Block;
+import org.mule.devkit.model.code.CatchBlock;
+import org.mule.devkit.model.code.Conditional;
+import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.DefinedClassRoles;
+import org.mule.devkit.model.code.ExpressionFactory;
+import org.mule.devkit.model.code.Invocation;
+import org.mule.devkit.model.code.Modifier;
+import org.mule.devkit.model.code.Op;
+import org.mule.devkit.model.code.TryStatement;
+import org.mule.devkit.model.code.TypeReference;
+import org.mule.devkit.model.code.Variable;
 import org.mule.devkit.model.schema.SchemaConstants;
 import org.mule.devkit.model.schema.SchemaTypeConversion;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -346,7 +357,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                 .arg(NameUtils.uncamel(NameUtils.singularize(fieldName)));
 
         if (variable.hasTypeArguments()) {
-            Identifiable typeArgument = (Identifiable) variable.getTypeArguments().get(0);
+            Identifiable typeArgument = variable.getTypeArguments().get(0);
 
             if (typeArgument.isArrayOrList()) {
                 String innerChildElementName = "inner-" + NameUtils.uncamel(NameUtils.singularize(fieldName));
@@ -371,7 +382,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                 .arg(NameUtils.uncamel(NameUtils.singularize(fieldName)));
 
         if (variable.hasTypeArguments()) {
-            Identifiable typeArgument = (Identifiable) variable.getTypeArguments().get(0);
+            Identifiable typeArgument = variable.getTypeArguments().get(0);
 
             if (typeArgument.isArrayOrList()) {
                 String innerChildElementName = "inner-" + NameUtils.uncamel(NameUtils.singularize(fieldName));

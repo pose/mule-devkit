@@ -64,7 +64,7 @@ public class AbstractExpressionEvaluatorGenerator extends AbstractMessageGenerat
 
     private DefinedClass getAbstractExpressionEvaluatorClass(Type type) {
         org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(type.getPackageName());
-        DefinedClass clazz = null;
+        DefinedClass clazz;
         try {
             clazz = pkg._class(Modifier.ABSTRACT | Modifier.PUBLIC, NamingConstants.ABSTRACT_EXPRESSION_EVALUATOR_CLASS_NAME_SUFFIX);
         } catch (ClassAlreadyExistsException e) {

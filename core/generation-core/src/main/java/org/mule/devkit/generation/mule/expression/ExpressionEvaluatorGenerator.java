@@ -138,7 +138,7 @@ public class ExpressionEvaluatorGenerator extends AbstractMessageGenerator {
             //argCount++;
         }
         Variable parameterClasses = tryStatement.body().decl(ref(Class.class).array(), "parameterClasses", newArray);
-        int argCount = 0;
+        int argCount;
         Invocation getMethod = module.invoke("getClass").invoke("getMethod").arg(executableElement.getSimpleName().toString()).arg(parameterClasses);
         Variable moduleEvaluate = tryStatement.body().decl(ref(java.lang.reflect.Method.class), "evaluateMethod", getMethod);
         List<Variable> types = new ArrayList<Variable>();

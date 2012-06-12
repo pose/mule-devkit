@@ -35,7 +35,7 @@ public class RegistryBootstrapGenerator extends AbstractModuleGenerator {
 
     @Override
     public void generate(Type type) throws GenerationException {
-        OutputStreamWriter registryBootstrapStreamOut = null;
+        OutputStreamWriter registryBootstrapStreamOut;
         try {
             OutputStream registryBootstrapStream = ctx().getCodeModel().getRegistryBootstrapStream();
             registryBootstrapStreamOut = new OutputStreamWriter(registryBootstrapStream, "UTF-8");
@@ -46,8 +46,6 @@ public class RegistryBootstrapGenerator extends AbstractModuleGenerator {
             registryBootstrapStreamOut.flush();
         } catch (IOException ioe) {
             throw new GenerationException(ioe);
-        } finally {
-            //IOUtils.closeQuietly(registryBootstrapStreamOut);
         }
     }
 }

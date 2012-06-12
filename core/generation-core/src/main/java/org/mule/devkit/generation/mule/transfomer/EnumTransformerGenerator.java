@@ -175,7 +175,7 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
         if (variableElement instanceof Type) {
             packageName = ((Type)variableElement).getPackageName();
         } else if (variableElement instanceof Parameter) {
-            packageName = ((Type)((Parameter) variableElement).parent().parent()).getPackageName();
+            packageName = (((Parameter) variableElement).parent().parent()).getPackageName();
         } else if (variableElement.parent() instanceof Type) {
             packageName = ((Type)variableElement.parent()).getPackageName();
         }
