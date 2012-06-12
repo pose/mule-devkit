@@ -122,6 +122,12 @@ public class AbstractBeanDefinitionParserGenerator extends AbstractMessageGenera
         }
     }
 
+    private FieldVariable generateFieldForPatternInfo(DefinedClass beanDefinitionParserClass) {
+        FieldVariable patternInfo = beanDefinitionParserClass.field(Modifier.PRIVATE, ref(TemplateParser.PatternInfo.class), "patternInfo");
+        patternInfo.javadoc().add("Mule Pattern Info");
+        return patternInfo;
+    }
+
     private void generateParseNestedProcessorMethod(DefinedClass beanDefinitionParserClass) {
         Method parseNestedProcessor = beanDefinitionParserClass.method(Modifier.PROTECTED, ref(BeanDefinition.class), "parseNestedProcessor");
         Variable element = parseNestedProcessor.param(ref(Element.class), "element");

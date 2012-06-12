@@ -83,12 +83,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
-    protected FieldVariable generateFieldForPatternInfo(DefinedClass messageProcessorClass) {
-        FieldVariable patternInfo = messageProcessorClass.field(Modifier.PRIVATE, ref(TemplateParser.PatternInfo.class), "patternInfo");
-        patternInfo.javadoc().add("Mule Pattern Info");
-        return patternInfo;
-    }
-
     protected FieldVariable generateFieldForMessageProcessor(DefinedClass messageProcessorClass, String name) {
         FieldVariable expressionManager = messageProcessorClass.field(Modifier.PRIVATE, ref(MessageProcessor.class), name);
         expressionManager.javadoc().add("Message Processor");
