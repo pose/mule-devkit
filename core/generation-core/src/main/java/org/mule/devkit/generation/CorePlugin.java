@@ -14,6 +14,7 @@ import org.mule.devkit.generation.api.AnnotationVerifier;
 import org.mule.devkit.generation.api.Generator;
 import org.mule.devkit.generation.api.Plugin;
 import org.mule.devkit.generation.callback.DefaultHttpCallbackGenerator;
+import org.mule.devkit.generation.mule.AbstractExpressionEvaluatorGenerator;
 import org.mule.devkit.generation.mule.MessageProcessorGenerator;
 import org.mule.devkit.generation.mule.MessageSourceGenerator;
 import org.mule.devkit.generation.mule.NestedProcessorChainGenerator;
@@ -73,6 +74,7 @@ public class CorePlugin implements Plugin {
         generators.add(new DefaultRestoreAccessTokenCallbackFactoryGenerator());
         generators.add(new DefaultSaveAccessTokenCallbackFactoryGenerator());
         generators.add(new AbstractBeanDefinitionParserGenerator());
+        generators.add(new AbstractExpressionEvaluatorGenerator());
         generators.add(new MessageSourceGenerator());
         generators.add(new MessageProcessorGenerator());
         generators.add(new AuthorizeMessageProcessorGenerator());

@@ -114,14 +114,6 @@ public class ExpressionEvaluatorGenerator extends AbstractMessageGenerator {
 
         generateSetName(evaluatorClass);
 
-        generateComputeClassHierarchyMethod(evaluatorClass);
-        generateIsListClassMethod(evaluatorClass);
-        generateIsMapClassMethod(evaluatorClass);
-        generateIsListMethod(evaluatorClass);
-        generateIsMapMethod(evaluatorClass);
-        generateIsAssignableFrom(evaluatorClass);
-        generateTransformMethod(evaluatorClass);
-
         org.mule.devkit.model.code.Method evaluate = evaluatorClass.method(Modifier.PUBLIC, ref(Object.class), "evaluate");
         Variable expression = evaluate.param(ref(String.class), "expression");
         Variable message = evaluate.param(ref(MuleMessage.class), "message");
@@ -277,13 +269,13 @@ public class ExpressionEvaluatorGenerator extends AbstractMessageGenerator {
 
     private DefinedClass getEvaluatorClass(String name, Type type) {
         org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.EXPRESSIONS_NAMESPACE);
-        DefinedClass evaluator = pkg._class(NameUtils.camel(name) + NamingConstants.EXPRESSION_EVALUATOR_CLASS_NAME_SUFFIX, new Class<?>[]{org.mule.api.expression.ExpressionEvaluator.class});
+        DefinedClass abstractExpressionEvaluator = ctx().getCodeModel()._class(DefinedClassRoles.ABSTRACT_EXPRESSION_EVALUATOR);
+        DefinedClass evaluator = pkg._class(NameUtils.camel(name) + NamingConstants.EXPRESSION_EVALUATOR_CLASS_NAME_SUFFIX, abstractExpressionEvaluator, new Class<?>[]{org.mule.api.expression.ExpressionEvaluator.class});
         evaluator._implements(ref(MuleContextAware.class));
         evaluator._implements(ref(Startable.class));
         evaluator._implements(ref(Stoppable.class));
         evaluator._implements(ref(Initialisable.class));
         evaluator._implements(ref(Disposable.class));
-        //evaluator._implements(ref(FlowConstructAware.class));
 
         return evaluator;
     }

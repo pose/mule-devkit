@@ -2,6 +2,7 @@ package org.mule.devkit.model.code;
 
 public enum DefinedClassRoles {
     ABSTRACT_BEAN_DEFINITION_PARSER,
+    ABSTRACT_EXPRESSION_EVALUATOR,
     PARSER_DELEGATE,
     CONFIG_BEAN_DEFINITION_PARSER,
     MODULE_OBJECT,

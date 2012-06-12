@@ -52,9 +52,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.devkit.generation.AbstractMessageGenerator;
@@ -82,18 +80,15 @@ import org.mule.expression.MessageHeaderExpressionEvaluator;
 import org.mule.expression.MessageHeadersExpressionEvaluator;
 import org.mule.expression.MessageHeadersListExpressionEvaluator;
 import org.mule.transformer.TransformerTemplate;
-import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.type.DeclaredType;
-import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 
 public class MessageProcessorGenerator extends AbstractMessageGenerator {
@@ -142,8 +137,6 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         FieldVariable logger = generateLoggerField(messageProcessorClass);
         FieldVariable object = generateFieldForModuleObject(messageProcessorClass, type);
         FieldVariable muleContext = generateFieldForMuleContext(messageProcessorClass);
-        FieldVariable expressionManager = generateFieldForExpressionManager(messageProcessorClass);
-        FieldVariable patternInfo = generateFieldForPatternInfo(messageProcessorClass);
         FieldVariable flowConstruct = generateFieldForFlowConstruct(messageProcessorClass);
         FieldVariable retryCount = generateRetryCountField(messageProcessorClass);
         FieldVariable retryMax = generateRetryMaxField(messageProcessorClass);
@@ -154,7 +147,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         }
 
         // add initialise
-        generateInitialiseMethod(messageProcessorClass, fields, type, muleContext, expressionManager, patternInfo, object, retryCount, !type.needsConfig());
+        generateInitialiseMethod(messageProcessorClass, fields, type, muleContext, object, retryCount, !type.needsConfig());
 
         // add start
         generateStartMethod(messageProcessorClass, fields);
@@ -199,16 +192,6 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             }
         }
 
-        // generate evaluate & transform methods and helpers
-        generateComputeClassHierarchyMethod(messageProcessorClass);
-        generateIsListClassMethod(messageProcessorClass);
-        generateIsMapClassMethod(messageProcessorClass);
-        generateIsListMethod(messageProcessorClass);
-        generateIsMapMethod(messageProcessorClass);
-        generateIsAssignableFrom(messageProcessorClass);
-        generateEvaluateMethod(messageProcessorClass, patternInfo, expressionManager);
-        generateEvaluateAndTransformMethod(messageProcessorClass, muleContext);
-
         // get pool object if poolable
         if (type.isPoolable()) {
             DefinedClass poolObjectClass = ctx().getCodeModel()._class(DefinedClassRoles.POOL_OBJECT, ref(type));
@@ -219,121 +202,6 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             // add process method
             generateProcessMethod(processorMethod, messageProcessorClass, fields, connectFields, messageProcessorListener, muleContext, object, logger, retryCount, retryMax);
         }
-    }
-
-    private void generateEvaluateAndTransformMethod(DefinedClass messageProcessorClass, FieldVariable muleContext) {
-        org.mule.devkit.model.code.Method evaluateAndTransform = messageProcessorClass.method(Modifier.PRIVATE, ref(Object.class), "evaluateAndTransform");
-        evaluateAndTransform._throws(ref(TransformerException.class));
-        org.mule.devkit.model.code.Variable muleMessage = evaluateAndTransform.param(ref(MuleMessage.class), "muleMessage");
-        org.mule.devkit.model.code.Variable expectedType = evaluateAndTransform.param(ref(java.lang.reflect.Type.class), "expectedType");
-        org.mule.devkit.model.code.Variable expectedMimeType = evaluateAndTransform.param(ref(String.class), "expectedMimeType");
-        org.mule.devkit.model.code.Variable source = evaluateAndTransform.param(ref(Object.class), "source");
-
-        evaluateAndTransform.body()._if(Op.eq(source, ExpressionFactory._null()))._then()._return(source);
-
-        org.mule.devkit.model.code.Variable target = evaluateAndTransform.body().decl(ref(Object.class), "target", ExpressionFactory._null());
-        Conditional isList = evaluateAndTransform.body()._if(
-                ExpressionFactory.invoke("isList").arg(source.invoke("getClass")));
-        Conditional isExpectedList = isList._then()._if(
-                ExpressionFactory.invoke("isList").arg(expectedType));
-        org.mule.devkit.model.code.Variable newList = isExpectedList._then().decl(ref(List.class), "newList", ExpressionFactory._new(ref(ArrayList.class)));
-        org.mule.devkit.model.code.Variable listParameterizedType = isExpectedList._then().decl(ref(java.lang.reflect.Type.class), "valueType",
-                ExpressionFactory.cast(ref(ParameterizedType.class), expectedType).
-                        invoke("getActualTypeArguments").component(ExpressionFactory.lit(0)));
-        org.mule.devkit.model.code.Variable listIterator = isExpectedList._then().decl(ref(ListIterator.class), "iterator",
-                ExpressionFactory.cast(ref(List.class), source).
-                        invoke("listIterator"));
-
-        Block whileHasNext = isExpectedList._then()._while(listIterator.invoke("hasNext")).body();
-        org.mule.devkit.model.code.Variable subTarget = whileHasNext.decl(ref(Object.class), "subTarget", listIterator.invoke("next"));
-        whileHasNext.add(newList.invoke("add").arg(
-                ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(listParameterizedType).
-                        arg(expectedMimeType).
-                        arg(subTarget)
-        ));
-        isExpectedList._then().assign(target, newList);
-        isExpectedList._else().assign(target, source);
-
-        Conditional isMap = isList._elseif(
-                ExpressionFactory.invoke("isMap").arg(source.invoke("getClass")));
-        Conditional isExpectedMap = isMap._then()._if(
-                ExpressionFactory.invoke("isMap").arg(expectedType));
-
-        Block isExpectedMapBlock = isExpectedMap._then();
-        org.mule.devkit.model.code.Variable keyType = isExpectedMapBlock.decl(ref(java.lang.reflect.Type.class), "keyType",
-                ref(Object.class).dotclass());
-        org.mule.devkit.model.code.Variable valueType = isExpectedMapBlock.decl(ref(java.lang.reflect.Type.class), "valueType",
-                ref(Object.class).dotclass());
-
-        Block isGenericMap = isExpectedMapBlock._if(Op._instanceof(expectedType, ref(ParameterizedType.class)))._then();
-
-        isGenericMap.assign(keyType, ExpressionFactory.cast(ref(ParameterizedType.class), expectedType).
-                invoke("getActualTypeArguments").component(ExpressionFactory.lit(0)));
-        isGenericMap.assign(valueType, ExpressionFactory.cast(ref(ParameterizedType.class), expectedType).
-                invoke("getActualTypeArguments").component(ExpressionFactory.lit(1)));
-
-        org.mule.devkit.model.code.Variable map = isExpectedMapBlock.decl(ref(Map.class), "map", ExpressionFactory.cast(ref(Map.class), source));
-
-        org.mule.devkit.model.code.Variable newMap = isExpectedMapBlock.decl(ref(Map.class), "newMap", ExpressionFactory._new(ref(HashMap.class)));
-        ForEach forEach = isExpectedMapBlock.forEach(ref(Object.class), "entryObj", map.invoke("entrySet"));
-        Block forEachBlock = forEach.body().block();
-        org.mule.devkit.model.code.Variable entry = forEachBlock.decl(ref(Map.Entry.class), "entry", ExpressionFactory.cast(ref(Map.Entry.class), forEach.var()));
-        org.mule.devkit.model.code.Variable newKey = forEachBlock.decl(ref(Object.class), "newKey", ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(keyType).arg(expectedMimeType).arg(entry.invoke("getKey")));
-        org.mule.devkit.model.code.Variable newValue = forEachBlock.decl(ref(Object.class), "newValue", ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(valueType).arg(expectedMimeType).arg(entry.invoke("getValue")));
-        forEachBlock.invoke(newMap, "put").arg(newKey).arg(newValue);
-
-        isExpectedMapBlock.assign(target, newMap);
-
-        isExpectedMap._else().assign(target, source);
-
-        Block otherwise = isMap._else();
-        otherwise.assign(target, ExpressionFactory.invoke("evaluate").arg(muleMessage).arg(source));
-
-
-        Conditional shouldTransform = evaluateAndTransform.body()._if(Op.cand(
-                Op.ne(target, ExpressionFactory._null()),
-                Op.not(ExpressionFactory.invoke("isAssignableFrom").arg(expectedType).arg(target.invoke("getClass")))
-        ));
-
-        org.mule.devkit.model.code.Variable sourceDataType = shouldTransform._then().decl(ref(DataType.class), "sourceDataType",
-                ref(DataTypeFactory.class).staticInvoke("create").arg(target.invoke("getClass")));
-        org.mule.devkit.model.code.Variable targetDataType = shouldTransform._then().decl(ref(DataType.class), "targetDataType", ExpressionFactory._null());
-
-        Conditional ifParameterizedType = shouldTransform._then()._if(Op._instanceof(expectedType, ref(ParameterizedType.class)));
-        ifParameterizedType._then().assign(expectedType, ExpressionFactory.cast(ref(ParameterizedType.class), expectedType).invoke("getRawType"));
-
-        Conditional ifExpectedMimeTypeNotNull = shouldTransform._then()._if(Op.ne(expectedMimeType, ExpressionFactory._null()));
-        ifExpectedMimeTypeNotNull._then().assign(targetDataType, ref(DataTypeFactory.class).staticInvoke("create").arg(
-                                ExpressionFactory.cast(ref(Class.class), expectedType)).arg(expectedMimeType));
-
-        ifExpectedMimeTypeNotNull._else().assign(targetDataType, ref(DataTypeFactory.class).staticInvoke("create").arg(
-                                ExpressionFactory.cast(ref(Class.class), expectedType)));
-        
-        org.mule.devkit.model.code.Variable transformer = shouldTransform._then().decl(ref(Transformer.class), "t",
-                muleContext.invoke("getRegistry").invoke("lookupTransformer").arg(sourceDataType).arg(targetDataType));
-
-        shouldTransform._then()._return(transformer.invoke("transform").arg(target));
-
-        shouldTransform._else()._return(target);
-    }
-
-
-    private void generateEvaluateMethod(DefinedClass messageProcessorClass, FieldVariable patternInfo, FieldVariable expressionManager) {
-        org.mule.devkit.model.code.Method evaluate = messageProcessorClass.method(Modifier.PRIVATE, ref(Object.class), "evaluate");
-        org.mule.devkit.model.code.Variable muleMessage = evaluate.param(ref(MuleMessage.class), "muleMessage");
-        org.mule.devkit.model.code.Variable source = evaluate.param(ref(Object.class), "source");
-
-        Block ifString = evaluate.body()._if(Op._instanceof(source, ref(String.class)))._then();
-        org.mule.devkit.model.code.Variable stringSource = ifString.decl(ref(String.class), "stringSource", ExpressionFactory.cast(ref(String.class), source));
-        Conditional isPattern = ifString._if(Op.cand(
-                stringSource.invoke("startsWith").arg(patternInfo.invoke("getPrefix")),
-                stringSource.invoke("endsWith").arg(patternInfo.invoke("getSuffix"))
-        ));
-
-        isPattern._then()._return(expressionManager.invoke("evaluate").arg(stringSource).arg(muleMessage));
-        isPattern._else()._return(expressionManager.invoke("parse").arg(stringSource).arg(muleMessage));
-
-        evaluate.body()._return(source);
     }
 
     private void generateMessageProcessorClassDoc(Method executableElement, DefinedClass messageProcessorClass) {
@@ -399,7 +267,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                 Invocation getGenericType = messageProcessorClass.dotclass().invoke("getDeclaredField").arg(
                         ExpressionFactory.lit(connectionFields.get(fieldName).getFieldType().name())
                 ).invoke("getGenericType");
-                Invocation evaluateAndTransform = ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(getGenericType).arg(ExpressionFactory._null());
+                Invocation evaluateAndTransform = ExpressionFactory.invoke("evaluateAndTransform").arg(muleContext).arg(muleMessage).arg(getGenericType).arg(ExpressionFactory._null());
 
                 evaluateAndTransform.arg(connectionFields.get(fieldName).getField());
 
@@ -407,7 +275,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
                 ifNotNull._then().assign(transformed, cast);
 
-                Invocation evaluateAndTransformLocal = ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(getGenericType).arg(ExpressionFactory._null());
+                Invocation evaluateAndTransformLocal = ExpressionFactory.invoke("evaluateAndTransform").arg(muleContext).arg(muleMessage).arg(getGenericType).arg(ExpressionFactory._null());
 
                 evaluateAndTransformLocal.arg(moduleObject.invoke("get" + StringUtils.capitalize(fieldName)));
 
@@ -451,7 +319,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             } else if (variable.asType().toString().startsWith(MuleMessage.class.getName())) {
                 parameters.add(muleMessage);
             } else {
-                outboundHeadersMap = declareStandardParameter(messageProcessorClass, fields, muleMessage, callProcessor, parameters, outboundHeadersMap, variable, fieldName);
+                outboundHeadersMap = declareStandardParameter(messageProcessorClass, fields, muleMessage, callProcessor, parameters, outboundHeadersMap, variable, fieldName, muleContext);
             }
         }
 
@@ -661,7 +529,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
     }
 
-    private org.mule.devkit.model.code.Variable declareStandardParameter(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, org.mule.devkit.model.code.Variable muleMessage, TryStatement callProcessor, List<Expression> parameters, org.mule.devkit.model.code.Variable outboundHeadersMap, Variable variable, String fieldName) {
+    private org.mule.devkit.model.code.Variable declareStandardParameter(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, org.mule.devkit.model.code.Variable muleMessage, TryStatement callProcessor, List<Expression> parameters, org.mule.devkit.model.code.Variable outboundHeadersMap, Variable variable, String fieldName, FieldVariable muleContext) {
         InboundHeaders inboundHeaders = variable.getAnnotation(InboundHeaders.class);
         OutboundHeaders outboundHeaders = variable.getAnnotation(OutboundHeaders.class);
         InvocationHeaders invocationHeaders = variable.getAnnotation(InvocationHeaders.class);
@@ -680,7 +548,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             Invocation getGenericType = messageProcessorClass.dotclass().invoke("getDeclaredField").arg(
                     ExpressionFactory.lit(fields.get(fieldName).getFieldType().name())
             ).invoke("getGenericType");
-            Invocation evaluateAndTransform = ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(getGenericType);
+            Invocation evaluateAndTransform = ExpressionFactory.invoke("evaluateAndTransform").arg(muleContext).arg(muleMessage).arg(getGenericType);
             
             Mime mime = fields.get(fieldName).getVariable().getAnnotation(Mime.class);
             if( mime != null ) {
@@ -908,7 +776,8 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
     private DefinedClass getMessageProcessorClass(Method processorMethod) {
         org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(processorMethod.parent().getPackageName() + NamingConstants.MESSAGE_PROCESSOR_NAMESPACE);
-        DefinedClass clazz = pkg._class(processorMethod.getCapitalizedName() + NamingConstants.MESSAGE_PROCESSOR_CLASS_NAME_SUFFIX, new Class[]{
+        DefinedClass abstractExpressionEvaluator = ctx().getCodeModel()._class(DefinedClassRoles.ABSTRACT_EXPRESSION_EVALUATOR);
+        DefinedClass clazz = pkg._class(processorMethod.getCapitalizedName() + NamingConstants.MESSAGE_PROCESSOR_CLASS_NAME_SUFFIX, abstractExpressionEvaluator, new Class[]{
                 Initialisable.class,
                 Startable.class,
                 Disposable.class,
@@ -924,7 +793,8 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
     private DefinedClass getInterceptingMessageProcessorClass(Method processorMethod) {
         org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(processorMethod.parent().getPackageName() + NamingConstants.MESSAGE_PROCESSOR_NAMESPACE);
-        DefinedClass clazz = pkg._class(processorMethod.getCapitalizedName() + NamingConstants.MESSAGE_PROCESSOR_CLASS_NAME_SUFFIX, new Class[]{
+        DefinedClass abstractExpressionEvaluator = ctx().getCodeModel()._class(DefinedClassRoles.ABSTRACT_EXPRESSION_EVALUATOR);
+        DefinedClass clazz = pkg._class(processorMethod.getCapitalizedName() + NamingConstants.MESSAGE_PROCESSOR_CLASS_NAME_SUFFIX, abstractExpressionEvaluator, new Class[]{
                 Initialisable.class,
                 Startable.class,
                 Disposable.class,

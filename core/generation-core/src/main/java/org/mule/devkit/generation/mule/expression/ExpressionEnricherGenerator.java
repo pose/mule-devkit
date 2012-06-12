@@ -150,14 +150,6 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
 
         generateSetName(enricherClass);
 
-        generateComputeClassHierarchyMethod(enricherClass);
-        generateIsListClassMethod(enricherClass);
-        generateIsMapClassMethod(enricherClass);
-        generateIsListMethod(enricherClass);
-        generateIsMapMethod(enricherClass);
-        generateIsAssignableFrom(enricherClass);
-        generateTransformMethod(enricherClass);
-
         org.mule.devkit.model.code.Method enrich = enricherClass.method(Modifier.PUBLIC, ctx().getCodeModel().VOID, "enrich");
         Variable expression = enrich.param(ref(String.class), "expression");
         Variable message = enrich.param(ref(MuleMessage.class), "message");
@@ -443,13 +435,13 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
 
     private DefinedClass getEnricherClass(String name, Type type) {
         org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.EXPRESSIONS_NAMESPACE);
-        DefinedClass enricherClass = pkg._class(NameUtils.camel(name) + NamingConstants.EXPRESSION_ENRICHER_CLASS_NAME_SUFFIX, new Class<?>[]{org.mule.api.expression.ExpressionEnricher.class});
+        DefinedClass abstractExpressionEvaluator = ctx().getCodeModel()._class(DefinedClassRoles.ABSTRACT_EXPRESSION_EVALUATOR);
+        DefinedClass enricherClass = pkg._class(NameUtils.camel(name) + NamingConstants.EXPRESSION_ENRICHER_CLASS_NAME_SUFFIX, abstractExpressionEvaluator, new Class<?>[]{org.mule.api.expression.ExpressionEnricher.class});
         enricherClass._implements(ref(MuleContextAware.class));
         enricherClass._implements(ref(Startable.class));
         enricherClass._implements(ref(Stoppable.class));
         enricherClass._implements(ref(Initialisable.class));
         enricherClass._implements(ref(Disposable.class));
-        //enricherClass._implements(ref(FlowConstructAware.class));
 
         return enricherClass;
     }

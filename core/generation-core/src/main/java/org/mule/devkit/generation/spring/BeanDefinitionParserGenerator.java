@@ -23,7 +23,6 @@ import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
-import org.mule.api.annotations.SourceThreadingModel;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.api.callback.HttpCallback;
@@ -247,38 +246,37 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         generateProcessorParseMethod(beanDefinitionparser, messageProcessorClass, processorMethod);
     }
 
-    private void generateProcessorParseMethod(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, Method executableElement) {
-        org.mule.devkit.model.code.Method parse = beanDefinitionparser.method(Modifier.PUBLIC, ref(BeanDefinition.class), "parse");
+    private void generateProcessorParseMethod(DefinedClass definitionParser, DefinedClass messageProcessorClass, Method processorMethod) {
+        org.mule.devkit.model.code.Method parse = definitionParser.method(Modifier.PUBLIC, ref(BeanDefinition.class), "parse");
         Variable element = parse.param(ref(org.w3c.dom.Element.class), "element");
         Variable parserContext = parse.param(ref(ParserContext.class), "parserContext");
 
-        Variable definition = generateParseCommon(beanDefinitionparser, messageProcessorClass, executableElement, parse, element, parserContext);
+        Variable definition = generateParseCommon(messageProcessorClass, processorMethod, parse, element, parserContext);
 
         parse.body().invoke("attachProcessorDefinition").arg(parserContext).arg(definition);
 
         parse.body()._return(definition);
     }
 
-    private void generateSourceParseMethod(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, Method executableElement) {
-        org.mule.devkit.model.code.Method parse = beanDefinitionparser.method(Modifier.PUBLIC, ref(BeanDefinition.class), "parse");
+    private void generateSourceParseMethod(DefinedClass definitionParser, DefinedClass messageProcessorClass, Method sourceMethod) {
+        org.mule.devkit.model.code.Method parse = definitionParser.method(Modifier.PUBLIC, ref(BeanDefinition.class), "parse");
         Variable element = parse.param(ref(org.w3c.dom.Element.class), "element");
         Variable parserContext = parse.param(ref(ParserContext.class), "parserContext");
 
-        Variable definition = generateParseCommon(beanDefinitionparser, messageProcessorClass, executableElement, parse, element, parserContext);
+        Variable definition = generateParseCommon(messageProcessorClass, sourceMethod, parse, element, parserContext);
 
         parse.body().invoke("attachSourceDefinition").arg(parserContext).arg(definition);
 
         parse.body()._return(definition);
     }
 
-    private Variable generateParseCommon(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, Method executableElement, org.mule.devkit.model.code.Method parse, Variable element, Variable parserContext) {
+    private Variable generateParseCommon(DefinedClass messageProcessorClass, Method method, org.mule.devkit.model.code.Method parse, Variable element, Variable parserContext) {
         Variable builder = parse.body().decl(ref(BeanDefinitionBuilder.class), "builder",
                 ref(BeanDefinitionBuilder.class).staticInvoke("rootBeanDefinition").arg(messageProcessorClass.dotclass().invoke("getName")));
 
         parse.body().invoke("parseConfigRef").arg(element).arg(builder);
 
-
-        for (Parameter variable : executableElement.getParameters()) {
+        for (Parameter variable : method.getParameters()) {
             if (variable.asType().toString().startsWith(SourceCallback.class.getName())) {
                 continue;
             }
@@ -287,7 +285,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
             if (variable.isNestedProcessor()) {
                 boolean isList = variable.isArrayOrList();
-                if (executableElement.hasOnlyOneChildElement()) {
+                if (method.hasOnlyOneChildElement()) {
                     generateParseNestedProcessor(parse.body(), element, parserContext, builder, fieldName, true, isList, true, ref(MessageProcessorChainFactoryBean.class));
                 } else {
                     generateParseNestedProcessor(parse.body(), element, parserContext, builder, fieldName, false, isList, true, ref(MessageProcessorChainFactoryBean.class));
@@ -323,7 +321,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             }
         }
 
-        Method connectMethod = connectForMethod(executableElement);
+        Method connectMethod = connectForMethod(method);
         if (connectMethod != null) {
             generateParseProperty(parse.body(), element, builder, "retryMax");
 

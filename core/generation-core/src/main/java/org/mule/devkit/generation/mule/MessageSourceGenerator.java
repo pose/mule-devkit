@@ -21,8 +21,6 @@ import org.apache.commons.lang.StringUtils;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.annotations.Connector;
-import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.SourceThreadingModel;
 import org.mule.api.callback.SourceCallback;
@@ -41,7 +39,21 @@ import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Parameter;
 import org.mule.devkit.model.SourceMethod;
 import org.mule.devkit.model.Type;
-import org.mule.devkit.model.code.*;
+import org.mule.devkit.model.code.Block;
+import org.mule.devkit.model.code.Cast;
+import org.mule.devkit.model.code.CatchBlock;
+import org.mule.devkit.model.code.Conditional;
+import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.DefinedClassRoles;
+import org.mule.devkit.model.code.Expression;
+import org.mule.devkit.model.code.ExpressionFactory;
+import org.mule.devkit.model.code.FieldVariable;
+import org.mule.devkit.model.code.Invocation;
+import org.mule.devkit.model.code.Modifier;
+import org.mule.devkit.model.code.Op;
+import org.mule.devkit.model.code.TryStatement;
+import org.mule.devkit.model.code.TypeReference;
+import org.mule.devkit.model.code.Variable;
 import org.mule.devkit.model.schema.SchemaTypeConversion;
 
 import java.util.ArrayList;
@@ -112,7 +124,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         }
 
         // add initialise
-        generateInitialiseMethod(messageSourceClass, fields, type, muleContext, null, null, object, null, !type.needsConfig());
+        generateInitialiseMethod(messageSourceClass, fields, type, muleContext, object, null, !type.needsConfig());
 
         // add setmulecontext
         generateSetMuleContextMethod(messageSourceClass, muleContext);

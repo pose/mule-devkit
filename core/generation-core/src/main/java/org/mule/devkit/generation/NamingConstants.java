@@ -48,6 +48,7 @@ public class NamingConstants {
     public static final String DEFINITION_PARSER_CLASS_NAME_SUFFIX = "DefinitionParser";
     public static final String CONFIG_DEFINITION_PARSER_CLASS_NAME_SUFFIX = "ConfigDefinitionParser";
     public static final String ABSTRACT_DEFINITION_PARSER_CLASS_NAME_SUFFIX = "AbstractDefinitionParser";
+    public static final String ABSTRACT_EXPRESSION_EVALUATOR_CLASS_NAME_SUFFIX = "AbstractExpressionEvaluator";
     public static final String NESTED_PROCESSOR_CHAIN_CLASS_NAME = "NestedProcessorChain";
     public static final String NESTED_PROCESSOR_STRING_CLASS_NAME = "NestedProcessorString";
     public static final String AUTHORIZE_DEFINITION_PARSER_CLASS_NAME = "AuthorizeDefinitionParser";
