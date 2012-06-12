@@ -104,11 +104,11 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
         }
     }
 
-    private void registerBeanDefinitionParserForProcessor(org.mule.devkit.model.code.Method init, Method executableElement) {
-        DefinedClass beanDefinitionParser = getBeanDefinitionParserClass(executableElement);
+    private void registerBeanDefinitionParserForProcessor(org.mule.devkit.model.code.Method init, Method processorMethod) {
+        DefinedClass beanDefinitionParser = ctx().getCodeModel()._class(DefinedClassRoles.BEAN_DEFINITION_PARSER, ref(processorMethod.parent()), processorMethod.getSimpleName().toString());
 
-        Processor processor = executableElement.getAnnotation(Processor.class);
-        String elementName = executableElement.getSimpleName().toString();
+        Processor processor = processorMethod.getAnnotation(Processor.class);
+        String elementName = processorMethod.getSimpleName().toString();
         if (processor.name().length() != 0) {
             elementName = processor.name();
         }
@@ -116,11 +116,11 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
         init.body().invoke("registerBeanDefinitionParser").arg(ExpressionFactory.lit(NameUtils.uncamel(elementName))).arg(ExpressionFactory._new(beanDefinitionParser));
     }
 
-    private void registerBeanDefinitionParserForSource(org.mule.devkit.model.code.Method init, Method executableElement) {
-        DefinedClass beanDefinitionParser = getBeanDefinitionParserClass(executableElement);
+    private void registerBeanDefinitionParserForSource(org.mule.devkit.model.code.Method init, Method sourceMethod) {
+        DefinedClass beanDefinitionParser = ctx().getCodeModel()._class(DefinedClassRoles.BEAN_DEFINITION_PARSER, ref(sourceMethod.parent()), sourceMethod.getSimpleName().toString());
 
-        Source source = executableElement.getAnnotation(Source.class);
-        String elementName = executableElement.getSimpleName().toString();
+        Source source = sourceMethod.getAnnotation(Source.class);
+        String elementName = sourceMethod.getSimpleName().toString();
         if (source.name().length() != 0) {
             elementName = source.name();
         }

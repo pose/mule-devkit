@@ -30,6 +30,7 @@ import org.mule.api.callback.SourceCallback;
 import org.mule.config.PoolingProfile;
 import org.mule.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.devkit.generation.AbstractMessageGenerator;
+import org.mule.devkit.generation.NamingConstants;
 import org.mule.devkit.generation.adapter.HttpCallbackAdapterGenerator;
 import org.mule.devkit.generation.utils.NameUtils;
 import org.mule.devkit.model.Field;
@@ -37,18 +38,7 @@ import org.mule.devkit.model.Identifiable;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Parameter;
 import org.mule.devkit.model.Type;
-import org.mule.devkit.model.code.Block;
-import org.mule.devkit.model.code.CatchBlock;
-import org.mule.devkit.model.code.Conditional;
-import org.mule.devkit.model.code.DefinedClass;
-import org.mule.devkit.model.code.DefinedClassRoles;
-import org.mule.devkit.model.code.ExpressionFactory;
-import org.mule.devkit.model.code.Invocation;
-import org.mule.devkit.model.code.Modifier;
-import org.mule.devkit.model.code.Op;
-import org.mule.devkit.model.code.TryStatement;
-import org.mule.devkit.model.code.TypeReference;
-import org.mule.devkit.model.code.Variable;
+import org.mule.devkit.model.code.*;
 import org.mule.devkit.model.schema.SchemaConstants;
 import org.mule.devkit.model.schema.SchemaTypeConversion;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -500,4 +490,24 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
         return anonymousClass;
     }
+
+    private DefinedClass getBeanDefinitionParserClass(Method executableElement) {
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(executableElement.parent().getPackageName() + NamingConstants.CONFIG_NAMESPACE);
+        DefinedClass abstractBeanDefinitionParser = ctx().getCodeModel()._class(DefinedClassRoles.ABSTRACT_BEAN_DEFINITION_PARSER);
+        DefinedClass clazz = pkg._class(executableElement.getCapitalizedName() + NamingConstants.DEFINITION_PARSER_CLASS_NAME_SUFFIX, abstractBeanDefinitionParser);
+        clazz.role(DefinedClassRoles.BEAN_DEFINITION_PARSER, ref(executableElement.parent()), executableElement.getSimpleName().toString());
+
+        return clazz;
+    }
+
+    private DefinedClass getConfigBeanDefinitionParserClass(Type type) {
+        DefinedClass abstractBeanDefinitionParser = ctx().getCodeModel()._class(DefinedClassRoles.ABSTRACT_BEAN_DEFINITION_PARSER);
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.CONFIG_NAMESPACE);
+        DefinedClass clazz = pkg._class(type.getClassName() + NamingConstants.CONFIG_DEFINITION_PARSER_CLASS_NAME_SUFFIX, abstractBeanDefinitionParser);
+        clazz.role(DefinedClassRoles.CONFIG_BEAN_DEFINITION_PARSER, ref(type));
+
+        return clazz;
+    }
+
+
 }

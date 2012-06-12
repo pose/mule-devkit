@@ -124,24 +124,6 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         return messageProcessor;
     }
 
-    protected DefinedClass getBeanDefinitionParserClass(Method executableElement) {
-        Package pkg = ctx().getCodeModel()._package(executableElement.parent().getPackageName() + NamingConstants.CONFIG_NAMESPACE);
-        DefinedClass abstractBeanDefinitionParser = ctx().getCodeModel()._class(DefinedClassRoles.ABSTRACT_BEAN_DEFINITION_PARSER);
-        DefinedClass clazz = pkg._class(executableElement.getCapitalizedName() + NamingConstants.DEFINITION_PARSER_CLASS_NAME_SUFFIX, abstractBeanDefinitionParser);
-
-        return clazz;
-    }
-
-    protected DefinedClass getConfigBeanDefinitionParserClass(Type type) {
-        DefinedClass abstractBeanDefinitionParser = ctx().getCodeModel()._class(DefinedClassRoles.ABSTRACT_BEAN_DEFINITION_PARSER);
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(type.getPackageName() + NamingConstants.CONFIG_NAMESPACE);
-        DefinedClass clazz = pkg._class(type.getClassName() + NamingConstants.CONFIG_DEFINITION_PARSER_CLASS_NAME_SUFFIX, abstractBeanDefinitionParser);
-
-        clazz.role(DefinedClassRoles.CONFIG_BEAN_DEFINITION_PARSER, ref(type));
-
-        return clazz;
-    }
-
     protected Map<String, FieldVariableElement> generateProcessorFieldForEachParameter(DefinedClass messageProcessorClass, Method processorMethod) {
         return generateProcessorFieldForEachParameter(messageProcessorClass, processorMethod, null);
     }
