@@ -73,11 +73,11 @@ public class CorePlugin implements Plugin {
         generators.add(new DefaultRestoreAccessTokenCallbackFactoryGenerator());
         generators.add(new DefaultSaveAccessTokenCallbackFactoryGenerator());
         generators.add(new AbstractBeanDefinitionParserGenerator());
-        generators.add(new BeanDefinitionParserGenerator());
         generators.add(new MessageSourceGenerator());
         generators.add(new MessageProcessorGenerator());
         generators.add(new AuthorizeMessageProcessorGenerator());
         generators.add(new AuthorizeBeanDefinitionParserGenerator());
+        generators.add(new BeanDefinitionParserGenerator());
         generators.add(new NamespaceHandlerGenerator());
         generators.add(new ExpressionEvaluatorGenerator());
         generators.add(new ExpressionEnricherGenerator());

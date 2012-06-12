@@ -34,6 +34,12 @@ public interface Type extends Identifiable<TypeElement, Type> {
 
     List<Method> getMethodsAnnotatedWith(Class<? extends Annotation> annotation);
 
+    /**
+     * Get a list of all methods annotated with @Source
+     *
+     * @return A list of all methods annotated with @Source
+     * @see {@link SourceMethod}
+     */
     List<SourceMethod> getSourceMethods();
 
     List<Method> getMethodsWhoseParametersAreAnnotatedWith(Class<? extends Annotation> annotation);
@@ -44,6 +50,11 @@ public interface Type extends Identifiable<TypeElement, Type> {
 
     List<Field> getFields();
 
+    /**
+     * Get all methods defined in this class
+     *
+     * @return A list containing all the methods defined in this class
+     */
     List<Method> getMethods();
 
     boolean isParametrized();

@@ -435,7 +435,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         }
 
         DefinedClass clazz = pkg._class(sourceMethod.getCapitalizedName() + NamingConstants.MESSAGE_SOURCE_CLASS_NAME_SUFFIX, inherits.toArray( new Class<?>[] {} ));
-        clazz.role(DefinedClassRoles.MESSAGE_SOURCE, sourceMethod);
+        clazz.role(DefinedClassRoles.MESSAGE_SOURCE, ref(sourceMethod.parent()), sourceMethod.getSimpleName().toString());
 
         return clazz;
     }

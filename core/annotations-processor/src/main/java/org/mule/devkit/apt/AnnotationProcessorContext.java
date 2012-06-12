@@ -44,7 +44,6 @@ public class AnnotationProcessorContext implements Context {
     private StudioModel studioModel;
     private List<DefinedClass> registerAtBoot;
     private Types types;
-    private Elements elements;
     private Set<TypeMirror> registeredEnums;
     private Set<TypeMirror> registeredJaxbElements;
 
@@ -52,7 +51,6 @@ public class AnnotationProcessorContext implements Context {
         registerAtBoot = new ArrayList<DefinedClass>();
         codeModel = new CodeModel(new FilerCodeWriter(env.getFiler()));
         schemaModel = new SchemaModel(new FilerCodeWriter(env.getFiler()));
-        elements = env.getElementUtils();
         types = env.getTypeUtils();
         studioModel = new StudioModel(new FilerCodeWriter(env.getFiler()));
         registeredEnums = new HashSet<TypeMirror>();

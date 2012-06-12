@@ -109,10 +109,10 @@ public final class CodeModel {
     /**
      * Created classes by its role
      */
-    private Map<Pair<DefinedClassRoles, Object>, DefinedClass> classesByRole = new HashMap<Pair<DefinedClassRoles, Object>, DefinedClass>();
+    private Map<Tuple<DefinedClassRoles, Type, String>, DefinedClass> classesByRole = new HashMap<Tuple<DefinedClassRoles, Type, String>, DefinedClass>();
 
     private CodeWriter codeWriter;
-    
+
     private OutputStream registryBootstrapStream;
 
     /**
@@ -189,7 +189,7 @@ public final class CodeModel {
      * @return A previously generated class
      */
     public DefinedClass _class(DefinedClassRoles role) {
-        return classesByRole.get(new Pair<DefinedClassRoles, Type>(role, null));
+        return classesByRole.get(new Tuple<DefinedClassRoles, Type, String>(role, null, null));
     }
 
     /**
@@ -198,8 +198,20 @@ public final class CodeModel {
      * @param role Role to be fulfilled
      * @return A previously generated class
      */
-    public DefinedClass _class(DefinedClassRoles role, Object object) {
-        return classesByRole.get(new Pair<DefinedClassRoles, Object>(role, object));
+    public DefinedClass _class(DefinedClassRoles role, Type type) {
+        return classesByRole.get(new Tuple<DefinedClassRoles, Type, String>(role, type, null));
+    }
+
+    /**
+     * Retrieve a previously generated class that fulfills the specified role
+     *
+     * @param role       Role to be fulfilled
+     * @param type       Type for which this role is fulfilled
+     * @param methodName Method for which this role is fulfilled
+     * @return A previously generated class
+     */
+    public DefinedClass _class(DefinedClassRoles role, Type type, String methodName) {
+        return classesByRole.get(new Tuple<DefinedClassRoles, Type, String>(role, type, methodName));
     }
 
 
@@ -598,7 +610,7 @@ public final class CodeModel {
     }
 
     public OutputStream getRegistryBootstrapStream() throws IOException {
-        if( registryBootstrapStream == null ) {
+        if (registryBootstrapStream == null) {
             registryBootstrapStream = getCodeWriter().openBinary(null, "META-INF/services/org/mule/config/registry-bootstrap.properties");
         }
         return registryBootstrapStream;
@@ -738,21 +750,27 @@ public final class CodeModel {
     }
 
     /**
-     *
      * @param role
      * @param clazz
      */
     protected void setDefinedClassRole(DefinedClassRoles role, DefinedClass clazz) {
-        this.classesByRole.put(new Pair<DefinedClassRoles, Object>(role, null), clazz);
+        this.classesByRole.put(new Tuple<DefinedClassRoles, Type, String>(role, null, null), clazz);
     }
 
     /**
-     *
      * @param role
      * @param clazz
      */
-    protected void setDefinedClassRole(DefinedClassRoles role, Object object, DefinedClass clazz) {
-        this.classesByRole.put(new Pair<DefinedClassRoles, Object>(role, object), clazz);
+    protected void setDefinedClassRole(DefinedClassRoles role, Type type, DefinedClass clazz) {
+        this.classesByRole.put(new Tuple<DefinedClassRoles, Type, String>(role, type, null), clazz);
+    }
+
+    /**
+     * @param role
+     * @param clazz
+     */
+    protected void setDefinedClassRole(DefinedClassRoles role, Type type, String methodName, DefinedClass clazz) {
+        this.classesByRole.put(new Tuple<DefinedClassRoles, Type, String>(role, type, methodName), clazz);
     }
 
     /**
@@ -788,46 +806,38 @@ public final class CodeModel {
 
     }
 
-    private class Pair<T, U>
-    {
+    private class Tuple<T, U, X> {
         private final T first;
         private final U second;
+        private final X third;
         private transient final int hash;
-        public Pair( T f, U s )
-        {
+
+        public Tuple(T f, U s, X x) {
             this.first = f;
             this.second = s;
-            hash = (first == null? 0 : first.hashCode() * 31)
-                    +(second == null? 0 : second.hashCode());
+            this.third = x;
+            hash = (first == null ? 0 : first.hashCode() * 31)
+                    + (second == null ? 0 : second.hashCode() * 17)
+                    + (third == null ? 0 : third.hashCode());
         }
-        public T getFirst()
-        {
-            return first;
-        }
-        public U getSecond()
-        {
-            return second;
-        }
+
         @Override
-        public int hashCode()
-        {
+        public int hashCode() {
             return hash;
         }
 
         @Override
-        public boolean equals( Object oth )
-        {
-            if ( this == oth )
-            {
+        public boolean equals(Object oth) {
+            if (this == oth) {
                 return true;
             }
-            if ( oth == null || !(getClass().isInstance( oth )) )
-            {
+            if (oth == null || !(getClass().isInstance(oth))) {
                 return false;
             }
-            Pair<T, U> other = getClass().cast( oth );
-            return (first == null? other.first == null : first.equals( other.first ))
-                    && (second == null? other.second == null : second.equals( other.second ));
+            Tuple<T, U, X> other = getClass().cast(oth);
+            return (first == null ? other.first == null : first.equals(other.first))
+                    && (second == null ? other.second == null : second.equals(other.second))
+                    && (third == null ? other.third == null : third.equals(other.third));
         }
     }
 }
