@@ -238,19 +238,13 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         generateSourceParseMethod(beanDefinitionparser, messageSourceClass, sourceMethod);
     }
 
-    private void generateBeanDefinitionParserForProcessor(Method executableElement) {
-        DefinedClass beanDefinitionparser = getBeanDefinitionParserClass(executableElement);
-        DefinedClass messageProcessorClass;
-
-        if (executableElement.getAnnotation(Processor.class).intercepting()) {
-            messageProcessorClass = getInterceptingMessageProcessorClass(executableElement);
-        } else {
-            messageProcessorClass = getMessageProcessorClass(executableElement);
-        }
+    private void generateBeanDefinitionParserForProcessor(Method processorMethod) {
+        DefinedClass beanDefinitionparser = getBeanDefinitionParserClass(processorMethod);
+        DefinedClass messageProcessorClass = ctx().getCodeModel()._class(DefinedClassRoles.MESSAGE_PROCESSOR, ref(processorMethod.parent()), processorMethod.getSimpleName().toString());
 
         ctx().note("Generating bean definition parser as " + beanDefinitionparser.fullName() + " for message processor " + messageProcessorClass.fullName());
 
-        generateProcessorParseMethod(beanDefinitionparser, messageProcessorClass, executableElement);
+        generateProcessorParseMethod(beanDefinitionparser, messageProcessorClass, processorMethod);
     }
 
     private void generateProcessorParseMethod(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, Method executableElement) {

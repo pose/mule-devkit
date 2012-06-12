@@ -430,40 +430,6 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         return clazz;
     }
 
-    protected DefinedClass getMessageProcessorClass(Method executableElement) {
-        return getMessageProcessorClass(executableElement.getCapitalizedName() + NamingConstants.MESSAGE_PROCESSOR_CLASS_NAME_SUFFIX,
-                executableElement.parent().getPackageName() + NamingConstants.MESSAGE_PROCESSOR_NAMESPACE);
-    }
-
-    protected DefinedClass getMessageProcessorClass(String className, String packageName) {
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(packageName);
-        DefinedClass clazz = pkg._class(className, new Class[]{
-                Initialisable.class,
-                Startable.class,
-                Disposable.class,
-                Stoppable.class,
-                MessageProcessor.class,
-                MuleContextAware.class,
-                FlowConstructAware.class});
-
-        return clazz;
-    }
-
-    protected DefinedClass getInterceptingMessageProcessorClass(Method executableElement) {
-        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(executableElement.parent().getPackageName() + NamingConstants.MESSAGE_PROCESSOR_NAMESPACE);
-        DefinedClass clazz = pkg._class(executableElement.getCapitalizedName() + NamingConstants.MESSAGE_PROCESSOR_CLASS_NAME_SUFFIX, new Class[]{
-                Initialisable.class,
-                Startable.class,
-                Disposable.class,
-                Stoppable.class,
-                InterceptingMessageProcessor.class,
-                MuleContextAware.class,
-                FlowConstructAware.class,
-                SourceCallback.class});
-
-        return clazz;
-    }
-
     protected Map<String, FieldVariableElement> generateProcessorFieldForEachParameter(DefinedClass messageProcessorClass, Method processorMethod) {
         return generateProcessorFieldForEachParameter(messageProcessorClass, processorMethod, null);
     }

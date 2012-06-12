@@ -44,6 +44,13 @@ import org.mule.api.annotations.param.Payload;
 import org.mule.api.annotations.param.SessionHeaders;
 import org.mule.api.callback.HttpCallback;
 import org.mule.api.callback.SourceCallback;
+import org.mule.api.construct.FlowConstructAware;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
@@ -51,6 +58,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.devkit.generation.AbstractMessageGenerator;
+import org.mule.devkit.generation.NamingConstants;
 import org.mule.devkit.model.Method;
 import org.mule.devkit.model.Parameter;
 import org.mule.devkit.model.Type;
@@ -104,24 +112,24 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         }
     }
 
-    private void generateMessageProcessor(Type type, Method executableElement) {
+    private void generateMessageProcessor(Type type, Method processorMethod) {
         // get class
         DefinedClass messageProcessorClass;
 
-        boolean intercepting = executableElement.getAnnotation(Processor.class).intercepting();
+        boolean intercepting = processorMethod.getAnnotation(Processor.class).intercepting();
         if (intercepting) {
-            messageProcessorClass = getInterceptingMessageProcessorClass(executableElement);
+            messageProcessorClass = getInterceptingMessageProcessorClass(processorMethod);
         } else {
-            messageProcessorClass = getMessageProcessorClass(executableElement);
+            messageProcessorClass = getMessageProcessorClass(processorMethod);
         }
 
-        ctx().note("Generating message processor as " + messageProcessorClass.fullName() + " for method " + executableElement.getSimpleName().toString() + " in " + type.getSimpleName().toString());
+        ctx().note("Generating message processor as " + messageProcessorClass.fullName() + " for method " + processorMethod.getSimpleName().toString() + " in " + type.getSimpleName().toString());
 
         // add javadoc
-        generateMessageProcessorClassDoc(executableElement, messageProcessorClass);
+        generateMessageProcessorClassDoc(processorMethod, messageProcessorClass);
 
         // add a field for each argument of the method
-        Map<String, AbstractMessageGenerator.FieldVariableElement> fields = generateProcessorFieldForEachParameter(messageProcessorClass, executableElement);
+        Map<String, AbstractMessageGenerator.FieldVariableElement> fields = generateProcessorFieldForEachParameter(messageProcessorClass, processorMethod);
 
         // add fields for connectivity if required
         Method connectMethod = connectMethodForClass(type);
@@ -206,10 +214,10 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             DefinedClass poolObjectClass = ctx().getCodeModel()._class(DefinedClassRoles.POOL_OBJECT, ref(type));
 
             // add process method
-            generateProcessMethod(executableElement, messageProcessorClass, fields, connectFields, messageProcessorListener, muleContext, object, poolObjectClass, logger, retryCount, retryMax);
+            generateProcessMethod(processorMethod, messageProcessorClass, fields, connectFields, messageProcessorListener, muleContext, object, poolObjectClass, logger, retryCount, retryMax);
         } else {
             // add process method
-            generateProcessMethod(executableElement, messageProcessorClass, fields, connectFields, messageProcessorListener, muleContext, object, logger, retryCount, retryMax);
+            generateProcessMethod(processorMethod, messageProcessorClass, fields, connectFields, messageProcessorListener, muleContext, object, logger, retryCount, retryMax);
         }
     }
 
@@ -897,4 +905,38 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         applyTransformers.arg(transformerList);
         block.add(applyTransformers);
     }
+
+    private DefinedClass getMessageProcessorClass(Method processorMethod) {
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(processorMethod.parent().getPackageName() + NamingConstants.MESSAGE_PROCESSOR_NAMESPACE);
+        DefinedClass clazz = pkg._class(processorMethod.getCapitalizedName() + NamingConstants.MESSAGE_PROCESSOR_CLASS_NAME_SUFFIX, new Class[]{
+                Initialisable.class,
+                Startable.class,
+                Disposable.class,
+                Stoppable.class,
+                MessageProcessor.class,
+                MuleContextAware.class,
+                FlowConstructAware.class});
+
+        clazz.role(DefinedClassRoles.MESSAGE_PROCESSOR, ref(processorMethod.parent()), processorMethod.getSimpleName().toString());
+
+        return clazz;
+    }
+
+    private DefinedClass getInterceptingMessageProcessorClass(Method processorMethod) {
+        org.mule.devkit.model.code.Package pkg = ctx().getCodeModel()._package(processorMethod.parent().getPackageName() + NamingConstants.MESSAGE_PROCESSOR_NAMESPACE);
+        DefinedClass clazz = pkg._class(processorMethod.getCapitalizedName() + NamingConstants.MESSAGE_PROCESSOR_CLASS_NAME_SUFFIX, new Class[]{
+                Initialisable.class,
+                Startable.class,
+                Disposable.class,
+                Stoppable.class,
+                InterceptingMessageProcessor.class,
+                MuleContextAware.class,
+                FlowConstructAware.class,
+                SourceCallback.class});
+
+        clazz.role(DefinedClassRoles.MESSAGE_PROCESSOR, ref(processorMethod.parent()), processorMethod.getSimpleName().toString());
+
+        return clazz;
+    }
+
 }
