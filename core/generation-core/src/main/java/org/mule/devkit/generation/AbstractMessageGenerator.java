@@ -89,12 +89,6 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         return patternInfo;
     }
 
-    protected FieldVariable generateFieldForExpressionManager(DefinedClass messageProcessorClass) {
-        FieldVariable expressionManager = messageProcessorClass.field(Modifier.PRIVATE, ref(ExpressionManager.class), "expressionManager");
-        expressionManager.javadoc().add("Mule Expression Manager");
-        return expressionManager;
-    }
-
     protected FieldVariable generateFieldForMessageProcessor(DefinedClass messageProcessorClass, String name) {
         FieldVariable expressionManager = messageProcessorClass.field(Modifier.PRIVATE, ref(MessageProcessor.class), name);
         expressionManager.javadoc().add("Message Processor");
